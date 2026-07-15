@@ -1,0 +1,17 @@
+name: HeneriaBedWars
+version: '0.1.0-SNAPSHOT'
+main: fr.heneria.bedwars.plugin.HeneriaBedWarsPlugin
+description: Fondation modulaire du plugin BedWars Heneria.
+api-version: '1.21.11'
+authors: [Heneria]
+website: https://github.com/tomashb-yt/HeneriaBedwars
+commands:
+  bedwars:
+    description: Diagnostic administratif de HeneriaBedWars.
+    usage: /bedwars version
+    aliases: [hbw]
+    permission: heneriabedwars.admin
+permissions:
+  heneriabedwars.admin:
+    description: Autorise les diagnostics administratifs HeneriaBedWars.
+    default: op

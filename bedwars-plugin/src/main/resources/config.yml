@@ -1,0 +1,9 @@
+plugin:
+  language: fr_FR
+  debug: false
+
+server:
+  shutdown-on-critical-startup-error: true
+
+storage:
+  type: sqlite
