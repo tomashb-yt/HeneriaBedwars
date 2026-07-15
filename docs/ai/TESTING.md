@@ -2,7 +2,9 @@
 
 ## Ticket 002
 
-La suite contient 39 tests JUnit 5 : 31 dans le cœur et 8 dans le module plugin. Elle couvre installation non destructive, YAML valide/invalide, versions, défauts, ports, délais, tailles/slots de menus, matériaux, locale absente/inconnue, parité FR/EN, clé manquante, placeholders sûrs, couleurs classiques/hex, permissions/completion, snapshots transactionnels, rapports d'erreurs, absence de remplacement partiel et sauvegardes anti-collision.
+La suite contient 42 tests JUnit 5 : 31 dans le cœur et 11 dans le module plugin. Elle couvre installation non destructive, YAML valide/invalide, versions, défauts, ports, délais, tailles/slots de menus, matériaux, locale absente/inconnue, parité FR/EN, clé manquante, placeholders sûrs, couleurs classiques/hex, permissions/completion, snapshots transactionnels, rapports d'erreurs, absence de remplacement partiel et sauvegardes anti-collision.
+
+Les tests de migration couvrent l'ancien `config.yml` sans version, la sauvegarde préalable, l'ajout de la version et des défauts, la conservation de la langue, du debug et des clés inconnues, un second démarrage sans nouvelle migration, le refus d'un fichier non reconnaissable, un YAML corrompu et une panne d'écriture simulée avec original préservé.
 
 Les tests de logique n'exigent pas de serveur. Les scénarios `/plugins`, commandes, permissions, changement persistant de langue, YAML cassé puis redémarrage doivent encore être exécutés manuellement sur Spigot/Paper 1.21.x. Ne pas utiliser `/reload` de Bukkit comme validation principale.
 

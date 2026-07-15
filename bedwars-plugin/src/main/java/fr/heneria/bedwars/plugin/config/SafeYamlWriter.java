@@ -9,7 +9,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 /** Serializes writes and replaces YAML files atomically when the filesystem supports it. */
-public final class SafeYamlWriter {
+public final class SafeYamlWriter implements YamlWriter {
+  @Override
   public synchronized void write(Path target, String yaml) throws IOException {
     Objects.requireNonNull(target, "target");
     Files.createDirectories(target.toAbsolutePath().getParent());

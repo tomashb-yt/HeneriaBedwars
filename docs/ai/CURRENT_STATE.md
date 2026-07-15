@@ -16,9 +16,10 @@
 - commandes `version`, `reload`, `config`, `language` et `language set`, aussi via `/hbw`;
 - permissions et complétion filtrée;
 - sauvegarde et contrat de migration prêts, sans migration artificielle.
+- migration réelle et ciblée du `config.yml` officiel Ticket 001 non versionné vers la version 1, avec sauvegarde préalable et fusion non destructive des défauts.
 
 ## Non disponible
 
 Aucun menu fonctionnel, gameplay, arène, équipe, lit, générateur actif, achat, amélioration, lobby protégé, base de données ou PlaceholderAPI. Les fichiers correspondants sont préparatoires.
 
-Les 39 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 42 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

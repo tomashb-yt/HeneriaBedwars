@@ -3,6 +3,7 @@ package fr.heneria.bedwars.plugin.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import fr.heneria.bedwars.core.config.ConfigurationId;
@@ -139,6 +140,78 @@ class ConfigurationSystemTest {
     assertNotEquals(first, second);
   }
 
+  @Test
+  void migratesTicket001ConfigWithBackupDefaultsAndCustomKeysThenRestarts() throws Exception {
+    String legacy =
+        """
+        plugin:
+          language: en_US
+          debug: true
+        storage:
+          type: sqlite
+        custom-section:
+          keep-me: preserved
+        """;
+    Path config = temporary.resolve("config.yml");
+    Files.writeString(config, legacy);
+
+    ConfigurationService service = service();
+    service.initialize();
+
+    String migrated = Files.readString(config);
+    assertTrue(migrated.contains("config-version: 1"));
+    assertTrue(migrated.contains("check-updates: false"));
+    assertTrue(migrated.contains("main-command: bedwars"));
+    assertTrue(migrated.contains("keep-me: preserved"));
+    assertEquals("en_US", service.snapshot().plugin().locale());
+    assertTrue(service.snapshot().plugin().debug());
+    List<Path> backups = backupFiles();
+    assertEquals(1, backups.size());
+    assertEquals(legacy, Files.readString(backups.get(0)));
+
+    ConfigurationService restarted = service();
+    restarted.initialize();
+    assertEquals("en_US", restarted.snapshot().plugin().locale());
+    assertEquals(1, backupFiles().size());
+  }
+
+  @Test
+  void refusesUnsafeOrCorruptedUnversionedConfigWithoutChangingIt() throws Exception {
+    Path config = temporary.resolve("config.yml");
+    String unsafe = "custom-only: true\n";
+    Files.writeString(config, unsafe);
+    assertThrows(IOException.class, () -> service().initialize());
+    assertEquals(unsafe, Files.readString(config));
+    assertTrue(backupFiles().isEmpty());
+
+    String corrupted = "plugin: [broken\n";
+    Files.writeString(config, corrupted);
+    assertThrows(IOException.class, () -> service().initialize());
+    assertEquals(corrupted, Files.readString(config));
+    assertTrue(backupFiles().isEmpty());
+  }
+
+  @Test
+  void migrationWriteFailurePreservesOriginalAndCreatedBackup() throws Exception {
+    String legacy = "plugin:\n  language: fr_FR\n  debug: false\n";
+    Path config = temporary.resolve("config.yml");
+    Files.writeString(config, legacy);
+    TestLogger logger = new TestLogger();
+    LegacyConfigurationMigrator migrator =
+        new LegacyConfigurationMigrator(
+            ConfigurationSystemTest::resource,
+            new BackupService(temporary.resolve("backups"), Clock.systemUTC(), logger),
+            (target, yaml) -> {
+              throw new IOException("simulated write failure");
+            },
+            logger);
+
+    assertThrows(IOException.class, () -> migrator.migrateIfNeeded(config));
+    assertEquals(legacy, Files.readString(config));
+    assertEquals(1, backupFiles().size());
+    assertEquals(legacy, Files.readString(backupFiles().get(0)));
+  }
+
   private ConfigurationService service() {
     return new ConfigurationService(
         temporary, ConfigurationSystemTest::resource, new TestLogger(), Clock.systemUTC());
@@ -151,6 +224,18 @@ class ConfigurationSystemTest {
   private void replace(String file, String target, String replacement) throws IOException {
     Path path = temporary.resolve(file);
     Files.writeString(path, Files.readString(path).replace(target, replacement));
+  }
+
+  private List<Path> backupFiles() throws IOException {
+    Path root = temporary.resolve("backups");
+    if (!Files.exists(root)) return List.of();
+    try (var paths = Files.walk(root)) {
+      return paths
+          .filter(
+              path ->
+                  Files.isRegularFile(path) && path.getFileName().toString().equals("config.yml"))
+          .toList();
+    }
   }
 
   private static InputStream resource(String name) throws IOException {

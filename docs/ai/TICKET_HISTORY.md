@@ -1,5 +1,11 @@
 # Historique des tickets
 
+## Correctif Ticket 002 — Migration du `config.yml` Ticket 001
+
+Ajout le 2026-07-15 de `LegacyConfigurationMigrator`. L'ancien format officiel non versionné est identifié par une signature minimale, sauvegardé, complété avec les défauts Ticket 002 puis écrit atomiquement. Les valeurs existantes, clés inconnues et secrets sont préservés sans être journalisés. Les fichiers vides, corrompus ou non reconnaissables restent inchangés et bloquent toujours le démarrage.
+
+Trois tests d'intégration portent le total à 42 et couvrent migration/restart, refus sécurisé et panne d'écriture avec sauvegarde. Le correctif répond à l'échec réel observé lors du passage du JAR Ticket 001 au Ticket 002.
+
 ## Ticket 002 — Configuration, messages et traductions
 
 Terminé le 2026-07-15 côté code et validation automatisée. Ajout de neuf YAML principaux, `fr_FR`, `en_US`, création des dossiers runtime, configuration typée, validation, registre, snapshots transactionnels, écritures atomiques, sauvegardes et contrat de migration. Les commandes `reload`, `config`, `language` et `language set` utilisent les traductions, permissions spécialisées et la tab-complétion.

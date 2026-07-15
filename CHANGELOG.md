@@ -22,3 +22,4 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Enregistrement et comportement de `/bedwars` et de l'alias `/hbw` sur l'API Bukkit classique.
 - Compatibilité de la fondation avec Spigot 1.21 et Paper 1.21.x sans appel `getPluginMeta()`.
 - Aide principale, permission, console, tab-complétion et encodage des messages de diagnostic.
+- Migration au démarrage du `config.yml` officiel Ticket 001 sans version, avec sauvegarde, fusion des nouveaux défauts et préservation des clés personnalisées.

@@ -111,4 +111,18 @@ Le format recommandé est le sous-ensemble MiniMessage : couleurs nommées, `<bo
 
 ## Versions, migrations et sauvegardes
 
-La version courante est 1. `ConfigurationMigration` définit les futures migrations séquentielles; aucune fausse migration 1 vers 1 n'est exécutée. Avant une migration ou un remplacement explicitement forcé, `BackupService` crée `backups/yyyy-MM-dd_HH-mm-ss/<fichier>` avec suffixe anti-collision. Les sauvegardes ne sont jamais créées à chaque lecture.
+La version courante est 1. `ConfigurationMigration` définit les migrations séquentielles. Avant une migration ou un remplacement explicitement forcé, `BackupService` crée `backups/yyyy-MM-dd_HH-mm-ss/<fichier>` avec suffixe anti-collision. Les sauvegardes ne sont jamais créées à chaque lecture.
+
+### Compatibilité Ticket 001
+
+Le seul fichier historique officiellement migré est `config.yml`, car le Ticket 001 ne créait pas les autres YAML. Un fichier sans `config-version` est reconnu uniquement s'il est un YAML lisible avec une chaîne `plugin.language` non vide et un booléen `plugin.debug`. Cette signature étroite évite de traiter arbitrairement un fichier personnalisé comme officiel.
+
+Une fois reconnu, le plugin :
+
+1. charge le nouveau `config.yml` embarqué;
+2. ajoute uniquement les clés par défaut absentes en conservant valeurs et clés inconnues;
+3. crée une sauvegarde de l'original;
+4. écrit le résultat via un fichier temporaire et un remplacement atomique si disponible;
+5. charge normalement le snapshot version 1.
+
+L'ancien `storage.type` éventuellement présent dans ce fichier est conservé, même si le réglage actif se trouve désormais dans `storage.yml`. La réécriture YAML ne peut pas garantir la conservation des commentaires. Si la sauvegarde ou l'écriture échoue, l'original n'est pas remplacé. Un fichier vide, corrompu, ou sans la signature Ticket 001 est refusé et laissé intact. Une configuration déjà versionnée n'est jamais remigrée.

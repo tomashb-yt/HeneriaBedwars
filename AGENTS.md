@@ -35,6 +35,8 @@ Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est 
 
 Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config` et `language`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge uniquement les fichiers HeneriaBedWars.
 
+Au démarrage, l'ancien `config.yml` officiel du Ticket 001 sans `config-version` est reconnu par sa signature minimale, sauvegardé puis migré vers la version 1. Ne jamais élargir cette détection à n'importe quel YAML non versionné : un fichier vide, corrompu ou non reconnaissable doit rester intact et être refusé.
+
 ## Règles architecturales
 
 - `bedwars-api` ne dépend ni de Paper, ni de `bedwars-core`, ni de `bedwars-plugin`.

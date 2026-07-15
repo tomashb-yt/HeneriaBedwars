@@ -224,3 +224,17 @@ Accepté.
 
 ### Conséquences
 Les mots de passe ne sont jamais inclus dans les rapports ni dans les logs debug.
+
+## ADR-016 — Migration étroite du format Ticket 001 non versionné
+
+### Statut
+Accepté.
+
+### Contexte
+Le Ticket 001 créait un `config.yml` officiel sans `config-version`, ce qui empêchait le Ticket 002 de démarrer lors d'une mise à jour normale.
+
+### Décision
+Considérer ce fichier comme version source 0 seulement s'il est lisible et contient la signature `plugin.language` chaîne non vide plus `plugin.debug` booléen. Sauvegarder, fusionner uniquement les défauts absents, puis écrire de façon sûre en version 1.
+
+### Conséquences
+Les installations Ticket 001 sont mises à niveau sans suppression de données. Un YAML vide, corrompu ou non reconnaissable n'est jamais « réparé » automatiquement. Les commentaires peuvent être reformattés par `YamlConfiguration`, limitation explicitement documentée.

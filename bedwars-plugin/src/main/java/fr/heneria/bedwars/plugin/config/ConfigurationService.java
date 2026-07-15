@@ -33,6 +33,7 @@ public final class ConfigurationService {
   private final DefaultConfigurationInstaller installer;
   private final ConfigurationLoader loader = new ConfigurationLoader();
   private final ConfigurationSnapshotFactory snapshotFactory;
+  private final LegacyConfigurationMigrator legacyMigrator;
   private final ConfigurationRegistry registry = new ConfigurationRegistry();
   private final SafeYamlWriter writer = new SafeYamlWriter();
   private final ProjectLogger logger;
@@ -51,6 +52,12 @@ public final class ConfigurationService {
     this.logger = Objects.requireNonNull(logger, "logger");
     this.installer = new DefaultConfigurationInstaller(dataDirectory, resources, logger);
     this.snapshotFactory = new ConfigurationSnapshotFactory(clock);
+    this.legacyMigrator =
+        new LegacyConfigurationMigrator(
+            resources,
+            new BackupService(dataDirectory.resolve("backups"), clock, logger),
+            writer,
+            logger);
     for (ConfigurationId id : ConfigurationId.values()) {
       registry.register(id);
     }
@@ -59,6 +66,7 @@ public final class ConfigurationService {
   /** Installs missing defaults and requires the first candidate to be fully valid. */
   public void initialize() throws IOException {
     installer.installMissing();
+    legacyMigrator.migrateIfNeeded(dataDirectory.resolve("config.yml"));
     ConfigurationReloadResult result = reloadAll();
     if (!result.successful())
       throw new IOException("Initial configuration is invalid; see preceding diagnostics");

@@ -8,6 +8,7 @@
 - Les clés de commandes dans `config.yml` sont documentaires : commande et alias réels restent dans `plugin.yml` et demandent un redémarrage.
 - Les réglages gameplay, lobby, menus, boutiques, upgrades, générateurs et stockage sont préparatoires.
 - Aucun test en jeu n'a été exécuté dans l'environnement Codex actuel.
+- La migration automatique concerne uniquement le `config.yml` reconnaissable du Ticket 001; les autres fichiers non versionnés restent volontairement refusés.
 
 - Aucun gameplay, arène, équipe, lit, générateur, boutique ou menu.
 - Aucun stockage fonctionnel malgré la valeur d'amorçage `sqlite`.
