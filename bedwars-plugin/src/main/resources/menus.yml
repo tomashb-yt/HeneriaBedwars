@@ -5,7 +5,26 @@ global:
   fill-empty-slots: true
   close-on-critical-error: true
   play-click-sounds: true
+navigation:
+  history-enabled: true
+  max-history-size: 20
+interaction:
+  default-click-cooldown-ms: 150
+  cancel-player-inventory-clicks: true
+  cancel-drag-events: true
+refresh:
+  enabled: true
+  minimum-interval-ticks: 10
 pagination:
   previous-slot: 45
   next-slot: 53
   back-slot: 49
+  page-indicator-slot: 50
+sounds:
+  enabled: true
+  open: {sound: UI_BUTTON_CLICK, volume: 0.5, pitch: 1.2}
+  click: {sound: UI_BUTTON_CLICK, volume: 0.4, pitch: 1.0}
+  success: {sound: ENTITY_PLAYER_LEVELUP, volume: 0.7, pitch: 1.2}
+  error: {sound: ENTITY_VILLAGER_NO, volume: 1.0, pitch: 1.0}
+  back: {sound: UI_BUTTON_CLICK, volume: 0.5, pitch: 0.8}
+  close: {sound: UI_BUTTON_CLICK, volume: 0.4, pitch: 0.8}

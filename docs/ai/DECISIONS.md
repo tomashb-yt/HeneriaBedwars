@@ -1,5 +1,25 @@
 # Décisions d'architecture
 
+## ADR-017 — Identification GUI par holder et identifiants de vue
+
+Accepté. Chaque inventaire utilise `GuiInventoryHolder(sessionId, viewId, menuId)`, jamais le titre. `viewId` est renouvelé à chaque navigation, empêchant une fermeture retardée de supprimer la vue suivante.
+
+## ADR-018 — Une session GUI active par joueur
+
+Accepté. `GuiSession` est indexée par UUID joueur sans référence forte au joueur dans le cœur. Remplacement et nettoyage restent déterministes.
+
+## ADR-019 — Framework GUI interne avant API publique
+
+Accepté. Les modèles restent internes jusqu'à plusieurs usages métier réels; `bedwars-api` reste inchangé et aucune surface instable n'est figée.
+
+## ADR-020 — Inventaires exclusivement sur le thread serveur
+
+Accepté. Toute ouverture hors thread est replanifiée et les auto-refresh utilisent une tâche Bukkit centrale, jamais une tâche par bouton ou vue.
+
+## ADR-021 — Navigation par historique limité
+
+Accepté. Une deque bornée conserve des définitions `Gui` immuables; le remplacement sans historique est explicite. Retour et racine sont prédictibles, la mémoire bornée par `menus.yml`.
+
 ## ADR-001 — Utilisation de Java 21
 
 ### Statut

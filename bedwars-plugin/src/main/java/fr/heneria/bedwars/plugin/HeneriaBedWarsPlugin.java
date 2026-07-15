@@ -5,6 +5,7 @@ import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
 import fr.heneria.bedwars.plugin.logging.BukkitProjectLogger;
 import java.time.Clock;
 import java.util.logging.Level;
@@ -15,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private PluginBootstrap bootstrap;
   private ConfigurationService configurations;
+  private BukkitGuiService guiService;
 
   @Override
   public void onEnable() {
@@ -28,8 +30,10 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               Clock.systemDefaultZone());
       configurations.initialize();
       projectLogger.setDebug(configurations.snapshot().plugin().debug());
+      guiService = new BukkitGuiService(this, configurations, projectLogger);
       bootstrap =
-          new BedWarsBootstrap(getDescription().getVersion(), configurations, projectLogger);
+          new BedWarsBootstrap(
+              getDescription().getVersion(), configurations, guiService, projectLogger);
       bootstrap.start();
       registerDiagnosticCommand();
       getLogger().info("HeneriaBedWars " + getDescription().getVersion() + " enabled.");
@@ -58,7 +62,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
     if (command == null) {
       throw new IllegalStateException("The 'bedwars' command is not declared in plugin.yml");
     }
-    BedWarsCommand executor = new BedWarsCommand(this, bootstrap, configurations);
+    BedWarsCommand executor = new BedWarsCommand(this, bootstrap, configurations, guiService);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }

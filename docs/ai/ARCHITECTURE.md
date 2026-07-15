@@ -1,5 +1,18 @@
 # Architecture actuelle
 
+## Ticket 003 — framework GUI
+
+Le cœur contient le modèle GUI pur, les sessions, la navigation, la pagination, les confirmations, les slots et l'exécuteur d'actions. Le module plugin contient `BukkitGuiService`, `GuiInventoryHolder`, `GuiListener`, le rendu d'items, les sons et la démonstration. `GuiService` est enregistré dans `ServiceRegistry` et `BukkitGuiService` participe au cycle de vie.
+
+```mermaid
+flowchart LR
+  COMMAND["/bedwars gui"] --> SERVICE["BukkitGuiService"]
+  SERVICE --> SESSION["GuiSessionManager"]
+  SERVICE --> MODEL["Gui / GuiButton"]
+  LISTENER["GuiListener"] --> SERVICE
+  SERVICE --> HOLDER["GuiInventoryHolder sessionId + viewId"]
+```
+
 ## Ticket 002 — configuration et localisation
 
 `bedwars-core` contient les documents immuables, records de réglages, problèmes typés, registre, snapshot, clés de traduction, placeholders et rendu de messages sans Bukkit. `bedwars-plugin` contient l'installation des ressources, `YamlConfiguration`, la validation des matériaux, les écritures sûres, sauvegardes et le `ConfigurationService`.

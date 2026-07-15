@@ -8,6 +8,8 @@ import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.gui.DemoMenuFactory;
+import fr.heneria.bedwars.plugin.gui.GuiService;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,17 +29,26 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   public static final String RELOAD = AdministrativeCommandPolicy.RELOAD;
   public static final String CONFIG = AdministrativeCommandPolicy.CONFIG;
   public static final String LANGUAGE = AdministrativeCommandPolicy.LANGUAGE;
+  public static final String GUI = AdministrativeCommandPolicy.GUI;
   private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
   private final JavaPlugin plugin;
   private final PluginBootstrap bootstrap;
   private final ConfigurationService configurations;
   private final AdministrativeCommandPolicy completionPolicy = new AdministrativeCommandPolicy();
+  private final GuiService guiService;
+  private final DemoMenuFactory demoMenus;
 
   public BedWarsCommand(
-      JavaPlugin plugin, PluginBootstrap bootstrap, ConfigurationService configurations) {
+      JavaPlugin plugin,
+      PluginBootstrap bootstrap,
+      ConfigurationService configurations,
+      GuiService guiService) {
     this.plugin = plugin;
     this.bootstrap = bootstrap;
     this.configurations = configurations;
+    this.guiService = guiService;
+    this.demoMenus =
+        new DemoMenuFactory(configurations, guiService, plugin.getDescription().getVersion());
   }
 
   @Override
@@ -52,6 +64,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "reload" -> reload(sender);
         case "config" -> config(sender);
         case "language" -> language(sender, args);
+        case "gui" -> gui(sender);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
     } catch (RuntimeException exception) {
@@ -68,6 +81,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (sender.hasPermission(RELOAD)) send(sender, TranslationKey.HELP_RELOAD);
     if (sender.hasPermission(CONFIG)) send(sender, TranslationKey.HELP_CONFIG);
     if (sender.hasPermission(LANGUAGE)) send(sender, TranslationKey.HELP_LANGUAGE);
+    if (sender.hasPermission(GUI)) send(sender, TranslationKey.HELP_GUI);
     return true;
   }
 
@@ -128,6 +142,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
             .put("storage", snapshot.storage().type())
             .put("last_reload", DATE.format(snapshot.loadedAt().atZone(ZoneId.systemDefault())))
             .put("warnings", snapshot.warningCount())
+            .put("gui_sessions", guiService.openCount())
             .build();
     send(sender, TranslationKey.CONFIG_HEADER);
     send(sender, TranslationKey.CONFIG_LANGUAGE, context);
@@ -137,6 +152,14 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     send(sender, TranslationKey.CONFIG_STORAGE, context);
     send(sender, TranslationKey.CONFIG_LAST_RELOAD, context);
     send(sender, TranslationKey.CONFIG_WARNINGS, context);
+    send(sender, TranslationKey.CONFIG_GUI_SESSIONS, context);
+    return true;
+  }
+
+  private boolean gui(CommandSender sender) {
+    if (!allowed(sender, GUI)) return true;
+    if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
+    guiService.open(player, demoMenus.main());
     return true;
   }
 

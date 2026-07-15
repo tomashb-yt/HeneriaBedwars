@@ -3,6 +3,7 @@ config-version: 1
 general:
   prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
   no-permission: "<red>Vous n'avez pas la permission d'utiliser cette commande."
+  player-only: "<red>Cette commande est réservée aux joueurs."
   unknown-command: "<red>Commande inconnue."
   internal-error: "<red>Une erreur interne est survenue."
 command:
@@ -12,6 +13,7 @@ command:
     reload: "<gray>/bedwars reload <dark_gray>- <white>Recharge les configurations."
     config: "<gray>/bedwars config <dark_gray>- <white>Affiche la configuration active."
     language: "<gray>/bedwars language [set <locale>] <dark_gray>- <white>Gère la langue globale."
+    gui: "<gray>/bedwars gui <dark_gray>- <white>Ouvre le menu de test des interfaces."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Version du plugin : <white>{plugin_version}"
@@ -36,9 +38,59 @@ command:
     storage: "<gray>Stockage configuré : <white>{storage}"
     last-reload: "<gray>Dernier rechargement réussi : <white>{last_reload}"
     warnings: "<gray>Avertissements actifs : <white>{warnings}"
+    gui-sessions: "<gray>Sessions GUI actives : <white>{gui_sessions}"
   language:
     current: "<gray>Langue actuelle : <white>{language}"
     available: "<gray>Langues disponibles : <white>{locales}"
     usage: "<yellow>Utilisation : /bedwars language set <locale>"
     changed: "<green>La langue globale est maintenant <white>{language}<green>."
     unknown: "<red>Langue inconnue : <white>{language}"
+gui:
+  general:
+    back: "<yellow>Retour"
+    close: "<red>Fermer"
+    previous-page: "<yellow>Page précédente"
+    next-page: "<yellow>Page suivante"
+    refresh: "<aqua>Actualiser"
+    confirm: "<green>Confirmer"
+    cancel: "<red>Annuler"
+    no-permission: "<red>Vous n'avez pas accès à cette action."
+    disabled: "<red>Cette action est actuellement désactivée."
+    internal-error: "<red>Une erreur est survenue pendant l'utilisation du menu."
+  demo:
+    title: "<aqua><bold>HeneriaBedWars <gray>— GUI Test"
+    submenu-title: "<light_purple>Sous-menu de démonstration"
+    pagination-title: "<green>Pagination de démonstration"
+    confirm-title: "<gold>Confirmer l'action de démonstration ?"
+    information:
+      name: "<aqua>Informations"
+      player: "<gray>Joueur : <white>{player}"
+      version: "<gray>Version : <white>{plugin_version}"
+      language: "<gray>Langue : <white>{language}"
+      sessions: "<gray>Sessions GUI : <white>{sessions}"
+      refresh-count: "<gray>Rafraîchissements : <white>{refresh_count}"
+    click-test:
+      name: "<yellow>Test des clics"
+      left: "<green>Clic gauche détecté."
+      right: "<green>Clic droit détecté."
+      shift-left: "<green>Shift + clic gauche détecté."
+      shift-right: "<green>Shift + clic droit détecté."
+      middle: "<green>Clic du milieu détecté."
+    pagination:
+      name: "<green>Tester la pagination"
+      element: "<aqua>Élément de test {element}"
+      page: "<gray>Page <white>{page}<gray>/<white>{max_page}"
+    confirmation:
+      name: "<gold>Tester la confirmation"
+      confirmed: "<green>Action de démonstration confirmée."
+      cancelled: "<yellow>Action de démonstration annulée."
+    submenu:
+      name: "<light_purple>Ouvrir un sous-menu"
+      info: "<gray>Ce sous-menu démontre la navigation."
+    refresh:
+      name: "<aqua>Actualiser le menu"
+    controlled-error:
+      name: "<red>Erreur contrôlée"
+      lore: "<gray>Test debug : l'exception sera interceptée."
+    close:
+      name: "<red>Fermer"

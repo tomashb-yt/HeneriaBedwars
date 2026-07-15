@@ -9,6 +9,7 @@ import fr.heneria.bedwars.core.config.LobbySettings;
 import fr.heneria.bedwars.core.config.MenuSettings;
 import fr.heneria.bedwars.core.config.PluginSettings;
 import fr.heneria.bedwars.core.config.ProblemSeverity;
+import fr.heneria.bedwars.core.config.SoundSettings;
 import fr.heneria.bedwars.core.config.StorageSettings;
 import fr.heneria.bedwars.core.config.TranslationBundle;
 import fr.heneria.bedwars.core.config.TranslationKey;
@@ -122,7 +123,23 @@ public final class ConfigurationSnapshotFactory {
             menus.bool("global.play-click-sounds", true),
             menus.integer("pagination.previous-slot", 45, 0, menuSize - 1),
             menus.integer("pagination.next-slot", 53, 0, menuSize - 1),
-            menus.integer("pagination.back-slot", 49, 0, menuSize - 1));
+            menus.integer("pagination.back-slot", 49, 0, menuSize - 1),
+            menus.integer("pagination.page-indicator-slot", 50, 0, menuSize - 1),
+            menus.bool("navigation.history-enabled", true),
+            menus.integer("navigation.max-history-size", 20, 0, 100),
+            menus.integer("interaction.default-click-cooldown-ms", 150, 0, 60_000),
+            menus.bool("interaction.cancel-player-inventory-clicks", true),
+            menus.bool("interaction.cancel-drag-events", true),
+            menus.bool("refresh.enabled", true),
+            menus.integer("refresh.minimum-interval-ticks", 10, 1, 72_000),
+            menus.bool("sounds.enabled", true),
+            Map.of(
+                "open", sound(menus, "open", "UI_BUTTON_CLICK", problems),
+                "click", sound(menus, "click", "UI_BUTTON_CLICK", problems),
+                "success", sound(menus, "success", "ENTITY_PLAYER_LEVELUP", problems),
+                "error", sound(menus, "error", "ENTITY_VILLAGER_NO", problems),
+                "back", sound(menus, "back", "UI_BUTTON_CLICK", problems),
+                "close", sound(menus, "close", "UI_BUTTON_CLICK", problems)));
 
     validateItems(documents.get(ConfigurationId.ITEMS), problems);
     Map<String, TranslationBundle> languages = languages(languageDocuments, problems);
@@ -177,6 +194,29 @@ public final class ConfigurationSnapshotFactory {
           "GRAY_STAINED_GLASS_PANE",
           "Invalid material");
     items.integer("items.menu-border.amount", 1, 1, 99);
+  }
+
+  private static SoundSettings sound(
+      Reader reader, String id, String fallback, List<ConfigurationProblem> problems) {
+    String path = "sounds." + id;
+    String value = reader.string(path + ".sound", fallback);
+    try {
+      org.bukkit.Sound.valueOf(value);
+    } catch (IllegalArgumentException exception) {
+      reader.problem(path + ".sound", value, "valid Bukkit sound", fallback, "Invalid sound");
+      value = fallback;
+    }
+    float volume = (float) reader.decimal(path + ".volume", 1.0);
+    float pitch = (float) reader.decimal(path + ".pitch", 1.0);
+    if (volume < 0) {
+      reader.problem(path + ".volume", volume, ">= 0", 1.0, "Invalid volume");
+      volume = 1;
+    }
+    if (pitch < 0 || pitch > 2) {
+      reader.problem(path + ".pitch", pitch, "between 0 and 2", 1.0, "Invalid pitch");
+      pitch = 1;
+    }
+    return new SoundSettings(value, volume, pitch);
   }
 
   private static Map<String, TranslationBundle> languages(

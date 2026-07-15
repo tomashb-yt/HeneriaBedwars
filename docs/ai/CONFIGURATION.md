@@ -8,6 +8,8 @@ Les ressources par défaut sont embarquées dans `bedwars-plugin/src/main/resour
 
 `YamlConfiguration` tolère les clés personnalisées et aucune lecture ne réécrit un fichier. Une écriture demandée, actuellement le changement de langue, utilise un fichier temporaire et un remplacement atomique si possible. Cette réécriture ne garantit pas la conservation parfaite des commentaires.
 
+Au premier démarrage du Ticket 003, `menus.yml`, `languages/fr_FR.yml` et `languages/en_US.yml` existants reçoivent uniquement les nouvelles clés embarquées absentes. Chaque fichier modifié est sauvegardé avant écriture; aucune valeur personnalisée existante n'est remplacée. Cette évolution ciblée permet une mise à jour directe depuis le Ticket 002 malgré le maintien de `config-version: 1`.
+
 ## `config.yml`
 
 | Clé | Type | Défaut / contrainte | Rechargeable | Sensible | État |
@@ -79,7 +81,7 @@ Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQ
 
 ## `menus.yml` et `items.yml`
 
-Ces fichiers préparent le Ticket 003. Aucun menu n'est encore ouvert.
+`menus.yml` configure le framework Ticket 003; `items.yml` fournit seulement le filler minimal. La fabrique complète d'items appartient au Ticket 004.
 
 | Fichier / clé | Type | Défaut / contrainte |
 |---|---|---|
@@ -91,6 +93,18 @@ Ces fichiers préparent le Ticket 003. Aucun menu n'est encore ouvert.
 | `pagination.previous-slot` | entier | `45`, dans l'inventaire |
 | `pagination.next-slot` | entier | `53`, dans l'inventaire |
 | `pagination.back-slot` | entier | `49`, dans l'inventaire |
+| `pagination.page-indicator-slot` | entier | `50`, dans l'inventaire |
+| `navigation.history-enabled` | booléen | `true` |
+| `navigation.max-history-size` | entier | `20`, de 0 à 100 |
+| `interaction.default-click-cooldown-ms` | entier | `150`, de 0 à 60000 |
+| `interaction.cancel-player-inventory-clicks` | booléen | `true` |
+| `interaction.cancel-drag-events` | booléen | `true` |
+| `refresh.enabled` | booléen | `true` |
+| `refresh.minimum-interval-ticks` | entier | `10`, supérieur à 0 |
+| `sounds.enabled` | booléen | `true` |
+| `sounds.<id>.sound` | chaîne | son Bukkit valide; open/click/success/error/back/close |
+| `sounds.<id>.volume` | nombre | positif ou nul |
+| `sounds.<id>.pitch` | nombre | de 0 à 2 |
 | `items.yml: config-version` | entier | `1` |
 | `items.menu-border.material` | chaîne | `GRAY_STAINED_GLASS_PANE`, matériau Bukkit valide |
 | `items.menu-border.amount` | entier | `1`, de 1 à 99 |

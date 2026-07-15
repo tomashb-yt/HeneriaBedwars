@@ -12,6 +12,7 @@ public final class AdministrativeCommandPolicy {
   public static final String RELOAD = "heneriabedwars.admin.reload";
   public static final String CONFIG = "heneriabedwars.admin.config";
   public static final String LANGUAGE = "heneriabedwars.admin.language";
+  public static final String GUI = "heneriabedwars.admin.gui";
 
   public List<String> complete(
       Predicate<String> permitted, String[] arguments, List<String> locales) {
@@ -24,6 +25,7 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(RELOAD)) choices.add("reload");
       if (permitted.test(CONFIG)) choices.add("config");
       if (permitted.test(LANGUAGE)) choices.add("language");
+      if (permitted.test(GUI)) choices.add("gui");
     } else if (arguments.length == 2
         && arguments[0].equalsIgnoreCase("language")
         && permitted.test(LANGUAGE)) {

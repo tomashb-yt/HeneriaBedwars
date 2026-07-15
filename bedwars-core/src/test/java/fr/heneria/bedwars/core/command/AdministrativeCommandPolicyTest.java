@@ -19,6 +19,16 @@ class AdministrativeCommandPolicyTest {
   }
 
   @Test
+  void exposesGuiOnlyWithGuiPermission() {
+    assertEquals(
+        List.of("gui"),
+        policy.complete(
+            permission -> permission.equals(AdministrativeCommandPolicy.GUI),
+            new String[] {""},
+            List.of()));
+  }
+
+  @Test
   void exposesLanguageSetAndKnownLocalesOnlyWithLanguagePermission() {
     assertEquals(
         List.of("set"),

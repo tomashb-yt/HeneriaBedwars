@@ -16,6 +16,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Rendu Spigot des couleurs MiniMessage usuelles, couleurs hexadécimales, codes legacy et placeholders sûrs.
 - Commandes `/bedwars reload`, `/bedwars config` et `/bedwars language set <locale>`, permissions et complétion associées.
 - Écriture YAML protégée, sauvegardes anti-collision et contrat de migrations futures.
+- Framework GUI interne : modèle immutable, sessions par joueur/vue, navigation limitée, pagination, confirmations, cooldowns, sons et rafraîchissement central.
+- Protection Bukkit des clics, drags, drops, touches numériques, déconnexions et arrêts, avec démonstration `/bedwars gui`.
 
 ### Fixed
 

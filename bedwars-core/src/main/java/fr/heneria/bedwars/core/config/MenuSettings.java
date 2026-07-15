@@ -1,6 +1,8 @@
 package fr.heneria.bedwars.core.config;
 
-/** Immutable global settings for the future menu framework. */
+import java.util.Map;
+
+/** Immutable settings consumed by the internal GUI framework. */
 public record MenuSettings(
     int defaultSize,
     boolean fillEmptySlots,
@@ -8,4 +10,18 @@ public record MenuSettings(
     boolean playClickSounds,
     int previousSlot,
     int nextSlot,
-    int backSlot) {}
+    int backSlot,
+    int pageIndicatorSlot,
+    boolean historyEnabled,
+    int maximumHistorySize,
+    long defaultClickCooldownMillis,
+    boolean cancelPlayerInventoryClicks,
+    boolean cancelDragEvents,
+    boolean refreshEnabled,
+    int minimumRefreshTicks,
+    boolean soundsEnabled,
+    Map<String, SoundSettings> sounds) {
+  public MenuSettings {
+    sounds = Map.copyOf(sounds);
+  }
+}

@@ -212,6 +212,33 @@ class ConfigurationSystemTest {
     assertEquals(legacy, Files.readString(backupFiles().get(0)));
   }
 
+  @Test
+  void startupAddsTicket003DefaultsToExistingMenusAndLanguagesWithBackups() throws Exception {
+    installer(new TestLogger()).installMissing();
+    replace("menus.yml", "navigation:\n  history-enabled: true\n  max-history-size: 20\n", "");
+    Path french = temporary.resolve("languages/fr_FR.yml");
+    Path english = temporary.resolve("languages/en_US.yml");
+    Files.writeString(french, Files.readString(french).replaceAll("(?ms)^gui:\\R.*\\z", ""));
+    Files.writeString(english, Files.readString(english).replaceAll("(?ms)^gui:\\R.*\\z", ""));
+
+    ConfigurationService service = service();
+    service.initialize();
+
+    assertTrue(Files.readString(temporary.resolve("menus.yml")).contains("history-enabled: true"));
+    assertTrue(Files.readString(french).contains("gui:"));
+    assertTrue(Files.readString(english).contains("gui:"));
+    assertTrue(
+        service
+            .snapshot()
+            .languages()
+            .get("fr_FR")
+            .keys()
+            .equals(service.snapshot().languages().get("en_US").keys()));
+    try (var paths = Files.walk(temporary.resolve("backups"))) {
+      assertEquals(3, paths.filter(Files::isRegularFile).count());
+    }
+  }
+
   private ConfigurationService service() {
     return new ConfigurationService(
         temporary, ConfigurationSystemTest::resource, new TestLogger(), Clock.systemUTC());

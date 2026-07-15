@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 003 — Framework interne de menus
+
+Terminé le 2026-07-15 côté code et tests automatisés. Le cœur fournit `Gui`, `GuiButton`, `GuiItem`, contextes/actions, `GuiSession`, `GuiSessionManager`, `Pagination`, `GuiSlots`, `ConfirmationGui` et `GuiActionExecutor`. Bukkit fournit `BukkitGuiService`, `GuiInventoryHolder`, `GuiListener`, `GuiItemRenderer`, boutons standards et `DemoMenuFactory`.
+
+Le listener protège clics, Shift, touches numériques, double collecte, drops et drags; quit/kick/disable nettoient les sessions. `sessionId` et `viewId` empêchent une ancienne fermeture de supprimer une nouvelle vue. Une tâche centrale gère les auto-refresh. `/bedwars gui` et `/hbw gui` utilisent `heneriabedwars.admin.gui`; la console est refusée avec traduction.
+
+La démonstration couvre informations, cinq clics, 50 éléments paginés, confirmation, sous-menu, retour, refresh, erreur contrôlée debug et fermeture. Une évolution sauvegarde puis complète les anciens `menus.yml` et catalogues Ticket 002. Total : 57 tests réussis. MockBukkit et tests en jeu non réalisés; validation Paper manuelle requise. Aucun menu métier, item system complet, texte avancé ou API GUI publique. Prochaine étape : Ticket 004, items configurables. Commit prévu : `feat(gui): add reusable inventory menu framework`.
+
 ## Correctif Ticket 002 — Migration du `config.yml` Ticket 001
 
 Ajout le 2026-07-15 de `LegacyConfigurationMigrator`. L'ancien format officiel non versionné est identifié par une signature minimale, sauvegardé, complété avec les défauts Ticket 002 puis écrit atomiquement. Les valeurs existantes, clés inconnues et secrets sont préservés sans être journalisés. Les fichiers vides, corrompus ou non reconnaissables restent inchangés et bloquent toujours le démarrage.

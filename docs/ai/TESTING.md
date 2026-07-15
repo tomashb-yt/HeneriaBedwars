@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 003
+
+La suite complète contient 57 tests : 45 dans le cœur et 12 dans le module plugin. Les 13 nouveaux tests purs couvrent construction/immutabilité, tailles/lignes/slots invalides, doublon et remplacement, routage des clics, permissions/conditions, navigation/retour/racine/limite, protections sessionId/viewId, pagination vide/multiple/réduite, rectangles, anti-spam, confirmation et interception d'exception avec session conservée. Un test d'évolution reproduit une installation Ticket 002 sans les nouvelles clés de menus/langues et vérifie fusion, trois sauvegardes et parité FR/EN; un test de commande vérifie aussi la permission propre à l'autocomplétion GUI.
+
+MockBukkit n'a pas été ajouté sans preuve de compatibilité avec Paper 1.21 dans ce dépôt. L'ouverture réelle, les événements Bukkit, sons et manipulations anti-duplication doivent être validés manuellement sur le serveur Paper de test.
+
 ## Ticket 002
 
 La suite contient 42 tests JUnit 5 : 31 dans le cœur et 11 dans le module plugin. Elle couvre installation non destructive, YAML valide/invalide, versions, défauts, ports, délais, tailles/slots de menus, matériaux, locale absente/inconnue, parité FR/EN, clé manquante, placeholders sûrs, couleurs classiques/hex, permissions/completion, snapshots transactionnels, rapports d'erreurs, absence de remplacement partiel et sauvegardes anti-collision.
