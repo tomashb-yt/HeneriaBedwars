@@ -8,12 +8,23 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version]
+    usage: /bedwars [version|reload|config|language]
     aliases:
       - hbw
-    permission: heneriabedwars.admin
-    permission-message: Vous n'avez pas la permission d'utiliser cette commande.
 permissions:
   heneriabedwars.admin:
     description: Permet d'utiliser les commandes administratives de HeneriaBedWars.
+    default: op
+    children:
+      heneriabedwars.admin.reload: true
+      heneriabedwars.admin.config: true
+      heneriabedwars.admin.language: true
+  heneriabedwars.admin.reload:
+    description: Permet de recharger les configurations.
+    default: op
+  heneriabedwars.admin.config:
+    description: Permet de consulter la configuration active.
+    default: op
+  heneriabedwars.admin.language:
+    description: Permet de consulter et modifier la langue globale.
     default: op

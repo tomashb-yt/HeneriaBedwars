@@ -8,10 +8,16 @@ import java.util.logging.Logger;
 /** Adapts the standard Bukkit logger to the platform-neutral logging boundary. */
 public final class BukkitProjectLogger implements ProjectLogger {
   private final Logger logger;
-  private final boolean debug;
+  private volatile boolean debug;
 
   public BukkitProjectLogger(Logger logger, boolean debug) {
     this.logger = Objects.requireNonNull(logger, "logger");
+    this.debug = debug;
+  }
+
+  /** Updates diagnostic logging after a configuration snapshot is activated. */
+  @Override
+  public void setDebug(boolean debug) {
     this.debug = debug;
   }
 

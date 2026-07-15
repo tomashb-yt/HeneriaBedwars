@@ -1,0 +1,11 @@
+config-version: 1
+
+# Preparatory only. Generators are not active yet.
+generators:
+  enabled: false
+  defaults:
+    iron: {material: IRON_INGOT, interval-ticks: 20}
+    gold: {material: GOLD_INGOT, interval-ticks: 160}
+    diamond: {material: DIAMOND, interval-ticks: 600}
+    emerald: {material: EMERALD, interval-ticks: 1200}
+  custom: {}

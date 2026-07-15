@@ -1,0 +1,17 @@
+config-version: 1
+
+main-lobby:
+  configured: false
+  world: ""
+  x: 0.0
+  y: 0.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+protection:
+  cancel-block-break: true
+  cancel-block-place: true
+  cancel-damage: true
+  cancel-hunger: true
+items:
+  enabled: true

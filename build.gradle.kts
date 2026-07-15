@@ -31,6 +31,9 @@ subprojects {
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        val testTemp = layout.buildDirectory.dir("tmp/tests")
+        doFirst { testTemp.get().asFile.mkdirs() }
+        systemProperty("java.io.tmpdir", testTemp.get().asFile.absolutePath)
     }
 
     tasks.withType<AbstractArchiveTask>().configureEach {

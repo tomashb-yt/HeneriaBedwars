@@ -13,4 +13,9 @@ public interface ProjectLogger {
 
   /** Records diagnostic information when debug mode is enabled. */
   void debug(String message);
+
+  /** Updates debug filtering when the active configuration changes. */
+  default void setDebug(boolean enabled) {
+    // Platform adapters without filtering do not need to react.
+  }
 }

@@ -1,5 +1,15 @@
 # Historique des tickets
 
+## Ticket 002 — Configuration, messages et traductions
+
+Terminé le 2026-07-15 côté code et validation automatisée. Ajout de neuf YAML principaux, `fr_FR`, `en_US`, création des dossiers runtime, configuration typée, validation, registre, snapshots transactionnels, écritures atomiques, sauvegardes et contrat de migration. Les commandes `reload`, `config`, `language` et `language set` utilisent les traductions, permissions spécialisées et la tab-complétion.
+
+Classes centrales : `ConfigurationService`, `ConfigurationSnapshotFactory`, `ConfigurationRegistry`, `ConfigurationSnapshot`, les cinq records de réglages, `LanguageService`, `TranslationKey`, `MessageRenderer`, `SafeYamlWriter` et `BackupService`.
+
+Validation : 39 tests réussis. Un problème de nettoyage de `@TempDir` dans le bac à sable Windows a été contourné par des dossiers sous `build/test-work`; aucun comportement de production n'est affecté. Tests en jeu non réalisés faute de serveur disponible.
+
+Décisions : YAML Bukkit sans dépendance supplémentaire, records immuables, activation transactionnelle, sous-ensemble MiniMessage compatible Spigot, version 1 obligatoire et secrets masqués. Limites : aucun gameplay/menu/arène/SQL/PlaceholderAPI; boutiques, upgrades et générateurs préparatoires. Prochaine étape : Ticket 003, framework interne de menus.
+
 ## Ticket 001 — Initialisation et fondation
 
 ### Objectif
@@ -20,8 +30,8 @@ Java 21, Gradle Kotlin DSL, trois modules, séparation de Paper, bootstrap manue
 ### Limitations
 Aucun gameplay, stockage, menu ou intégration optionnelle. Le démarrage sur un vrai serveur Paper reste à tester.
 
-### Prochaine étape
-Ticket 002 — configuration complète, messages et traductions. Ne pas commencer ce périmètre dans le Ticket 001.
+### Étape réalisée ensuite
+Le Ticket 002 a livré la configuration complète, les messages et traductions sans modifier rétrospectivement le périmètre du Ticket 001.
 
 ### Message de commit prévu
 `feat(core): initialize modular BedWars plugin foundation`

@@ -1,0 +1,44 @@
+config-version: 1
+
+general:
+  prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
+  no-permission: "<red>You do not have permission to use this command."
+  unknown-command: "<red>Unknown command."
+  internal-error: "<red>An internal error occurred."
+command:
+  help:
+    header: "<aqua><bold>HeneriaBedWars"
+    version: "<gray>/bedwars version <dark_gray>- <white>Displays the plugin version."
+    reload: "<gray>/bedwars reload <dark_gray>- <white>Reloads configuration files."
+    config: "<gray>/bedwars config <dark_gray>- <white>Displays the active configuration."
+    language: "<gray>/bedwars language [set <locale>] <dark_gray>- <white>Manages the global language."
+  version:
+    header: "<aqua><bold>HeneriaBedWars"
+    plugin-version: "<gray>Plugin version: <white>{plugin_version}"
+    java-version: "<gray>Java version: <white>{java_version}"
+    server-version: "<gray>Server version: <white>{server_version}"
+    state: "<gray>State: <green>{state}"
+    services: "<gray>Registered services: <white>{service_count}"
+  reload:
+    started: "<yellow>Reloading configuration files..."
+    success: "<green>Reload completed successfully."
+    failed: "<red>Reload failed. Check the console."
+    loaded-files: "<gray>Loaded files: <white>{loaded_files}"
+    warnings: "<gray>Warnings: <white>{warnings}"
+    errors: "<gray>Errors: <white>{errors}"
+    preserved: "<yellow>The previous configuration is still active."
+  config:
+    header: "<aqua><bold>Active configuration"
+    language: "<gray>Language: <white>{language}"
+    debug: "<gray>Debug: <white>{debug}"
+    loaded-files: "<gray>Loaded files: <white>{loaded_files}"
+    versions: "<gray>Main versions: <white>{versions}"
+    storage: "<gray>Configured storage: <white>{storage}"
+    last-reload: "<gray>Last successful reload: <white>{last_reload}"
+    warnings: "<gray>Active warnings: <white>{warnings}"
+  language:
+    current: "<gray>Current language: <white>{language}"
+    available: "<gray>Available languages: <white>{locales}"
+    usage: "<yellow>Usage: /bedwars language set <locale>"
+    changed: "<green>The global language is now <white>{language}<green>."
+    unknown: "<red>Unknown language: <white>{language}"

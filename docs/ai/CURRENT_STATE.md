@@ -1,28 +1,24 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 001
-- Version actuelle : `0.1.0-SNAPSHOT`
-- État du build : réussi avec Gradle 8.14.5
-- État des tests : réussi, 18 tests
+- Dernier ticket terminé : Ticket 002.
+- Version : `0.1.0-SNAPSHOT`.
+- Cibles : Java 21, Spigot/Paper 1.21.x.
 
-## Fonctionnalités disponibles
+## Disponible
 
-- projet Gradle multi-modules ;
-- chargement initial Paper ;
-- bootstrap et cycle de vie avec rollback ;
-- registre de services typé ;
-- configuration générale minimale ;
-- commande Bukkit `/bedwars` et alias `/hbw` avec aide, diagnostic `version`, permission et tab-complétion ;
-- documentation initiale et formatage Spotless.
+- bootstrap et cycle de vie déterministes;
+- API publique minimale de statut;
+- création non destructive de neuf YAML principaux, deux langues et trois dossiers runtime;
+- validation INFO/WARNING/ERROR/CRITICAL, défauts contrôlés et masquage des secrets;
+- réglages immuables `PluginSettings`, `GameplaySettings`, `LobbySettings`, `StorageSettings` et `MenuSettings`;
+- reload transactionnel et accès par registre;
+- messages FR/EN, couleurs nommées/hex/legacy et placeholders non interprétés;
+- commandes `version`, `reload`, `config`, `language` et `language set`, aussi via `/hbw`;
+- permissions et complétion filtrée;
+- sauvegarde et contrat de migration prêts, sans migration artificielle.
 
-## Fonctionnalités non disponibles
+## Non disponible
 
-Arènes, parties, équipes, lits, générateurs, boutiques, menus, statistiques et base de données fonctionnelle ne sont pas implémentés.
+Aucun menu fonctionnel, gameplay, arène, équipe, lit, générateur actif, achat, amélioration, lobby protégé, base de données ou PlaceholderAPI. Les fichiers correspondants sont préparatoires.
 
-## Prochaine étape recommandée
-
-Ticket 002 : système complet de configuration, messages et traductions.
-
-## Validation serveur
-
-La compilation contre Spigot API 1.21 et les tests automatisés sont réussis. Le fonctionnement réel de `/bedwars`, `/hbw`, de la permission et de la console n'a pas encore été confirmé sur un serveur Spigot/Paper après redémarrage complet.
+Les 39 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

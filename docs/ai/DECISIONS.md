@@ -169,3 +169,58 @@ Le build complet et ses tests restent reproductibles dans l'environnement pris e
 
 ### Conséquences
 Le module final recompile API et cœur avant de produire le Shadow JAR. Cette mesure pourra être retirée dans un ticket ultérieur après validation sur une CI Windows/Linux non isolée.
+
+## ADR-011 — YAML Bukkit sans dépendance supplémentaire
+
+### Statut
+Accepté.
+
+### Décision
+Utiliser `YamlConfiguration` uniquement dans `bedwars-plugin`; le cœur manipule des documents aplatis et immuables.
+
+### Conséquences
+Le JAR reste compatible Spigot/Paper sans bibliothèque embarquée. Les commentaires sont conservés tant que le fichier n'est pas réécrit; le changement de langue réécrit `config.yml` et ne garantit donc pas leur conservation parfaite.
+
+## ADR-012 — Configurations Java immuables et snapshots transactionnels
+
+### Statut
+Accepté.
+
+### Décision
+Convertir les valeurs principales en records et construire un `ConfigurationSnapshot` complet avant activation atomique.
+
+### Conséquences
+Un reload invalide conserve intégralement l'état précédent; aucune valeur YAML mutable n'est exposée au reste du plugin.
+
+## ADR-013 — MiniMessage limité rendu sans Adventure obligatoire
+
+### Statut
+Accepté.
+
+### Décision
+MiniMessage est le format recommandé, avec prise en charge explicite des couleurs nommées, décorations, hexadécimal et codes `&`. Le rendu produit les codes Minecraft legacy sans charger Adventure.
+
+### Conséquences
+Le plugin démarre sur Spigot 1.21. Les événements, gradients, hover/click et balises MiniMessage avancées ne sont pas pris en charge.
+
+## ADR-014 — Version 1 obligatoire et migrations séquentielles futures
+
+### Statut
+Accepté.
+
+### Décision
+Chaque YAML contient `config-version: 1`. Une version absente ou inconnue refuse l'activation. `ConfigurationMigration` et `BackupService` préparent les migrations sans simuler de migration inutile.
+
+### Conséquences
+Toute migration future devra sauvegarder le fichier, écrire de façon sûre et avancer version par version.
+
+## ADR-015 — Secrets exclus des diagnostics
+
+### Statut
+Accepté.
+
+### Décision
+`ConfigurationProblem` masque les clés contenant password, token, secret ou credential. `/bedwars config` n'affiche que le type de stockage.
+
+### Conséquences
+Les mots de passe ne sont jamais inclus dans les rapports ni dans les logs debug.

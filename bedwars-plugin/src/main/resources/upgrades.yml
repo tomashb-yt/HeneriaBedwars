@@ -1,0 +1,6 @@
+config-version: 1
+
+# Preparatory only. Team upgrades are not implemented yet.
+upgrades:
+  enabled: false
+  definitions: {}

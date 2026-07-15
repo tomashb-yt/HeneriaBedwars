@@ -1,0 +1,10 @@
+config-version: 1
+
+items:
+  menu-border:
+    material: GRAY_STAINED_GLASS_PANE
+    amount: 1
+    name: " "
+    lore: []
+    glow: false
+    custom-model-data: null

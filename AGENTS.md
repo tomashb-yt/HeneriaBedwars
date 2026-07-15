@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. La priorité est de garder la logique métier indépendante de Bukkit, testable et compatible avec plusieurs parties simultanées. Aucun gameplay n'existe à l'issue du Ticket 001.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 et 002 livrent la fondation, les configurations et les traductions ; aucun gameplay n'est encore actif.
 
 ## Lecture obligatoire
 
@@ -14,8 +14,9 @@ Avant chaque ticket, lire dans cet ordre :
 4. `docs/ai/CURRENT_STATE.md` ;
 5. `docs/ai/ROADMAP.md` ;
 6. `docs/ai/DECISIONS.md` ;
-7. `docs/ai/KNOWN_ISSUES.md` ;
-8. les dernières entrées de `docs/ai/TICKET_HISTORY.md`.
+7. `docs/ai/CONFIGURATION.md` ;
+8. `docs/ai/KNOWN_ISSUES.md` ;
+9. les dernières entrées de `docs/ai/TICKET_HISTORY.md`.
 
 Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne supprimer ni écraser une ressource existante sans analyse. Vérifier qu'aucun secret n'est ajouté.
 
@@ -32,7 +33,7 @@ Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne
 
 Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est produit par `:bedwars-plugin:shadowJar`.
 
-Commande de diagnostic : `/bedwars` ou `/hbw`, sous-commande `version`, permission `heneriabedwars.admin`. Après modification d'une commande, remplacer l'ancien JAR du serveur et effectuer un redémarrage complet ; ne pas valider avec `/reload`.
+Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config` et `language`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge uniquement les fichiers HeneriaBedWars.
 
 ## Règles architecturales
 

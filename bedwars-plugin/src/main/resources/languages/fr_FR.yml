@@ -1,0 +1,44 @@
+config-version: 1
+
+general:
+  prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
+  no-permission: "<red>Vous n'avez pas la permission d'utiliser cette commande."
+  unknown-command: "<red>Commande inconnue."
+  internal-error: "<red>Une erreur interne est survenue."
+command:
+  help:
+    header: "<aqua><bold>HeneriaBedWars"
+    version: "<gray>/bedwars version <dark_gray>- <white>Affiche la version du plugin."
+    reload: "<gray>/bedwars reload <dark_gray>- <white>Recharge les configurations."
+    config: "<gray>/bedwars config <dark_gray>- <white>Affiche la configuration active."
+    language: "<gray>/bedwars language [set <locale>] <dark_gray>- <white>Gère la langue globale."
+  version:
+    header: "<aqua><bold>HeneriaBedWars"
+    plugin-version: "<gray>Version du plugin : <white>{plugin_version}"
+    java-version: "<gray>Version Java : <white>{java_version}"
+    server-version: "<gray>Version du serveur : <white>{server_version}"
+    state: "<gray>État : <green>{state}"
+    services: "<gray>Services enregistrés : <white>{service_count}"
+  reload:
+    started: "<yellow>Rechargement des configurations..."
+    success: "<green>Rechargement terminé avec succès."
+    failed: "<red>Le rechargement a échoué. Consultez la console."
+    loaded-files: "<gray>Fichiers chargés : <white>{loaded_files}"
+    warnings: "<gray>Avertissements : <white>{warnings}"
+    errors: "<gray>Erreurs : <white>{errors}"
+    preserved: "<yellow>L'ancienne configuration est toujours active."
+  config:
+    header: "<aqua><bold>Configuration active"
+    language: "<gray>Langue : <white>{language}"
+    debug: "<gray>Debug : <white>{debug}"
+    loaded-files: "<gray>Fichiers chargés : <white>{loaded_files}"
+    versions: "<gray>Versions principales : <white>{versions}"
+    storage: "<gray>Stockage configuré : <white>{storage}"
+    last-reload: "<gray>Dernier rechargement réussi : <white>{last_reload}"
+    warnings: "<gray>Avertissements actifs : <white>{warnings}"
+  language:
+    current: "<gray>Langue actuelle : <white>{language}"
+    available: "<gray>Langues disponibles : <white>{locales}"
+    usage: "<yellow>Utilisation : /bedwars language set <locale>"
+    changed: "<green>La langue globale est maintenant <white>{language}<green>."
+    unknown: "<red>Langue inconnue : <white>{language}"

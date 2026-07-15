@@ -1,0 +1,11 @@
+config-version: 1
+
+global:
+  default-size: 54
+  fill-empty-slots: true
+  close-on-critical-error: true
+  play-click-sounds: true
+pagination:
+  previous-slot: 45
+  next-slot: 53
+  back-slot: 49

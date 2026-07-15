@@ -1,0 +1,16 @@
+config-version: 1
+
+combat:
+  profile: legacy_1_8
+  attack-cooldown-enabled: false
+  shields-enabled: false
+  friendly-fire: false
+respawn:
+  enabled: true
+  delay-seconds: 5
+  protection-seconds: 3
+void:
+  minimum-y: -64
+blocks:
+  break-only-player-placed: true
+  restore-after-game: true

@@ -6,7 +6,7 @@ import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.lifecycle.LifecycleManager;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.core.service.ServiceRegistry;
-import fr.heneria.bedwars.plugin.config.GeneralConfiguration;
+import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,10 +19,10 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
   private PluginStatus status = PluginStatus.STOPPED;
 
   public BedWarsBootstrap(
-      String version, GeneralConfiguration configuration, ProjectLogger logger) {
+      String version, ConfigurationService configuration, ProjectLogger logger) {
     this.version = Objects.requireNonNull(version, "version");
     this.logger = Objects.requireNonNull(logger, "logger");
-    services.register(GeneralConfiguration.class, configuration);
+    services.register(ConfigurationService.class, configuration);
     services.register(HeneriaBedWarsApi.class, this);
     lifecycle = new LifecycleManager(List.of(new FoundationComponent()), logger);
   }

@@ -11,6 +11,11 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Gestion déterministe du cycle de vie avec rollback.
 - Registre de services typé et configuration générale minimale.
 - Tests JUnit 5, formatage Spotless et documentation de reprise IA.
+- Neuf fichiers YAML versionnés, deux catalogues de langue et création sûre des dossiers d'exécution.
+- Configurations Java immuables, validation structurée et activation transactionnelle par snapshot.
+- Rendu Spigot des couleurs MiniMessage usuelles, couleurs hexadécimales, codes legacy et placeholders sûrs.
+- Commandes `/bedwars reload`, `/bedwars config` et `/bedwars language set <locale>`, permissions et complétion associées.
+- Écriture YAML protégée, sauvegardes anti-collision et contrat de migrations futures.
 
 ### Fixed
 

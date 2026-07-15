@@ -1,9 +1,17 @@
+config-version: 1
+
 plugin:
   language: fr_FR
   debug: false
+  check-updates: false
 
-server:
-  shutdown-on-critical-startup-error: true
+commands:
+  main-command: bedwars
+  aliases: [hbw]
 
-storage:
-  type: sqlite
+security:
+  confirm-dangerous-actions: true
+  prevent-reload-during-games: true
+
+performance:
+  warn-main-thread-task-duration-ms: 50

@@ -4,8 +4,9 @@ import fr.heneria.bedwars.api.PluginStatus;
 import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
-import fr.heneria.bedwars.plugin.config.GeneralConfiguration;
+import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.logging.BukkitProjectLogger;
+import java.time.Clock;
 import java.util.logging.Level;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,16 +14,22 @@ import org.bukkit.plugin.java.JavaPlugin;
 /** Paper entry point. All construction and lifecycle work is delegated to a bootstrap. */
 public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private PluginBootstrap bootstrap;
+  private ConfigurationService configurations;
 
   @Override
   public void onEnable() {
-    saveDefaultConfig();
-    GeneralConfiguration configuration;
     try {
-      configuration = GeneralConfiguration.from(getConfig());
-      BukkitProjectLogger projectLogger =
-          new BukkitProjectLogger(getLogger(), configuration.debug());
-      bootstrap = new BedWarsBootstrap(getDescription().getVersion(), configuration, projectLogger);
+      BukkitProjectLogger projectLogger = new BukkitProjectLogger(getLogger(), false);
+      configurations =
+          new ConfigurationService(
+              getDataFolder().toPath(),
+              this::getResource,
+              projectLogger,
+              Clock.systemDefaultZone());
+      configurations.initialize();
+      projectLogger.setDebug(configurations.snapshot().plugin().debug());
+      bootstrap =
+          new BedWarsBootstrap(getDescription().getVersion(), configurations, projectLogger);
       bootstrap.start();
       registerDiagnosticCommand();
       getLogger().info("HeneriaBedWars " + getDescription().getVersion() + " enabled.");
@@ -51,7 +58,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
     if (command == null) {
       throw new IllegalStateException("The 'bedwars' command is not declared in plugin.yml");
     }
-    BedWarsCommand executor = new BedWarsCommand(this, bootstrap);
+    BedWarsCommand executor = new BedWarsCommand(this, bootstrap, configurations);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }
