@@ -1,5 +1,7 @@
 package fr.heneria.bedwars.plugin.command;
 
+import fr.heneria.bedwars.core.command.BedWarsCommandLogic;
+import fr.heneria.bedwars.core.command.CommandDiagnostics;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import java.util.List;
 import org.bukkit.command.Command;
@@ -10,10 +12,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Implements the deliberately small {@code /bedwars version} diagnostic command. */
+/** Implements the Bukkit-compatible {@code /bedwars} administrative command. */
 public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   private final JavaPlugin plugin;
   private final PluginBootstrap bootstrap;
+  private final BedWarsCommandLogic logic = new BedWarsCommandLogic();
 
   public BedWarsCommand(JavaPlugin plugin, PluginBootstrap bootstrap) {
     this.plugin = plugin;
@@ -26,17 +29,19 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull Command command,
       @NotNull String label,
       @NotNull String[] args) {
-    if (args.length != 1 || !args[0].equalsIgnoreCase("version")) {
-      sender.sendMessage("§cUsage: /" + label + " version");
-      return true;
+    CommandDiagnostics diagnostics =
+        new CommandDiagnostics(
+            plugin.getDescription().getName(),
+            plugin.getDescription().getVersion(),
+            System.getProperty("java.version"),
+            plugin.getServer().getVersion(),
+            bootstrap.status().name().toLowerCase(),
+            bootstrap.serviceCount());
+    for (String message :
+        logic.execute(
+            sender.hasPermission(BedWarsCommandLogic.PERMISSION), label, args, diagnostics)) {
+      sender.sendMessage(message);
     }
-    sender.sendMessage("§6HeneriaBedWars §7- diagnostic");
-    sender.sendMessage("§ePlugin: §f" + plugin.getPluginMeta().getName());
-    sender.sendMessage("§eVersion: §f" + plugin.getPluginMeta().getVersion());
-    sender.sendMessage("§eJava: §f" + System.getProperty("java.version"));
-    sender.sendMessage("§eServeur: §f" + plugin.getServer().getVersion());
-    sender.sendMessage("§eÉtat: §f" + bootstrap.status());
-    sender.sendMessage("§eServices internes: §f" + bootstrap.serviceCount());
     return true;
   }
 
@@ -46,9 +51,6 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull Command command,
       @NotNull String alias,
       @NotNull String[] args) {
-    if (args.length == 1 && "version".startsWith(args[0].toLowerCase())) {
-      return List.of("version");
-    }
-    return List.of();
+    return logic.complete(sender.hasPermission(BedWarsCommandLogic.PERMISSION), args);
   }
 }

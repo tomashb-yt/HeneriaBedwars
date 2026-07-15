@@ -128,13 +128,13 @@ Accepté.
 Le Ticket 001 n'a besoin que d'une commande Bukkit simple.
 
 ### Décision
-Utiliser `plugin.yml` avec `api-version: 1.21.11`.
+Utiliser `plugin.yml` avec `api-version: 1.21` et enregistrer la commande via l'API Bukkit classique.
 
 ### Raisons
-Solution Paper stable, documentée et suffisante pour ce périmètre.
+Solution stable commune à Spigot et Paper, suffisante pour ce périmètre.
 
 ### Conséquences
-Une migration vers le manifeste Paper nécessitera un ADR si une API moderne la justifie.
+Les commandes simples ne doivent pas dépendre d'une API Paper. Une migration de manifeste nécessitera un ADR et devra préserver le JAR Spigot si cette cible reste prise en charge.
 
 ## ADR-009 — Licence propriétaire temporaire
 

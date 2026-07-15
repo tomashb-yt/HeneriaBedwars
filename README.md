@@ -1,6 +1,6 @@
 # HeneriaBedWars
 
-HeneriaBedWars est un plugin BedWars expérimental pour Paper 1.21.11, développé en Java 21. Le dépôt contient actuellement la fondation technique uniquement : aucun gameplay BedWars n'est encore disponible.
+HeneriaBedWars est un plugin BedWars expérimental pour Spigot/Paper 1.21.x, développé en Java 21. Le dépôt contient actuellement la fondation technique uniquement : aucun gameplay BedWars n'est encore disponible.
 
 ## Prérequis et compilation
 
@@ -34,4 +34,4 @@ Lire d'abord [AGENTS.md](AGENTS.md), puis la documentation de reprise dans [docs
 
 ## État
 
-La commande administrative `/bedwars version` (alias `/hbw version`) permet uniquement de diagnostiquer le chargement de la fondation. Arènes, équipes, lits, boutiques, générateurs, stockage et parties ne sont pas implémentés.
+La commande administrative `/bedwars` (alias `/hbw`) affiche l'aide minimale ; sa sous-commande `version` diagnostique le chargement de la fondation. Arènes, équipes, lits, boutiques, générateurs, stockage et parties ne sont pas implémentés.

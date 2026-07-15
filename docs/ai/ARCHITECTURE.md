@@ -4,14 +4,14 @@
 
 - `bedwars-api` contient les contrats publics et ne dépend d'aucun autre module ni de Paper.
 - `bedwars-core` contient les abstractions de journalisation, le registre de services et le cycle de vie. Il dépend uniquement de `bedwars-api`.
-- `bedwars-plugin` contient la classe Paper, le bootstrap, la configuration, l'adaptateur de logs et la commande de diagnostic. Il dépend de l'API, du cœur et compile contre Paper sans l'embarquer.
+- `bedwars-plugin` contient la classe Bukkit, le bootstrap, la configuration, l'adaptateur de logs et la commande de diagnostic. Il dépend de l'API, du cœur et compile contre Spigot API sans l'embarquer. Le même JAR cible Paper 1.21.x.
 
 ```mermaid
 graph TD
     CORE["bedwars-core"] --> API["bedwars-api"]
     PLUGIN["bedwars-plugin"] --> API
     PLUGIN --> CORE
-    PLUGIN --> PAPER["Paper API (compileOnly)"]
+    PLUGIN --> BUKKIT["Spigot API 1.21 (compileOnly)"]
 ```
 
 ## Construction et démarrage
@@ -20,4 +20,4 @@ Le package racine est `fr.heneria.bedwars`. `HeneriaBedWarsPlugin` charge la con
 
 Le gestionnaire démarre les composants dans l'ordre fourni et les arrête en ordre inverse. Un échec de démarrage déclenche le rollback des composants déjà lancés. Le registre refuse les doublons, fournit `require` pour les services obligatoires et `find` pour les absences normales.
 
-Paper reste confiné à `bedwars-plugin`. Toute future logique de partie doit être conçue dans le cœur avec des ports explicites, puis adaptée à Paper. Le document historique `docs/ARCHITECTURE.md` décrit une cible plus ambitieuse ; il ne représente pas le code actuellement livré.
+Bukkit reste confiné à `bedwars-plugin`. La construction des réponses de commande est pure et placée dans `bedwars-core`; seul l'envoi aux `CommandSender` réside dans l'adaptateur. Toute future logique de partie doit être conçue dans le cœur avec des ports explicites, puis adaptée à la plateforme. Le document historique `docs/ARCHITECTURE.md` décrit une cible plus ambitieuse ; il ne représente pas le code actuellement livré.

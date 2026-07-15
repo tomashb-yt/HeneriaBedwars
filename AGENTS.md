@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Paper 1.21.11. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. La priorité est de garder la logique métier indépendante de Paper, testable et compatible avec plusieurs parties simultanées. Aucun gameplay n'existe à l'issue du Ticket 001.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. La priorité est de garder la logique métier indépendante de Bukkit, testable et compatible avec plusieurs parties simultanées. Aucun gameplay n'existe à l'issue du Ticket 001.
 
 ## Lecture obligatoire
 
@@ -32,11 +32,13 @@ Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne
 
 Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est produit par `:bedwars-plugin:shadowJar`.
 
+Commande de diagnostic : `/bedwars` ou `/hbw`, sous-commande `version`, permission `heneriabedwars.admin`. Après modification d'une commande, remplacer l'ancien JAR du serveur et effectuer un redémarrage complet ; ne pas valider avec `/reload`.
+
 ## Règles architecturales
 
 - `bedwars-api` ne dépend ni de Paper, ni de `bedwars-core`, ni de `bedwars-plugin`.
-- `bedwars-core` peut dépendre de l'API mais doit rester indépendant de Paper.
-- `bedwars-plugin` est la seule frontière Paper et peut dépendre des deux autres modules.
+- `bedwars-core` peut dépendre de l'API mais doit rester indépendant de Bukkit/Paper.
+- `bedwars-plugin` est la seule frontière Bukkit et peut dépendre des deux autres modules.
 - Aucune logique métier importante dans les listeners, commandes ou classe principale.
 - Aucune requête SQL dans un menu et aucune opération lourde sur le thread serveur.
 - Aucun accès d'une API publique aux implémentations internes.

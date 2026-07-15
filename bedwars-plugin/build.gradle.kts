@@ -5,7 +5,8 @@ plugins {
 dependencies {
     implementation(project(":bedwars-api"))
     implementation(project(":bedwars-core"))
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("org.jetbrains:annotations:26.0.2")
 
     testImplementation(platform("org.junit:junit-bom:5.13.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")

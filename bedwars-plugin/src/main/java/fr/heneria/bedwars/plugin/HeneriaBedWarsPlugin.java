@@ -5,8 +5,7 @@ import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.GeneralConfiguration;
-import fr.heneria.bedwars.plugin.logging.PaperProjectLogger;
-import java.util.Objects;
+import fr.heneria.bedwars.plugin.logging.BukkitProjectLogger;
 import java.util.logging.Level;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,11 +20,12 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
     GeneralConfiguration configuration;
     try {
       configuration = GeneralConfiguration.from(getConfig());
-      PaperProjectLogger projectLogger = new PaperProjectLogger(getLogger(), configuration.debug());
-      bootstrap = new BedWarsBootstrap(getPluginMeta().getVersion(), configuration, projectLogger);
+      BukkitProjectLogger projectLogger =
+          new BukkitProjectLogger(getLogger(), configuration.debug());
+      bootstrap = new BedWarsBootstrap(getDescription().getVersion(), configuration, projectLogger);
       bootstrap.start();
       registerDiagnosticCommand();
-      getLogger().info("HeneriaBedWars " + getPluginMeta().getVersion() + " enabled.");
+      getLogger().info("HeneriaBedWars " + getDescription().getVersion() + " enabled.");
     } catch (Exception exception) {
       getLogger()
           .log(Level.SEVERE, "Critical startup failure; disabling HeneriaBedWars.", exception);
@@ -47,8 +47,10 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
   }
 
   private void registerDiagnosticCommand() {
-    PluginCommand command =
-        Objects.requireNonNull(getCommand("bedwars"), "bedwars command missing from plugin.yml");
+    PluginCommand command = getCommand("bedwars");
+    if (command == null) {
+      throw new IllegalStateException("The 'bedwars' command is not declared in plugin.yml");
+    }
     BedWarsCommand executor = new BedWarsCommand(this, bootstrap);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
