@@ -99,6 +99,17 @@ class GuiFrameworkTest {
   }
 
   @Test
+  void itemKeyIsExclusiveAndCanBeResolvedDynamically() {
+    GuiSession session = new GuiSession(UUID.randomUUID(), gui("x"), 2);
+    GuiRenderContext context = new GuiRenderContext("Alex", session);
+    GuiButton keyed = GuiButton.builder().itemKey(value -> "page." + value.page()).build();
+    assertEquals("page.0", keyed.itemKey(context).orElseThrow());
+    assertThrows(
+        GuiBuildException.class,
+        () -> GuiButton.builder().itemKey("gui.close").item(GuiItem.of("STONE", "x")).build());
+  }
+
+  @Test
   void navigationSupportsBackRootLimitAndReplacement() {
     Gui root = gui("root");
     GuiSession session = new GuiSession(UUID.randomUUID(), root, 2);

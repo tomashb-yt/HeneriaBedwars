@@ -17,6 +17,9 @@ public final class ConfirmationGui {
     private GuiItem information = GuiItem.of("PAPER", "Information");
     private GuiItem confirm = GuiItem.of("LIME_CONCRETE", "Confirm");
     private GuiItem cancel = GuiItem.of("RED_CONCRETE", "Cancel");
+    private String informationKey;
+    private String confirmKey;
+    private String cancelKey;
     private GuiAction onConfirm;
     private GuiAction onCancel = GuiClickContext::back;
     private String permission;
@@ -34,16 +37,34 @@ public final class ConfirmationGui {
 
     public Builder information(GuiItem value) {
       information = value;
+      informationKey = null;
+      return this;
+    }
+
+    public Builder informationKey(String value) {
+      informationKey = value;
       return this;
     }
 
     public Builder confirmItem(GuiItem value) {
       confirm = value;
+      confirmKey = null;
+      return this;
+    }
+
+    public Builder confirmItemKey(String value) {
+      confirmKey = value;
       return this;
     }
 
     public Builder cancelItem(GuiItem value) {
       cancel = value;
+      cancelKey = null;
+      return this;
+    }
+
+    public Builder cancelItemKey(String value) {
+      cancelKey = value;
       return this;
     }
 
@@ -70,18 +91,21 @@ public final class ConfirmationGui {
     public Gui build() {
       if (onConfirm == null) throw new GuiBuildException("confirmation action is required");
       GuiButton.Builder confirmButton =
-          GuiButton.builder().item(confirm).cooldown(cooldown).onLeftClick(onConfirm);
+          source(confirm, confirmKey).cooldown(cooldown).onLeftClick(onConfirm);
       if (permission != null) confirmButton.permission(permission);
       return Gui.builder()
           .id(id)
           .title(Objects.requireNonNull(title, "title"))
           .rows(3)
           .fillEmptySlots(true)
-          .button(13, GuiButton.builder().item(information).build())
+          .button(13, source(information, informationKey).build())
           .button(11, confirmButton.build())
-          .button(
-              15, GuiButton.builder().item(cancel).cooldown(cooldown).onLeftClick(onCancel).build())
+          .button(15, source(cancel, cancelKey).cooldown(cooldown).onLeftClick(onCancel).build())
           .build();
+    }
+
+    private static GuiButton.Builder source(GuiItem item, String key) {
+      return key == null ? GuiButton.builder().item(item) : GuiButton.builder().itemKey(key);
     }
   }
 }

@@ -99,7 +99,9 @@ public final class ConfigurationService {
               + candidate.loadedFiles()
               + " configuration files with "
               + warnings
-              + " warning(s).");
+              + " warning(s); "
+              + candidate.snapshot().items().size()
+              + " configurable item(s) active.");
       if (candidate.snapshot().plugin().debug()) {
         logger.debug(
             "Configuration load took " + ((System.nanoTime() - started) / 1_000_000.0) + " ms.");

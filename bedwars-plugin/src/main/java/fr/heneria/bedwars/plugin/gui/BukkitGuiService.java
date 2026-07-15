@@ -14,9 +14,11 @@ import fr.heneria.bedwars.core.gui.GuiRenderContext;
 import fr.heneria.bedwars.core.gui.GuiRuntime;
 import fr.heneria.bedwars.core.gui.GuiSession;
 import fr.heneria.bedwars.core.gui.GuiSessionManager;
+import fr.heneria.bedwars.core.item.ItemContext;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.item.ItemService;
 import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -38,6 +40,7 @@ public final class BukkitGuiService implements GuiService, LifecycleComponent {
   private final JavaPlugin plugin;
   private final ConfigurationService configurations;
   private final ProjectLogger logger;
+  private final ItemService itemService;
   private final GuiSessionManager sessions = new GuiSessionManager();
   private final GuiItemRenderer items = new GuiItemRenderer();
   private final GuiActionExecutor actions;
@@ -45,10 +48,14 @@ public final class BukkitGuiService implements GuiService, LifecycleComponent {
   private boolean stopped;
 
   public BukkitGuiService(
-      JavaPlugin plugin, ConfigurationService configurations, ProjectLogger logger) {
+      JavaPlugin plugin,
+      ConfigurationService configurations,
+      ItemService itemService,
+      ProjectLogger logger) {
     this.plugin = plugin;
     this.configurations = configurations;
     this.logger = logger;
+    this.itemService = itemService;
     this.actions =
         new GuiActionExecutor(
             (context, exception) -> {
@@ -275,11 +282,41 @@ public final class BukkitGuiService implements GuiService, LifecycleComponent {
         .forEach(
             (slot, button) -> {
               if (button.visible(context))
-                inventory.setItem(slot, items.render(button.render(context)));
+                inventory.setItem(slot, render(player, gui, button, context));
             });
     if (gui.fillEmptySlots())
       for (int slot = 0; slot < inventory.getSize(); slot++)
-        if (inventory.getItem(slot) == null) inventory.setItem(slot, items.render(gui.filler()));
+        if (inventory.getItem(slot) == null)
+          inventory.setItem(
+              slot,
+              itemService.buildOrFallback(
+                  "gui.border", itemContext(player, gui, session, java.util.Map.of())));
+  }
+
+  private org.bukkit.inventory.ItemStack render(
+      Player player, Gui gui, GuiButton button, GuiRenderContext context) {
+    return button
+        .itemKey(context)
+        .map(
+            key ->
+                itemService.buildOrFallback(
+                    key,
+                    itemContext(player, gui, context.session(), button.itemPlaceholders(context))))
+        .orElseGet(() -> items.render(button.render(context)));
+  }
+
+  private ItemContext itemContext(
+      Player player, Gui gui, GuiSession session, java.util.Map<String, ?> buttonValues) {
+    ItemContext.Builder context =
+        ItemContext.builder()
+            .player(player.getUniqueId(), player.getName())
+            .locale(configurations.snapshot().plugin().locale())
+            .menu(gui.id())
+            .page(session.page() + 1)
+            .placeholder("gui_sessions", openCount())
+            .placeholders(gui.data())
+            .placeholders(buttonValues);
+    return context.build();
   }
 
   private void refreshDueSessions() {

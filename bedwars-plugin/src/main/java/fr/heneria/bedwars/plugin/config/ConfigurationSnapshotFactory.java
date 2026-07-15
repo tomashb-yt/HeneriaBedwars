@@ -13,6 +13,8 @@ import fr.heneria.bedwars.core.config.SoundSettings;
 import fr.heneria.bedwars.core.config.StorageSettings;
 import fr.heneria.bedwars.core.config.TranslationBundle;
 import fr.heneria.bedwars.core.config.TranslationKey;
+import fr.heneria.bedwars.core.item.ItemRegistry;
+import fr.heneria.bedwars.plugin.item.ItemDefinitionLoader;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.bukkit.Material;
 
 /** Validates raw documents and converts them into one typed immutable snapshot. */
 public final class ConfigurationSnapshotFactory {
@@ -141,8 +142,9 @@ public final class ConfigurationSnapshotFactory {
                 "back", sound(menus, "back", "UI_BUTTON_CLICK", problems),
                 "close", sound(menus, "close", "UI_BUTTON_CLICK", problems)));
 
-    validateItems(documents.get(ConfigurationId.ITEMS), problems);
     Map<String, TranslationBundle> languages = languages(languageDocuments, problems);
+    ItemRegistry items =
+        new ItemDefinitionLoader().load(documents.get(ConfigurationId.ITEMS), languages, problems);
     if (!languages.containsKey(locale)) {
       problems.add(
           new ConfigurationProblem(
@@ -160,6 +162,7 @@ public final class ConfigurationSnapshotFactory {
         lobbySettings,
         storageSettings,
         menuSettings,
+        items,
         documents,
         languages,
         problems,
@@ -180,20 +183,6 @@ public final class ConfigurationSnapshotFactory {
               document.version() < 1
                   ? "Missing configuration version"
                   : "Unsupported configuration version"));
-  }
-
-  private static void validateItems(
-      ConfigurationDocument document, List<ConfigurationProblem> problems) {
-    Reader items = new Reader(document, problems);
-    String material = items.string("items.menu-border.material", "GRAY_STAINED_GLASS_PANE");
-    if (Material.matchMaterial(material) == null)
-      items.problem(
-          "items.menu-border.material",
-          material,
-          "a valid Minecraft material",
-          "GRAY_STAINED_GLASS_PANE",
-          "Invalid material");
-    items.integer("items.menu-border.amount", 1, 1, 99);
   }
 
   private static SoundSettings sound(

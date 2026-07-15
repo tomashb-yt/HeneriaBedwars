@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 /** Adds newly introduced optional built-in keys without replacing existing customized values. */
 public final class ConfigurationDefaultsUpdater {
   private static final List<String> EVOLVING_FILES =
-      List.of("menus.yml", "languages/fr_FR.yml", "languages/en_US.yml");
+      List.of("menus.yml", "items.yml", "languages/fr_FR.yml", "languages/en_US.yml");
   private final Path root;
   private final DefaultConfigurationInstaller.ResourceProvider resources;
   private final BackupService backups;
@@ -48,7 +48,7 @@ public final class ConfigurationDefaultsUpdater {
       logger.warning(
           "[Configuration] Added "
               + added
-              + " new Ticket 003 default key(s) to "
+              + " new built-in default key(s) to "
               + name
               + "; existing values were preserved. Backup: "
               + backup);

@@ -33,7 +33,7 @@ Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne
 
 Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est produit par `:bedwars-plugin:shadowJar`.
 
-Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language` et `gui`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge uniquement les fichiers HeneriaBedWars.
+Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui` et `item`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge uniquement les fichiers HeneriaBedWars, y compris le registre d'items.
 
 Au démarrage, l'ancien `config.yml` officiel du Ticket 001 sans `config-version` est reconnu par sa signature minimale, sauvegardé puis migré vers la version 1. Ne jamais élargir cette détection à n'importe quel YAML non versionné : un fichier vide, corrompu ou non reconnaissable doit rester intact et être refusé.
 

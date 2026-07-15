@@ -18,6 +18,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Écriture YAML protégée, sauvegardes anti-collision et contrat de migrations futures.
 - Framework GUI interne : modèle immutable, sessions par joueur/vue, navigation limitée, pagination, confirmations, cooldowns, sons et rafraîchissement central.
 - Protection Bukkit des clics, drags, drops, touches numériques, déconnexions et arrêts, avec démonstration `/bedwars gui`.
+- Registre d'items immuable et transactionnel, clés logiques, fallback, validation, héritage avec cycles/profondeur et rendu Bukkit indépendant par construction.
+- Propriétés configurables d'items, textes traduits et placeholders sûrs, PDC contrôlé, intégration complète au GUI et commandes `/bedwars item` avec menu de prévisualisation.
 
 ### Fixed
 

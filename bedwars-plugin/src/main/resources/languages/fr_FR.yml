@@ -14,6 +14,7 @@ command:
     config: "<gray>/bedwars config <dark_gray>- <white>Affiche la configuration active."
     language: "<gray>/bedwars language [set <locale>] <dark_gray>- <white>Gère la langue globale."
     gui: "<gray>/bedwars gui <dark_gray>- <white>Ouvre le menu de test des interfaces."
+    item: "<gray>/bedwars item <dark_gray>- <white>Inspecte les items configurables."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Version du plugin : <white>{plugin_version}"
@@ -39,12 +40,20 @@ command:
     last-reload: "<gray>Dernier rechargement réussi : <white>{last_reload}"
     warnings: "<gray>Avertissements actifs : <white>{warnings}"
     gui-sessions: "<gray>Sessions GUI actives : <white>{gui_sessions}"
+    items: "<gray>Items configurables actifs : <white>{items}"
   language:
     current: "<gray>Langue actuelle : <white>{language}"
     available: "<gray>Langues disponibles : <white>{locales}"
     usage: "<yellow>Utilisation : /bedwars language set <locale>"
     changed: "<green>La langue globale est maintenant <white>{language}<green>."
     unknown: "<red>Langue inconnue : <white>{language}"
+  item:
+    help: "<yellow>Utilisation : /bedwars item <list|give <clé>|preview>"
+    list: "<gray>Items chargés (<white>{count}<gray>) : <white>{keys}"
+    unknown: "<red>Clé d'item inconnue : <white>{item_key}"
+    given: "<green>Une copie de <white>{item_key}<green> a été ajoutée à votre inventaire."
+    inventory-full: "<red>Votre inventaire est plein. Aucun item n'a été ajouté."
+    preview-title: "<aqua>Prévisualisation des items"
 gui:
   general:
     back: "<yellow>Retour"

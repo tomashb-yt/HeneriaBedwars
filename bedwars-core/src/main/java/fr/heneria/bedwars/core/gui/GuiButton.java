@@ -11,6 +11,8 @@ import java.util.function.Predicate;
 /** Immutable button with dynamic rendering, conditions, permissions and click routing. */
 public final class GuiButton {
   private final Function<GuiRenderContext, GuiItem> item;
+  private final Function<GuiRenderContext, String> itemKey;
+  private final Function<GuiRenderContext, Map<String, ?>> itemPlaceholders;
   private final Map<GuiClickType, GuiAction> actions;
   private final GuiAction genericAction;
   private final Predicate<GuiRenderContext> visible;
@@ -20,6 +22,8 @@ public final class GuiButton {
 
   private GuiButton(Builder builder) {
     item = builder.item;
+    itemKey = builder.itemKey;
+    itemPlaceholders = builder.itemPlaceholders;
     actions = Map.copyOf(builder.actions);
     genericAction = builder.genericAction;
     visible = builder.visible;
@@ -33,7 +37,16 @@ public final class GuiButton {
   }
 
   public GuiItem render(GuiRenderContext context) {
+    if (item == null) throw new GuiBuildException("button uses an item key, not a GuiItem");
     return item.apply(context);
+  }
+
+  public Optional<String> itemKey(GuiRenderContext context) {
+    return itemKey == null ? Optional.empty() : Optional.ofNullable(itemKey.apply(context));
+  }
+
+  public Map<String, ?> itemPlaceholders(GuiRenderContext context) {
+    return Map.copyOf(itemPlaceholders.apply(context));
   }
 
   public boolean visible(GuiRenderContext context) {
@@ -63,6 +76,8 @@ public final class GuiButton {
 
   public static final class Builder {
     private Function<GuiRenderContext, GuiItem> item;
+    private Function<GuiRenderContext, String> itemKey;
+    private Function<GuiRenderContext, Map<String, ?>> itemPlaceholders = context -> Map.of();
     private final Map<GuiClickType, GuiAction> actions = new EnumMap<>(GuiClickType.class);
     private GuiAction genericAction;
     private Predicate<GuiRenderContext> visible = context -> true;
@@ -77,6 +92,22 @@ public final class GuiButton {
 
     public Builder item(Function<GuiRenderContext, GuiItem> value) {
       item = Objects.requireNonNull(value);
+      return this;
+    }
+
+    public Builder itemKey(String value) {
+      Objects.requireNonNull(value);
+      itemKey = context -> value;
+      return this;
+    }
+
+    public Builder itemKey(Function<GuiRenderContext, String> value) {
+      itemKey = Objects.requireNonNull(value);
+      return this;
+    }
+
+    public Builder itemPlaceholders(Function<GuiRenderContext, Map<String, ?>> value) {
+      itemPlaceholders = Objects.requireNonNull(value);
       return this;
     }
 
@@ -119,7 +150,8 @@ public final class GuiButton {
     }
 
     public GuiButton build() {
-      if (item == null) throw new IllegalStateException("button item is required");
+      if ((item == null) == (itemKey == null))
+        throw new GuiBuildException("button requires exactly one item source");
       return new GuiButton(this);
     }
   }

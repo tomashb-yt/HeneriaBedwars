@@ -12,7 +12,11 @@ public record TranslationBundle(String locale, int version, Map<String, String> 
   }
 
   public String message(TranslationKey key) {
-    return messages.getOrDefault(key.path(), "<red>Missing translation: " + key.path());
+    return message(key.path());
+  }
+
+  public String message(String key) {
+    return messages.getOrDefault(key, "<red>Missing translation: " + key);
   }
 
   public Set<String> keys() {

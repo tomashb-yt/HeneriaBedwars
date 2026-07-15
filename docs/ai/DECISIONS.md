@@ -1,5 +1,33 @@
 # Décisions d'architecture
 
+## ADR-022 — Clés logiques et définitions d'items immuables
+
+Accepté. Les items sont adressés par des clés minuscules pointées, normalisées par `ItemKey`. `ItemDefinition` ne contient aucune section YAML ni donnée Bukkit mutable.
+
+## ADR-023 — Reconstruction de chaque ItemStack
+
+Accepté. Seules les définitions validées sont conservées; chaque appel à `ItemService.build` crée un stack et une meta indépendants. Aucun cache d'`ItemStack` traduit ou dynamique n'est partagé.
+
+## ADR-024 — Héritage simple borné et fusion explicite
+
+Accepté. Profondeur maximale 16, parent unique, parent inconnu/cycle refusé. Le lore enfant remplace le lore parent; flags et placeholders requis sont réunis sans doublon; enchantements et tags fusionnent avec priorité enfant.
+
+## ADR-025 — Actions GUI séparées des items
+
+Accepté. `items.yml` décrit uniquement l'apparence et des métadonnées non exécutables. Slots, permissions et actions restent dans les définitions GUI Java.
+
+## ADR-026 — PDC contrôlé par liste blanche
+
+Accepté. `heneriabedwars:item_key` est interne; seuls les tags configurables `category` et `action` peuvent être copiés dans des clés PDC dédiées. Le slot/session reste l'autorité pour les clics GUI.
+
+## ADR-027 — Registre d'items dans le snapshot transactionnel
+
+Accepté. Traductions, héritages et propriétés sont validés avant l'échange de `ConfigurationSnapshot`. Une erreur d'héritage ou critique conserve intégralement l'ancien registre et les menus ouverts ne sont pas fermés.
+
+## ADR-028 — Têtes sans résolution réseau synchrone
+
+Accepté. Le joueur du contexte est appliqué par UUID; un propriétaire statique n'est appliqué que s'il est déjà en ligne. Les textures Base64 et téléchargements de skin sont exclus de ce ticket.
+
 ## ADR-017 — Identification GUI par holder et identifiants de vue
 
 Accepté. Chaque inventaire utilise `GuiInventoryHolder(sessionId, viewId, menuId)`, jamais le titre. `viewId` est renouvelé à chaque navigation, empêchant une fermeture retardée de supprimer la vue suivante.

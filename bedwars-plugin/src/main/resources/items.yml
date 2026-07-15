@@ -1,10 +1,146 @@
 config-version: 1
 
+fallback-item:
+  material: BARRIER
+  amount: 1
+  name: "<red><bold>Item invalide"
+  lore:
+    - "<gray>Impossible d'afficher cet item."
+    - "<dark_gray>Référence : {item_key}"
+  glow: false
+  unbreakable: false
+  custom-model-data: null
+  item-flags: []
+  enchantments: {}
+
 items:
-  menu-border:
-    material: GRAY_STAINED_GLASS_PANE
-    amount: 1
-    name: " "
-    lore: []
-    glow: false
-    custom-model-data: null
+  gui:
+    border:
+      material: GRAY_STAINED_GLASS_PANE
+      amount: 1
+      name: " "
+      lore: []
+      glow: false
+      tags:
+        category: gui
+    back:
+      material: ARROW
+      name-key: "gui.general.back"
+      lore: []
+      item-flags: [HIDE_ATTRIBUTES]
+      tags:
+        category: gui
+        action: back
+    close:
+      material: BARRIER
+      name-key: "gui.general.close"
+      lore: []
+      tags:
+        category: gui
+        action: close
+    confirm:
+      material: LIME_CONCRETE
+      name-key: "gui.general.confirm"
+      tags:
+        category: gui
+        action: confirm
+    cancel:
+      material: RED_CONCRETE
+      name-key: "gui.general.cancel"
+      tags:
+        category: gui
+        action: cancel
+    previous-page:
+      material: ARROW
+      name-key: "gui.general.previous-page"
+      lore-keys: ["gui.demo.pagination.page"]
+      tags:
+        category: gui
+        action: previous-page
+    next-page:
+      material: ARROW
+      name-key: "gui.general.next-page"
+      lore-keys: ["gui.demo.pagination.page"]
+      tags:
+        category: gui
+        action: next-page
+    page-indicator:
+      material: MAP
+      name-key: "gui.demo.pagination.page"
+      tags:
+        category: gui
+    refresh:
+      material: SUNFLOWER
+      name-key: "gui.general.refresh"
+      tags:
+        category: gui
+        action: refresh
+    information:
+      material: BOOK
+      name: "<aqua>Information"
+      tags:
+        category: gui
+    locked:
+      material: IRON_BARS
+      name: "<red>Accès verrouillé"
+      tags:
+        category: gui
+    error:
+      inherit: "gui.close"
+      name: "<red>Erreur"
+
+  demo:
+    information:
+      material: PLAYER_HEAD
+      name-key: "gui.demo.information.name"
+      lore-keys:
+        - "gui.demo.information.player"
+        - "gui.demo.information.version"
+        - "gui.demo.information.language"
+        - "gui.demo.information.sessions"
+        - "gui.demo.information.refresh-count"
+      head:
+        type: context-player
+      required-placeholders: [player, plugin_version, language, sessions, refresh_count]
+      tags:
+        category: demo
+    click-test:
+      material: STONE_BUTTON
+      name-key: "gui.demo.click-test.name"
+      tags:
+        category: demo
+    pagination:
+      material: CHEST
+      name-key: "gui.demo.pagination.name"
+      tags:
+        category: demo
+    pagination-entry:
+      material: PAPER
+      name-key: "gui.demo.pagination.element"
+      required-placeholders: [element]
+      tags:
+        category: demo
+    confirmation:
+      material: EMERALD
+      name-key: "gui.demo.confirmation.name"
+      tags:
+        category: demo
+    submenu:
+      material: ENDER_CHEST
+      name-key: "gui.demo.submenu.name"
+      tags:
+        category: demo
+    submenu-information:
+      inherit: "gui.information"
+      name-key: "gui.demo.submenu.info"
+    refresh:
+      inherit: "gui.refresh"
+      name-key: "gui.demo.refresh.name"
+    controlled-error:
+      material: TNT
+      name-key: "gui.demo.controlled-error.name"
+      lore-keys: ["gui.demo.controlled-error.lore"]
+      tags:
+        category: demo
+    close:
+      inherit: "gui.close"

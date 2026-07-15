@@ -39,3 +39,5 @@ Au premier démarrage, le plugin crée les neuf YAML principaux, `languages/fr_F
 Les arènes, équipes, lits, menus métier, achats, générateurs actifs, stockage SQL et parties ne sont pas implémentés.
 
 Le framework interne de menus est disponible via `/bedwars gui` ou `/hbw gui` avec `heneriabedwars.admin.gui`. Il démontre navigation, pagination, confirmation, rafraîchissement et protection des inventaires, sans fonctionnalité BedWars.
+
+Les apparences viennent de `items.yml` : matériaux, quantités, textes directs ou traduits, lore, glow, enchantements sûrs, flags, cuir, têtes hors ligne, custom model data, tags contrôlés et héritage. `/bedwars item list`, `/bedwars item give <clé>` et `/bedwars item preview` permettent de vérifier le registre sans recompilation.

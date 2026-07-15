@@ -1,5 +1,20 @@
 # Architecture actuelle
 
+## Ticket 004 — items configurables
+
+`bedwars-core/item` contient clés, textes, contexte, définitions/templates immuables, registre et résolveur d'héritage sans Bukkit. `bedwars-plugin/item` charge et valide `items.yml`, construit des `ItemStack` neufs, applique les métadonnées/PDC et fournit `ItemService` au GUI et aux commandes. `ConfigurationSnapshot` contient le registre : le même échange atomique active configuration, langues et items, ou conserve l'ancien ensemble.
+
+```mermaid
+flowchart LR
+  YAML["items.yml"] --> LOADER["ItemDefinitionLoader"]
+  LOADER --> INHERIT["ItemInheritanceResolver"]
+  INHERIT --> SNAPSHOT["ConfigurationSnapshot + ItemRegistry"]
+  SNAPSHOT --> SERVICE["BukkitItemService"]
+  SERVICE --> FACTORY["BukkitItemFactory"]
+  SERVICE --> GUI["BukkitGuiService"]
+  SERVICE --> COMMAND["/bedwars item"]
+```
+
 ## Ticket 003 — framework GUI
 
 Le cœur contient le modèle GUI pur, les sessions, la navigation, la pagination, les confirmations, les slots et l'exécuteur d'actions. Le module plugin contient `BukkitGuiService`, `GuiInventoryHolder`, `GuiListener`, le rendu d'items, les sons et la démonstration. `GuiService` est enregistré dans `ServiceRegistry` et `BukkitGuiService` participe au cycle de vie.

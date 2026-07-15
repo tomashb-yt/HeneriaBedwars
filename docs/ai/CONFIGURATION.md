@@ -81,7 +81,7 @@ Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQ
 
 ## `menus.yml` et `items.yml`
 
-`menus.yml` configure le framework Ticket 003; `items.yml` fournit seulement le filler minimal. La fabrique complète d'items appartient au Ticket 004.
+`menus.yml` configure le framework GUI; `items.yml` contient le registre Ticket 004 complet. Les deux sont rechargeables par `/bedwars reload`.
 
 | Fichier / clé | Type | Défaut / contrainte |
 |---|---|---|
@@ -106,12 +106,33 @@ Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQ
 | `sounds.<id>.volume` | nombre | positif ou nul |
 | `sounds.<id>.pitch` | nombre | de 0 à 2 |
 | `items.yml: config-version` | entier | `1` |
-| `items.menu-border.material` | chaîne | `GRAY_STAINED_GLASS_PANE`, matériau Bukkit valide |
-| `items.menu-border.amount` | entier | `1`, de 1 à 99 |
-| `items.menu-border.name` | chaîne | espace |
-| `items.menu-border.lore` | liste | vide |
-| `items.menu-border.glow` | booléen | `false` |
-| `items.menu-border.custom-model-data` | entier ou null | `null` |
+| `fallback-item` | section item | fallback sûr obligatoire; `BARRIER` par défaut |
+| `items.<clé>` | section item | clé normalisée `[a-z0-9][a-z0-9._-]*` |
+
+### Propriétés de `items.yml`
+
+| Propriété | Type / défaut | Contraintes et fallback |
+|---|---|---|
+| `material` | chaîne, parent ou fallback | nom Bukkit insensible à la casse; inconnu/air devient le matériau fallback avec warning |
+| `amount` | entier, `1` | de 1 à la taille maximale du stack; sinon `1` avec warning |
+| `name` | chaîne, vide | texte direct au format Ticket 002; exclusif avec `name-key` |
+| `name-key` | chaîne, absent | clé des catalogues; absence dans une locale produit un warning et un diagnostic visible |
+| `lore` | liste de chaînes, vide | remplace complètement le lore parent; exclusif avec `lore-keys` |
+| `lore-keys` | liste de clés, vide | chaque ligne est traduite dans la locale du contexte |
+| `glow` | booléen, `false` | ajoute `UNBREAKING` masqué uniquement sans enchantement réel |
+| `unbreakable` | booléen, `false` | appliqué via `ItemMeta#setUnbreakable` |
+| `custom-model-data` | entier supérieur ou égal à zéro, ou `null`, absent | ne fournit ni n'impose un resource pack |
+| `item-flags` | liste, vide | flags Bukkit connus; inconnus ignorés avec warning; fusion sans doublon à l'héritage |
+| `enchantments.<clé>` | entier, vide | enchantements connus et niveaux sûrs uniquement; fusion avec priorité enfant |
+| `leather-color` | `#RRGGBB` ou section RGB, absent | canaux 0..255; ignorée avec warning hors matériau cuir |
+| `head.type/value` | `context-player` ou `player`, absent | contexte par UUID; propriétaire statique appliqué seulement s'il est en ligne, sans réseau |
+| `inherit` | clé, absent | parent unique, profondeur maximale 16, parent inconnu/cycle = reload refusé |
+| `tags.<clé>` | chaîne, vide | métadonnées immuables; seuls `category` et `action` sont autorisés vers le PDC |
+| `required-placeholders` | liste, vide | construction normale échoue si une valeur obligatoire manque; `buildOrFallback` affiche le fallback |
+
+Les placeholders sont insérés après le rendu des couleurs : une valeur dynamique telle que `<red>Alex` reste littérale et ne peut pas injecter de style. Le contexte supporte joueur optionnel, locale, menu, page, nombres, booléens et valeurs futures sans dépendre d'une arène. Chaque construction relit le registre en mémoire, jamais le YAML, et crée un `ItemStack` neuf.
+
+L'évolution depuis le Ticket 003 sauvegarde puis complète uniquement les clés absentes de `items.yml`; les personnalisations existantes ne sont pas écrasées. Au reload, langues, définitions, héritage et validation sont préparés ensemble. Une erreur `ERROR/CRITICAL` conserve l'ancien snapshot; les menus ouverts ne ferment pas et reflètent les nouvelles définitions valides à leur prochain rafraîchissement.
 
 ## Fichiers préparatoires
 

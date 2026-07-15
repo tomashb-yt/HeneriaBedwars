@@ -72,7 +72,18 @@ La profondeur vient de `navigation.max-history-size`. Chaque changement exécute
 
 ## Items, traductions et sons
 
-`GuiItemRenderer` prend en charge matériau, quantité, nom, lore, glow et custom model data. La fabrique complète d'items appartient au Ticket 004. Les textes de la démonstration et boutons standards viennent exclusivement de `TranslationKey`; les placeholders sont rendus par le système Ticket 002 après interprétation des couleurs, ce qui empêche l'injection de balises par un nom de joueur.
+`BukkitGuiService` résout désormais les clés par `ItemService`; `GuiItemRenderer` ne subsiste que pour les rendus dynamiques explicitement fournis par du code. Bordure, retour, fermeture, confirmation, annulation, pagination, refresh, informations et démonstration viennent de `items.yml`. Les placeholders passent par `ItemContext` et le système Ticket 002 après interprétation des couleurs, ce qui empêche l'injection de balises par un nom de joueur.
+
+```java
+GuiButton.builder()
+    .itemKey("gui.close")
+    .onLeftClick(context -> context.close())
+    .build();
+```
+
+Une clé peut être dynamique avec `itemKey(renderContext -> ...)` et recevoir des valeurs avec `itemPlaceholders`. Le builder refuse une clé et un `GuiItem` simultanés. Les actions, permissions et slots ne sont jamais lus depuis `items.yml`. Le holder/session/slot reste l'identité d'une action; le PDC `heneriabedwars:item_key` n'est qu'un complément pour les futurs objets hors GUI. Le nom ou le lore ne doit jamais servir d'identifiant.
+
+`/bedwars item preview` est un menu paginé. Il reconstruit les items depuis le snapshot actif, ajoute leur clé au lore de prévisualisation et donne une copie au clic seulement avec `heneriabedwars.admin.item.give` et une place libre. Un reload valide apparaît au prochain refresh/réouverture; un reload refusé laisse les vues et l'ancien registre intacts.
 
 Les sons configurés sont `open`, `click`, `success`, `error`, `back` et `close`. Une valeur invalide devient un warning de configuration et utilise le défaut. Le système peut être désactivé globalement.
 

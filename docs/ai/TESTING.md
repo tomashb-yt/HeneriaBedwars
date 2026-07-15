@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 004
+
+La suite contient 70 tests : 54 dans le cœur et 16 dans le module plugin. Les nouveaux scénarios couvrent format/casse des clés, immutabilité, valeurs par défaut, contexte typé, registre, source GUI exclusive, héritage profond, surcharge, fusion, parent inconnu, cycles directs/indirects, profondeur déterministe même avec cache, matériaux/fallback, quantité, flags, enchantements sûrs, couleur incompatible, fallback critique, complétion des commandes, évolution sauvegardée d'un `items.yml` Ticket 003 et conservation du registre lors d'un reload cyclique.
+
+MockBukkit n'a pas été ajouté : aucune version compatible avec la frontière Spigot/Paper 1.21 de ce dépôt n'a été établie. La construction réelle de `ItemStack`, les `Component`/métadonnées, glow, PDC, têtes, inventaire plein, preview et changements visuels après reload nécessitent la matrice manuelle du Ticket 004 sur Paper.
+
 ## Ticket 003
 
 La suite complète contient 57 tests : 45 dans le cœur et 12 dans le module plugin. Les 13 nouveaux tests purs couvrent construction/immutabilité, tailles/lignes/slots invalides, doublon et remplacement, routage des clics, permissions/conditions, navigation/retour/racine/limite, protections sessionId/viewId, pagination vide/multiple/réduite, rectangles, anti-spam, confirmation et interception d'exception avec session conservée. Un test d'évolution reproduit une installation Ticket 002 sans les nouvelles clés de menus/langues et vérifie fusion, trois sauvegardes et parité FR/EN; un test de commande vérifie aussi la permission propre à l'autocomplétion GUI.

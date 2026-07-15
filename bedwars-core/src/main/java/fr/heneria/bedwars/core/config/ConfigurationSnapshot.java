@@ -1,5 +1,6 @@
 package fr.heneria.bedwars.core.config;
 
+import fr.heneria.bedwars.core.item.ItemRegistry;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ public record ConfigurationSnapshot(
     LobbySettings lobby,
     StorageSettings storage,
     MenuSettings menus,
+    ItemRegistry items,
     Map<ConfigurationId, ConfigurationDocument> documents,
     Map<String, TranslationBundle> languages,
     List<ConfigurationProblem> problems,

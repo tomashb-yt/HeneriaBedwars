@@ -29,6 +29,26 @@ class AdministrativeCommandPolicyTest {
   }
 
   @Test
+  void completesItemActionsAndKnownKeysBySpecificPermission() {
+    Set<String> permissions =
+        Set.of(
+            AdministrativeCommandPolicy.ITEM,
+            AdministrativeCommandPolicy.ITEM_GIVE,
+            AdministrativeCommandPolicy.ITEM_PREVIEW);
+    assertEquals(
+        List.of("list", "give", "preview"),
+        policy.complete(
+            permissions::contains, new String[] {"item", ""}, List.of(), List.of("gui.close")));
+    assertEquals(
+        List.of("gui.close"),
+        policy.complete(
+            permissions::contains,
+            new String[] {"item", "give", "gui"},
+            List.of(),
+            List.of("gui.close", "demo.info")));
+  }
+
+  @Test
   void exposesLanguageSetAndKnownLocalesOnlyWithLanguagePermission() {
     assertEquals(
         List.of("set"),

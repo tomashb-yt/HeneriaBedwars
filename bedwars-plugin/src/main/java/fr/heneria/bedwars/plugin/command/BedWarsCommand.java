@@ -10,6 +10,9 @@ import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.DemoMenuFactory;
 import fr.heneria.bedwars.plugin.gui.GuiService;
+import fr.heneria.bedwars.plugin.item.ItemContexts;
+import fr.heneria.bedwars.plugin.item.ItemPreviewMenuFactory;
+import fr.heneria.bedwars.plugin.item.ItemService;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -30,25 +33,35 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   public static final String CONFIG = AdministrativeCommandPolicy.CONFIG;
   public static final String LANGUAGE = AdministrativeCommandPolicy.LANGUAGE;
   public static final String GUI = AdministrativeCommandPolicy.GUI;
+  public static final String ITEM = AdministrativeCommandPolicy.ITEM;
+  public static final String ITEM_GIVE = AdministrativeCommandPolicy.ITEM_GIVE;
+  public static final String ITEM_PREVIEW = AdministrativeCommandPolicy.ITEM_PREVIEW;
   private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
   private final JavaPlugin plugin;
   private final PluginBootstrap bootstrap;
   private final ConfigurationService configurations;
   private final AdministrativeCommandPolicy completionPolicy = new AdministrativeCommandPolicy();
   private final GuiService guiService;
+  private final ItemService itemService;
   private final DemoMenuFactory demoMenus;
+  private final ItemPreviewMenuFactory itemPreview;
 
   public BedWarsCommand(
       JavaPlugin plugin,
       PluginBootstrap bootstrap,
       ConfigurationService configurations,
+      ItemService itemService,
       GuiService guiService) {
     this.plugin = plugin;
     this.bootstrap = bootstrap;
     this.configurations = configurations;
     this.guiService = guiService;
+    this.itemService = itemService;
     this.demoMenus =
         new DemoMenuFactory(configurations, guiService, plugin.getDescription().getVersion());
+    this.itemPreview =
+        new ItemPreviewMenuFactory(
+            configurations, itemService, plugin.getDescription().getVersion());
   }
 
   @Override
@@ -65,6 +78,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "config" -> config(sender);
         case "language" -> language(sender, args);
         case "gui" -> gui(sender);
+        case "item" -> item(sender, args);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
     } catch (RuntimeException exception) {
@@ -82,6 +96,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (sender.hasPermission(CONFIG)) send(sender, TranslationKey.HELP_CONFIG);
     if (sender.hasPermission(LANGUAGE)) send(sender, TranslationKey.HELP_LANGUAGE);
     if (sender.hasPermission(GUI)) send(sender, TranslationKey.HELP_GUI);
+    if (sender.hasPermission(ITEM)) send(sender, TranslationKey.HELP_ITEM);
     return true;
   }
 
@@ -143,6 +158,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
             .put("last_reload", DATE.format(snapshot.loadedAt().atZone(ZoneId.systemDefault())))
             .put("warnings", snapshot.warningCount())
             .put("gui_sessions", guiService.openCount())
+            .put("items", snapshot.items().size())
             .build();
     send(sender, TranslationKey.CONFIG_HEADER);
     send(sender, TranslationKey.CONFIG_LANGUAGE, context);
@@ -153,6 +169,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     send(sender, TranslationKey.CONFIG_LAST_RELOAD, context);
     send(sender, TranslationKey.CONFIG_WARNINGS, context);
     send(sender, TranslationKey.CONFIG_GUI_SESSIONS, context);
+    send(sender, TranslationKey.CONFIG_ITEMS, context);
     return true;
   }
 
@@ -160,6 +177,58 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (!allowed(sender, GUI)) return true;
     if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
     guiService.open(player, demoMenus.main());
+    return true;
+  }
+
+  private boolean item(CommandSender sender, String[] args) {
+    if (!allowed(sender, ITEM)) return true;
+    if (args.length == 1) return send(sender, TranslationKey.ITEM_HELP);
+    return switch (args[1].toLowerCase(Locale.ROOT)) {
+      case "list" -> itemList(sender);
+      case "give" -> itemGive(sender, args);
+      case "preview" -> itemPreview(sender);
+      default -> send(sender, TranslationKey.ITEM_HELP);
+    };
+  }
+
+  private boolean itemList(CommandSender sender) {
+    List<String> keys = itemService.registeredKeys().stream().sorted().toList();
+    String visible = String.join(", ", keys.stream().limit(20).toList());
+    if (keys.size() > 20) visible += " …";
+    return send(
+        sender,
+        TranslationKey.ITEM_LIST,
+        PlaceholderContext.builder().put("count", keys.size()).put("keys", visible).build());
+  }
+
+  private boolean itemGive(CommandSender sender, String[] args) {
+    if (!allowed(sender, ITEM_GIVE)) return true;
+    if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
+    if (args.length != 3 || !itemService.exists(args[2]))
+      return send(
+          sender,
+          TranslationKey.ITEM_UNKNOWN,
+          PlaceholderContext.builder().put("item_key", args.length >= 3 ? args[2] : "?").build());
+    if (player.getInventory().firstEmpty() < 0)
+      return send(sender, TranslationKey.ITEM_INVENTORY_FULL);
+    player
+        .getInventory()
+        .addItem(
+            itemService.build(
+                args[2],
+                ItemContexts.forPlayer(player, configurations)
+                    .placeholder("plugin_version", plugin.getDescription().getVersion())
+                    .build()));
+    return send(
+        sender,
+        TranslationKey.ITEM_GIVEN,
+        PlaceholderContext.builder().put("item_key", args[2]).build());
+  }
+
+  private boolean itemPreview(CommandSender sender) {
+    if (!allowed(sender, ITEM_PREVIEW)) return true;
+    if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
+    guiService.open(player, itemPreview.create());
     return true;
   }
 
@@ -216,6 +285,9 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull String alias,
       @NotNull String[] args) {
     return completionPolicy.complete(
-        sender::hasPermission, args, configurations.availableLocales());
+        sender::hasPermission,
+        args,
+        configurations.availableLocales(),
+        itemService.registeredKeys().stream().sorted().toList());
   }
 }

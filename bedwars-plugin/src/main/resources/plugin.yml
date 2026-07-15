@@ -8,7 +8,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version|reload|config|language|gui]
+    usage: /bedwars [version|reload|config|language|gui|item]
     aliases:
       - hbw
 permissions:
@@ -20,6 +20,7 @@ permissions:
       heneriabedwars.admin.config: true
       heneriabedwars.admin.language: true
       heneriabedwars.admin.gui: true
+      heneriabedwars.admin.item: true
   heneriabedwars.admin.reload:
     description: Permet de recharger les configurations.
     default: op
@@ -31,4 +32,16 @@ permissions:
     default: op
   heneriabedwars.admin.gui:
     description: Permet d'ouvrir le menu de test des interfaces.
+    default: op
+  heneriabedwars.admin.item:
+    description: Permet de consulter les items configurables.
+    default: op
+    children:
+      heneriabedwars.admin.item.give: true
+      heneriabedwars.admin.item.preview: true
+  heneriabedwars.admin.item.give:
+    description: Permet de recevoir une copie d'un item configurable.
+    default: op
+  heneriabedwars.admin.item.preview:
+    description: Permet d'ouvrir la prévisualisation des items.
     default: op

@@ -3,6 +3,7 @@ package fr.heneria.bedwars.plugin.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -216,6 +217,9 @@ class ConfigurationSystemTest {
   void startupAddsTicket003DefaultsToExistingMenusAndLanguagesWithBackups() throws Exception {
     installer(new TestLogger()).installMissing();
     replace("menus.yml", "navigation:\n  history-enabled: true\n  max-history-size: 20\n", "");
+    Files.writeString(
+        temporary.resolve("items.yml"),
+        "config-version: 1\nitems:\n  menu-border:\n    material: GRAY_STAINED_GLASS_PANE\n    amount: 1\n");
     Path french = temporary.resolve("languages/fr_FR.yml");
     Path english = temporary.resolve("languages/en_US.yml");
     Files.writeString(french, Files.readString(french).replaceAll("(?ms)^gui:\\R.*\\z", ""));
@@ -225,6 +229,7 @@ class ConfigurationSystemTest {
     service.initialize();
 
     assertTrue(Files.readString(temporary.resolve("menus.yml")).contains("history-enabled: true"));
+    assertTrue(Files.readString(temporary.resolve("items.yml")).contains("demo:"));
     assertTrue(Files.readString(french).contains("gui:"));
     assertTrue(Files.readString(english).contains("gui:"));
     assertTrue(
@@ -235,8 +240,23 @@ class ConfigurationSystemTest {
             .keys()
             .equals(service.snapshot().languages().get("en_US").keys()));
     try (var paths = Files.walk(temporary.resolve("backups"))) {
-      assertEquals(3, paths.filter(Files::isRegularFile).count());
+      assertEquals(4, paths.filter(Files::isRegularFile).count());
     }
+  }
+
+  @Test
+  void cyclicItemReloadKeepsTheCompletePreviousRegistry() throws Exception {
+    ConfigurationService service = service();
+    service.initialize();
+    var previous = service.snapshot().items();
+    replace("items.yml", "inherit: \"gui.close\"", "inherit: \"demo.close\"");
+
+    ConfigurationReloadResult result = service.reloadAll();
+
+    assertFalse(result.successful());
+    assertSame(previous, service.snapshot().items());
+    assertTrue(
+        result.problems().stream().anyMatch(problem -> problem.key().equals("items.inherit")));
   }
 
   private ConfigurationService service() {

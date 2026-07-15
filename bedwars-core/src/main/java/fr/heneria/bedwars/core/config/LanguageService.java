@@ -21,4 +21,14 @@ public final class LanguageService {
   public String message(TranslationKey key, PlaceholderContext context) {
     return renderer.render(snapshotSupplier.get().activeLanguage().message(key), context);
   }
+
+  public String message(String key, String locale, PlaceholderContext context) {
+    ConfigurationSnapshot snapshot = snapshotSupplier.get();
+    TranslationBundle bundle = snapshot.languages().getOrDefault(locale, snapshot.activeLanguage());
+    return renderer.render(bundle.message(key), context);
+  }
+
+  public String render(String text, PlaceholderContext context) {
+    return renderer.render(text, context);
+  }
 }

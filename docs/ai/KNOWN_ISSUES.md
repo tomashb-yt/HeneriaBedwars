@@ -1,5 +1,14 @@
 # Limitations connues
 
+## Ticket 004
+
+- Aucun éditeur complet d'items en jeu, aucune boutique et aucun objet de gameplay actif.
+- Les têtes utilisent le joueur contextuel par UUID; un nom statique hors ligne n'est pas résolu afin d'éviter tout appel réseau synchrone. Les textures Base64 ne sont pas prises en charge.
+- Aucun resource pack n'est fourni; `custom-model-data` ne garantit donc aucun modèle visuel.
+- Le rendu texte conserve le sous-ensemble MiniMessage/legacy du Ticket 002, pas l'ensemble Adventure avancé.
+- Les enchantements configurables restent sûrs et bornés; aucun niveau unsafe arbitraire.
+- La compatibilité est compilée avec Spigot API 1.21 et cible Paper 1.21.x, mais les métadonnées/PDC et commandes n'ont pas été exécutés sur un serveur réel dans cet environnement.
+
 ## Ticket 002
 
 - Le rendu MiniMessage est limité aux couleurs, décorations et hex; aucune balise interactive ou gradient.
@@ -17,5 +26,4 @@
 - `/bedwars`, `/hbw`, les permissions, la console, les langues et la tab-complétion n'ont pas encore été testés en jeu après redémarrage complet.
 - Le document historique `docs/ARCHITECTURE.md` décrit une cible plus large que les trois modules actuels.
 - Le build désactive temporairement les caches/incréments et agrège les sources dans le module final pour contourner l'isolation du classpath Windows observée pendant le Ticket 001 ; cette mesure devra être réévaluée sur CI.
-- Le rendu d'items GUI est minimal; têtes, cuir, flags et enchantements configurables complets appartiennent au Ticket 004.
 - Aucun test en jeu du framework n'a été réalisé ici; la compatibilité compilée Spigot/Paper ne vaut pas validation runtime Paper.

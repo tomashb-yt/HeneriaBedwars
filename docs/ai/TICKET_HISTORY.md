@@ -1,5 +1,15 @@
 # Historique des tickets
 
+## Ticket 004 — Système complet d'items configurables
+
+Terminé le 2026-07-15 côté code et validation automatisée. `bedwars-core/item` ajoute `ItemKey`, `ItemText`, `ItemDefinition`, `ItemDefinitionTemplate`, `ItemContext`, `ItemRegistry`, `ItemInheritanceResolver` et exceptions/résultat de reload. `bedwars-plugin/item` ajoute `ItemDefinitionLoader`, `BukkitItemFactory`, `BukkitItemService`, `ItemContexts` et `ItemPreviewMenuFactory`.
+
+`items.yml` définit fallback, boutons standards et démonstration. Matériau, quantité, texte direct/traduit, lore, glow, unbreakable, custom model data, flags, enchantements sûrs, cuir, tête, tags autorisés, placeholders requis et héritage sont validés avant activation. Le registre partage le snapshot transactionnel : cycle, parent inconnu ou fallback critique conservent l'ancien état. Les menus ouverts restent visibles et utilisent le nouveau registre au prochain refresh.
+
+Le GUI accepte une clé statique/dynamique ou un `GuiItem`, jamais plusieurs sources. Bordure, boutons standards et démonstration utilisent le registre; les actions restent en Java. Commandes : `/bedwars item`, `list`, `give <clé>`, `preview`. Permissions : `heneriabedwars.admin.item`, `.give`, `.preview`. Le preview est paginé, affiche la clé et permet une copie seulement avec la permission et une place libre.
+
+Validation : 70 tests automatisés réussis après correction d'une limite d'héritage initialement dépendante du cache. Aucun test Paper/MockBukkit ou en jeu n'a été effectué. Limites : pas d'éditeur, gameplay, boutique, arène, resource pack ou texture Base64; propriétaire statique de tête limité aux joueurs en ligne. Cible : Java 21, Spigot API 1.21, Paper 1.21.x. Prochaine étape : Ticket 005, modèle/cycle de vie/stockage des arènes. Commit prévu : `feat(items): add configurable item definition system`.
+
 ## Ticket 003 — Framework interne de menus
 
 Terminé le 2026-07-15 côté code et tests automatisés. Le cœur fournit `Gui`, `GuiButton`, `GuiItem`, contextes/actions, `GuiSession`, `GuiSessionManager`, `Pagination`, `GuiSlots`, `ConfirmationGui` et `GuiActionExecutor`. Bukkit fournit `BukkitGuiService`, `GuiInventoryHolder`, `GuiListener`, `GuiItemRenderer`, boutons standards et `DemoMenuFactory`.
