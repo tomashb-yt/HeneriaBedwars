@@ -192,6 +192,21 @@ arena:
     confirm-enabled: "<red>Cette arene est activee. Confirmez une seconde fois."
     success: "<green>L'arene {arena_id} a ete sauvegardee puis supprimee."
     failed: "<red>Suppression impossible."
+game:
+  command:
+    help: "<yellow>Utilisation : /bedwars game <create|list|info|join|leave|destroy>"
+    creating: "<yellow>Création d'une instance pour <white>{arena_id}<yellow>..."
+    created: "<green>Instance <white>{game_id}<green> créée pour <white>{arena_id}<green>, monde <white>{world_name}<green>."
+    destroying: "<yellow>Nettoyage de l'instance <white>{game_id}<yellow>..."
+    destroyed: "<green>Instance <white>{game_id}<green> détruite et monde temporaire supprimé."
+    list: "<gray>Instances actives (<white>{count}<gray>) : <white>{games}"
+    info: "<aqua>{game_id} <gray>— arène <white>{arena_id}<gray>, carte <white>{map_id}<gray>, état <white>{game_state}<gray>, monde <white>{world_name}<gray>, joueurs <white>{player_count}<gray>."
+    joined: "<green>Vous avez rejoint l'instance <white>{game_id}<green>. Aucun gameplay BedWars n'est encore actif."
+    left: "<green>Vous avez quitté votre instance."
+    failed: "<red>Opération runtime impossible : <white>{code}<red>."
+    not-found: "<red>Instance runtime introuvable."
+    player-only: "<red>Cette opération doit être effectuée par un joueur."
+    teleport-failed: "<red>L'instance existe, mais votre téléportation a échoué."
 gui:
   general:
     back: "<yellow>Retour"

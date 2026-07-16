@@ -1,11 +1,14 @@
 package fr.heneria.bedwars.plugin;
 
+import fr.heneria.bedwars.api.HeneriaBedWarsApi;
 import fr.heneria.bedwars.api.PluginStatus;
 import fr.heneria.bedwars.core.arena.ArenaMapTemplateStatus;
 import fr.heneria.bedwars.core.arena.ArenaRegistry;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.arena.ArenaValidator;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
+import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.gui.TextInputManager;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapOperationLock;
@@ -24,6 +27,9 @@ import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.BukkitRuntimePlayerGateway;
+import fr.heneria.bedwars.plugin.game.BukkitRuntimeWorldService;
+import fr.heneria.bedwars.plugin.game.GameLifecycleComponent;
 import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
 import fr.heneria.bedwars.plugin.gui.BukkitTextInputService;
 import fr.heneria.bedwars.plugin.item.BukkitItemService;
@@ -39,6 +45,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /** Paper entry point. All construction and lifecycle work is delegated to a bootstrap. */
@@ -53,6 +60,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private MapTemplateService mapService;
   private BukkitMapWorldService mapWorldService;
   private MapMenuFactory mapMenus;
+  private GameInstanceManager gameService;
 
   @Override
   public void onEnable() {
@@ -138,6 +146,22 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                           .lobby()
                           .world()
                           .equalsIgnoreCase(template.worldName()));
+      GameEventBus gameEvents = new GameEventBus();
+      BukkitRuntimeWorldService runtimeWorlds =
+          new BukkitRuntimeWorldService(
+              this,
+              worldSettings,
+              data.resolve(worldSettings.instancesDirectory()),
+              getServer().getWorldContainer().toPath(),
+              projectLogger);
+      gameService =
+          new GameInstanceManager(
+              arenaService,
+              mapService,
+              runtimeWorlds,
+              new BukkitRuntimePlayerGateway(this, worldSettings),
+              gameEvents,
+              clock);
       itemService = new BukkitItemService(this, configurations, projectLogger);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       ArenaEditorStateStore editorStates = new ArenaEditorStateStore();
@@ -201,6 +225,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               configurations,
               arenaService,
               mapService,
+              gameService,
               new MapLifecycleComponent(
                   this,
                   mapService,
@@ -210,12 +235,18 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   mapOperations,
                   projectLogger),
               new ArenaLifecycleComponent(arenaService, projectLogger),
+              new GameLifecycleComponent(
+                  this, gameService, runtimeWorlds, gameEvents, projectLogger),
               textInputService,
               textInputService,
               itemService,
               guiService,
               projectLogger);
       bootstrap.start();
+      getServer()
+          .getServicesManager()
+          .register(
+              HeneriaBedWarsApi.class, (HeneriaBedWarsApi) bootstrap, this, ServicePriority.Normal);
       registerDiagnosticCommand();
       getLogger().info("HeneriaBedWars " + getDescription().getVersion() + " enabled.");
     } catch (Exception exception) {
@@ -231,6 +262,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       return;
     }
     try {
+      getServer().getServicesManager().unregisterAll(this);
       bootstrap.stop();
       getLogger().info("HeneriaBedWars disabled cleanly.");
     } catch (Exception exception) {
@@ -250,6 +282,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
             configurations,
             arenaService,
             mapService,
+            gameService,
             mapWorldService,
             itemService,
             guiService,

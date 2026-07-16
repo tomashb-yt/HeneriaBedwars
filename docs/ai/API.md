@@ -1,6 +1,6 @@
 # API publique
 
-Depuis le Ticket 008, `/bedwars map` ouvre l'éditeur graphique v4. Les sous-commandes historiques restent compatibles pour la console et les administrateurs avancés; aucune permission existante n'est supprimée. Menus et commandes utilisent les mêmes services métier.
+Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManager` Bukkit et expose des snapshots runtime immuables. Les sous-commandes historiques restent compatibles; aucune permission existante n'est supprimée.
 
 ## Commandes internes disponibles
 
@@ -36,12 +36,18 @@ Depuis le Ticket 008, `/bedwars map` ouvre l'éditeur graphique v4. Les sous-com
 | `/bedwars map setspawn <id>` | `heneriabedwars.admin.map.edit` | sauvegarde la position courante comme spawn |
 | `/bedwars map duplicate <source> <destination>` | `heneriabedwars.admin.map.duplicate` | copie la carte en arrière-plan |
 | `/bedwars map delete <id>` | `heneriabedwars.admin.map.delete` | ouvre la confirmation, sauvegarde puis supprime |
+| `/bedwars game create <arène>` | `heneriabedwars.admin.game.create` | clone la carte, crée l'instance en `WAITING` et fait rejoindre le joueur |
+| `/bedwars game list` | `heneriabedwars.admin.game.list` | liste les instances vivantes |
+| `/bedwars game info <UUID>` | `heneriabedwars.admin.game.info` | affiche arène, carte, état, monde et joueurs |
+| `/bedwars game join <UUID>` | `heneriabedwars.admin.game.join` | rejoint une instance en attente |
+| `/bedwars game leave` | `heneriabedwars.admin.game.leave` | quitte l'instance et revient au monde de secours |
+| `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | évacue, décharge et supprime le clone |
 
 `heneriabedwars.admin` est accordée aux opérateurs et possède les permissions spécialisées comme enfants. La complétion ne propose que les sous-commandes autorisées.
 
 `heneriabedwars.admin.arena.teleport` protège toutes les téléportations depuis l'éditeur. Les permissions existantes `arena.create`, `arena.edit`, `arena.enable`, `arena.disable`, `arena.delete`, `arena.list`, `arena.info` et `arena.menu` continuent de protéger chaque action au clic et en commande.
 
-Le système de configuration reste interne. Ses points principaux sont `ConfigurationService`, `ConfigurationSnapshot`, `LanguageService`, `TranslationKey` et `PlaceholderContext`. L'API publique Ticket 001 (`HeneriaBedWarsApi`) est inchangée.
+Le système de configuration reste interne. Ses points principaux sont `ConfigurationService`, `ConfigurationSnapshot`, `LanguageService`, `TranslationKey` et `PlaceholderContext`.
 
 Le framework GUI et `ItemService` restent strictement internes. Ce sont des contrats du module plugin enregistrés dans `ServiceRegistry`, pas encore une API d'addons. Les modèles purs de `bedwars-core/item` permettent une future stabilisation sans exposer Bukkit prématurément.
 
@@ -49,6 +55,6 @@ Le framework GUI et `ItemService` restent strictement internes. Ce sont des cont
 
 `MapTemplateService`, `MapTemplateRepository`, `MapWorldService` et `MapFileService` restent aussi internes. Leurs modèles purs préparent une future API sans exposer Bukkit ni promettre une stabilité d'addon au Ticket 007.
 
-L'API du Ticket 001 est volontairement minimale : `HeneriaBedWarsApi` expose seulement la version et l'état général, avec `PluginStatus`. Elle n'est pas encore publiée dans le `ServicesManager` Paper et ne constitue pas une API d'addons complète.
+`HeneriaBedWarsApi` expose `version`, `status`, `games`, `players` et `arenas`. `GameApi`, `PlayerGameApi` et `ArenaGameApi` sont en lecture seule et retournent `GameSnapshot`, `RuntimePlayerSnapshot` et `RuntimeTeamSnapshot`. Un addon récupère l'API avec `Bukkit.getServicesManager().load(HeneriaBedWarsApi.class)`. Les mutations restent volontairement internes afin de préserver les invariants de cycle de vie.
 
 Les futurs contrats devront être stables, versionnés, documentés par JavaDoc et exposer des modèles immuables. Une API obsolète sera dépréciée avant suppression. Les événements publics seront documentés et aucune implémentation interne ne sera exposée inutilement.

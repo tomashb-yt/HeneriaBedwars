@@ -38,6 +38,13 @@ public final class AdministrativeCommandPolicy {
   public static final String MAP_DUPLICATE = "heneriabedwars.admin.map.duplicate";
   public static final String MAP_DELETE = "heneriabedwars.admin.map.delete";
   public static final String MAP_FORCE = "heneriabedwars.admin.map.force";
+  public static final String GAME = "heneriabedwars.admin.game";
+  public static final String GAME_CREATE = "heneriabedwars.admin.game.create";
+  public static final String GAME_LIST = "heneriabedwars.admin.game.list";
+  public static final String GAME_INFO = "heneriabedwars.admin.game.info";
+  public static final String GAME_JOIN = "heneriabedwars.admin.game.join";
+  public static final String GAME_LEAVE = "heneriabedwars.admin.game.leave";
+  public static final String GAME_DESTROY = "heneriabedwars.admin.game.destroy";
 
   public List<String> complete(
       Predicate<String> permitted, String[] arguments, List<String> locales) {
@@ -88,6 +95,7 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(ARENA) || permitted.test(ARENA_MENU)) choices.add("arena");
       if (permitted.test(SETUP)) choices.add("setup");
       if (permitted.test(MAP) || permitted.test(MAP_MENU)) choices.add("map");
+      if (permitted.test(GAME)) choices.add("game");
     } else if (arguments.length == 2
         && arguments[0].equalsIgnoreCase("language")
         && permitted.test(LANGUAGE)) {

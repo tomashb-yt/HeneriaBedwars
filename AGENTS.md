@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 008 livrent la fondation, les configurations, traductions, menus, items, arènes et l'éditeur guidé complet des cartes modèles ; aucun gameplay n'est encore actif.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 009 livrent la fondation administrative et le moteur d'instances temporaires ; aucun gameplay BedWars n'est encore actif.
 
 ## Lecture obligatoire
 
@@ -42,6 +42,8 @@ Le Ticket 005 stocke une définition UTF-8 par fichier dans `arenas/`. Une suppr
 Au démarrage, l'ancien `config.yml` officiel du Ticket 001 sans `config-version` est reconnu par sa signature minimale, sauvegardé puis migré vers la version 1. Ne jamais élargir cette détection à n'importe quel YAML non versionné : un fichier vide, corrompu ou non reconnaissable doit rester intact et être refusé.
 
 Le Ticket 008 centralise l'administration des cartes dans le menu v4. Les commandes restent disponibles pour le diagnostic avancé. Toute sauvegarde complète, duplication ou suppression de dossier doit rester asynchrone, visible dans `MapOperationTracker` et protégée par `MapOperationLock`. Les associations d'arènes restent la source de vérité et les états d'éditeur sont nettoyés à la déconnexion et à l'arrêt.
+
+Le Ticket 009 introduit `GameInstanceManager`. Une arène ne peut avoir qu'une instance vivante et un joueur ne peut appartenir qu'à une instance. Les clones `hbw_game_*` sont jetables, exclus des registres administratifs, déchargés sans sauvegarde puis supprimés. Les accès fichiers restent asynchrones; les appels Bukkit restent sur le thread serveur. Les événements `core.game.event` ne sont pas des événements Bukkit. Ne jamais persister `RuntimePlayer`, `RuntimeTeam` ou les statistiques runtime dans les YAML administratifs.
 
 ## Règles architecturales
 

@@ -1,10 +1,16 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 008.
+- Dernier ticket terminé : Ticket 009.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
 ## Disponible
+
+- moteur `GameInstance` avec UUID, machine d'état complète, monde temporaire, joueurs, équipes, timers et statistiques en mémoire;
+- `GameInstanceManager` indexé par partie, joueur et arène, empêchant les doubles occupations et compensant les créations échouées;
+- clonage asynchrone des cartes `BEDWARS`, chargement Bukkit sur le thread serveur, téléportation au point d'attente, évacuation, déchargement et suppression;
+- événements Java internes de création, attente, démarrage, fin, destruction, entrée et sortie;
+- API publique immuable enregistrée dans le `ServicesManager` Bukkit et commandes `/bedwars game`;
 
 - éditeur graphique de cartes v4 : bibliothèque paginée avec filtres/tri par administrateur, création simple ou avancée, progression et prochaine action;
 - édition guidée du nom, type, point d'arrivée et règles du monde; sauvegarde, ouverture/fermeture, visite, duplication, archive complète et suppression sécurisée;
@@ -22,7 +28,7 @@
 - commandes et menus `/bedwars map`; association des arènes à une carte `BEDWARS` via `/bedwars arena setmap` et l'éditeur;
 
 - bootstrap et cycle de vie déterministes;
-- API publique minimale de statut;
+- API publique de statut et vues immuables des parties, joueurs et arènes runtime;
 - création non destructive de neuf YAML principaux, deux langues et trois dossiers runtime;
 - validation INFO/WARNING/ERROR/CRITICAL, défauts contrôlés et masquage des secrets;
 - réglages immuables `PluginSettings`, `GameplaySettings`, `LobbySettings`, `StorageSettings` et `MenuSettings`;
@@ -47,6 +53,6 @@
 
 ## Non disponible
 
-Aucune équipe BedWars détaillée ou couleur d'équipe, aucune instance temporaire de partie ou remise à zéro après match, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes sont des modèles administratifs persistants, pas des parties jouables.
+Aucune équipe BedWars configurable ou mécanique de couleur, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes restent des modèles administratifs persistants; leurs clones runtime ne fournissent encore aucun gameplay.
 
-Les 144 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 149 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

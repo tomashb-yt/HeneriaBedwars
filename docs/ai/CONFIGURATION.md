@@ -146,6 +146,8 @@ Une arène activable exige un monde chargé, une position d'attente, des capacit
 
 ## `worlds.yml`
 
+Le Ticket 009 consomme `directories.instances`, `naming.instance-world-prefix`, `fallback-world` et les exclusions de copie. Les valeurs par défaut produisent un manifeste sous `instances/game-<UUID>/` et un monde Bukkit `hbw_game_<UUID compact>`. Modifier le préfixe ou les racines avec des instances vivantes est interdit opérationnellement et demande un redémarrage complet.
+
 `WorldManagerSettings` est rechargé transactionnellement. Les dossiers doivent être relatifs et sûrs; un chemin absolu ou contenant `..` refuse le snapshot. Changer les racines ou préfixes pendant que des mondes sont chargés exige un redémarrage complet.
 
 | Clé | Défaut / contrainte |

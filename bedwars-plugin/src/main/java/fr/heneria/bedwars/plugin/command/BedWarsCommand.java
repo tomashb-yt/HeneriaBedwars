@@ -8,12 +8,14 @@ import fr.heneria.bedwars.core.config.ConfigurationReloadResult;
 import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
+import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.plugin.arena.ArenaCommandHandler;
 import fr.heneria.bedwars.plugin.arena.ArenaEditorMenuFactory;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.GameCommandHandler;
 import fr.heneria.bedwars.plugin.gui.DemoMenuFactory;
 import fr.heneria.bedwars.plugin.gui.GuiService;
 import fr.heneria.bedwars.plugin.item.ItemContexts;
@@ -59,6 +61,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   private final ArenaEditorMenuFactory arenaEditor;
   private final MapTemplateService mapService;
   private final MapCommandHandler mapCommands;
+  private final GameCommandHandler gameCommands;
 
   public BedWarsCommand(
       JavaPlugin plugin,
@@ -66,6 +69,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       ConfigurationService configurations,
       ArenaService arenaService,
       MapTemplateService mapService,
+      GameInstanceManager gameService,
       BukkitMapWorldService mapWorldService,
       ItemService itemService,
       GuiService guiService,
@@ -90,6 +94,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     this.mapCommands =
         new MapCommandHandler(
             plugin, mapService, mapWorldService, configurations, guiService, mapMenus, logger);
+    this.gameCommands = new GameCommandHandler(plugin, gameService, configurations);
   }
 
   @Override
@@ -113,6 +118,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "item" -> item(sender, args);
         case "arena" -> arenaCommands.execute(sender, args);
         case "map" -> mapCommands.execute(sender, args);
+        case "game" -> gameCommands.execute(sender, args);
         case "setup" -> setup(sender);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
@@ -146,6 +152,14 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (sender.hasPermission(AdministrativeCommandPolicy.MAP)
         || sender.hasPermission(AdministrativeCommandPolicy.MAP_MENU))
       send(sender, TranslationKey.HELP_MAP);
+    if (sender.hasPermission(AdministrativeCommandPolicy.GAME))
+      sender.sendMessage(
+          configurations
+              .language()
+              .message(
+                  "game.command.help",
+                  configurations.snapshot().plugin().locale(),
+                  PlaceholderContext.builder().build()));
     return true;
   }
 
@@ -363,6 +377,9 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull Command command,
       @NotNull String alias,
       @NotNull String[] args) {
+    if (args.length >= 1 && args[0].equalsIgnoreCase("game"))
+      return gameCommands.complete(
+          sender, args, arenaService.list().stream().map(arena -> arena.id().value()).toList());
     List<String> completions =
         completionPolicy.complete(
             sender::hasPermission,
@@ -378,7 +395,11 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (sender instanceof Player && args.length == 1)
       return completions.stream()
           .filter(
-              value -> value.equals("setup") || value.equals("version") || value.equals("reload"))
+              value ->
+                  value.equals("setup")
+                      || value.equals("version")
+                      || value.equals("reload")
+                      || value.equals("game"))
           .toList();
     return completions;
   }

@@ -1,5 +1,13 @@
 # Limitations connues
 
+## Ticket 009
+
+- Il s'agit d'un moteur de cycle de vie, pas d'une partie BedWars jouable : les équipes runtime sont des emplacements génériques et aucun lit, générateur, achat, mort finale ou vainqueur n'est calculé.
+- Sous Bukkit/Spigot, les chunks actifs doivent vivre dans le conteneur de mondes. `instances/game-<UUID>/world/active-world.txt` conserve le manifeste tandis que les chunks sont dans `hbw_game_<UUID>`; les deux emplacements sont supprimés ensemble.
+- Après un arrêt brutal, les dossiers orphelins sont supprimés de façon asynchrone avant la première nouvelle création. Aucune reconnexion ou reprise de partie après crash n'est fournie.
+- Le stockage runtime est uniquement mémoire. Redis, SQL, proxy, matchmaking, replay et reconnexion sont des fonctions futures, pas des fonctionnalités simulées.
+- Le comportement réel de copie, chargement, téléportation et nettoyage doit encore être validé sur Paper avec plusieurs joueurs.
+
 ## Ticket 008
 
 - L'éditeur est validé automatiquement mais doit encore être essayé sur Paper pour les inventaires, saisies chat, téléportations et règles de monde.

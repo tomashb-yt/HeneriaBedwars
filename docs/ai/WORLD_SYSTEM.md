@@ -1,12 +1,27 @@
 # Système de cartes modèles
 
+## Instances temporaires Ticket 009
+
+Une instance copie le dossier du monde modèle vers `<conteneur Bukkit>/hbw_game_<UUID compact>` hors du thread serveur, puis charge ce clone avec `WorldCreator` sur le thread serveur. Elle écrit parallèlement un manifeste sous `plugins/HeneriaBedWars/instances/game-<UUID>/world/active-world.txt`. Cette séparation est imposée par le chargement de mondes nommé de Spigot; les deux dossiers appartiennent au même runtime et sont supprimés ensemble.
+
+```text
+plugins/HeneriaBedWars/instances/game-<UUID>/
+├── arena.txt
+└── world/active-world.txt
+
+<conteneur de mondes Bukkit>/
+└── hbw_game_<UUID compact>/
+```
+
+`uid.dat`, `session.lock`, `playerdata`, `stats` et `advancements` sont exclus comme pour les duplications administratives. La destruction évacue les joueurs vers `fallback-world`, décharge sans sauvegarder, puis supprime le clone. Au démarrage, les restes `game-*` et `hbw_game_*` d'un crash sont nettoyés avant la première création.
+
 ## Interface guidée Ticket 008
 
 Le menu v4 configure et applique heure, cycles, météo, difficulté, PVP, créatures, propagation du feu, dégâts environnementaux et autosauvegarde. Les changements sont d'abord persistés, puis appliqués au monde chargé; un échec restaure les anciennes métadonnées. Les archives complètes, duplications et suppressions sont préparées sur le thread serveur puis copiées hors thread avec verrou et suivi d'état.
 
 ## Périmètre
 
-Le Ticket 007 gère des cartes modèles administratives. Une carte peut être créée, chargée, éditée manuellement, sauvegardée, déchargée, dupliquée et associée à une arène. Elle n'est ni une instance de partie ni une copie jetable. Le dossier `instances/` et le préfixe `hbw_game_` sont réservés à un futur ticket.
+Le Ticket 007 gère des cartes modèles administratives. Une carte peut être créée, chargée, éditée manuellement, sauvegardée, déchargée, dupliquée et associée à une arène. Elle n'est ni une instance de partie ni une copie jetable. Le Ticket 009 utilise `instances/` et le préfixe `hbw_game_` exclusivement pour les clones runtime.
 
 Types disponibles : `LOBBY`, `BEDWARS` et `GENERIC`. Une arène ne peut référencer qu'une carte `BEDWARS` existante et hors état `ERROR`. Les états `LOADING`, `SAVING` et `UNLOADING` sont transitoires; au redémarrage, l'état réel Bukkit est recalculé.
 
@@ -18,11 +33,12 @@ plugins/HeneriaBedWars/
 ├── maps/
 │   ├── metadata/<id>.yml
 │   └── templates/<id>/managed-world.txt
-├── instances/                         # réservé, non utilisé
+├── instances/game-<UUID>/             # manifeste runtime temporaire
 └── backups/maps/<horodatage>/<id>/
 
 <conteneur de mondes Bukkit>/
-└── hbw_template_<id>/                 # chunks du monde de travail
+├── hbw_template_<id>/                 # chunks du monde de travail
+└── hbw_game_<UUID compact>/           # clone jetable d'une partie
 ```
 
 Bukkit `WorldCreator` charge un monde par son nom dans le conteneur de mondes du serveur. Les chunks ne sont donc pas placés sous le dossier de données du plugin. Le marqueur `managed-world.txt` relie explicitement l'identifiant au monde préfixé et empêche le plugin de revendiquer silencieusement un dossier existant.

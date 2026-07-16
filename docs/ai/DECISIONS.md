@@ -1,5 +1,21 @@
 # Décisions d'architecture
 
+## ADR-040 — Instance runtime distincte des définitions persistantes
+
+Accepté. `ArenaDefinition` et `MapTemplate` restent administratifs; `GameInstance` ne les modifie jamais et possède un UUID ainsi qu'un clone jetable.
+
+## ADR-041 — Machine d'état fermée et index atomiques
+
+Accepté. Les transitions autorisées sont déclarées dans `GameInstance`. `GameInstanceManager` réserve l'arène avant le clonage, indexe un joueur une seule fois et libère tous les index après destruction ou rollback.
+
+## ADR-042 — Ports asynchrones pour monde et joueur
+
+Accepté. `RuntimeWorldService` et `RuntimePlayerGateway` utilisent `CompletionStage`. L'adaptateur Bukkit copie/supprime hors thread et replannifie chargement, téléportation et déchargement sur le thread serveur. Cette frontière permet de futurs adaptateurs proxy sans ajouter de dépendance maintenant.
+
+## ADR-043 — API publique par snapshots
+
+Accepté. `HeneriaBedWarsApi` expose trois façades en lecture seule et des records immuables. L'implémentation est publiée par le `ServicesManager` Bukkit; aucune classe de `bedwars-core`, collection mutable ou objet Bukkit n'est exposé.
+
 ## ADR-039 — Éditeur graphique des cartes
 
 Accepté. Le menu v4 est une façade : toutes les mutations passent par `MapTemplateService` ou `ArenaService`. `MapEditorStateStore` conserve uniquement des données bornées par UUID et les nettoie à la déconnexion. Progression guidée et validation technique restent séparées. `MapOperationTracker` expose sauvegarde, duplication et suppression sans remplacer `MapOperationLock`. Les copies de fichiers sont asynchrones, les arènes restent la source de vérité des associations et l'application des réglages Bukkit est compensée en cas d'échec.

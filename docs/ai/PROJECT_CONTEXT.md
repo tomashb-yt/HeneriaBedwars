@@ -1,6 +1,6 @@
 # Contexte du projet
 
-État Ticket 008 : l'administration des cartes modèles est entièrement accessible depuis une interface guidée v4. Les commandes demeurent une surface avancée compatible. Ce ticket ne crée toujours aucune instance de partie ni gameplay BedWars.
+État Ticket 009 : le plugin sait transformer une arène valide et sa carte modèle en instance vivante isolée, avec clone temporaire, machine d'état, joueurs, équipes, événements et nettoyage. Il ne contient encore aucune mécanique BedWars : aucun lit actif, générateur, boutique, combat spécifique, victoire ou matchmaking.
 
 HeneriaBedWars vise un plugin BedWars complet pour Paper 1.21.11 et Java 21, avec un combat inspiré du PvP 1.8. Il devra gérer plusieurs arènes et parties simultanées, un lobby principal et des lobbies d'attente, des équipes, lits, générateurs, boutiques et améliorations configurables, des statistiques, une API publique et de futurs addons.
 
@@ -12,4 +12,4 @@ Depuis le Ticket 005, le projet gère des définitions administratives d'arènes
 
 Depuis le Ticket 006, toute la configuration générale de ces définitions est réalisable en jeu. L'éditeur réutilise exclusivement `ArenaService`, sauvegarde après chaque mutation et détecte les vues obsolètes par révision. La saisie chat est réservée aux sessions administratives et n'est pas diffusée.
 
-Depuis le Ticket 007, les cartes modèles sont autonomes, persistantes et chargeables comme mondes Bukkit vides. Une arène peut référencer une carte `BEDWARS`, mais la carte, la définition d'arène et la future instance de partie restent trois concepts distincts. Le dossier `instances/` est réservé : la copie temporaire, le reset et le cycle de match restent futurs.
+Depuis le Ticket 007, les cartes modèles sont autonomes et persistantes. Le Ticket 009 conserve la séparation stricte `ArenaDefinition` / `MapTemplate` / `GameInstance` : le runtime référence des snapshots administratifs et travaille uniquement dans un clone jetable.

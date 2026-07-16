@@ -1,5 +1,21 @@
 # Architecture actuelle
 
+## Ticket 009 — moteur d'instances
+
+`bedwars-api/game` expose seulement des snapshots immuables via `GameApi`, `PlayerGameApi` et `ArenaGameApi`. `bedwars-core/game` contient `GameInstance`, `GameInstanceManager`, `RuntimeArena`, `RuntimePlayer`, `RuntimeTeam`, la machine d'état, les index et le bus d'événements interne. `bedwars-plugin/game` adapte la copie de fichiers, `WorldCreator`, les téléportations, commandes et événements de déconnexion.
+
+```mermaid
+flowchart LR
+  ARENA["ArenaDefinition"] --> MANAGER["GameInstanceManager"]
+  TEMPLATE["MapTemplate BEDWARS"] --> MANAGER
+  MANAGER --> CREATING["CREATING"]
+  CREATING --> CLONE["Clone asynchrone hbw_game_UUID"]
+  CLONE --> WAITING --> STARTING --> PLAYING --> ENDING --> RESETTING --> DESTROYED
+  RESETTING --> CLEAN["Déchargement + suppression"]
+```
+
+Les ports `RuntimeWorldService` et `RuntimePlayerGateway` peuvent recevoir plus tard des adaptateurs proxy, matchmaking ou orchestration réseau. Ils ne contiennent aucune dépendance SQL/Redis et ne promettent aucune persistance de partie.
+
 ## Ticket 008 — éditeur graphique des cartes
 
 Le domaine pur contient préférences de vue, progression, validation, suivi d'opération et réglages persistants. `bedwars-plugin` adapte uniquement les événements Bukkit, mondes, inventaires et tâches asynchrones. Les menus délèguent aux services; le câblage différé `MapMenuNavigation` évite une dépendance circulaire entre tableau de bord, éditeur d'arènes et éditeur de cartes.

@@ -8,7 +8,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version|reload|config|language|gui|item|arena|map|setup]
+    usage: /bedwars [version|reload|config|language|gui|item|arena|map|game|setup]
     aliases:
       - hbw
 permissions:
@@ -24,6 +24,7 @@ permissions:
       heneriabedwars.admin.arena: true
       heneriabedwars.admin.setup: true
       heneriabedwars.admin.map: true
+      heneriabedwars.admin.game: true
   heneriabedwars.admin.reload:
     description: Permet de recharger les configurations.
     default: op
@@ -95,3 +96,19 @@ permissions:
   heneriabedwars.admin.map.duplicate: {description: Dupliquer une carte modele, default: op}
   heneriabedwars.admin.map.delete: {description: Supprimer une carte modele avec sauvegarde, default: op}
   heneriabedwars.admin.map.force: {description: Forcer un dechargement apres evacuation, default: op}
+  heneriabedwars.admin.game:
+    description: Administrer les instances temporaires de partie.
+    default: op
+    children:
+      heneriabedwars.admin.game.create: true
+      heneriabedwars.admin.game.list: true
+      heneriabedwars.admin.game.info: true
+      heneriabedwars.admin.game.join: true
+      heneriabedwars.admin.game.leave: true
+      heneriabedwars.admin.game.destroy: true
+  heneriabedwars.admin.game.create: {description: Creer une instance depuis une arene, default: op}
+  heneriabedwars.admin.game.list: {description: Lister les instances runtime, default: op}
+  heneriabedwars.admin.game.info: {description: Inspecter une instance runtime, default: op}
+  heneriabedwars.admin.game.join: {description: Rejoindre une instance runtime, default: op}
+  heneriabedwars.admin.game.leave: {description: Quitter son instance runtime, default: op}
+  heneriabedwars.admin.game.destroy: {description: Detruire et nettoyer une instance runtime, default: op}

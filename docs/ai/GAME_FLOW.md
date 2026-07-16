@@ -1,5 +1,24 @@
 # Cycle des parties
 
+## Socle runtime Ticket 009
+
+```mermaid
+stateDiagram-v2
+  [*] --> CREATING: réservation arène + UUID
+  CREATING --> WAITING: clone chargé
+  CREATING --> RESETTING: échec/annulation
+  WAITING --> STARTING
+  STARTING --> PLAYING
+  WAITING --> ENDING: arrêt administratif
+  STARTING --> ENDING: arrêt administratif
+  PLAYING --> ENDING
+  ENDING --> RESETTING
+  RESETTING --> DESTROYED: monde supprimé
+  DESTROYED --> [*]
+```
+
+Le Ticket 009 n'automatise pas encore `STARTING`, `PLAYING` ou `ENDING`; il garantit uniquement que ces transitions existent et qu'aucun appel ne peut les contourner. Les futurs countdown, règles BedWars et conditions de victoire piloteront cette machine via le manager.
+
 Le cycle cible envisagé est :
 
 ```text

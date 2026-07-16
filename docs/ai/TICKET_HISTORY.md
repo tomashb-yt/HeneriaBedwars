@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 009 — Runtime des parties (Game Instance Engine)
+
+Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/game` introduit `GameId`, `GameInstance`, `GameInstanceManager`, `RuntimeArena`, `RuntimePlayer`, `RuntimeTeam`, les ports monde/joueur et la machine `CREATING → WAITING → STARTING → PLAYING → ENDING → RESETTING → DESTROYED`. Les index empêchent une seconde instance sur une arène et l'appartenance d'un joueur à plusieurs parties. Une copie échouée détruit l'instance provisoire et libère la réservation.
+
+`bedwars-plugin/game` clone le monde modèle hors thread, charge le clone `hbw_game_<UUID>` sur le thread serveur, applique les règles sûres, téléporte au point d'attente, évacue, décharge sans sauvegarde et supprime les dossiers contrôlés. Les restes d'un crash sont nettoyés avant la première création. `/bedwars game create|list|info|join|leave|destroy` fournit le contrôle administratif.
+
+Les événements Java internes couvrent création, attente, démarrage, fin, destruction et mouvements de joueurs. `HeneriaBedWarsApi` expose désormais des façades et snapshots en lecture seule via le registre de services Bukkit. Aucun gameplay, lit actif, générateur, boutique, victoire, SQL, Redis ou proxy n'est livré. Validation : 149 tests automatisés réussis, 0 échec, 0 erreur et 0 ignoré; Spotless, build propre, `git diff --check` et Shadow JAR contrôlés. Les opérations Paper restent à tester manuellement faute de serveur Minecraft dans l'environnement. Commit prévu : `feat(runtime): add game instance engine`.
+
 ## Ticket 008 — Finalisation de l'éditeur graphique des cartes
 
 Terminé le 2026-07-16 côté code et validation automatisée. `MapMenuFactory` fournit une interface v4 cohérente avec le tableau de bord : bibliothèque paginée, filtres, tris et direction persistants par joueur; états vides explicites; création BedWars directe ou choix avancé `LOBBY`/`BEDWARS`/`GENERIC`; confirmation, création du monde et téléportation automatique.

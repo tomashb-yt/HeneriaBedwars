@@ -6,6 +6,10 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Ticket 009 : moteur de `GameInstance`, machine d'état, index par arène/joueur, runtime players/teams, timers/statistiques et événements Java internes.
+- Clonage asynchrone des cartes modèles en mondes `hbw_game_*`, téléportation, évacuation, déchargement sans sauvegarde, suppression et récupération des dossiers orphelins.
+- Commandes `/bedwars game`, permissions dédiées et API publique immuable `GameApi`/`PlayerGameApi`/`ArenaGameApi` publiée via Bukkit.
+
 - Ticket 008 : éditeur graphique v4 des cartes avec bibliothèque filtrable/triable, création guidée, réglages du monde, point d'arrivée, progression et validation localisée.
 - Associations carte–arène dans les deux sens, création d'arène liée, suivi des opérations longues et détection des constructions non sauvegardées.
 - Sauvegarde complète manuelle asynchrone, protections des cartes liées/lobby et navigation déterministe.

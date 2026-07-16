@@ -2,7 +2,11 @@ package fr.heneria.bedwars.plugin.bootstrap;
 
 import fr.heneria.bedwars.api.HeneriaBedWarsApi;
 import fr.heneria.bedwars.api.PluginStatus;
+import fr.heneria.bedwars.api.game.ArenaGameApi;
+import fr.heneria.bedwars.api.game.GameApi;
+import fr.heneria.bedwars.api.game.PlayerGameApi;
 import fr.heneria.bedwars.core.arena.ArenaService;
+import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.gui.TextInputService;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.lifecycle.LifecycleManager;
@@ -22,6 +26,10 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
   private final ProjectLogger logger;
   private final ServiceRegistry services = new ServiceRegistry();
   private final LifecycleManager lifecycle;
+  private final GameInstanceManager games;
+  private final GameApi gameApi;
+  private final PlayerGameApi playerApi;
+  private final ArenaGameApi arenaApi;
   private PluginStatus status = PluginStatus.STOPPED;
 
   public BedWarsBootstrap(
@@ -29,8 +37,10 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
       ConfigurationService configuration,
       ArenaService arenaService,
       MapTemplateService mapService,
+      GameInstanceManager games,
       LifecycleComponent mapLifecycle,
       LifecycleComponent arenaLifecycle,
+      LifecycleComponent gameLifecycle,
       TextInputService textInputService,
       LifecycleComponent textInputLifecycle,
       ItemService itemService,
@@ -38,9 +48,14 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
       ProjectLogger logger) {
     this.version = Objects.requireNonNull(version, "version");
     this.logger = Objects.requireNonNull(logger, "logger");
+    this.games = Objects.requireNonNull(games, "games");
+    this.gameApi = new PublicGameApi();
+    this.playerApi = new PublicPlayerApi();
+    this.arenaApi = new PublicArenaApi();
     services.register(ConfigurationService.class, configuration);
     services.register(ArenaService.class, arenaService);
     services.register(MapTemplateService.class, mapService);
+    services.register(GameInstanceManager.class, games);
     services.register(TextInputService.class, textInputService);
     services.register(ItemService.class, itemService);
     services.register(GuiService.class, guiService);
@@ -51,6 +66,7 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
                 new FoundationComponent(),
                 mapLifecycle,
                 arenaLifecycle,
+                gameLifecycle,
                 textInputLifecycle,
                 guiService),
             logger);
@@ -91,6 +107,21 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
   }
 
   @Override
+  public GameApi games() {
+    return gameApi;
+  }
+
+  @Override
+  public PlayerGameApi players() {
+    return playerApi;
+  }
+
+  @Override
+  public ArenaGameApi arenas() {
+    return arenaApi;
+  }
+
+  @Override
   public int serviceCount() {
     return services.size();
   }
@@ -109,6 +140,63 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
     @Override
     public void stop() {
       logger.info("Core foundation stopped.");
+    }
+  }
+
+  private final class PublicGameApi implements GameApi {
+    @Override
+    public java.util.List<fr.heneria.bedwars.api.game.GameSnapshot> all() {
+      return games.snapshots();
+    }
+
+    @Override
+    public java.util.Optional<fr.heneria.bedwars.api.game.GameSnapshot> find(
+        java.util.UUID gameId) {
+      return games
+          .find(new fr.heneria.bedwars.core.game.GameId(gameId))
+          .map(game -> game.snapshot(java.time.Instant.now()));
+    }
+
+    @Override
+    public java.util.Optional<fr.heneria.bedwars.api.game.GameSnapshot> byPlayer(
+        java.util.UUID playerId) {
+      return games.byPlayer(playerId).map(game -> game.snapshot(java.time.Instant.now()));
+    }
+
+    @Override
+    public java.util.Optional<fr.heneria.bedwars.api.game.GameSnapshot> byArena(String arenaId) {
+      return games.byArena(arenaId).map(game -> game.snapshot(java.time.Instant.now()));
+    }
+  }
+
+  private final class PublicPlayerApi implements PlayerGameApi {
+    @Override
+    public java.util.Optional<fr.heneria.bedwars.api.game.GameSnapshot> game(
+        java.util.UUID playerId) {
+      return gameApi.byPlayer(playerId);
+    }
+
+    @Override
+    public java.util.Optional<fr.heneria.bedwars.api.game.RuntimePlayerSnapshot> runtime(
+        java.util.UUID playerId) {
+      return game(playerId)
+          .flatMap(
+              snapshot ->
+                  snapshot.players().stream()
+                      .filter(player -> player.playerId().equals(playerId))
+                      .findFirst());
+    }
+  }
+
+  private final class PublicArenaApi implements ArenaGameApi {
+    @Override
+    public java.util.Optional<fr.heneria.bedwars.api.game.GameSnapshot> game(String arenaId) {
+      return gameApi.byArena(arenaId);
+    }
+
+    @Override
+    public boolean occupied(String arenaId) {
+      return games.byArena(arenaId).isPresent();
     }
   }
 }

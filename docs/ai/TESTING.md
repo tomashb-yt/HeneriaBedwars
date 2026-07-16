@@ -1,5 +1,9 @@
 # Tests
 
+## Ticket 009
+
+Les tests purs couvrent la séquence complète des états, le refus d'une transition illégale, la réservation unique d'arène, le rollback d'un clone échoué, les index joueur, l'affectation d'équipe, les événements et la destruction libérant monde/mémoire. La suite complète contient 149 tests, 0 échec, 0 erreur et 0 test ignoré. Les opérations Bukkit réelles restent dans la matrice manuelle Paper : création, arrivée dans le clone, présence simultanée de plusieurs joueurs, refus d'une seconde instance, sortie, destruction et contrôle des deux dossiers.
+
 ## Ticket 007
 
 Les tests purs couvrent l'identifiant sécurisé, l'immutabilité/révision/état, l'ordre et les snapshots du registre, les verrous, la publication après persistance, les pannes de création et nettoyage, sauvegarde/déchargement, présence de joueurs, duplication indépendante, suppression avec sauvegarde, relations d'arènes en direct et conflits de révision. La validation d'arène couvre carte absente, inconnue, mauvais type, erreur et association valide.

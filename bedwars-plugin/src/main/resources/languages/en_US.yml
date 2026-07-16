@@ -192,6 +192,21 @@ arena:
     confirm-enabled: "<red>This arena is enabled. Confirm a second time."
     success: "<green>Arena {arena_id} was backed up and deleted."
     failed: "<red>Deletion failed."
+game:
+  command:
+    help: "<yellow>Usage: /bedwars game <create|list|info|join|leave|destroy>"
+    creating: "<yellow>Creating an instance for <white>{arena_id}<yellow>..."
+    created: "<green>Instance <white>{game_id}<green> created for <white>{arena_id}<green>, world <white>{world_name}<green>."
+    destroying: "<yellow>Cleaning instance <white>{game_id}<yellow>..."
+    destroyed: "<green>Instance <white>{game_id}<green> destroyed and temporary world deleted."
+    list: "<gray>Active instances (<white>{count}<gray>): <white>{games}"
+    info: "<aqua>{game_id} <gray>— arena <white>{arena_id}<gray>, map <white>{map_id}<gray>, state <white>{game_state}<gray>, world <white>{world_name}<gray>, players <white>{player_count}<gray>."
+    joined: "<green>You joined instance <white>{game_id}<green>. No BedWars gameplay is active yet."
+    left: "<green>You left your instance."
+    failed: "<red>Runtime operation failed: <white>{code}<red>."
+    not-found: "<red>Runtime instance not found."
+    player-only: "<red>This operation must be performed by a player."
+    teleport-failed: "<red>The instance exists, but your teleport failed."
 gui:
   general:
     back: "<yellow>Back"
