@@ -341,3 +341,14 @@ Accepté.
 
 ### Conséquences
 Les opérations restent sûres face aux traversées de chemin, liens symboliques, copies partielles et vues concurrentes. Une installation qui change le préfixe ou les dossiers doit redémarrer complètement et ne doit pas déplacer manuellement un monde chargé.
+
+## ADR-045 — Navigation administrative déterministe
+
+### Statut
+Accepté.
+
+### Décision
+Les retours des menus métier ciblent explicitement leur parent logique au lieu de dépendre uniquement de l'historique de session. Après suppression réussie d'une arène, le GUI ouvre une nouvelle session dont le tableau de bord est la racine et supprime la révision observée de cette arène.
+
+### Conséquences
+Une vue ouverte directement par commande, devenue obsolète après reload ou issue d'une confirmation ne peut plus renvoyer vers un éditeur supprimé. Le bouton retour conserve le même sens visuel dans tout l'assistant : sous-menu vers éditeur, éditeur vers liste, liste vers configuration.

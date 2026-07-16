@@ -9,6 +9,8 @@
 - tableau de bord administratif v2 ouvert directement par `/bedwars`, commandes avancées masquées de l'aide joueur et création guidée d'une carte `BEDWARS` associée à une nouvelle arène;
 - validation visuelle compacte, localisée et orientée action, sans exposer les codes internes; une carte modèle valide n'a pas besoin de rester chargée pour que l'arène soit administrativement valide;
 - éditeur d'arène présenté comme un assistant continu avec pourcentage, prochaine action et étapes numérotées; les menus carte, joueurs, équipes, positions, limites, activation et suppression expliquent leurs effets au lieu d'exposer des réglages bruts;
+- navigation administrative déterministe : les sous-menus reviennent à l'éditeur, l'éditeur à la liste et la liste au tableau de bord; une suppression d'arène réussie ouvre une nouvelle session au tableau de bord et oublie toute vue ou révision devenue obsolète;
+- apparence guidée v3 étendue aux listes vides, au résumé de configuration et à l'éditeur de carte, avec informations utiles, prérequis et effets des clics sans détails techniques superflus;
 - gestion autonome de cartes modèles `LOBBY`, `BEDWARS` et `GENERIC`, identifiants sûrs, métadonnées immutables/révisionnées et registre ordonné;
 - création de mondes vides préfixés, plateforme de sécurité configurable, chargement, téléportation, spawn, sauvegarde, déchargement et autosauvegarde centrale optionnelle;
 - duplication asynchrone avec exclusions, suppression asynchrone après sauvegarde complète, confinement des chemins et refus des liens symboliques;
@@ -42,4 +44,4 @@
 
 Aucune équipe BedWars détaillée ou couleur d'équipe, aucune instance temporaire de partie ou remise à zéro après match, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes sont des modèles administratifs persistants, pas des parties jouables.
 
-Les 137 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 138 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

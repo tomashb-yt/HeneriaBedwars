@@ -83,6 +83,7 @@ admin:
     title-v2: "<dark_aqua><bold>HeneriaBedWars <gray>• <white>Configuration"
     arenas: "<aqua>Gestion des arenes"
     configuration: "<yellow>Configuration generale"
+    configuration-title-v3: "<yellow><bold>État du plugin <gray>• <white>Résumé"
     lobby: "<gray>Lobby - prochain ticket"
     close: "<red>Fermer"
 arena:
@@ -114,6 +115,7 @@ arena:
       conflict: "<red>Cette arene a ete modifiee par un autre administrateur. Actualisez le menu."
       failed: "<red>La modification n'a pas pu etre enregistree : {detail}"
       missing: "<red>Cette arene n'existe plus."
+      missing-title-v3: "<red><bold>Arène introuvable <gray>• <white>Menu actualisé"
     position:
       missing: "<red>Cette position n'est pas configuree."
       clear-title: "<red>Reinitialiser cette position de {arena_id} ?"

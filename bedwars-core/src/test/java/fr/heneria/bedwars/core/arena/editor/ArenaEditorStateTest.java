@@ -55,6 +55,14 @@ class ArenaEditorStateTest {
   }
 
   @Test
+  void deletedArenaRevisionIsForgotten() {
+    ArenaEditorViewState state = new ArenaEditorViewState();
+    state.observe("alpha", 4);
+    state.forget("alpha");
+    assertEquals(9, state.observedRevision("alpha", 9));
+  }
+
+  @Test
   void filtersMatchAdministrativeStatuses() {
     ArenaDefinition draft = ArenaDefinition.draft(new ArenaId("draft"), Instant.EPOCH);
     ArenaDefinition enabled = draft.withStatus(ArenaStatus.ENABLED, Instant.EPOCH);

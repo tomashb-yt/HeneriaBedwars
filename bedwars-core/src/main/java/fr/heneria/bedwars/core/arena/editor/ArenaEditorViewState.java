@@ -43,4 +43,8 @@ public final class ArenaEditorViewState {
   public long observedRevision(String arenaId, long fallback) {
     return observedRevisions.getOrDefault(arenaId, fallback);
   }
+
+  public void forget(String arenaId) {
+    observedRevisions.remove(arenaId);
+  }
 }

@@ -83,6 +83,7 @@ admin:
     title-v2: "<dark_aqua><bold>HeneriaBedWars <gray>• <white>Setup"
     arenas: "<aqua>Arena management"
     configuration: "<yellow>General configuration"
+    configuration-title-v3: "<yellow><bold>Plugin status <gray>• <white>Summary"
     lobby: "<gray>Lobby - future ticket"
     close: "<red>Close"
 arena:
@@ -114,6 +115,7 @@ arena:
       conflict: "<red>This arena was changed by another administrator. Refresh the menu."
       failed: "<red>The change could not be saved: {detail}"
       missing: "<red>This arena no longer exists."
+      missing-title-v3: "<red><bold>Arena not found <gray>• <white>Menu refreshed"
     position:
       missing: "<red>This position is not configured."
       clear-title: "<red>Reset this position for {arena_id}?"

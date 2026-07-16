@@ -8,6 +8,8 @@ La validation ne produit plus simultanément `MAP_TEMPLATE_MISSING` et `missing-
 
 Deuxième passe après capture de l'éditeur : tous les réglages d'arène restants ont été convertis en assistant continu. L'écran indique la progression et la prochaine action; carte, attente, équipes, joueurs et spectateur sont numérotés. Les sous-menus joueurs/équipes détaillent chaque clic, les limites sont annoncées comme optionnelles et les confirmations réutilisent les nouvelles apparences. De nouvelles clés `assistant-*` garantissent que cette refonte est fusionnée même sur une installation ayant déjà reçu les premières clés v2.
 
+Troisième passe après test de suppression : une arène supprimée ne laisse plus son éditeur dans l'historique. La suppression réussie oublie sa révision observée et recrée une session GUI directement sur le tableau de bord de configuration. Tous les retours de l'assistant sont désormais déterministes, y compris les confirmations ouvertes directement. Les listes d'arènes/cartes, les états vides, le résumé de configuration, l'absence d'arène et l'éditeur de carte partagent des apparences v3 concises qui expliquent action, effet et blocages sans afficher les détails internes.
+
 Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/map` ajoute modèle immutable, identifiants sûrs, types/états, registre copy-on-write, verrous, ports et service transactionnel. `bedwars-plugin/map` ajoute métadonnées YAML UTF-8 atomiques, fichiers confinés, générateur vide, gestion Bukkit, cycle de vie, commandes et menus.
 
 La création fournit un monde vide préfixé avec plateforme optionnelle et réglages configurables. Chargement, téléportation, spawn, sauvegarde et déchargement restent sur le thread serveur. Duplication et suppression de fichiers sont asynchrones; les copies excluent les données propres au monde/joueur. La suppression exige une sauvegarde complète, refuse les joueurs et vérifie en direct les arènes liées ainsi que le lobby protégé.
@@ -16,7 +18,7 @@ Les arènes peuvent référencer une carte `BEDWARS` par `map.template-id`. L'an
 
 Configuration : ajout de `worlds.yml`, dixième YAML principal, dossiers `maps/templates`, `maps/metadata`, `instances` et `backups/maps`, items de menus et traductions FR/EN. Les mondes de chunks restent dans le conteneur Bukkit sous `hbw_template_<id>`; les templates du dossier plugin portent un marqueur de propriété. `instances/` reste réservé et aucun gameplay n'est livré.
 
-Validation : 137 tests automatisés réussis, 0 échec et 0 ignoré; Spotless, build propre et Shadow JAR contrôlés lors de la livraison. Tests en jeu non réalisés faute de serveur Minecraft. Commit prévu : `feat(world): add autonomous map template manager`.
+Validation : 138 tests automatisés réussis, 0 échec et 0 ignoré; Spotless, build propre et Shadow JAR contrôlés après la troisième passe. Tests en jeu non réalisés faute de serveur Minecraft. Commit prévu pour la passe GUI : `fix(gui): reset navigation after arena deletion`.
 
 ## Ticket 006 — Éditeur complet des arènes via menus
 

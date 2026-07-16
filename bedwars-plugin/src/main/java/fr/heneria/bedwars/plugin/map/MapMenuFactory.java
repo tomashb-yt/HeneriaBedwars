@@ -74,7 +74,15 @@ public final class MapMenuFactory {
             .id("map.list")
             .title(message("map.gui.list-title-v2", Map.of("count", templates.size())))
             .rows(6)
-            .fillEmptySlots(true);
+            .fillEmptySlots(true)
+            .button(
+                4,
+                GuiButton.builder()
+                    .itemKey("map.list.guide-v3")
+                    .itemPlaceholders(context -> Map.of("map_count", templates.size()))
+                    .build());
+    if (templates.isEmpty())
+      builder.button(22, GuiButton.builder().itemKey("map.list.empty-v3").build());
     for (int index = 0; index < CONTENT.size(); index++) {
       int absolute = page * CONTENT.size() + index;
       if (absolute >= templates.size()) break;
@@ -128,26 +136,32 @@ public final class MapMenuFactory {
             .button(
                 4,
                 GuiButton.builder()
-                    .itemKey("map.editor.information")
+                    .itemKey("map.editor.information-v3")
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
                 20,
                 action(
-                    "map.editor.duplicate",
+                    "map.editor.duplicate-v3",
                     AdministrativeCommandPolicy.MAP_DUPLICATE,
                     values,
                     context -> requestDuplicate(playerId, template)))
             .button(
+                22,
+                GuiButton.builder()
+                    .itemKey("map.editor.workflow-v3")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
                 24,
                 GuiButton.builder()
-                    .itemKey("map.editor.associations")
+                    .itemKey("map.editor.associations-v3")
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
                 31,
                 action(
-                    "map.editor.delete",
+                    "map.editor.delete-v3",
                     AdministrativeCommandPolicy.MAP_DELETE,
                     values,
                     context -> context.open(deleteConfirmation(playerId, id))))
@@ -164,28 +178,28 @@ public final class MapMenuFactory {
           .button(
               10,
               action(
-                  "map.editor.teleport",
+                  "map.editor.teleport-v3",
                   AdministrativeCommandPolicy.MAP_TELEPORT,
                   values,
                   context -> loadOrTeleport(playerId, id, context)))
           .button(
               12,
               action(
-                  "map.editor.save",
+                  "map.editor.save-v3",
                   AdministrativeCommandPolicy.MAP_SAVE,
                   values,
                   context -> mutate(playerId, maps.save(id), context, id)))
           .button(
               14,
               action(
-                  "map.editor.set-spawn",
+                  "map.editor.set-spawn-v3",
                   AdministrativeCommandPolicy.MAP_EDIT,
                   values,
                   context -> setSpawn(playerId, template, context)))
           .button(
               16,
               action(
-                  "map.editor.unload",
+                  "map.editor.unload-v3",
                   AdministrativeCommandPolicy.MAP_UNLOAD,
                   values,
                   context -> mutate(playerId, maps.unload(id, false), context, id)));
@@ -193,7 +207,7 @@ public final class MapMenuFactory {
       builder.button(
           13,
           action(
-              "map.editor.load",
+              "map.editor.load-v3",
               AdministrativeCommandPolicy.MAP_LOAD,
               values,
               context -> mutate(playerId, maps.load(id), context, id)));
@@ -207,11 +221,12 @@ public final class MapMenuFactory {
     return ConfirmationGui.builder()
         .id("map.delete." + id)
         .title(message("map.gui.delete", placeholders(template)))
-        .informationKey("map.editor.delete")
+        .informationKey("map.editor.delete-v3")
         .informationPlaceholders(placeholders(template))
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
         .permission(AdministrativeCommandPolicy.MAP_DELETE)
+        .onCancel(context -> context.replace(info(playerId, id)))
         .onConfirm(
             context -> {
               MapOperationResult prepared = maps.prepareDelete(id);
@@ -232,7 +247,10 @@ public final class MapMenuFactory {
                                 () -> {
                                   feedback(playerId, result);
                                   Player onlinePlayer = Bukkit.getPlayer(playerId);
-                                  if (onlinePlayer != null) gui.open(onlinePlayer, list(playerId));
+                                  if (onlinePlayer != null)
+                                    gui.open(
+                                        onlinePlayer,
+                                        result.successful() ? list(playerId) : info(playerId, id));
                                 });
                       });
             })

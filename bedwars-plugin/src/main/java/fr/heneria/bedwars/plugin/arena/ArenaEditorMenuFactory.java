@@ -195,7 +195,7 @@ public final class ArenaEditorMenuFactory {
             GuiButton.builder()
                 .itemKey("admin.main.configuration-v2")
                 .itemPlaceholders(context -> configurationPlaceholders())
-                .onLeftClick(context -> context.open(configurationInfo()))
+                .onLeftClick(context -> context.open(configurationInfo(playerId)))
                 .build())
         .button(40, standard.close())
         .build();
@@ -229,7 +229,30 @@ public final class ArenaEditorMenuFactory {
             .fillEmptySlots(true)
             .data("filter", state.filter().name())
             .data("sort", state.sort().name())
-            .data("max_page", maximumPage);
+            .data("max_page", maximumPage)
+            .button(
+                4,
+                GuiButton.builder()
+                    .itemKey("arena.list.guide-v3")
+                    .itemPlaceholders(
+                        context ->
+                            Map.of(
+                                "visible_count",
+                                visible.size(),
+                                "arena_count",
+                                arenas.list().size(),
+                                "filter",
+                                displayFilter(state.filter().name()),
+                                "sort",
+                                displaySort(state.sort().name())))
+                    .build());
+    if (visible.isEmpty())
+      builder.button(
+          22,
+          GuiButton.builder()
+              .itemKey("arena.list.empty-v3")
+              .itemPlaceholders(context -> Map.of("filter", displayFilter(state.filter().name())))
+              .build());
     for (int index = 0; index < pageSize; index++) {
       int absolute = state.page() * pageSize + index;
       if (absolute >= visible.size()) break;
@@ -293,7 +316,7 @@ public final class ArenaEditorMenuFactory {
                 .permission(AdministrativeCommandPolicy.ARENA_CREATE)
                 .onLeftClick(context -> requestArenaId(playerId))
                 .build())
-        .button(settings.listRows() * 9 - 8, standard.back())
+        .button(settings.listRows() * 9 - 8, dashboardButton(playerId))
         .button(settings.listRows() * 9 - 6, standard.close())
         .button(
             settings.listRows() * 9 - 4,
@@ -304,19 +327,38 @@ public final class ArenaEditorMenuFactory {
         .build();
   }
 
-  private Gui configurationInfo() {
+  private Gui configurationInfo(UUID playerId) {
     return Gui.builder()
         .id("admin.configuration")
-        .title(message("admin.main.configuration", Map.of()))
-        .rows(3)
+        .title(message("admin.main.configuration-title-v3", Map.of()))
+        .rows(4)
         .fillEmptySlots(true)
+        .button(
+            4,
+            GuiButton.builder()
+                .itemKey("admin.configuration.summary-v3")
+                .itemPlaceholders(context -> configurationPlaceholders())
+                .build())
+        .button(
+            11,
+            GuiButton.builder()
+                .itemKey("admin.configuration.language-v3")
+                .itemPlaceholders(context -> configurationPlaceholders())
+                .build())
         .button(
             13,
             GuiButton.builder()
-                .itemKey("admin.main.configuration")
+                .itemKey("admin.configuration.resources-v3")
                 .itemPlaceholders(context -> configurationPlaceholders())
                 .build())
-        .button(22, standard.back())
+        .button(
+            15,
+            GuiButton.builder()
+                .itemKey("admin.configuration.storage-v3")
+                .itemPlaceholders(context -> configurationPlaceholders())
+                .build())
+        .button(27, dashboardButton(playerId))
+        .button(35, standard.close())
         .build();
   }
 
@@ -402,7 +444,12 @@ public final class ArenaEditorMenuFactory {
                 AdministrativeCommandPolicy.ARENA_DELETE,
                 placeholders(arena, validation),
                 context -> context.open(deleteConfirmation(playerId, id, false))))
-        .button(settings.editorBackSlot(), standard.back())
+        .button(
+            settings.editorBackSlot(),
+            GuiButton.builder()
+                .itemKey("gui.back")
+                .onLeftClick(context -> context.replace(list(playerId)))
+                .build())
         .button(
             settings.editorRefreshSlot(),
             GuiButton.builder()
@@ -449,7 +496,7 @@ public final class ArenaEditorMenuFactory {
               .onRightClick(context -> teleportWorld(context, playerId, world))
               .build());
     }
-    return builder.button(45, standard.back()).button(49, standard.close()).build();
+    return builder.button(45, editorBackButton(playerId, id)).button(49, standard.close()).build();
   }
 
   /** Selects a persistent BedWars map id; arena YAML remains the relation source of truth. */
@@ -507,7 +554,7 @@ public final class ArenaEditorMenuFactory {
               .build());
     }
     return builder
-        .button(45, standard.back())
+        .button(45, editorBackButton(playerId, id))
         .button(
             49,
             GuiButton.builder()
@@ -536,7 +583,7 @@ public final class ArenaEditorMenuFactory {
                 .itemKey("arena.players.assistant-summary")
                 .itemPlaceholders(context -> placeholders(arena, validation))
                 .build())
-        .button(22, standard.back())
+        .button(22, editorBackButton(playerId, id))
         .build();
   }
 
@@ -556,7 +603,7 @@ public final class ArenaEditorMenuFactory {
                 .itemKey("arena.teams.assistant-summary")
                 .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
                 .build())
-        .button(22, standard.back())
+        .button(22, editorBackButton(playerId, id))
         .build();
   }
 
@@ -644,7 +691,7 @@ public final class ArenaEditorMenuFactory {
                 AdministrativeCommandPolicy.ARENA_EDIT,
                 placeholders,
                 context -> context.open(clearBoundaryConfirmation(playerId, id, expected))))
-        .button(31, standard.back())
+        .button(31, editorBackButton(playerId, id))
         .build();
   }
 
@@ -691,7 +738,7 @@ public final class ArenaEditorMenuFactory {
               .build());
     }
     return builder
-        .button(36, standard.back())
+        .button(36, editorBackButton(playerId, id))
         .button(
             40,
             GuiButton.builder()
@@ -859,6 +906,7 @@ public final class ArenaEditorMenuFactory {
             arena.enabled()
                 ? AdministrativeCommandPolicy.ARENA_DISABLE
                 : AdministrativeCommandPolicy.ARENA_ENABLE)
+        .onCancel(context -> context.replace(editor(playerId, id)))
         .onConfirm(
             context ->
                 mutate(
@@ -881,6 +929,7 @@ public final class ArenaEditorMenuFactory {
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
         .permission(AdministrativeCommandPolicy.ARENA_DELETE)
+        .onCancel(context -> context.replace(editor(playerId, id)))
         .onConfirm(
             context -> {
               if (arena.enabled() && !enabledConfirmed) {
@@ -891,7 +940,8 @@ public final class ArenaEditorMenuFactory {
               if (result.successful()) {
                 logger.info("[Arena] " + playerName(playerId) + " deleted '" + id + "'.");
                 send(playerId, "arena.delete.success", Map.of("arena_id", id));
-                context.replace(list(playerId));
+                states.state(playerId).forget(id);
+                openDashboard(playerId);
               } else mutationFailure(playerId, result);
             })
         .build();
@@ -909,6 +959,7 @@ public final class ArenaEditorMenuFactory {
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
         .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+        .onCancel(context -> context.replace(editor(playerId, id)))
         .onConfirm(
             context ->
                 mutate(
@@ -931,6 +982,7 @@ public final class ArenaEditorMenuFactory {
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
         .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+        .onCancel(context -> context.replace(boundary(playerId, id, expected)))
         .onConfirm(
             context ->
                 mutate(context, playerId, id, arenas.clearBoundary(id, expected), "boundary-clear"))
@@ -951,6 +1003,7 @@ public final class ArenaEditorMenuFactory {
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
         .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+        .onCancel(context -> context.replace(teams(playerId, arena.id().value(), expected)))
         .onConfirm(
             context ->
                 mutate(
@@ -1212,7 +1265,7 @@ public final class ArenaEditorMenuFactory {
       context.replace(editor(playerId, id));
     } else {
       mutationFailure(playerId, result);
-      if (result.code() == ArenaOperationCode.NOT_FOUND) context.replace(list(playerId));
+      if (result.code() == ArenaOperationCode.NOT_FOUND) openDashboard(playerId);
     }
   }
 
@@ -1282,17 +1335,31 @@ public final class ArenaEditorMenuFactory {
   private Gui missing(UUID playerId) {
     return Gui.builder()
         .id("arena.missing")
-        .title(message("arena.gui.editor.missing", Map.of()))
+        .title(message("arena.gui.editor.missing-title-v3", Map.of()))
         .rows(3)
         .fillEmptySlots(true)
-        .button(13, GuiButton.builder().itemKey("arena.validation.error").build())
-        .button(
-            22,
-            GuiButton.builder()
-                .itemKey("gui.back")
-                .onLeftClick(context -> context.replace(list(playerId)))
-                .build())
+        .button(13, GuiButton.builder().itemKey("arena.missing.information-v3").build())
+        .button(22, dashboardButton(playerId))
         .build();
+  }
+
+  private GuiButton dashboardButton(UUID playerId) {
+    return GuiButton.builder()
+        .itemKey("admin.main.back-to-dashboard-v3")
+        .onLeftClick(context -> openDashboard(playerId))
+        .build();
+  }
+
+  private GuiButton editorBackButton(UUID playerId, String id) {
+    return GuiButton.builder()
+        .itemKey("gui.back")
+        .onLeftClick(context -> context.replace(editor(playerId, id)))
+        .build();
+  }
+
+  private void openDashboard(UUID playerId) {
+    Player player = Bukkit.getPlayer(playerId);
+    if (player != null) gui.open(player, setup(playerId));
   }
 
   private GuiButton action(
@@ -1319,7 +1386,11 @@ public final class ArenaEditorMenuFactory {
         "debug", snapshot.plugin().debug(),
         "storage", snapshot.storage().type(),
         "items", snapshot.items().size(),
-        "loaded_files", snapshot.documents().size() + snapshot.languages().size());
+        "loaded_files", snapshot.documents().size() + snapshot.languages().size(),
+        "arena_count", arenas.list().size(),
+        "enabled_count", arenas.list().stream().filter(ArenaDefinition::enabled).count(),
+        "map_count", maps.list().size(),
+        "loaded_map_count", maps.list().stream().filter(map -> map.loaded()).count());
   }
 
   private static String entryKey(ArenaDefinition arena) {

@@ -182,6 +182,27 @@ items:
         material: COMPARATOR
         name: "<yellow>État du plugin"
         lore: ["<gray>Langue: <white>{language}", "<gray>Configuration: <green>chargée", "<gray>Fichiers: <white>{loaded_files}", "", "<yellow>▸ Voir les détails"]
+      back-to-dashboard-v3:
+        material: ARROW
+        name: "<aqua>Retour à la configuration"
+        lore: ["<gray>Revenir au tableau de bord principal.", "", "<yellow>▸ Cliquez pour revenir"]
+    configuration:
+      summary-v3:
+        material: NETHER_STAR
+        name: "<green><bold>Plugin opérationnel"
+        lore: ["<gray>Les services de configuration sont chargés.", "", "<gray>Arènes: <white>{arena_count}", "<gray>Cartes: <white>{map_count}", "<green>Arènes actives: <white>{enabled_count}"]
+      language-v3:
+        material: BOOK
+        name: "<aqua>Langue et affichage"
+        lore: ["<gray>Langue active: <white>{language}", "<gray>Mode diagnostic: <white>{debug}", "", "<dark_gray>Les menus utilisent automatiquement", "<dark_gray>la configuration actuellement chargée."]
+      resources-v3:
+        material: CHEST
+        name: "<gold>Ressources chargées"
+        lore: ["<gray>Fichiers et langues: <white>{loaded_files}", "<gray>Apparences d'items: <white>{items}", "<gray>Cartes actuellement ouvertes: <white>{loaded_map_count}", "", "<green>Aucune action requise."]
+      storage-v3:
+        material: BARREL
+        name: "<yellow>Stockage préparé"
+        lore: ["<gray>Type configuré: <white>{storage}", "", "<gray>Les arènes et cartes actuelles sont", "<gray>sauvegardées automatiquement en YAML.", "<dark_gray>Les statistiques arriveront plus tard."]
   arena:
     list:
       create: {material: EMERALD, name: "<green>Creer une arene", lore: ["<gray>Saisie securisee dans le chat."]}
@@ -190,6 +211,8 @@ items:
       create-v2: {material: EMERALD_BLOCK, name: "<green><bold>Créer une arène", lore: ["<gray>L'assistant vous guidera ensuite.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
       filter-v2: {material: HOPPER, name: "<yellow>Afficher : <white>{filter}", lore: ["", "<yellow>▸ Cliquez pour changer"]}
       sort-v2: {material: COMPARATOR, name: "<yellow>Trier par : <white>{sort}", lore: ["", "<yellow>▸ Cliquez pour changer"]}
+      guide-v3: {material: COMPASS, name: "<aqua><bold>Choisissez une arène", lore: ["<gray>Affichées: <white>{visible_count}<gray> / {arena_count}", "<gray>Filtre: <white>{filter}", "<gray>Tri: <white>{sort}", "", "<yellow>▸ Gauche : continuer la configuration", "<aqua>▸ Droit : voir les étapes", "<red>▸ Shift+droit : supprimer"]}
+      empty-v3: {material: MINECART, name: "<gold><bold>Aucune arène affichée", lore: ["<gray>Filtre actuel: <white>{filter}", "", "<gray>Changez le filtre ou créez", "<gray>une nouvelle arène ci-dessous."]}
       entry-enabled: &arena-entry
         material: LIME_CONCRETE
         name: "<green>{arena_name}"
@@ -298,6 +321,8 @@ items:
       step-warning: {material: YELLOW_CONCRETE, name: "<yellow><bold>Conseil", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour ouvrir"]}
       step-error: {material: ORANGE_CONCRETE, name: "<gold><bold>Étape requise", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour corriger"]}
       step-critical: {material: RED_CONCRETE, name: "<red><bold>Action indispensable", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour corriger"]}
+    missing:
+      information-v3: {material: BARRIER, name: "<red><bold>Cette arène n'existe plus", lore: ["<gray>Elle a été supprimée ou rechargée", "<gray>pendant que ce menu était ouvert.", "", "<yellow>Revenez à la configuration pour", "<yellow>continuer sur des données à jour."]}
     map:
       empty: {material: MINECART, name: "<gold><bold>Aucune carte BedWars", lore: ["<gray>Cette arène a besoin d'une carte.", "", "<white>Utilisez le bouton ci-dessous pour", "<white>créer un monde vide automatiquement."]}
       create: {material: EMERALD_BLOCK, name: "<green><bold>Créer et associer une carte", lore: ["<gray>Le monde sera créé puis lié", "<gray>automatiquement à cette arène.", "", "<yellow>▸ Cliquez pour commencer"]}
@@ -308,6 +333,8 @@ items:
     list:
       create: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
       create-bedwars: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
+      guide-v3: {material: COMPASS, name: "<green><bold>Gérer les cartes BedWars", lore: ["<gray>Cartes disponibles: <white>{map_count}", "", "<yellow>▸ Gauche : ouvrir les outils", "<aqua>▸ Droit : charger et visiter", "<red>▸ Shift+droit : supprimer"]}
+      empty-v3: {material: MAP, name: "<gold><bold>Aucune carte créée", lore: ["<gray>Créez un monde vide avec le bouton", "<gray>vert, puis construisez votre BedWars.", "", "<green>Vous serez guidé automatiquement."]}
       entry-loaded: &map-entry
         material: LIME_CONCRETE
         name: "<green>{map_name}"
@@ -341,6 +368,16 @@ items:
       set-spawn: {material: COMPASS, name: "<gold>Definir le spawn"}
       associations: {material: CHAIN, name: "<yellow>Associations", lore: ["<gray>Arenes: <white>{linked_arenas}", "<gray>Total: <white>{arena_count}"]}
       delete: {material: TNT, name: "<red>Supprimer", lore: ["<yellow>Sauvegarde complete obligatoire."]}
+      information-v3: {material: NETHER_STAR, name: "<gold><bold>{map_name}", lore: ["<gray>Type: <white>{map_type_label}", "<gray>État: <white>{map_state_label}", "<gray>Joueurs présents: <white>{player_count}", "<gray>Arènes liées: <white>{arena_count}", "<gray>Dernière sauvegarde: <white>{last_saved_at}"]}
+      workflow-v3: {material: BOOK, name: "<aqua><bold>Parcours conseillé", lore: ["<yellow>1. <white>Chargez et visitez la carte", "<yellow>2. <white>Construisez votre terrain", "<yellow>3. <white>Définissez le point d'arrivée", "<yellow>4. <white>Sauvegardez puis fermez", "", "<dark_gray>Les actions indisponibles sont masquées."]}
+      load-v3: {material: LIME_CONCRETE, name: "<green><bold>Ouvrir pour construire", lore: ["<gray>Charge le monde de travail sans", "<gray>lancer de partie BedWars.", "", "<yellow>▸ Cliquez pour charger"]}
+      teleport-v3: {material: ENDER_PEARL, name: "<light_purple><bold>Visiter la carte", lore: ["<gray>Vous téléporte au point d'arrivée", "<gray>pour construire ou vérifier la carte.", "", "<yellow>▸ Cliquez pour vous téléporter"]}
+      save-v3: {material: CHEST, name: "<aqua><bold>Sauvegarder les changements", lore: ["<gray>Enregistre immédiatement les blocs", "<gray>et les réglages de cette carte.", "", "<yellow>▸ Cliquez pour sauvegarder"]}
+      unload-v3: {material: GRAY_CONCRETE, name: "<yellow><bold>Sauvegarder et fermer", lore: ["<gray>Libère le monde de travail.", "<gray>Refusé si un joueur est encore dedans.", "", "<yellow>▸ Cliquez pour fermer"]}
+      duplicate-v3: {material: STRUCTURE_BLOCK, name: "<gold><bold>Créer une copie", lore: ["<gray>Duplique entièrement cette carte", "<gray>sans modifier l'originale.", "", "<yellow>▸ Cliquez puis écrivez un nom"]}
+      set-spawn-v3: {material: COMPASS, name: "<gold><bold>Définir le point d'arrivée", lore: ["<gray>Placez-vous où les administrateurs", "<gray>arriveront en visitant la carte.", "", "<yellow>▸ Cliquez pour utiliser votre position"]}
+      associations-v3: {material: CHAIN, name: "<yellow><bold>Arènes associées", lore: ["<gray>Nombre d'arènes liées: <white>{arena_count}", "<gray>{linked_arenas}", "", "<dark_gray>Une carte liée ne peut pas être supprimée."]}
+      delete-v3: {material: TNT, name: "<red><bold>Supprimer la carte", lore: ["<gray>Une sauvegarde complète est créée.", "<gray>La suppression est bloquée si une", "<gray>arène ou un joueur utilise la carte.", "", "<red>▸ Cliquez pour continuer"]}
     type:
       lobby: {material: NETHER_STAR, name: "<aqua>Lobby"}
       bedwars: {material: RED_BED, name: "<red>BedWars"}
