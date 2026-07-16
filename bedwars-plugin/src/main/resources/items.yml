@@ -281,6 +281,7 @@ items:
       assistant-review-ready: {material: LIME_CONCRETE, name: "<green><bold>Configuration terminée", lore: ["<gray>Toutes les étapes obligatoires", "<gray>sont correctement configurées.", "", "<yellow>▸ Cliquez pour vérifier"]}
       assistant-activation-ready: {material: LIME_CONCRETE, name: "<green><bold>Activer l'arène", lore: ["<gray>L'arène est prête à être utilisée.", "", "<yellow>▸ Cliquez pour confirmer"]}
       assistant-activation-blocked: {material: IRON_BARS, name: "<gray><bold>Activation verrouillée", lore: ["<gold>{validation_errors} étape(s) sont encore requises.", "", "<yellow>▸ Cliquez pour voir quoi faire"]}
+      assistant-runtime-ready: {material: ENDER_EYE, glow: true, name: "<aqua><bold>Tester l'arène", lore: ["<gray>L'arène est active et prête.", "<gray>Une instance sera créée automatiquement", "<gray>si aucune n'existe encore.", "", "<green>▸ Gauche : lancer ou rejoindre", "<yellow>▸ Droit : désactiver"]}
       assistant-disable: {material: GRAY_DYE, name: "<yellow>Désactiver l'arène", lore: ["<gray>La configuration sera conservée.", "", "<yellow>▸ Cliquez pour confirmer"]}
       assistant-delete: {material: TNT, name: "<red>Supprimer définitivement", lore: ["<gray>Une sauvegarde sera créée avant", "<gray>la suppression de l'arène.", "", "<red>▸ Cliquez pour continuer"]}
     world:

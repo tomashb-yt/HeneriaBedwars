@@ -11,6 +11,7 @@
 - clonage asynchrone des cartes `BEDWARS`, chargement Bukkit sur le thread serveur, téléportation au point d'attente, évacuation, déchargement et suppression;
 - événements Java internes de création, attente, démarrage, fin, destruction, entrée et sortie;
 - API publique immuable enregistrée dans le `ServicesManager` Bukkit et commandes `/bedwars game`;
+- une arène active peut être lancée/rejointe depuis son éditeur en un clic; `/bedwars game join <arène>` crée également l'instance automatiquement si nécessaire;
 
 - éditeur graphique de cartes v4 : bibliothèque paginée avec filtres/tri par administrateur, création simple ou avancée, progression et prochaine action;
 - édition guidée du nom, type, point d'arrivée et règles du monde; sauvegarde, ouverture/fermeture, visite, duplication, archive complète et suppression sécurisée;

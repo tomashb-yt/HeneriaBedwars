@@ -6,6 +6,8 @@ Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/gam
 
 `bedwars-plugin/game` clone le monde modèle hors thread, charge le clone `hbw_game_<UUID>` sur le thread serveur, applique les règles sûres, téléporte au point d'attente, évacue, décharge sans sauvegarde et supprime les dossiers contrôlés. Les restes d'un crash sont nettoyés avant la première création. `/bedwars game create|list|info|join|leave|destroy` fournit le contrôle administratif.
 
+Correctif de parcours : une arène active affiche désormais « Tester l'arène » dans l'éditeur. Le clic gauche crée l'instance si nécessaire puis téléporte le joueur; le clic droit conserve l'accès à la désactivation. `/bedwars game join <arène>` accepte aussi directement l'identifiant administratif et crée automatiquement l'instance absente.
+
 Les événements Java internes couvrent création, attente, démarrage, fin, destruction et mouvements de joueurs. `HeneriaBedWarsApi` expose désormais des façades et snapshots en lecture seule via le registre de services Bukkit. Aucun gameplay, lit actif, générateur, boutique, victoire, SQL, Redis ou proxy n'est livré. Validation : 149 tests automatisés réussis, 0 échec, 0 erreur et 0 ignoré; Spotless, build propre, `git diff --check` et Shadow JAR contrôlés. Les opérations Paper restent à tester manuellement faute de serveur Minecraft dans l'environnement. Commit prévu : `feat(runtime): add game instance engine`.
 
 ## Ticket 008 — Finalisation de l'éditeur graphique des cartes

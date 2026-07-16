@@ -39,7 +39,7 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 | `/bedwars game create <arène>` | `heneriabedwars.admin.game.create` | clone la carte, crée l'instance en `WAITING` et fait rejoindre le joueur |
 | `/bedwars game list` | `heneriabedwars.admin.game.list` | liste les instances vivantes |
 | `/bedwars game info <UUID>` | `heneriabedwars.admin.game.info` | affiche arène, carte, état, monde et joueurs |
-| `/bedwars game join <UUID>` | `heneriabedwars.admin.game.join` | rejoint une instance en attente |
+| `/bedwars game join <arène ou UUID>` | `heneriabedwars.admin.game.join` | rejoint l'instance existante ou la crée automatiquement depuis une arène active |
 | `/bedwars game leave` | `heneriabedwars.admin.game.leave` | quitte l'instance et revient au monde de secours |
 | `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | évacue, décharge et supprime le clone |
 

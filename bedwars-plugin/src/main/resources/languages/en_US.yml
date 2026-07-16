@@ -87,6 +87,12 @@ admin:
     lobby: "<gray>Lobby - future ticket"
     close: "<red>Close"
 arena:
+  runtime:
+    creating: "<yellow>Preparing arena <white>{arena_id}<yellow>..."
+    joined: "<green>You joined arena <white>{arena_id}<green>. Instance: <white>{game_id}<green>."
+    already-joined: "<yellow>You are already in this arena."
+    player-occupied: "<red>Leave your current instance first."
+    failed: "<red>Unable to launch this arena: <white>{code}<red>."
   gui:
     list:
       title: "<aqua>Arenas <gray>({count}) - {filter} / {sort}"
@@ -194,7 +200,7 @@ arena:
     failed: "<red>Deletion failed."
 game:
   command:
-    help: "<yellow>Usage: /bedwars game <create|list|info|join|leave|destroy>"
+    help: "<yellow>Usage: /bedwars game join <arena> — other commands are for advanced administration."
     creating: "<yellow>Creating an instance for <white>{arena_id}<yellow>..."
     created: "<green>Instance <white>{game_id}<green> created for <white>{arena_id}<green>, world <white>{world_name}<green>."
     destroying: "<yellow>Cleaning instance <white>{game_id}<yellow>..."
@@ -204,7 +210,7 @@ game:
     joined: "<green>You joined instance <white>{game_id}<green>. No BedWars gameplay is active yet."
     left: "<green>You left your instance."
     failed: "<red>Runtime operation failed: <white>{code}<red>."
-    not-found: "<red>Runtime instance not found."
+    not-found: "<red>Arena or runtime instance not found."
     player-only: "<red>This operation must be performed by a player."
     teleport-failed: "<red>The instance exists, but your teleport failed."
 gui:

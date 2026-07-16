@@ -54,8 +54,11 @@ public final class GameCommandHandler {
       if (sender.hasPermission(AdministrativeCommandPolicy.GAME_DESTROY)) values.add("destroy");
     } else if (args.length == 3 && args[1].equalsIgnoreCase("create")) {
       values.addAll(arenaIds);
+    } else if (args.length == 3 && args[1].equalsIgnoreCase("join")) {
+      values.addAll(arenaIds);
+      values.addAll(games.all().stream().map(game -> game.id().toString()).toList());
     } else if (args.length == 3
-        && List.of("info", "join", "destroy").contains(args[1].toLowerCase(Locale.ROOT))) {
+        && List.of("info", "destroy").contains(args[1].toLowerCase(Locale.ROOT))) {
       values.addAll(games.all().stream().map(game -> game.id().toString()).toList());
     }
     String input = args.length == 0 ? "" : args[args.length - 1].toLowerCase(Locale.ROOT);
@@ -126,8 +129,32 @@ public final class GameCommandHandler {
     if (!allowed(sender, AdministrativeCommandPolicy.GAME_JOIN)) return true;
     if (!(sender instanceof Player player))
       return send(sender, "game.command.player-only", Map.of());
+    if (args.length != 3) return send(sender, "game.command.help", Map.of());
     GameInstance instance = instance(args);
-    if (instance == null) return send(sender, "game.command.not-found", Map.of());
+    if (instance == null) instance = games.byArena(args[2]).orElse(null);
+    if (instance == null) {
+      if (!sender.hasPermission(AdministrativeCommandPolicy.GAME_CREATE))
+        return send(sender, "game.command.not-found", Map.of());
+      send(sender, "game.command.creating", Map.of("arena_id", args[2]));
+      games
+          .create(args[2])
+          .whenComplete(
+              (created, failure) ->
+                  main(
+                      () -> {
+                        if (failure != null || created == null || !created.successful()) {
+                          feedback(sender, created);
+                          return;
+                        }
+                        join(sender, player, created.instance().orElseThrow());
+                      }));
+      return true;
+    }
+    join(sender, player, instance);
+    return true;
+  }
+
+  private void join(CommandSender sender, Player player, GameInstance instance) {
     games
         .join(instance.id(), player.getUniqueId())
         .whenComplete(
@@ -137,7 +164,6 @@ public final class GameCommandHandler {
                       if (failure != null || !result.successful()) feedback(sender, result);
                       else send(sender, "game.command.joined", values(instance));
                     }));
-    return true;
   }
 
   private boolean leave(CommandSender sender) {

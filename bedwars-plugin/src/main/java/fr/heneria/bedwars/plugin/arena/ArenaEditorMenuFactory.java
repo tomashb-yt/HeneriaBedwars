@@ -18,6 +18,9 @@ import fr.heneria.bedwars.core.command.AdministrativeCommandPolicy;
 import fr.heneria.bedwars.core.config.ArenaEditorSettings;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.ProblemSeverity;
+import fr.heneria.bedwars.core.game.GameInstance;
+import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.GameOperationResult;
 import fr.heneria.bedwars.core.gui.ConfirmationGui;
 import fr.heneria.bedwars.core.gui.Gui;
 import fr.heneria.bedwars.core.gui.GuiButton;
@@ -94,6 +97,7 @@ public final class ArenaEditorMenuFactory {
   private final ProjectLogger logger;
   private final MapTemplateService maps;
   private final MapMenuFactory mapMenus;
+  private final GameInstanceManager games;
   private final StandardGuiButtons standard = new StandardGuiButtons();
 
   public ArenaEditorMenuFactory(
@@ -105,7 +109,8 @@ public final class ArenaEditorMenuFactory {
       ArenaEditorStateStore states,
       ProjectLogger logger,
       MapTemplateService maps,
-      MapMenuFactory mapMenus) {
+      MapMenuFactory mapMenus,
+      GameInstanceManager games) {
     this.plugin = plugin;
     this.arenas = arenas;
     this.configurations = configurations;
@@ -115,6 +120,7 @@ public final class ArenaEditorMenuFactory {
     this.logger = logger;
     this.maps = maps;
     this.mapMenus = mapMenus;
+    this.games = games;
   }
 
   public Gui setup(UUID playerId) {
@@ -869,15 +875,91 @@ public final class ArenaEditorMenuFactory {
           .itemPlaceholders(context -> placeholders(arena, validation))
           .onLeftClick(context -> context.open(validation(playerId, arena.id().value())))
           .build();
+    if (arena.enabled())
+      return GuiButton.builder()
+          .itemKey("arena.editor.assistant-runtime-ready")
+          .itemPlaceholders(context -> placeholders(arena, validation))
+          .onLeftClick(context -> launchOrJoin(context, playerId, arena.id().value()))
+          .onRightClick(
+              context ->
+                  context.open(activationConfirmation(playerId, arena.id().value(), expected)))
+          .build();
     return action(
-        arena.enabled()
-            ? "arena.editor.assistant-disable"
-            : "arena.editor.assistant-activation-ready",
-        arena.enabled()
-            ? AdministrativeCommandPolicy.ARENA_DISABLE
-            : AdministrativeCommandPolicy.ARENA_ENABLE,
+        "arena.editor.assistant-activation-ready",
+        AdministrativeCommandPolicy.ARENA_ENABLE,
         placeholders(arena, validation),
         context -> context.open(activationConfirmation(playerId, arena.id().value(), expected)));
+  }
+
+  private void launchOrJoin(GuiClickContext context, UUID playerId, String arenaId) {
+    Player player = player(playerId);
+    if (!player.hasPermission(AdministrativeCommandPolicy.GAME_JOIN)
+        || (!games.byArena(arenaId).isPresent()
+            && !player.hasPermission(AdministrativeCommandPolicy.GAME_CREATE))) {
+      send(playerId, "general.no-permission", Map.of());
+      return;
+    }
+    Optional<GameInstance> current = games.byPlayer(playerId);
+    if (current.isPresent()) {
+      send(
+          playerId,
+          current.orElseThrow().arena().definition().id().value().equalsIgnoreCase(arenaId)
+              ? "arena.runtime.already-joined"
+              : "arena.runtime.player-occupied",
+          Map.of());
+      return;
+    }
+    context.close();
+    Optional<GameInstance> existing = games.byArena(arenaId);
+    if (existing.isPresent()) {
+      joinRuntime(playerId, existing.orElseThrow());
+      return;
+    }
+    send(playerId, "arena.runtime.creating", Map.of("arena_id", arenaId));
+    games
+        .create(arenaId)
+        .whenComplete(
+            (result, failure) ->
+                main(
+                    () -> {
+                      if (failure != null || result == null || !result.successful()) {
+                        runtimeFailure(playerId, result);
+                        return;
+                      }
+                      joinRuntime(playerId, result.instance().orElseThrow());
+                    }));
+  }
+
+  private void joinRuntime(UUID playerId, GameInstance instance) {
+    games
+        .join(instance.id(), playerId)
+        .whenComplete(
+            (result, failure) ->
+                main(
+                    () -> {
+                      if (failure != null || result == null || !result.successful()) {
+                        runtimeFailure(playerId, result);
+                        return;
+                      }
+                      send(
+                          playerId,
+                          "arena.runtime.joined",
+                          Map.of(
+                              "arena_id", instance.arena().definition().id().value(),
+                              "game_id", instance.id()));
+                    }));
+  }
+
+  private void runtimeFailure(UUID playerId, GameOperationResult result) {
+    send(
+        playerId,
+        "arena.runtime.failed",
+        Map.of("code", result == null ? "INTERNAL_ERROR" : result.code().name()));
+  }
+
+  private void main(Runnable action) {
+    if (Bukkit.isPrimaryThread()) action.run();
+    else plugin.getServer().getScheduler().runTask(plugin, action);
   }
 
   private GuiButton infoButton(ArenaDefinition arena, ArenaValidationResult validation) {

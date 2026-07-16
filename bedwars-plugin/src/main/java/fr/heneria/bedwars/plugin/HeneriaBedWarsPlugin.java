@@ -217,7 +217,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               editorStates,
               projectLogger,
               mapService,
-              mapMenus);
+              mapMenus,
+              gameService);
       arenaEditorReference.set(arenaEditor);
       bootstrap =
           new BedWarsBootstrap(

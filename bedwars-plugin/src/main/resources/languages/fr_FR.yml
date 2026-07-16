@@ -87,6 +87,12 @@ admin:
     lobby: "<gray>Lobby - prochain ticket"
     close: "<red>Fermer"
 arena:
+  runtime:
+    creating: "<yellow>Préparation de l'arène <white>{arena_id}<yellow>..."
+    joined: "<green>Vous avez rejoint l'arène <white>{arena_id}<green>. Instance : <white>{game_id}<green>."
+    already-joined: "<yellow>Vous êtes déjà dans cette arène."
+    player-occupied: "<red>Quittez d'abord votre instance actuelle."
+    failed: "<red>Impossible de lancer cette arène : <white>{code}<red>."
   gui:
     list:
       title: "<aqua>Arenes <gray>({count}) - {filter} / {sort}"
@@ -194,7 +200,7 @@ arena:
     failed: "<red>Suppression impossible."
 game:
   command:
-    help: "<yellow>Utilisation : /bedwars game <create|list|info|join|leave|destroy>"
+    help: "<yellow>Utilisation : /bedwars game join <arène> — les autres commandes sont réservées à l'administration avancée."
     creating: "<yellow>Création d'une instance pour <white>{arena_id}<yellow>..."
     created: "<green>Instance <white>{game_id}<green> créée pour <white>{arena_id}<green>, monde <white>{world_name}<green>."
     destroying: "<yellow>Nettoyage de l'instance <white>{game_id}<yellow>..."
@@ -204,7 +210,7 @@ game:
     joined: "<green>Vous avez rejoint l'instance <white>{game_id}<green>. Aucun gameplay BedWars n'est encore actif."
     left: "<green>Vous avez quitté votre instance."
     failed: "<red>Opération runtime impossible : <white>{code}<red>."
-    not-found: "<red>Instance runtime introuvable."
+    not-found: "<red>Arène ou instance runtime introuvable."
     player-only: "<red>Cette opération doit être effectuée par un joueur."
     teleport-failed: "<red>L'instance existe, mais votre téléportation a échoué."
 gui:
