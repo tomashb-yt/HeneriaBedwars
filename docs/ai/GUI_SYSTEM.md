@@ -4,6 +4,12 @@
 
 `MapMenuFactory` réutilise le framework pour la liste paginée, les informations, la création par chat, les actions de monde et la confirmation de suppression. Les apparences `map.*` viennent de `items.yml`; le menu ne lit jamais les YAML. La copie et la phase fichier de suppression quittent le thread serveur, puis le résultat revient sur le thread Bukkit avant tout message ou changement de vue. L'éditeur d'arènes ouvre aussi un sélecteur des cartes `BEDWARS` valides.
 
+### Refonte d'expérience administrative
+
+Pour un joueur autorisé, `/bedwars` ouvre le tableau de bord au lieu d'imprimer toute la surface de commandes. Le parcours recommandé est carte → construction → arène → positions → activation. La création d'une arène ouvre immédiatement le choix de carte; si aucune carte `BEDWARS` n'existe, le même menu peut créer le monde vide et l'associer automatiquement.
+
+Les nouvelles apparences et traductions utilisent des clés v2 distinctes. L'installateur les fusionne dans les anciens `items.yml` et catalogues sans remplacer les valeurs personnalisées. Les sous-commandes restent exécutables pour la console, l'automatisation et le diagnostic, mais ne saturent plus l'aide ni la complétion de premier niveau des joueurs.
+
 ## Architecture
 
 Le framework Ticket 003 est interne et séparé en deux frontières :

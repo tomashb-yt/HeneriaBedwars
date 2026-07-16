@@ -4,7 +4,7 @@
 
 | Commande | Permission | Effet |
 |---|---|---|
-| `/bedwars`, `/hbw` | `heneriabedwars.admin` | aide traduite |
+| `/bedwars`, `/hbw` | `heneriabedwars.admin.setup` pour un joueur | ouvre directement le tableau de bord; la console conserve l'aide |
 | `/bedwars version` | `heneriabedwars.admin` | versions, état et nombre de services |
 | `/bedwars reload` | `heneriabedwars.admin.reload` | reload transactionnel des YAML |
 | `/bedwars config` | `heneriabedwars.admin.config` | diagnostic sans secret |

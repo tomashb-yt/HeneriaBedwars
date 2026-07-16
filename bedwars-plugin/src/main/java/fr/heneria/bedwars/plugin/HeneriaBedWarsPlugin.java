@@ -151,7 +151,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               textInputService,
               editorStates,
               projectLogger,
-              mapService);
+              mapService,
+              mapMenus);
       bootstrap =
           new BedWarsBootstrap(
               getDescription().getVersion(),

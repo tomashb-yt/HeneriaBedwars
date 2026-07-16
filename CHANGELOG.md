@@ -6,6 +6,7 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Parcours d'administration simplifié : `/bedwars` ouvre directement un tableau de bord visuel, création guidée carte–arène et menus v2 ajoutés sans écraser les personnalisations existantes.
 - Gestionnaire autonome de cartes modèles : modèle immutable, registre, métadonnées YAML atomiques, mondes vides Bukkit, chargement, sauvegarde, déchargement, téléportation et autosauvegarde optionnelle.
 - Duplication confinée hors thread serveur, exclusions des données joueurs, suppression avec sauvegarde complète obligatoire et refus des cartes liées à une arène ou au lobby.
 - Commandes et menus `/bedwars map`, permissions détaillées, liaisons arène–carte `BEDWARS`, configuration `worlds.yml` et ressources FR/EN.
@@ -32,6 +33,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Sauvegarde automatique des arènes et révisions optimistes empêchant une vue obsolète d'écraser une modification plus récente.
 
 ### Fixed
+
+- Validation des arènes sans doublon carte/monde, compatibilité des cartes modèles déchargées et diagnostics entièrement reformulés dans la langue active sans codes techniques visibles.
 
 - Enregistrement et comportement de `/bedwars` et de l'alias `/hbw` sur l'API Bukkit classique.
 - Compatibilité de la fondation avec Spigot 1.21 et Paper 1.21.x sans appel `getPluginMeta()`.

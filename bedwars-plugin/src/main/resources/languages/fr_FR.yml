@@ -79,7 +79,8 @@ command:
     menu-console: "<yellow>La console ne peut pas ouvrir l'editeur. Utilisez les sous-commandes textuelles /bedwars arena."
 admin:
   main:
-    title: "<aqua><bold>HeneriaBedWars <gray>- Configuration"
+    title: "<dark_aqua><bold>HeneriaBedWars <gray>• <white>Configuration"
+    title-v2: "<dark_aqua><bold>HeneriaBedWars <gray>• <white>Configuration"
     arenas: "<aqua>Gestion des arenes"
     configuration: "<yellow>Configuration generale"
     lobby: "<gray>Lobby - prochain ticket"
@@ -88,6 +89,7 @@ arena:
   gui:
     list:
       title: "<aqua>Arenes <gray>({count}) - {filter} / {sort}"
+      title-v2: "<dark_aqua><bold>Mes arènes <gray>• <white>{filter}"
       create: "<green>Creer une arene"
       empty: "<gray>Aucune arene pour ce filtre."
       filter: "<yellow>Filtre : {filter}"
@@ -116,6 +118,7 @@ arena:
       clear-title: "<red>Reinitialiser cette position de {arena_id} ?"
   input:
     arena-id: "<yellow>Ecrivez l'identifiant de la nouvelle arene. Tapez annuler pour abandonner."
+    map-id: "<yellow>Écrivez le nom de la carte pour <white>{arena_id}<yellow>. Elle sera créée et associée automatiquement. Tapez <white>annuler<yellow> pour abandonner."
     display-name: "<yellow>Ecrivez le nouveau nom de {arena_id}. Tapez annuler pour abandonner."
     number: "<yellow>Ecrivez une valeur positive pour {field}. Tapez annuler pour abandonner."
     cancel: "<yellow>Saisie annulee."
@@ -148,13 +151,34 @@ arena:
     invalid: "<red>Limites incoherentes"
     reset: "<red>Reinitialiser les limites de {arena_id} ?"
   validation:
-    title: "<red>Validation - {arena_name}"
+    title: "<gold><bold>À terminer <gray>• <white>{arena_name}"
+    title-v2: "<gold><bold>À terminer <gray>• <white>{arena_name}"
     success: "<green>Aucun probleme bloquant."
     errors: "<red>Erreurs : {validation_errors}"
     warnings: "<yellow>Avertissements : {validation_warnings}"
     open-section: "<gray>Cliquez pour ouvrir la section concernee."
+    problems:
+      unsupported-version: {message: "Le fichier de l'arène utilise une version incompatible.", solution: "Rechargez une version prise en charge ou recréez l'arène."}
+      blank-name: {message: "L'arène n'a pas encore de nom visible.", solution: "Choisissez un nom d'affichage."}
+      map-template-missing: {message: "Aucune carte BedWars n'est associée.", solution: "Choisissez une carte ou créez-en une ici."}
+      map-template-not-found: {message: "La carte associée n'existe plus.", solution: "Sélectionnez une autre carte BedWars."}
+      map-template-invalid-type: {message: "La carte associée n'est pas une carte BedWars.", solution: "Choisissez une carte de type BedWars."}
+      map-template-error: {message: "La carte associée contient une erreur.", solution: "Réparez la carte ou sélectionnez-en une autre."}
+      missing-world: {message: "Aucun monde n'est associé à l'arène.", solution: "Choisissez une carte BedWars."}
+      unknown-world: {message: "Le monde configuré est introuvable.", solution: "Chargez le monde ou choisissez une autre carte."}
+      invalid-minimum: {message: "Le nombre minimum de joueurs est incorrect.", solution: "Définissez au moins un joueur."}
+      invalid-maximum: {message: "Le maximum est inférieur au minimum.", solution: "Corrigez les limites de joueurs."}
+      invalid-team-count: {message: "Il faut au moins deux équipes.", solution: "Choisissez un format avec deux équipes ou plus."}
+      invalid-team-size: {message: "Une équipe doit accepter au moins un joueur.", solution: "Augmentez la taille des équipes."}
+      capacity-mismatch: {message: "Le maximum ne correspond pas au format des équipes.", solution: "Ajustez le format; la capacité sera recalculée."}
+      missing-waiting: {message: "Le point d'attente n'est pas placé.", solution: "Placez-vous au bon endroit puis cliquez pour le définir."}
+      missing-spectator: {message: "Le point des spectateurs n'est pas placé.", solution: "Ajoutez-le pour une meilleure expérience."}
+      location-world-mismatch: {message: "Une position appartient à une autre carte.", solution: "Replacez cette position dans la carte associée."}
+      incomplete-boundary: {message: "Les limites sont activées mais incomplètes.", solution: "Placez les deux points ou désactivez les limites."}
+      invalid-boundary: {message: "Les deux points des limites sont incohérents.", solution: "Replacez les points minimum et maximum."}
   map:
     title: "<aqua>Carte modele - {arena_name}"
+    created-and-linked: "<green>La carte <white>{map_id}<green> a été créée et associée à l'arène."
   delete:
     title: "<red>Supprimer {arena_name} ?"
     warning: "<yellow>Une sauvegarde sera creee."
@@ -253,8 +277,11 @@ map:
     error: "Erreur"
   gui:
     list-title: "<aqua>Cartes modeles ({count})"
+    list-title-v2: "<dark_green><bold>Mes cartes <gray>• <white>{count}"
     editor-title: "<gold>Carte - {map_name}"
-    create: "<yellow>Ecrivez l'identifiant de la nouvelle carte dans le chat."
+    editor-title-v2: "<gold><bold>Carte <gray>• <white>{map_name}"
+    create: "<yellow>Écrivez le nom de la nouvelle carte BedWars dans le chat. Tapez <white>annuler<yellow> pour abandonner."
+    create-bedwars: "<yellow>Écrivez le nom de la nouvelle carte BedWars dans le chat. Tapez <white>annuler<yellow> pour abandonner."
     duplicate: "<yellow>Ecrivez l'identifiant de la copie dans le chat."
     delete: "<red>Supprimer {map_name} ?"
     empty: "<gray>Aucune carte modele."

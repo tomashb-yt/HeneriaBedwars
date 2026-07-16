@@ -6,6 +6,8 @@
 
 ## Disponible
 
+- tableau de bord administratif v2 ouvert directement par `/bedwars`, commandes avancées masquées de l'aide joueur et création guidée d'une carte `BEDWARS` associée à une nouvelle arène;
+- validation visuelle compacte, localisée et orientée action, sans exposer les codes internes; une carte modèle valide n'a pas besoin de rester chargée pour que l'arène soit administrativement valide;
 - gestion autonome de cartes modèles `LOBBY`, `BEDWARS` et `GENERIC`, identifiants sûrs, métadonnées immutables/révisionnées et registre ordonné;
 - création de mondes vides préfixés, plateforme de sécurité configurable, chargement, téléportation, spawn, sauvegarde, déchargement et autosauvegarde centrale optionnelle;
 - duplication asynchrone avec exclusions, suppression asynchrone après sauvegarde complète, confinement des chemins et refus des liens symboliques;
@@ -39,4 +41,4 @@
 
 Aucune équipe BedWars détaillée ou couleur d'équipe, aucune instance temporaire de partie ou remise à zéro après match, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes sont des modèles administratifs persistants, pas des parties jouables.
 
-Les 136 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 137 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

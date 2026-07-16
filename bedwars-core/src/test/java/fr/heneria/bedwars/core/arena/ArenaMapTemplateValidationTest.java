@@ -13,9 +13,9 @@ class ArenaMapTemplateValidationTest {
   void missingMapTemplateIsBlocking() {
     ArenaValidator validator =
         new ArenaValidator(world -> true, id -> ArenaMapTemplateStatus.VALID);
-    assertTrue(
-        codes(validator, ArenaDefinition.draft(ArenaId.parse("arena"), NOW))
-            .contains("MAP_TEMPLATE_MISSING"));
+    var codes = codes(validator, ArenaDefinition.draft(ArenaId.parse("arena"), NOW));
+    assertTrue(codes.contains("MAP_TEMPLATE_MISSING"));
+    assertTrue(codes.stream().noneMatch(code -> code.equals("missing-world")));
   }
 
   @Test
@@ -36,6 +36,16 @@ class ArenaMapTemplateValidationTest {
     assertTrue(
         codes(new ArenaValidator(world -> true, id -> ArenaMapTemplateStatus.VALID), arena).stream()
             .noneMatch(code -> code.startsWith("MAP_TEMPLATE_")));
+  }
+
+  @Test
+  void validTemplateDoesNotRequireItsConstructionWorldToStayLoaded() {
+    ArenaDefinition arena =
+        ArenaDefinition.draft(ArenaId.parse("arena"), NOW)
+            .withTemplate("desert", "hbw_template_desert", ArenaStatus.INVALID, NOW);
+    var codes =
+        codes(new ArenaValidator(world -> false, id -> ArenaMapTemplateStatus.VALID), arena);
+    assertTrue(codes.stream().noneMatch(code -> code.equals("unknown-world")));
   }
 
   private static String mapCode(ArenaDefinition arena, ArenaMapTemplateStatus status) {

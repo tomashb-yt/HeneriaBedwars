@@ -14,7 +14,6 @@ import fr.heneria.bedwars.core.arena.editor.ArenaEditorSection;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorViewState;
 import fr.heneria.bedwars.core.arena.editor.ArenaProblemRouter;
-import fr.heneria.bedwars.core.arena.editor.ArenaValidationVisual;
 import fr.heneria.bedwars.core.command.AdministrativeCommandPolicy;
 import fr.heneria.bedwars.core.config.ArenaEditorSettings;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
@@ -58,6 +57,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  * immediately with the revision captured when the view was built.
  */
 public final class ArenaEditorMenuFactory {
+  private static final List<Integer> VALIDATION_SLOTS =
+      List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34);
   private static final DateTimeFormatter DATE =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
   private static final Set<String> ALLOWED_TAGS =
@@ -92,6 +93,7 @@ public final class ArenaEditorMenuFactory {
   private final ArenaEditorStateStore states;
   private final ProjectLogger logger;
   private final MapTemplateService maps;
+  private final MapMenuFactory mapMenus;
   private final StandardGuiButtons standard = new StandardGuiButtons();
 
   public ArenaEditorMenuFactory(
@@ -102,7 +104,8 @@ public final class ArenaEditorMenuFactory {
       TextInputService input,
       ArenaEditorStateStore states,
       ProjectLogger logger,
-      MapTemplateService maps) {
+      MapTemplateService maps,
+      MapMenuFactory mapMenus) {
     this.plugin = plugin;
     this.arenas = arenas;
     this.configurations = configurations;
@@ -111,6 +114,7 @@ public final class ArenaEditorMenuFactory {
     this.states = states;
     this.logger = logger;
     this.maps = maps;
+    this.mapMenus = mapMenus;
   }
 
   public Gui setup(UUID playerId) {
@@ -125,13 +129,29 @@ public final class ArenaEditorMenuFactory {
         arenas.list().stream().filter(arena -> arena.status() == ArenaStatus.DRAFT).count();
     return Gui.builder()
         .id("admin.setup")
-        .title(message("admin.main.title", Map.of()))
-        .rows(3)
+        .title(message("admin.main.title-v2", Map.of()))
+        .rows(5)
         .fillEmptySlots(true)
+        .button(
+            4,
+            GuiButton.builder()
+                .itemKey("admin.main.overview")
+                .itemPlaceholders(
+                    context ->
+                        Map.of(
+                            "arena_count",
+                            arenas.list().size(),
+                            "map_count",
+                            maps.list().size(),
+                            "enabled_count",
+                            enabled,
+                            "invalid_count",
+                            invalid))
+                .build())
         .button(
             11,
             GuiButton.builder()
-                .itemKey("admin.main.arenas")
+                .itemKey("admin.main.arenas-v2")
                 .itemPlaceholders(
                     context ->
                         Map.of(
@@ -143,14 +163,41 @@ public final class ArenaEditorMenuFactory {
                 .onLeftClick(context -> context.open(list(playerId)))
                 .build())
         .button(
-            13,
+            15,
             GuiButton.builder()
-                .itemKey("admin.main.configuration")
+                .itemKey("admin.main.maps")
+                .itemPlaceholders(
+                    context ->
+                        Map.of(
+                            "map_count", maps.list().size(),
+                            "loaded_map_count",
+                                maps.list().stream().filter(map -> map.loaded()).count()))
+                .permission(AdministrativeCommandPolicy.MAP_MENU)
+                .onLeftClick(context -> context.open(mapMenus.list(playerId)))
+                .build())
+        .button(
+            20,
+            GuiButton.builder()
+                .itemKey("admin.main.create-arena")
+                .permission(AdministrativeCommandPolicy.ARENA_CREATE)
+                .onLeftClick(context -> requestArenaId(playerId))
+                .build())
+        .button(22, GuiButton.builder().itemKey("admin.main.guide").build())
+        .button(
+            24,
+            GuiButton.builder()
+                .itemKey("admin.main.create-map")
+                .permission(AdministrativeCommandPolicy.MAP_CREATE)
+                .onLeftClick(context -> mapMenus.beginCreate(playerId))
+                .build())
+        .button(
+            31,
+            GuiButton.builder()
+                .itemKey("admin.main.configuration-v2")
                 .itemPlaceholders(context -> configurationPlaceholders())
                 .onLeftClick(context -> context.open(configurationInfo()))
                 .build())
-        .button(15, GuiButton.builder().itemKey("admin.main.lobby").build())
-        .button(22, standard.close())
+        .button(40, standard.close())
         .build();
   }
 
@@ -170,9 +217,14 @@ public final class ArenaEditorMenuFactory {
             .id("arena.list")
             .title(
                 message(
-                    "arena.gui.list.title",
+                    "arena.gui.list.title-v2",
                     Map.of(
-                        "count", visible.size(), "filter", state.filter(), "sort", state.sort())))
+                        "count",
+                        visible.size(),
+                        "filter",
+                        displayFilter(state.filter().name()),
+                        "sort",
+                        displaySort(state.sort().name()))))
             .rows(settings.listRows())
             .fillEmptySlots(true)
             .data("filter", state.filter().name())
@@ -215,8 +267,8 @@ public final class ArenaEditorMenuFactory {
         .button(
             settings.filterSlot(),
             GuiButton.builder()
-                .itemKey("arena.list.filter")
-                .itemPlaceholders(context -> Map.of("filter", state.filter().name()))
+                .itemKey("arena.list.filter-v2")
+                .itemPlaceholders(context -> Map.of("filter", displayFilter(state.filter().name())))
                 .onLeftClick(
                     context -> {
                       state.filter(state.filter().next());
@@ -226,8 +278,8 @@ public final class ArenaEditorMenuFactory {
         .button(
             settings.sortSlot(),
             GuiButton.builder()
-                .itemKey("arena.list.sort")
-                .itemPlaceholders(context -> Map.of("sort", state.sort().name()))
+                .itemKey("arena.list.sort-v2")
+                .itemPlaceholders(context -> Map.of("sort", displaySort(state.sort().name())))
                 .onLeftClick(
                     context -> {
                       state.sort(state.sort().next());
@@ -237,7 +289,7 @@ public final class ArenaEditorMenuFactory {
         .button(
             settings.createSlot(),
             GuiButton.builder()
-                .itemKey("arena.list.create")
+                .itemKey("arena.list.create-v2")
                 .permission(AdministrativeCommandPolicy.ARENA_CREATE)
                 .onLeftClick(context -> requestArenaId(playerId))
                 .build())
@@ -293,7 +345,7 @@ public final class ArenaEditorMenuFactory {
         .button(
             settings.worldSlot(),
             GuiButton.builder()
-                .itemKey("arena.editor.world")
+                .itemKey("arena.editor.map-template")
                 .itemPlaceholders(context -> placeholders(arena, validation))
                 .permission(AdministrativeCommandPolicy.ARENA_EDIT)
                 .onLeftClick(context -> context.open(mapTemplates(playerId, id, expected)))
@@ -338,8 +390,8 @@ public final class ArenaEditorMenuFactory {
             GuiButton.builder()
                 .itemKey(
                     validation.valid()
-                        ? "arena.editor.validation-valid"
-                        : "arena.editor.validation-invalid")
+                        ? "arena.editor.setup-valid"
+                        : "arena.editor.setup-incomplete")
                 .itemPlaceholders(context -> placeholders(arena, validation))
                 .onLeftClick(context -> context.open(validation(playerId, id)))
                 .build())
@@ -417,6 +469,13 @@ public final class ArenaEditorMenuFactory {
             .rows(6)
             .fillEmptySlots(true);
     List<Integer> slots = settings().contentSlots();
+    if (templates.isEmpty())
+      builder.button(
+          22,
+          GuiButton.builder()
+              .itemKey("arena.map.empty")
+              .itemPlaceholders(context -> Map.of("arena_name", arena.displayName()))
+              .build());
     for (int index = 0; index < Math.min(slots.size(), templates.size()); index++) {
       var template = templates.get(index);
       Map<String, Object> values = new LinkedHashMap<>(MapMenuFactory.placeholders(template));
@@ -437,7 +496,17 @@ public final class ArenaEditorMenuFactory {
                   })
               .build());
     }
-    return builder.button(45, standard.back()).button(49, standard.close()).build();
+    return builder
+        .button(45, standard.back())
+        .button(
+            49,
+            GuiButton.builder()
+                .itemKey("arena.map.create")
+                .permission(AdministrativeCommandPolicy.MAP_CREATE)
+                .onLeftClick(context -> requestMapForArena(playerId, id, expected))
+                .build())
+        .button(53, standard.close())
+        .build();
   }
 
   public Gui players(UUID playerId, String id, long expected) {
@@ -564,28 +633,31 @@ public final class ArenaEditorMenuFactory {
     Gui.Builder builder =
         Gui.builder()
             .id("arena.validation." + id)
-            .title(message("arena.validation.title", placeholders(arena, result)))
-            .rows(6)
+            .title(message("arena.validation.title-v2", placeholders(arena, result)))
+            .rows(5)
             .fillEmptySlots(true)
             .button(
                 4,
                 GuiButton.builder()
-                    .itemKey(result.valid() ? "arena.validation.info" : "arena.validation.error")
+                    .itemKey(
+                        result.valid()
+                            ? "arena.validation.summary-valid"
+                            : "arena.validation.summary-incomplete")
                     .itemPlaceholders(context -> placeholders(arena, result))
                     .build());
-    List<Integer> slots = settings().contentSlots();
+    List<Integer> slots = VALIDATION_SLOTS;
     for (int index = 0; index < Math.min(slots.size(), result.problems().size()); index++) {
       ArenaProblem problem = result.problems().get(index);
       Map<String, Object> values = new LinkedHashMap<>(placeholders(arena, result));
       values.put("severity", problem.severity().name());
       values.put("code", problem.code());
       values.put("field", problem.field());
-      values.put("problem", problem.message());
+      values.put("problem", localizedProblem(problem));
       values.put("solution", solution(problem));
       builder.button(
           slots.get(index),
           GuiButton.builder()
-              .itemKey(ArenaValidationVisual.itemKey(problem.severity()))
+              .itemKey(validationItemKey(problem.severity()))
               .itemPlaceholders(context -> values)
               .onLeftClick(
                   context ->
@@ -596,7 +668,16 @@ public final class ArenaEditorMenuFactory {
                               ArenaProblemRouter.section(problem.field()))))
               .build());
     }
-    return builder.button(45, standard.back()).button(49, standard.close()).build();
+    return builder
+        .button(36, standard.back())
+        .button(
+            40,
+            GuiButton.builder()
+                .itemKey("gui.refresh")
+                .onLeftClick(context -> context.replace(validation(playerId, id)))
+                .build())
+        .button(44, standard.close())
+        .build();
   }
 
   public Gui deleteMenu(UUID playerId, String id) {
@@ -874,7 +955,8 @@ public final class ArenaEditorMenuFactory {
               ArenaOperationResult result = arenas.create(value);
               if (result.successful()) {
                 logger.info("[Arena] " + player.getName() + " created '" + value + "'.");
-                gui.open(player, editor(playerId, result.arena().orElseThrow().id().value()));
+                ArenaDefinition created = result.arena().orElseThrow();
+                gui.open(player, mapTemplates(playerId, created.id().value(), created.revision()));
               } else {
                 mutationFailure(playerId, result);
                 gui.open(player, list(playerId));
@@ -886,6 +968,54 @@ public final class ArenaEditorMenuFactory {
     }
     gui.close(player);
     send(playerId, "arena.input.arena-id", Map.of());
+  }
+
+  private void requestMapForArena(UUID playerId, String arenaId, long expected) {
+    Player player = Bukkit.getPlayer(playerId);
+    if (player == null) return;
+    if (!input.begin(
+        playerId,
+        request(
+            playerId,
+            "arena.input.map-id",
+            32,
+            value -> {
+              try {
+                fr.heneria.bedwars.core.map.MapId.parse(value);
+                return maps.find(value).isPresent() ? Optional.of("exists") : Optional.empty();
+              } catch (RuntimeException exception) {
+                return Optional.of("invalid-id");
+              }
+            },
+            value -> {
+              var created = maps.create(value, MapType.BEDWARS, player.getName());
+              if (!created.successful()) {
+                send(
+                    playerId,
+                    "map.command.failed",
+                    Map.of("code", created.code(), "detail", created.detail()));
+                gui.open(player, mapTemplates(playerId, arenaId, expected));
+                return;
+              }
+              var template = created.template().orElseThrow();
+              ArenaOperationResult linked =
+                  arenas.setMapTemplate(
+                      arenaId, template.id().value(), template.worldName(), expected);
+              if (linked.successful()) {
+                maps.synchronizeLinks(arenas.list());
+                send(playerId, "arena.map.created-and-linked", Map.of("map_id", value));
+                gui.open(player, editor(playerId, arenaId));
+              } else {
+                mutationFailure(playerId, linked);
+                gui.open(player, mapTemplates(playerId, arenaId, expected));
+              }
+            },
+            reason -> gui.open(player, mapTemplates(playerId, arenaId, expected))))) {
+      send(playerId, "arena.input.already-active", Map.of());
+      return;
+    }
+    gui.close(player);
+    send(playerId, "arena.input.map-id", Map.of("arena_id", arenaId));
   }
 
   private void requestDisplayName(UUID playerId, String id, long expected) {
@@ -1166,10 +1296,29 @@ public final class ArenaEditorMenuFactory {
 
   private static String entryKey(ArenaDefinition arena) {
     return switch (arena.status()) {
-      case ENABLED -> "arena.list.entry-enabled";
-      case INVALID, ERROR -> "arena.list.entry-invalid";
-      case DRAFT -> "arena.list.entry-draft";
-      default -> "arena.list.entry-disabled";
+      case ENABLED -> "arena.list.entry-enabled-v2";
+      case INVALID, ERROR -> "arena.list.entry-invalid-v2";
+      case DRAFT -> "arena.list.entry-draft-v2";
+      default -> "arena.list.entry-disabled-v2";
+    };
+  }
+
+  private static String displayFilter(String filter) {
+    return switch (filter) {
+      case "ENABLED" -> "Prêtes";
+      case "DISABLED" -> "Désactivées";
+      case "INVALID" -> "À terminer";
+      case "DRAFT" -> "Brouillons";
+      default -> "Toutes";
+    };
+  }
+
+  private static String displaySort(String sort) {
+    return switch (sort) {
+      case "NAME" -> "Nom";
+      case "STATUS" -> "État";
+      case "UPDATED" -> "Modifiées récemment";
+      default -> "Identifiant";
     };
   }
 
@@ -1179,6 +1328,15 @@ public final class ArenaEditorMenuFactory {
     values.put("arena_id", arena.id().value());
     values.put("arena_name", arena.displayName());
     values.put("arena_status", arena.status().name());
+    values.put(
+        "arena_status_label",
+        switch (arena.status()) {
+          case ENABLED -> "Prête";
+          case DISABLED -> "Désactivée";
+          case INVALID, ERROR -> "À terminer";
+          case DRAFT -> "Brouillon";
+          case READY -> "Prête à activer";
+        });
     values.put("arena_enabled", arena.enabled());
     values.put("arena_revision", arena.revision());
     values.put("world", arena.worldName().orElse("-"));
@@ -1267,15 +1425,24 @@ public final class ArenaEditorMenuFactory {
         .count();
   }
 
-  private static String solution(ArenaProblem problem) {
-    return switch (ArenaProblemRouter.section(problem.field())) {
-      case WORLD -> "Select a loaded world";
-      case WAITING -> "Set the waiting position";
-      case SPECTATOR -> "Set the spectator position";
-      case PLAYERS -> "Correct player limits";
-      case TEAMS -> "Correct the team format";
-      case BOUNDARY -> "Correct or disable the boundary";
-      default -> "Review arena information";
+  private String localizedProblem(ArenaProblem problem) {
+    return message("arena.validation.problems." + problemKey(problem) + ".message", Map.of());
+  }
+
+  private String solution(ArenaProblem problem) {
+    return message("arena.validation.problems." + problemKey(problem) + ".solution", Map.of());
+  }
+
+  private static String problemKey(ArenaProblem problem) {
+    return problem.code().toLowerCase(Locale.ROOT).replace('_', '-');
+  }
+
+  private static String validationItemKey(ProblemSeverity severity) {
+    return switch (severity) {
+      case INFO -> "arena.validation.step-info";
+      case WARNING -> "arena.validation.step-warning";
+      case ERROR -> "arena.validation.step-error";
+      case CRITICAL -> "arena.validation.step-critical";
     };
   }
 

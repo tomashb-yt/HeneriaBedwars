@@ -72,7 +72,7 @@ public final class MapMenuFactory {
     Gui.Builder builder =
         Gui.builder()
             .id("map.list")
-            .title(message("map.gui.list-title", Map.of("count", templates.size())))
+            .title(message("map.gui.list-title-v2", Map.of("count", templates.size())))
             .rows(6)
             .fillEmptySlots(true);
     for (int index = 0; index < CONTENT.size(); index++) {
@@ -100,9 +100,9 @@ public final class MapMenuFactory {
         .button(
             49,
             GuiButton.builder()
-                .itemKey("map.list.create")
+                .itemKey("map.list.create-bedwars")
                 .permission(AdministrativeCommandPolicy.MAP_CREATE)
-                .onLeftClick(context -> requestCreate(playerId))
+                .onLeftClick(context -> beginCreate(playerId))
                 .build())
         .button(
             50,
@@ -119,81 +119,86 @@ public final class MapMenuFactory {
     MapTemplate template = maps.find(id).orElse(null);
     if (template == null) return list(playerId);
     Map<String, Object> values = placeholders(template);
-    return Gui.builder()
-        .id("map.info." + id)
-        .title(message("map.gui.editor-title", values))
-        .rows(6)
-        .fillEmptySlots(true)
-        .button(
-            4,
-            GuiButton.builder()
-                .itemKey("map.editor.information")
-                .itemPlaceholders(context -> values)
-                .build())
-        .button(
-            10,
-            action(
-                "map.editor.load",
-                AdministrativeCommandPolicy.MAP_LOAD,
-                values,
-                context -> mutate(playerId, maps.load(id), context, id)))
-        .button(
-            12,
-            action(
-                "map.editor.teleport",
-                AdministrativeCommandPolicy.MAP_TELEPORT,
-                values,
-                context -> loadOrTeleport(playerId, id, context)))
-        .button(
-            14,
-            action(
-                "map.editor.save",
-                AdministrativeCommandPolicy.MAP_SAVE,
-                values,
-                context -> mutate(playerId, maps.save(id), context, id)))
-        .button(
-            16,
-            action(
-                "map.editor.unload",
-                AdministrativeCommandPolicy.MAP_UNLOAD,
-                values,
-                context -> mutate(playerId, maps.unload(id, false), context, id)))
-        .button(
-            20,
-            action(
-                "map.editor.duplicate",
-                AdministrativeCommandPolicy.MAP_DUPLICATE,
-                values,
-                context -> requestDuplicate(playerId, template)))
-        .button(
-            22,
-            action(
-                "map.editor.set-spawn",
-                AdministrativeCommandPolicy.MAP_EDIT,
-                values,
-                context -> setSpawn(playerId, template, context)))
-        .button(
-            24,
-            GuiButton.builder()
-                .itemKey("map.editor.associations")
-                .itemPlaceholders(context -> values)
-                .build())
-        .button(
-            31,
-            action(
-                "map.editor.delete",
-                AdministrativeCommandPolicy.MAP_DELETE,
-                values,
-                context -> context.open(deleteConfirmation(playerId, id))))
-        .button(45, standard.back())
-        .button(
-            49,
-            GuiButton.builder()
-                .itemKey("gui.refresh")
-                .onLeftClick(context -> context.replace(info(playerId, id)))
-                .build())
-        .button(53, standard.close())
-        .build();
+    Gui.Builder builder =
+        Gui.builder()
+            .id("map.info." + id)
+            .title(message("map.gui.editor-title-v2", values))
+            .rows(5)
+            .fillEmptySlots(true)
+            .button(
+                4,
+                GuiButton.builder()
+                    .itemKey("map.editor.information")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                20,
+                action(
+                    "map.editor.duplicate",
+                    AdministrativeCommandPolicy.MAP_DUPLICATE,
+                    values,
+                    context -> requestDuplicate(playerId, template)))
+            .button(
+                24,
+                GuiButton.builder()
+                    .itemKey("map.editor.associations")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                31,
+                action(
+                    "map.editor.delete",
+                    AdministrativeCommandPolicy.MAP_DELETE,
+                    values,
+                    context -> context.open(deleteConfirmation(playerId, id))))
+            .button(36, standard.back())
+            .button(
+                40,
+                GuiButton.builder()
+                    .itemKey("gui.refresh")
+                    .onLeftClick(context -> context.replace(info(playerId, id)))
+                    .build())
+            .button(44, standard.close());
+    if (template.loaded()) {
+      builder
+          .button(
+              10,
+              action(
+                  "map.editor.teleport",
+                  AdministrativeCommandPolicy.MAP_TELEPORT,
+                  values,
+                  context -> loadOrTeleport(playerId, id, context)))
+          .button(
+              12,
+              action(
+                  "map.editor.save",
+                  AdministrativeCommandPolicy.MAP_SAVE,
+                  values,
+                  context -> mutate(playerId, maps.save(id), context, id)))
+          .button(
+              14,
+              action(
+                  "map.editor.set-spawn",
+                  AdministrativeCommandPolicy.MAP_EDIT,
+                  values,
+                  context -> setSpawn(playerId, template, context)))
+          .button(
+              16,
+              action(
+                  "map.editor.unload",
+                  AdministrativeCommandPolicy.MAP_UNLOAD,
+                  values,
+                  context -> mutate(playerId, maps.unload(id, false), context, id)));
+    } else {
+      builder.button(
+          13,
+          action(
+              "map.editor.load",
+              AdministrativeCommandPolicy.MAP_LOAD,
+              values,
+              context -> mutate(playerId, maps.load(id), context, id)));
+    }
+    return builder.build();
   }
 
   public Gui deleteConfirmation(UUID playerId, String id) {
@@ -234,14 +239,15 @@ public final class MapMenuFactory {
         .build();
   }
 
-  private void requestCreate(UUID playerId) {
+  /** Starts the simple setup flow; specialized map types remain available to advanced commands. */
+  public void beginCreate(UUID playerId) {
     Player player = Bukkit.getPlayer(playerId);
     if (player == null) return;
     if (!input.begin(
         playerId,
         request(
             playerId,
-            "map.gui.create",
+            "map.gui.create-bedwars",
             value -> {
               try {
                 fr.heneria.bedwars.core.map.MapId.parse(value);
@@ -253,7 +259,7 @@ public final class MapMenuFactory {
               }
             },
             value -> {
-              MapOperationResult result = maps.create(value, MapType.GENERIC, player.getName());
+              MapOperationResult result = maps.create(value, MapType.BEDWARS, player.getName());
               feedback(playerId, result);
               result
                   .template()
@@ -261,7 +267,7 @@ public final class MapMenuFactory {
             },
             reason -> gui.open(player, list(playerId))))) return;
     gui.close(player);
-    send(playerId, "map.gui.create", Map.of());
+    send(playerId, "map.gui.create-bedwars", Map.of());
   }
 
   private void requestDuplicate(UUID playerId, MapTemplate source) {
@@ -425,8 +431,8 @@ public final class MapMenuFactory {
   }
 
   private static String entryKey(MapTemplate template) {
-    if (template.state() == MapState.ERROR) return "map.list.entry-error";
-    return template.loaded() ? "map.list.entry-loaded" : "map.list.entry-unloaded";
+    if (template.state() == MapState.ERROR) return "map.list.entry-error-v2";
+    return template.loaded() ? "map.list.entry-loaded-v2" : "map.list.entry-unloaded-v2";
   }
 
   public static Map<String, Object> placeholders(MapTemplate template) {
@@ -435,6 +441,23 @@ public final class MapMenuFactory {
     values.put("map_name", template.displayName());
     values.put("map_type", template.type());
     values.put("map_state", template.state());
+    values.put(
+        "map_type_label",
+        switch (template.type()) {
+          case BEDWARS -> "BedWars";
+          case LOBBY -> "Lobby";
+          case GENERIC -> "Générique";
+        });
+    values.put(
+        "map_state_label",
+        switch (template.state()) {
+          case LOADED -> "Chargée";
+          case UNLOADED -> "Fermée";
+          case LOADING -> "Chargement";
+          case SAVING -> "Sauvegarde";
+          case UNLOADING -> "Fermeture";
+          case ERROR -> "Erreur";
+        });
     values.put("world_name", template.worldName());
     values.put("folder_name", template.folderName());
     values.put("loaded", template.loaded());

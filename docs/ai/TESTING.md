@@ -4,7 +4,7 @@
 
 Les tests purs couvrent l'identifiant sécurisé, l'immutabilité/révision/état, l'ordre et les snapshots du registre, les verrous, la publication après persistance, les pannes de création et nettoyage, sauvegarde/déchargement, présence de joueurs, duplication indépendante, suppression avec sauvegarde, relations d'arènes en direct et conflits de révision. La validation d'arène couvre carte absente, inconnue, mauvais type, erreur et association valide.
 
-Les tests plugin couvrent le round-trip YAML UTF-8, l'isolation des métadonnées cassées, les exclusions de copie, dossiers temporaires, sauvegardes et refus de chemins externes. La configuration vérifie `worlds.yml`, les chemins dangereux, la parité FR/EN et la complétion permission-aware. La suite complète contient 136 tests, 0 échec et 0 ignoré.
+Les tests plugin couvrent le round-trip YAML UTF-8, l'isolation des métadonnées cassées, les exclusions de copie, dossiers temporaires, sauvegardes et refus de chemins externes. La configuration vérifie `worlds.yml`, les chemins dangereux, la parité FR/EN, la fusion non destructive des clés d'interface v2 et la complétion permission-aware. La suite complète contient 137 tests, 0 échec et 0 ignoré.
 
 Aucun serveur Minecraft n'est disponible dans l'environnement Codex. Il faut tester manuellement sur Paper : monde réellement vide, plateforme, règles de jeu, persistance des blocs et du spawn, présence de joueurs, évacuation forcée, téléportation, copie volumineuse, sauvegarde de suppression, redémarrage, associations et deux opérations concurrentes.
 

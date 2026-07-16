@@ -2,6 +2,10 @@
 
 ## Ticket 007 — Gestionnaire autonome de mondes et cartes modèles
 
+Correctif d'expérience après test en jeu : le point d'entrée joueur est désormais le simple `/bedwars`, qui ouvre un tableau de bord compact. Les listes d'arènes/cartes et les diagnostics utilisent des apparences v2 fusionnées sans écraser les configurations existantes. La création d'arène enchaîne sur le choix de carte et peut créer/associer une carte `BEDWARS` depuis le même écran. Les codes techniques et textes anglais ne sont plus présentés dans la validation.
+
+La validation ne produit plus simultanément `MAP_TEMPLATE_MISSING` et `missing-world`. Une carte modèle valide peut rester déchargée : sa métadonnée est l'autorité administrative, tandis que le monde Bukkit n'est chargé que pour la construction ou la téléportation. Les commandes détaillées restent compatibles pour la console et les usages avancés mais sont masquées de l'aide et de la complétion principale des joueurs.
+
 Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/map` ajoute modèle immutable, identifiants sûrs, types/états, registre copy-on-write, verrous, ports et service transactionnel. `bedwars-plugin/map` ajoute métadonnées YAML UTF-8 atomiques, fichiers confinés, générateur vide, gestion Bukkit, cycle de vie, commandes et menus.
 
 La création fournit un monde vide préfixé avec plateforme optionnelle et réglages configurables. Chargement, téléportation, spawn, sauvegarde et déchargement restent sur le thread serveur. Duplication et suppression de fichiers sont asynchrones; les copies excluent les données propres au monde/joueur. La suppression exige une sauvegarde complète, refuse les joueurs et vérifie en direct les arènes liées ainsi que le lobby protégé.
@@ -10,7 +14,7 @@ Les arènes peuvent référencer une carte `BEDWARS` par `map.template-id`. L'an
 
 Configuration : ajout de `worlds.yml`, dixième YAML principal, dossiers `maps/templates`, `maps/metadata`, `instances` et `backups/maps`, items de menus et traductions FR/EN. Les mondes de chunks restent dans le conteneur Bukkit sous `hbw_template_<id>`; les templates du dossier plugin portent un marqueur de propriété. `instances/` reste réservé et aucun gameplay n'est livré.
 
-Validation : 136 tests automatisés réussis, 0 échec et 0 ignoré; Spotless, build propre et Shadow JAR contrôlés lors de la livraison. Tests en jeu non réalisés faute de serveur Minecraft. Commit prévu : `feat(world): add autonomous map template manager`.
+Validation : 137 tests automatisés réussis, 0 échec et 0 ignoré; Spotless, build propre et Shadow JAR contrôlés lors de la livraison. Tests en jeu non réalisés faute de serveur Minecraft. Commit prévu : `feat(world): add autonomous map template manager`.
 
 ## Ticket 006 — Éditeur complet des arènes via menus
 

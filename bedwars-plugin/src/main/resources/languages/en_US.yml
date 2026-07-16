@@ -79,7 +79,8 @@ command:
     menu-console: "<yellow>The console cannot open the editor. Use the textual /bedwars arena subcommands."
 admin:
   main:
-    title: "<aqua><bold>HeneriaBedWars <gray>- Configuration"
+    title: "<dark_aqua><bold>HeneriaBedWars <gray>• <white>Setup"
+    title-v2: "<dark_aqua><bold>HeneriaBedWars <gray>• <white>Setup"
     arenas: "<aqua>Arena management"
     configuration: "<yellow>General configuration"
     lobby: "<gray>Lobby - future ticket"
@@ -88,6 +89,7 @@ arena:
   gui:
     list:
       title: "<aqua>Arenas <gray>({count}) - {filter} / {sort}"
+      title-v2: "<dark_aqua><bold>My arenas <gray>• <white>{filter}"
       create: "<green>Create an arena"
       empty: "<gray>No arena matches this filter."
       filter: "<yellow>Filter: {filter}"
@@ -116,6 +118,7 @@ arena:
       clear-title: "<red>Reset this position for {arena_id}?"
   input:
     arena-id: "<yellow>Enter the new arena id in chat. Type cancel to abort."
+    map-id: "<yellow>Enter the map name for <white>{arena_id}<yellow>. It will be created and linked automatically. Type <white>cancel<yellow> to abort."
     display-name: "<yellow>Enter the new name for {arena_id}. Type cancel to abort."
     number: "<yellow>Enter a positive value for {field}. Type cancel to abort."
     cancel: "<yellow>Input cancelled."
@@ -148,13 +151,34 @@ arena:
     invalid: "<red>Invalid boundary"
     reset: "<red>Reset boundary for {arena_id}?"
   validation:
-    title: "<red>Validation - {arena_name}"
+    title: "<gold><bold>To complete <gray>• <white>{arena_name}"
+    title-v2: "<gold><bold>To complete <gray>• <white>{arena_name}"
     success: "<green>No blocking problem."
     errors: "<red>Errors: {validation_errors}"
     warnings: "<yellow>Warnings: {validation_warnings}"
     open-section: "<gray>Click to open the related section."
+    problems:
+      unsupported-version: {message: "The arena file uses an unsupported version.", solution: "Restore a supported version or recreate the arena."}
+      blank-name: {message: "The arena does not have a visible name yet.", solution: "Choose a display name."}
+      map-template-missing: {message: "No BedWars map is associated.", solution: "Choose a map or create one here."}
+      map-template-not-found: {message: "The associated map no longer exists.", solution: "Select another BedWars map."}
+      map-template-invalid-type: {message: "The associated map is not a BedWars map.", solution: "Choose a map with the BedWars type."}
+      map-template-error: {message: "The associated map contains an error.", solution: "Repair the map or select another one."}
+      missing-world: {message: "No world is associated with the arena.", solution: "Choose a BedWars map."}
+      unknown-world: {message: "The configured world cannot be found.", solution: "Load the world or choose another map."}
+      invalid-minimum: {message: "The minimum player count is invalid.", solution: "Set at least one player."}
+      invalid-maximum: {message: "The maximum is lower than the minimum.", solution: "Correct the player limits."}
+      invalid-team-count: {message: "At least two teams are required.", solution: "Choose a format with two or more teams."}
+      invalid-team-size: {message: "A team must accept at least one player.", solution: "Increase the team size."}
+      capacity-mismatch: {message: "The maximum does not match the team format.", solution: "Adjust the format; capacity will be recalculated."}
+      missing-waiting: {message: "The waiting point has not been placed.", solution: "Stand at the right location and click to set it."}
+      missing-spectator: {message: "The spectator point has not been placed.", solution: "Add it for a better experience."}
+      location-world-mismatch: {message: "A position belongs to another map.", solution: "Set this position again inside the associated map."}
+      incomplete-boundary: {message: "Boundaries are enabled but incomplete.", solution: "Set both points or disable boundaries."}
+      invalid-boundary: {message: "The two boundary points are inconsistent.", solution: "Set the minimum and maximum points again."}
   map:
     title: "<aqua>Map template - {arena_name}"
+    created-and-linked: "<green>Map <white>{map_id}<green> was created and linked to the arena."
   delete:
     title: "<red>Delete {arena_name}?"
     warning: "<yellow>A backup will be created."
@@ -253,8 +277,11 @@ map:
     error: "Error"
   gui:
     list-title: "<aqua>Map templates ({count})"
+    list-title-v2: "<dark_green><bold>My maps <gray>• <white>{count}"
     editor-title: "<gold>Map - {map_name}"
-    create: "<yellow>Write the new map id in chat."
+    editor-title-v2: "<gold><bold>Map <gray>• <white>{map_name}"
+    create: "<yellow>Enter the new BedWars map name in chat. Type <white>cancel<yellow> to abort."
+    create-bedwars: "<yellow>Enter the new BedWars map name in chat. Type <white>cancel<yellow> to abort."
     duplicate: "<yellow>Write the copy id in chat."
     delete: "<red>Delete {map_name}?"
     empty: "<gray>No map template."

@@ -32,8 +32,11 @@ public final class ArenaValidator {
       error(problems, "unsupported-version", "config-version", "Unsupported arena version");
     if (arena.displayName().isBlank())
       error(problems, "blank-name", "display-name", "Display name is blank");
-    if (requireMapTemplate) validateMapTemplate(problems, arena);
-    if (arena.worldName().isEmpty()) {
+    if (requireMapTemplate) {
+      validateMapTemplate(problems, arena);
+      if (arena.template().isPresent() && arena.worldName().isEmpty())
+        error(problems, "missing-world", "world", "No world is configured");
+    } else if (arena.worldName().isEmpty()) {
       error(problems, "missing-world", "world", "No world is configured");
     } else if (!worlds.exists(arena.worldName().orElseThrow())) {
       error(problems, "unknown-world", "world", "Configured world is not loaded");

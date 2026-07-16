@@ -146,20 +146,50 @@ items:
       inherit: "gui.close"
   admin:
     main:
+      overview:
+        material: NETHER_STAR
+        name: "<aqua><bold>HeneriaBedWars"
+        lore: ["<dark_gray>Centre de configuration", "", "<gray>Arènes: <white>{arena_count}", "<gray>Cartes: <white>{map_count}", "<green>Prêtes: {enabled_count}", "<red>À terminer: {invalid_count}"]
       arenas:
-        material: MAP
-        name: "<aqua>Gestion des arenes"
-        lore: ["<gray>Total: <white>{arena_count}", "<green>Activees: {enabled_count}", "<red>Invalides: {invalid_count}", "<yellow>Brouillons: {draft_count}"]
+        material: RED_BED
+        name: "<aqua><bold>Mes arènes"
+        lore: ["<gray>Créer et configurer les parties", "", "<white>{arena_count} <gray>arène(s)", "<green>{enabled_count} <gray>prête(s)", "<red>{invalid_count} <gray>à terminer", "", "<yellow>▸ Cliquez pour ouvrir"]
+      arenas-v2:
+        material: RED_BED
+        name: "<aqua><bold>Mes arènes"
+        lore: ["<gray>Créer et configurer les parties", "", "<white>{arena_count} <gray>arène(s)", "<green>{enabled_count} <gray>prête(s)", "<red>{invalid_count} <gray>à terminer", "", "<yellow>▸ Cliquez pour ouvrir"]
+      maps:
+        material: GRASS_BLOCK
+        name: "<green><bold>Mes cartes"
+        lore: ["<gray>Construire les mondes BedWars", "", "<white>{map_count} <gray>carte(s)", "<aqua>{loaded_map_count} <gray>chargée(s)", "", "<yellow>▸ Cliquez pour ouvrir"]
+      create-arena:
+        material: LIME_CONCRETE
+        name: "<green>Créer une arène"
+        lore: ["<gray>L'assistant vous guide étape par étape.", "", "<yellow>▸ Cliquez pour commencer"]
+      create-map:
+        material: EMERALD_BLOCK
+        name: "<green>Créer une carte BedWars"
+        lore: ["<gray>Crée automatiquement un monde vide.", "", "<yellow>▸ Cliquez pour commencer"]
+      guide:
+        material: BOOK
+        name: "<gold><bold>Parcours conseillé"
+        lore: ["<yellow>1. <white>Créez une carte", "<yellow>2. <white>Construisez votre map", "<yellow>3. <white>Créez une arène", "<yellow>4. <white>Placez attente et spectateurs", "<yellow>5. <white>Activez l'arène"]
       configuration:
         material: COMPARATOR
-        name: "<yellow>Configuration generale"
-        lore: ["<gray>Langue: <white>{language}", "<gray>Debug: <white>{debug}", "<gray>Stockage: <white>{storage}", "<gray>Items: <white>{items}", "<gray>Fichiers: <white>{loaded_files}"]
-      lobby: {material: LIGHT_GRAY_DYE, name: "<gray>Lobby - prochain ticket", lore: ["<dark_gray>Aucune action disponible."]}
+        name: "<yellow>État du plugin"
+        lore: ["<gray>Langue: <white>{language}", "<gray>Configuration: <green>chargée", "<gray>Fichiers: <white>{loaded_files}", "", "<yellow>▸ Voir les détails"]
+      configuration-v2:
+        material: COMPARATOR
+        name: "<yellow>État du plugin"
+        lore: ["<gray>Langue: <white>{language}", "<gray>Configuration: <green>chargée", "<gray>Fichiers: <white>{loaded_files}", "", "<yellow>▸ Voir les détails"]
   arena:
     list:
       create: {material: EMERALD, name: "<green>Creer une arene", lore: ["<gray>Saisie securisee dans le chat."]}
       filter: {material: HOPPER, name: "<yellow>Filtre: {filter}", lore: ["<gray>Cliquez pour changer."]}
       sort: {material: COMPARATOR, name: "<yellow>Tri: {sort}", lore: ["<gray>Cliquez pour changer."]}
+      create-v2: {material: EMERALD_BLOCK, name: "<green><bold>Créer une arène", lore: ["<gray>L'assistant vous guidera ensuite.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
+      filter-v2: {material: HOPPER, name: "<yellow>Afficher : <white>{filter}", lore: ["", "<yellow>▸ Cliquez pour changer"]}
+      sort-v2: {material: COMPARATOR, name: "<yellow>Trier par : <white>{sort}", lore: ["", "<yellow>▸ Cliquez pour changer"]}
       entry-enabled: &arena-entry
         material: LIME_CONCRETE
         name: "<green>{arena_name}"
@@ -176,20 +206,39 @@ items:
         <<: *arena-entry
         material: ORANGE_CONCRETE
         name: "<gold>{arena_name}"
+      entry-enabled-v2: &arena-entry-v2
+        material: LIME_CONCRETE
+        name: "<green><bold>{arena_name}"
+        lore: ["<gray>État: <white>{arena_status_label}", "<gray>Carte: <white>{map_template}", "<gray>Format: <white>{team_count} équipes de {players_per_team}", "", "<gold>{validation_errors} étape(s) restante(s)", "", "<yellow>▸ Gauche : configurer", "<aqua>▸ Droit : voir les étapes", "<red>▸ Shift+droit : supprimer"]
+      entry-disabled-v2:
+        <<: *arena-entry-v2
+        material: GRAY_CONCRETE
+        name: "<gray><bold>{arena_name}"
+      entry-invalid-v2:
+        <<: *arena-entry-v2
+        material: ORANGE_CONCRETE
+        name: "<gold><bold>{arena_name}"
+      entry-draft-v2:
+        <<: *arena-entry-v2
+        material: YELLOW_CONCRETE
+        name: "<yellow><bold>{arena_name}"
     editor:
       information:
         material: BOOK
         name: "<aqua>Informations generales"
         lore: ["<gray>ID: <white>{arena_id}", "<gray>Nom: <white>{arena_name}", "<gray>Statut: <white>{arena_status}", "<gray>Revision: <white>{arena_revision}", "<gray>Fichier: <white>{arena_file}", "<gray>Creee: <white>{created_at}", "<gray>Modifiee: <white>{updated_at}", "<red>Erreurs: {validation_errors}", "<yellow>Avertissements: {validation_warnings}"]
       display-name: {material: NAME_TAG, name: "<yellow>Nom d'affichage", lore: ["<white>{arena_name}", "<gray>Cliquez pour modifier dans le chat."]}
-      world: {material: GRASS_BLOCK, name: "<green>Monde", lore: ["<gray>Actuel: <white>{world}", "<gray>Cliquez pour choisir."]}
+      world: {material: GRASS_BLOCK, name: "<green>Carte du jeu", lore: ["<gray>Carte liée: <white>{map_template}", "<gray>Monde: <white>{world}", "", "<yellow>▸ Cliquez pour choisir"]}
+      map-template: {material: GRASS_BLOCK, name: "<green><bold>Carte du jeu", lore: ["<gray>Carte liée: <white>{map_template}", "<gray>Monde: <white>{world}", "", "<yellow>▸ Cliquez pour choisir ou créer"]}
       waiting-lobby: {material: CLOCK, name: "<yellow>Lobby d'attente", lore: ["<gray>Configure: <white>{position_configured}", "<gray>Monde: <white>{position_world}", "<gray>{x}, {y}, {z}", "<white>Gauche: definir ici", "<white>Droit: teleporter", "<red>Shift+droit: reinitialiser"]}
       spectator: {material: ENDER_EYE, name: "<aqua>Point spectateur", lore: ["<gray>Configure: <white>{position_configured}", "<gray>Monde: <white>{position_world}", "<gray>{x}, {y}, {z}", "<white>Gauche: definir ici", "<white>Droit: teleporter", "<red>Shift+droit: reinitialiser"]}
       players: {material: PLAYER_HEAD, name: "<gold>Joueurs", lore: ["<gray>Minimum: <white>{minimum_players}", "<gray>Maximum: <white>{maximum_players}", "<gray>Capacite equipes: <white>{capacity}"]}
       teams: {material: WHITE_BANNER, name: "<light_purple>Equipes", lore: ["<gray>Format: <white>{team_count} x {players_per_team}", "<gray>Capacite: <white>{capacity}"]}
       boundary: {material: STRUCTURE_VOID, name: "<blue>Limites de carte", lore: ["<gray>Configuration administrative uniquement."]}
-      validation-valid: {material: LIME_DYE, name: "<green>Validation reussie", lore: ["<yellow>Avertissements: {validation_warnings}"]}
-      validation-invalid: {material: RED_DYE, name: "<red>Validation incomplete", lore: ["<red>Erreurs: {validation_errors}", "<yellow>Avertissements: {validation_warnings}"]}
+      validation-valid: {material: LIME_CONCRETE, name: "<green><bold>Configuration terminée", lore: ["<gray>L'arène peut être activée.", "", "<yellow>▸ Voir le résumé"]}
+      validation-invalid: {material: ORANGE_CONCRETE, name: "<gold><bold>Configuration à terminer", lore: ["<white>{validation_errors} <gray>étape(s) obligatoire(s)", "<white>{validation_warnings} <gray>conseil(s)", "", "<yellow>▸ Cliquez pour être guidé"]}
+      setup-valid: {material: LIME_CONCRETE, name: "<green><bold>Configuration terminée", lore: ["<gray>L'arène peut être activée.", "", "<yellow>▸ Voir le résumé"]}
+      setup-incomplete: {material: ORANGE_CONCRETE, name: "<gold><bold>Configuration à terminer", lore: ["<white>{validation_errors} <gray>étape(s) obligatoire(s)", "<white>{validation_warnings} <gray>conseil(s)", "", "<yellow>▸ Cliquez pour être guidé"]}
       enable: {material: LIME_DYE, name: "<green>Activer l'arene"}
       enable-invalid: {material: BARRIER, name: "<red>Activation impossible", lore: ["<gray>Cliquez pour afficher les problemes."]}
       disable: {material: GRAY_DYE, name: "<yellow>Desactiver l'arene"}
@@ -210,19 +259,43 @@ items:
       disabled: {material: GRAY_DYE, name: "<gray>Limites desactivees", lore: ["<gray>Cliquez pour activer."]}
       reset: {material: BARRIER, name: "<red>Reinitialiser les limites"}
     validation:
-      info: {material: BOOK, name: "<aqua>Information", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}"]}
-      warning: {material: ORANGE_DYE, name: "<yellow>Avertissement: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
-      error: {material: RED_DYE, name: "<red>Erreur: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
-      critical: {material: BARRIER, name: "<dark_red>Critique: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
+      info: {material: LIME_CONCRETE, name: "<green><bold>Tout est prêt", lore: ["<gray>Aucun problème bloquant.", "", "<white>Vous pouvez activer cette arène."]}
+      warning: {material: YELLOW_CONCRETE, name: "<yellow><bold>Conseil", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour ouvrir"]}
+      error: {material: ORANGE_CONCRETE, name: "<gold><bold>Étape requise", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour corriger"]}
+      critical: {material: RED_CONCRETE, name: "<red><bold>Action indispensable", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour corriger"]}
+      summary-valid: {material: LIME_CONCRETE, name: "<green><bold>Tout est prêt", lore: ["<gray>Aucun problème bloquant.", "", "<white>Vous pouvez activer cette arène."]}
+      summary-incomplete: {material: ORANGE_CONCRETE, name: "<gold><bold>Encore quelques étapes", lore: ["<white>{validation_errors} <gray>étape(s) obligatoire(s)", "<white>{validation_warnings} <gray>conseil(s)", "", "<yellow>Cliquez sur une étape pour la corriger."]}
+      step-info: {material: LIME_CONCRETE, name: "<green><bold>Information", lore: ["<white>{problem}", "", "<aqua>{solution}"]}
+      step-warning: {material: YELLOW_CONCRETE, name: "<yellow><bold>Conseil", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour ouvrir"]}
+      step-error: {material: ORANGE_CONCRETE, name: "<gold><bold>Étape requise", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour corriger"]}
+      step-critical: {material: RED_CONCRETE, name: "<red><bold>Action indispensable", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour corriger"]}
+    map:
+      empty: {material: MINECART, name: "<gold><bold>Aucune carte BedWars", lore: ["<gray>Cette arène a besoin d'une carte.", "", "<white>Utilisez le bouton ci-dessous pour", "<white>créer un monde vide automatiquement."]}
+      create: {material: EMERALD_BLOCK, name: "<green><bold>Créer et associer une carte", lore: ["<gray>Le monde sera créé puis lié", "<gray>automatiquement à cette arène.", "", "<yellow>▸ Cliquez pour commencer"]}
   map:
     list:
-      create: {material: EMERALD, name: "<green>Creer une carte", lore: ["<gray>Saisie securisee dans le chat."]}
+      create: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
+      create-bedwars: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
       entry-loaded: &map-entry
         material: LIME_CONCRETE
         name: "<green>{map_name}"
         lore: ["<gray>ID: <white>{map_id}", "<gray>Type: <white>{map_type}", "<gray>Etat: <white>{map_state}", "<gray>Monde: <white>{world_name}", "<gray>Joueurs: <white>{player_count}", "<gray>Arenes: <white>{arena_count}", "<gray>Revision: <white>{revision}", "<gray>Derniere sauvegarde: <white>{last_saved_at}", "", "<white>Gauche: informations", "<white>Droit: charger/teleporter", "<red>Shift+droit: supprimer"]
       entry-unloaded: {<<: *map-entry, material: GRAY_CONCRETE, name: "<gray>{map_name}"}
       entry-error: {<<: *map-entry, material: RED_CONCRETE, name: "<red>{map_name}"}
+      entry-loaded-v2: &map-entry-v2
+        material: LIME_CONCRETE
+        name: "<green><bold>{map_name}"
+        lore: ["<gray>Type: <white>{map_type_label}", "<gray>État: <green>{map_state_label}", "<gray>Arènes liées: <white>{arena_count}", "", "<yellow>▸ Gauche : gérer", "<aqua>▸ Droit : se téléporter", "<red>▸ Shift+droit : supprimer"]
+      entry-unloaded-v2:
+        <<: *map-entry-v2
+        material: GRAY_CONCRETE
+        name: "<gray><bold>{map_name}"
+        lore: ["<gray>Type: <white>{map_type_label}", "<gray>État: <white>{map_state_label}", "<gray>Arènes liées: <white>{arena_count}", "", "<yellow>▸ Gauche : gérer", "<aqua>▸ Droit : charger et visiter", "<red>▸ Shift+droit : supprimer"]
+      entry-error-v2:
+        <<: *map-entry-v2
+        material: RED_CONCRETE
+        name: "<red><bold>{map_name}"
+        lore: ["<red>Cette carte contient une erreur.", "", "<yellow>▸ Cliquez pour voir les détails"]
       refresh: {inherit: "gui.refresh", name: "<aqua>Actualiser les cartes"}
       filter: {material: HOPPER, name: "<yellow>Filtrer les cartes"}
       sort: {material: COMPARATOR, name: "<yellow>Trier les cartes"}

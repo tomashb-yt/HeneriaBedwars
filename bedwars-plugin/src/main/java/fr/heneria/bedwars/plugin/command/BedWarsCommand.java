@@ -99,8 +99,12 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull String label,
       @NotNull String[] args) {
     try {
+      if (args.length == 0
+          && sender instanceof Player
+          && sender.hasPermission(AdministrativeCommandPolicy.SETUP)) return setup(sender);
       if (args.length == 0) return help(sender);
       return switch (args[0].toLowerCase(Locale.ROOT)) {
+        case "help" -> help(sender);
         case "version" -> version(sender);
         case "reload" -> reload(sender);
         case "config" -> config(sender);
@@ -122,6 +126,13 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   private boolean help(CommandSender sender) {
     if (!allowed(sender, ADMIN)) return true;
     send(sender, TranslationKey.HELP_HEADER);
+    if (sender instanceof Player) {
+      if (sender.hasPermission(AdministrativeCommandPolicy.SETUP))
+        send(sender, TranslationKey.HELP_SETUP);
+      send(sender, TranslationKey.HELP_VERSION);
+      if (sender.hasPermission(RELOAD)) send(sender, TranslationKey.HELP_RELOAD);
+      return true;
+    }
     send(sender, TranslationKey.HELP_VERSION);
     if (sender.hasPermission(RELOAD)) send(sender, TranslationKey.HELP_RELOAD);
     if (sender.hasPermission(CONFIG)) send(sender, TranslationKey.HELP_CONFIG);
@@ -352,13 +363,23 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull Command command,
       @NotNull String alias,
       @NotNull String[] args) {
-    return completionPolicy.complete(
-        sender::hasPermission,
-        args,
-        configurations.availableLocales(),
-        itemService.registeredKeys().stream().sorted().toList(),
-        arenaService.list().stream().map(arena -> arena.id().value()).toList(),
-        plugin.getServer().getWorlds().stream().map(org.bukkit.World::getName).sorted().toList(),
-        mapService.list().stream().map(map -> map.id().value()).toList());
+    List<String> completions =
+        completionPolicy.complete(
+            sender::hasPermission,
+            args,
+            configurations.availableLocales(),
+            itemService.registeredKeys().stream().sorted().toList(),
+            arenaService.list().stream().map(arena -> arena.id().value()).toList(),
+            plugin.getServer().getWorlds().stream()
+                .map(org.bukkit.World::getName)
+                .sorted()
+                .toList(),
+            mapService.list().stream().map(map -> map.id().value()).toList());
+    if (sender instanceof Player && args.length == 1)
+      return completions.stream()
+          .filter(
+              value -> value.equals("setup") || value.equals("version") || value.equals("reload"))
+          .toList();
+    return completions;
   }
 }

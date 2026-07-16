@@ -258,9 +258,15 @@ class ConfigurationSystemTest {
     service.initialize();
 
     assertTrue(Files.readString(temporary.resolve("menus.yml")).contains("history-enabled: true"));
-    assertTrue(Files.readString(temporary.resolve("items.yml")).contains("demo:"));
+    String evolvedItems = Files.readString(temporary.resolve("items.yml"));
+    assertTrue(evolvedItems.contains("demo:"));
+    assertTrue(evolvedItems.contains("arenas-v2:"));
+    assertTrue(evolvedItems.contains("step-error:"));
+    assertTrue(evolvedItems.contains("create-bedwars:"));
     assertTrue(Files.readString(french).contains("gui:"));
     assertTrue(Files.readString(english).contains("gui:"));
+    assertTrue(Files.readString(french).contains("title-v2:"));
+    assertTrue(Files.readString(french).contains("map-template-missing:"));
     assertTrue(
         service
             .snapshot()
