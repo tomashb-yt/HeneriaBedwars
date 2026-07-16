@@ -6,6 +6,10 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Ticket 008 : éditeur graphique v4 des cartes avec bibliothèque filtrable/triable, création guidée, réglages du monde, point d'arrivée, progression et validation localisée.
+- Associations carte–arène dans les deux sens, création d'arène liée, suivi des opérations longues et détection des constructions non sauvegardées.
+- Sauvegarde complète manuelle asynchrone, protections des cartes liées/lobby et navigation déterministe.
+
 - Parcours d'administration simplifié : `/bedwars` ouvre directement un tableau de bord visuel, création guidée carte–arène et menus v2 ajoutés sans écraser les personnalisations existantes.
 - Assistant continu dans l'éditeur d'arène : progression, prochaine action, étapes carte/attente/équipes/joueurs/spectateur, limites optionnelles et sous-menus explicatifs harmonisés.
 - Gestionnaire autonome de cartes modèles : modèle immutable, registre, métadonnées YAML atomiques, mondes vides Bukkit, chargement, sauvegarde, déchargement, téléportation et autosauvegarde optionnelle.

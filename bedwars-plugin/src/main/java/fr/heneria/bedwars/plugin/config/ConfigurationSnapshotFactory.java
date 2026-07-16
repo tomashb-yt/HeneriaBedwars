@@ -7,6 +7,7 @@ import fr.heneria.bedwars.core.config.ConfigurationProblem;
 import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
 import fr.heneria.bedwars.core.config.GameplaySettings;
 import fr.heneria.bedwars.core.config.LobbySettings;
+import fr.heneria.bedwars.core.config.MapEditorSettings;
 import fr.heneria.bedwars.core.config.MenuSettings;
 import fr.heneria.bedwars.core.config.PluginSettings;
 import fr.heneria.bedwars.core.config.ProblemSeverity;
@@ -149,6 +150,7 @@ public final class ConfigurationSnapshotFactory {
                 "back", sound(menus, "back", "UI_BUTTON_CLICK", problems),
                 "close", sound(menus, "close", "UI_BUTTON_CLICK", problems)),
             arenaEditor(menus),
+            mapEditor(menus),
             new TextInputSettings(
                 java.time.Duration.ofSeconds(
                     menus.integer("text-input.timeout-seconds", 60, 5, 600)),
@@ -430,6 +432,105 @@ public final class ConfigurationSnapshotFactory {
     List<Integer> values = new ArrayList<>(content);
     values.addAll(List.of(controls));
     return values;
+  }
+
+  private static MapEditorSettings mapEditor(Reader menus) {
+    String root = "map-editor.";
+    int listRows = menus.integer(root + "list.rows", 6, 1, 6);
+    int listSize = listRows * 9;
+    List<Integer> content =
+        menus.integerList(
+            root + "list.content-slots",
+            List.of(
+                10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34),
+            listSize);
+    int guide = menus.integer(root + "list.guide-slot", 4, 0, listSize - 1);
+    int previous = menus.integer(root + "list.previous-page-slot", 46, 0, listSize - 1);
+    int filter = menus.integer(root + "list.filter-slot", 47, 0, listSize - 1);
+    int create = menus.integer(root + "list.create-slot", 49, 0, listSize - 1);
+    int refresh = menus.integer(root + "list.refresh-slot", 50, 0, listSize - 1);
+    int sort = menus.integer(root + "list.sort-slot", 51, 0, listSize - 1);
+    int next = menus.integer(root + "list.next-page-slot", 52, 0, listSize - 1);
+    int dashboard = menus.integer(root + "list.dashboard-slot", 45, 0, listSize - 1);
+    int close = menus.integer(root + "list.close-slot", 53, 0, listSize - 1);
+    List<Integer> listSlots =
+        combine(content, guide, previous, filter, create, refresh, sort, next, dashboard, close);
+    validateSlotRange(menus, root + "list", listSlots, listSize);
+    validateDistinctSlots(menus, root + "list", listSlots);
+
+    int editorRows = menus.integer(root + "editor.rows", 6, 1, 6);
+    int editorSize = editorRows * 9;
+    int summary = menus.integer(root + "editor.summary-slot", 4, 0, editorSize - 1);
+    int enter = menus.integer(root + "editor.enter-slot", 10, 0, editorSize - 1);
+    int save = menus.integer(root + "editor.save-slot", 12, 0, editorSize - 1);
+    int spawn = menus.integer(root + "editor.spawn-slot", 14, 0, editorSize - 1);
+    int worldState = menus.integer(root + "editor.world-state-slot", 16, 0, editorSize - 1);
+    int displayName = menus.integer(root + "editor.display-name-slot", 19, 0, editorSize - 1);
+    int type = menus.integer(root + "editor.type-slot", 20, 0, editorSize - 1);
+    int settings = menus.integer(root + "editor.settings-slot", 21, 0, editorSize - 1);
+    int workflow = menus.integer(root + "editor.workflow-slot", 22, 0, editorSize - 1);
+    int associations = menus.integer(root + "editor.associations-slot", 23, 0, editorSize - 1);
+    int validation = menus.integer(root + "editor.validation-slot", 25, 0, editorSize - 1);
+    int backup = menus.integer(root + "editor.backup-slot", 29, 0, editorSize - 1);
+    int duplicate = menus.integer(root + "editor.duplicate-slot", 31, 0, editorSize - 1);
+    int delete = menus.integer(root + "editor.delete-slot", 33, 0, editorSize - 1);
+    int list = menus.integer(root + "editor.list-slot", 45, 0, editorSize - 1);
+    int editorRefresh = menus.integer(root + "editor.refresh-slot", 49, 0, editorSize - 1);
+    int editorClose = menus.integer(root + "editor.close-slot", 53, 0, editorSize - 1);
+    List<Integer> editorSlots =
+        List.of(
+            summary,
+            enter,
+            save,
+            spawn,
+            worldState,
+            displayName,
+            type,
+            settings,
+            workflow,
+            associations,
+            validation,
+            backup,
+            duplicate,
+            delete,
+            list,
+            editorRefresh,
+            editorClose);
+    validateSlotRange(menus, root + "editor", editorSlots, editorSize);
+    validateDistinctSlots(menus, root + "editor", editorSlots);
+    return new MapEditorSettings(
+        listRows,
+        guide,
+        content,
+        previous,
+        filter,
+        create,
+        refresh,
+        sort,
+        next,
+        dashboard,
+        close,
+        editorRows,
+        summary,
+        enter,
+        save,
+        spawn,
+        worldState,
+        displayName,
+        type,
+        settings,
+        workflow,
+        associations,
+        validation,
+        backup,
+        duplicate,
+        delete,
+        list,
+        editorRefresh,
+        editorClose,
+        menus.integer(root + "settings.rows", 5, 1, 6),
+        menus.integer(root + "associations.rows", 6, 1, 6),
+        menus.integer(root + "validation.rows", 6, 1, 6));
   }
 
   private static void validateDistinctSlots(Reader reader, String path, List<Integer> slots) {

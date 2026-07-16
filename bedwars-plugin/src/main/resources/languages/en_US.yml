@@ -299,3 +299,97 @@ map:
     teleport: "<light_purple>Teleport"
     set-spawn: "<gold>Set spawn"
     linked-arenas: "<gray>Linked arenas: {linked_arenas}"
+    list-title-v4: "<dark_green><bold>Maps <gray>• <white>{visible_count}/{map_count}"
+    editor-title-v4: "<gold><bold>Map <gray>• <white>{map_name}"
+    delete-v4: "<red>Permanently delete {map_name}?"
+    creation:
+      advanced-title: "<aqua><bold>Choose the map type"
+      confirm-title: "<green>Create map {map_id}?"
+      input: "<yellow>Enter the map id in chat. Type <white>cancel<yellow> to abort."
+      ready: "<green>Map <white>{map_name}<green> is ready. Build it, set its arrival point, then save it."
+    type: {title: "<aqua>Type of {map_name}"}
+    settings:
+      title: "<blue>Settings for {map_name}"
+      time-input: "<yellow>Enter a time between 0 and 24000."
+    associations:
+      title: "<yellow>Arenas linked to {map_name}"
+      create-input: "<yellow>Enter the new arena id."
+    validation: {title: "<gold>Validation of {map_name}"}
+    operation: {title: "<yellow>Operation on {map_name}"}
+    display-name-input: "<yellow>Enter the new display name for {map_name}."
+    duplicate:
+      input: "<yellow>Enter the id for the copy of {map_name}."
+      confirm-title: "<gold>Duplicate {map_name} to {destination_id}?"
+    deletion: {phrase: "<red>Enter exactly <white>{delete_phrase}<red> to confirm."}
+    spawn: {clear-title: "<red>Remove the arrival point of {map_name}?"}
+    unload: {force-title: "<red>Force close {map_name}?"}
+    missing: {title: "<red>Map not found"}
+  filter: {all: "All", bedwars: "BedWars", lobby: "Lobbies", generic: "Generic", loaded: "Open", unloaded: "Closed", error: "Errors", unlinked: "Unlinked"}
+  sort: {id: "Id", name: "Name", type: "Type", state: "State", updated: "Updated", saved: "Saved", ascending: "ascending", descending: "descending"}
+  dirty: {unsaved: "changes to save", saved: "saved", possible: "first save recommended"}
+  setting:
+    enabled: "enabled"
+    disabled: "disabled"
+    weather: {clear: "clear", rain: "rain"}
+    difficulty: {peaceful: "Peaceful", easy: "Easy", normal: "Normal", hard: "Hard"}
+  workflow:
+    next: {spawn: "Set the arrival point", save: "Save the map", link-arena: "Link or create an arena", select-lobby: "Select this map as the main lobby", complete: "Setup complete"}
+  operation:
+    type: {duplicate: "Duplication", backup: "Full backup", delete: "Deletion"}
+    status: {pending: "pending", running: "running", success: "complete", failed: "failed", cancelled: "cancelled"}
+  validation:
+    problem:
+      not-found: "The map no longer exists."
+      missing-folder: "The template folder is missing."
+      invalid-folder: "The folder does not match the id."
+      invalid-spawn: "The arrival point belongs to another world."
+      technical-error: "The map reports a technical error."
+      incompatible-links: "A non-BedWars map is linked to an arena."
+      unlinked: "This BedWars map is not linked to an arena."
+      spawn-missing: "No custom arrival point is set."
+      runtime-state: "The loaded state does not match the server."
+      operation-active: "An operation is currently running."
+      protected: "This map is protected by configuration."
+    solution:
+      not-found: "Return to the dashboard."
+      missing-folder: "Restore a backup or recreate the map."
+      invalid-folder: "Check the metadata and folder."
+      invalid-spawn: "Set the point again in this map."
+      technical-error: "Check the logs, then reload the map."
+      incompatible-links: "Switch to BedWars or unlink the arenas."
+      unlinked: "Open associations and choose an arena."
+      spawn-missing: "Enter the map and set the point."
+      runtime-state: "Refresh or reload the maps."
+      operation-active: "Open operation tracking."
+      protected: "Deletion remains intentionally blocked."
+  input:
+    already-active: "<red>An input is already active."
+    invalid: "<red>Invalid value: <white>{problem}<red>. Try again or type cancel."
+  feedback:
+    success: "<green>Change saved."
+    association-success: "<green>Association updated."
+    entered: "<green>You are now inside <white>{map_name}<green>."
+    teleported: "<green>Teleported to the arrival point."
+  error:
+    not-found: "<red>Map not found."
+    already-exists: "<red>This id already exists."
+    invalid-argument: "<red>Invalid value or id."
+    already-loaded: "<yellow>This map is already open."
+    not-loaded: "<red>Open this map first."
+    players-present: "<red>Players are still inside this map."
+    operation-running: "<red>An operation is already running on this map."
+    linked: "<red>Unlink arenas before deleting this map."
+    protected: "<red>This map is protected and cannot be deleted."
+    world-creation: "<red>Could not create the world."
+    world-load: "<red>Could not open the world."
+    world-save: "<red>Could not save the world."
+    world-unload: "<red>Could not close the world."
+    world-settings: "<red>Could not apply the world settings."
+    copy: "<red>Copy failed."
+    backup: "<red>Full backup failed."
+    conflict: "<red>The map changed. Refresh the menu."
+    invalid-type: "<red>This map type is incompatible with its links."
+    storage: "<red>Could not save metadata."
+    association: "<red>Could not update the association."
+    invalid-world: "<red>Stand inside world <white>{world_name}<red>."
+    teleport: "<red>Teleport failed."

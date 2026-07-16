@@ -85,6 +85,15 @@ public final class BukkitMapWorldService implements MapWorldService {
   }
 
   @Override
+  public MapWorldResult applySettings(MapTemplate template) {
+    requirePrimaryThread();
+    World world = Bukkit.getWorld(template.worldName());
+    if (world == null) return MapWorldResult.failure("World is not loaded");
+    applySettings(world, template);
+    return MapWorldResult.success();
+  }
+
+  @Override
   public boolean isLoaded(MapTemplate template) {
     return Bukkit.getWorld(template.worldName()) != null;
   }
@@ -119,23 +128,21 @@ public final class BukkitMapWorldService implements MapWorldService {
   }
 
   private void applySettings(World world, MapTemplate template) {
-    world.setDifficulty(Difficulty.valueOf(settings.difficulty()));
-    world.setPVP(settings.pvp());
+    world.setDifficulty(Difficulty.valueOf(template.settings().difficulty()));
+    world.setPVP(template.settings().pvp());
     world.setSpawnFlags(template.settings().allowMonsters(), template.settings().allowAnimals());
     world.setAutoSave(template.settings().autoSave());
     world.setTime(template.settings().fixedTime());
-    if (template.settings().clearWeather()) {
-      world.setStorm(false);
-      world.setThundering(false);
-      world.setWeatherDuration(0);
-    }
-    rule(world, "doDaylightCycle", false);
-    rule(world, "doWeatherCycle", false);
+    world.setStorm(!template.settings().clearWeather());
+    world.setThundering(false);
+    world.setWeatherDuration(0);
+    rule(world, "doDaylightCycle", template.settings().daylightCycle());
+    rule(world, "doWeatherCycle", template.settings().weatherCycle());
     rule(world, "doMobSpawning", false);
     rule(world, "doPatrolSpawning", false);
     rule(world, "doTraderSpawning", false);
     rule(world, "doInsomnia", false);
-    rule(world, "doFireTick", false);
+    rule(world, "doFireTick", template.settings().fireTick());
     rule(world, "mobGriefing", false);
     rule(world, "keepInventory", true);
     rule(world, "announceAdvancements", false);
@@ -143,6 +150,10 @@ public final class BukkitMapWorldService implements MapWorldService {
     rule(world, "doImmediateRespawn", true);
     rule(world, "randomTickSpeed", 0);
     rule(world, "spawnRadius", 0);
+    rule(world, "fallDamage", template.settings().environmentalDamage());
+    rule(world, "fireDamage", template.settings().environmentalDamage());
+    rule(world, "drowningDamage", template.settings().environmentalDamage());
+    rule(world, "freezeDamage", template.settings().environmentalDamage());
     MapSpawn spawn = template.spawn();
     world.setSpawnLocation(
         (int) Math.floor(spawn.x()), (int) Math.floor(spawn.y()), (int) Math.floor(spawn.z()));

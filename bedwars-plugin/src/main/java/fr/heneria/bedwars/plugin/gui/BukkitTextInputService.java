@@ -1,6 +1,5 @@
 package fr.heneria.bedwars.plugin.gui;
 
-import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
 import fr.heneria.bedwars.core.gui.TextInputCancelReason;
 import fr.heneria.bedwars.core.gui.TextInputManager;
 import fr.heneria.bedwars.core.gui.TextInputRequest;
@@ -10,6 +9,7 @@ import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,18 +31,21 @@ public final class BukkitTextInputService
     implements TextInputService, LifecycleComponent, Listener {
   private final JavaPlugin plugin;
   private final TextInputManager manager;
-  private final ArenaEditorStateStore editorStates;
+  private final Consumer<UUID> stateCleanup;
+  private final Runnable allStateCleanup;
   private final ProjectLogger logger;
   private BukkitTask expiryTask;
 
   public BukkitTextInputService(
       JavaPlugin plugin,
       TextInputManager manager,
-      ArenaEditorStateStore editorStates,
+      Consumer<UUID> stateCleanup,
+      Runnable allStateCleanup,
       ProjectLogger logger) {
     this.plugin = plugin;
     this.manager = manager;
-    this.editorStates = editorStates;
+    this.stateCleanup = stateCleanup;
+    this.allStateCleanup = allStateCleanup;
     this.logger = logger;
   }
 
@@ -61,7 +64,7 @@ public final class BukkitTextInputService
   public void stop() {
     if (expiryTask != null) expiryTask.cancel();
     manager.cancelAll(TextInputCancelReason.PLUGIN_STOP);
-    editorStates.clear();
+    allStateCleanup.run();
   }
 
   @EventHandler(priority = EventPriority.LOWEST)
@@ -85,7 +88,7 @@ public final class BukkitTextInputService
 
   private void disconnect(UUID playerId) {
     manager.cancel(playerId, TextInputCancelReason.DISCONNECT);
-    editorStates.remove(playerId);
+    stateCleanup.accept(playerId);
   }
 
   @Override

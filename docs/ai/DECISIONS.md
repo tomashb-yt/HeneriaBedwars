@@ -1,5 +1,9 @@
 # Décisions d'architecture
 
+## ADR-039 — Éditeur graphique des cartes
+
+Accepté. Le menu v4 est une façade : toutes les mutations passent par `MapTemplateService` ou `ArenaService`. `MapEditorStateStore` conserve uniquement des données bornées par UUID et les nettoie à la déconnexion. Progression guidée et validation technique restent séparées. `MapOperationTracker` expose sauvegarde, duplication et suppression sans remplacer `MapOperationLock`. Les copies de fichiers sont asynchrones, les arènes restent la source de vérité des associations et l'application des réglages Bukkit est compensée en cas d'échec.
+
 ## ADR-029 — Définition d'arène distincte d'une partie
 
 Accepté. `ArenaDefinition` décrit uniquement une configuration administrative persistante. `ArenaStatus` ne réutilise aucun futur état `WAITING/PLAYING/RESETTING` et aucune arène activée ne lance de gameplay.

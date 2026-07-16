@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État Ticket 008 : l'administration des cartes modèles est entièrement accessible depuis une interface guidée v4. Les commandes demeurent une surface avancée compatible. Ce ticket ne crée toujours aucune instance de partie ni gameplay BedWars.
+
 HeneriaBedWars vise un plugin BedWars complet pour Paper 1.21.11 et Java 21, avec un combat inspiré du PvP 1.8. Il devra gérer plusieurs arènes et parties simultanées, un lobby principal et des lobbies d'attente, des équipes, lits, générateurs, boutiques et améliorations configurables, des statistiques, une API publique et de futurs addons.
 
 Les stockages visés sont YAML pour l'amorçage, SQLite par défaut, MySQL/MariaDB en production et éventuellement Redis pour le réseau. PlaceholderAPI, Vault, PacketEvents, Citizens et Velocity sont des compatibilités futures, pas des dépendances actuelles.

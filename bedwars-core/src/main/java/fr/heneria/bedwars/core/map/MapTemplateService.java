@@ -1,5 +1,6 @@
 package fr.heneria.bedwars.core.map;
 
+import fr.heneria.bedwars.core.config.ProblemSeverity;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
@@ -333,6 +334,149 @@ public final class MapTemplateService {
     return metadataEdit(rawId, expectedRevision, map -> map.withSpawn(spawn, now()));
   }
 
+  public MapOperationResult clearSpawn(String rawId, long expectedRevision) {
+    return metadataEdit(rawId, expectedRevision, map -> map.clearSpawn(platformY, now()));
+  }
+
+  public MapOperationResult setType(String rawId, MapType type, long expectedRevision) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (type == null) return MapOperationResult.failure(MapOperationCode.INVALID_TYPE, rawId);
+    if (type != MapType.BEDWARS && !arenaLinks.apply(template.id()).isEmpty())
+      return MapOperationResult.failure(MapOperationCode.MAP_LINKED, template, rawId);
+    if (type != MapType.LOBBY && protectedTemplate.test(template))
+      return MapOperationResult.failure(MapOperationCode.MAP_PROTECTED, template, rawId);
+    return metadataEdit(rawId, expectedRevision, map -> map.withType(type, now()));
+  }
+
+  /**
+   * Persists settings before applying them to a loaded world and compensates on platform failure.
+   */
+  public MapOperationResult setSettings(
+      String rawId, MapWorldSettings settings, long expectedRevision) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (template.revision() != expectedRevision)
+      return MapOperationResult.failure(MapOperationCode.CONFLICT, template, rawId);
+    if (settings == null)
+      return MapOperationResult.failure(MapOperationCode.INVALID_ARGUMENT, template, "settings");
+    if (!locks.acquire(template.id()))
+      return MapOperationResult.failure(MapOperationCode.OPERATION_IN_PROGRESS, template, rawId);
+    MapTemplate updated = template.withSettings(settings, now());
+    try {
+      repository.save(updated);
+      if (template.loaded() && worlds.isLoaded(template)) {
+        MapWorldResult applied = worlds.applySettings(updated);
+        if (!applied.successful()) {
+          repository.save(template);
+          worlds.applySettings(template);
+          return MapOperationResult.failure(
+              MapOperationCode.WORLD_SETTINGS_FAILED, template, applied.detail());
+        }
+      }
+      registry.put(updated);
+      return MapOperationResult.success(updated);
+    } catch (IOException exception) {
+      return MapOperationResult.failure(
+          MapOperationCode.STORAGE_ERROR, template, exception.getMessage());
+    } finally {
+      locks.release(template.id());
+    }
+  }
+
+  /** Marks known construction changes without persisting or changing the optimistic revision. */
+  public MapOperationResult markDirty(String rawId) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (!locks.acquire(template.id()))
+      return MapOperationResult.failure(MapOperationCode.OPERATION_IN_PROGRESS, template, rawId);
+    try {
+      MapTemplate dirty = template.markedDirty();
+      registry.put(dirty);
+      return MapOperationResult.success(dirty);
+    } finally {
+      locks.release(template.id());
+    }
+  }
+
+  /** Main-thread phase for a full archive; the lock remains held for the asynchronous phase. */
+  public MapOperationResult prepareBackup(String rawId) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (!locks.acquire(template.id()))
+      return MapOperationResult.failure(MapOperationCode.OPERATION_IN_PROGRESS, template, rawId);
+    try {
+      if (template.loaded() && worlds.isLoaded(template)) {
+        MapWorldResult saved = worlds.save(template);
+        if (!saved.successful()) {
+          locks.release(template.id());
+          return MapOperationResult.failure(
+              MapOperationCode.WORLD_SAVE_FAILED, template, saved.detail());
+        }
+        MapTemplate updated = template.savedAt(now());
+        repository.save(updated);
+        registry.put(updated);
+        template = updated;
+      }
+      return MapOperationResult.success(template);
+    } catch (IOException exception) {
+      locks.release(template.id());
+      return MapOperationResult.failure(
+          MapOperationCode.STORAGE_ERROR, template, exception.getMessage());
+    }
+  }
+
+  /** Asynchronous filesystem phase for a full archive. */
+  public MapOperationResult completeBackup(String rawId, String reason) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (!locks.active(template.id()))
+      return MapOperationResult.failure(MapOperationCode.INVALID_ARGUMENT, template, rawId);
+    try {
+      files.backup(template, reason == null ? "MANUAL" : reason, pluginVersion);
+      return MapOperationResult.success(template);
+    } catch (IOException exception) {
+      return MapOperationResult.failure(
+          MapOperationCode.BACKUP_FAILED, template, exception.getMessage());
+    } finally {
+      locks.release(template.id());
+    }
+  }
+
+  public boolean protectedTemplate(String rawId) {
+    return find(rawId).map(protectedTemplate::test).orElse(false);
+  }
+
+  /** User-oriented validation assembled behind the service boundary. */
+  public MapValidationResult validate(String rawId) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null)
+      return new MapValidationResult(
+          List.of(new MapValidationProblem(ProblemSeverity.ERROR, "not-found", "dashboard")));
+    List<MapValidationProblem> problems = new java.util.ArrayList<>();
+    if (!files.templateExists(template))
+      problems.add(new MapValidationProblem(ProblemSeverity.ERROR, "missing-folder", "none"));
+    if (!template.folderName().equals(template.id().value()))
+      problems.add(new MapValidationProblem(ProblemSeverity.ERROR, "invalid-folder", "none"));
+    if (!template.spawn().world().equals(template.worldName()))
+      problems.add(new MapValidationProblem(ProblemSeverity.ERROR, "invalid-spawn", "spawn"));
+    if (template.state() == MapState.ERROR)
+      problems.add(new MapValidationProblem(ProblemSeverity.ERROR, "technical-error", "none"));
+    if (!template.linkedArenaIds().isEmpty() && template.type() != MapType.BEDWARS)
+      problems.add(new MapValidationProblem(ProblemSeverity.ERROR, "incompatible-links", "type"));
+    if (template.type() == MapType.BEDWARS && template.linkedArenaIds().isEmpty())
+      problems.add(new MapValidationProblem(ProblemSeverity.WARNING, "unlinked", "associations"));
+    if (!template.spawn().configured())
+      problems.add(new MapValidationProblem(ProblemSeverity.WARNING, "spawn-missing", "spawn"));
+    if (template.loaded() != worlds.isLoaded(template))
+      problems.add(new MapValidationProblem(ProblemSeverity.WARNING, "runtime-state", "refresh"));
+    if (locks.active(template.id()))
+      problems.add(new MapValidationProblem(ProblemSeverity.INFO, "operation-active", "operation"));
+    if (protectedTemplate.test(template))
+      problems.add(new MapValidationProblem(ProblemSeverity.INFO, "protected", "none"));
+    return new MapValidationResult(problems);
+  }
+
   /** Reconciles derived links; arena definitions remain the source of truth. */
   public synchronized void synchronizeLinks(
       Collection<fr.heneria.bedwars.core.arena.ArenaDefinition> arenas) {
@@ -392,6 +536,9 @@ public final class MapTemplateService {
       repository.save(updated);
       registry.put(updated);
       return MapOperationResult.success(updated);
+    } catch (IllegalArgumentException exception) {
+      return MapOperationResult.failure(
+          MapOperationCode.INVALID_ARGUMENT, template, exception.getMessage());
     } catch (IOException exception) {
       return MapOperationResult.failure(
           MapOperationCode.STORAGE_ERROR, template, exception.getMessage());

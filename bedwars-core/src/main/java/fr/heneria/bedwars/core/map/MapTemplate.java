@@ -111,6 +111,7 @@ public record MapTemplate(
         type,
         value,
         spawn,
+        settings,
         updatedAt,
         lastLoadedAt,
         lastSavedAt,
@@ -126,6 +127,7 @@ public record MapTemplate(
         type,
         MapState.LOADED,
         spawn,
+        settings,
         now,
         Optional.of(now),
         lastSavedAt,
@@ -141,6 +143,7 @@ public record MapTemplate(
         type,
         MapState.UNLOADED,
         spawn,
+        settings,
         now,
         lastLoadedAt,
         lastSavedAt,
@@ -156,6 +159,7 @@ public record MapTemplate(
         type,
         MapState.LOADED,
         spawn,
+        settings,
         now,
         lastLoadedAt,
         Optional.of(now),
@@ -171,6 +175,7 @@ public record MapTemplate(
         type,
         state,
         spawn,
+        settings,
         now,
         lastLoadedAt,
         lastSavedAt,
@@ -186,6 +191,7 @@ public record MapTemplate(
         value,
         state,
         spawn,
+        settings,
         now,
         lastLoadedAt,
         lastSavedAt,
@@ -201,6 +207,7 @@ public record MapTemplate(
         type,
         state,
         value,
+        settings,
         now,
         lastLoadedAt,
         lastSavedAt,
@@ -217,6 +224,7 @@ public record MapTemplate(
         type,
         state,
         spawn,
+        settings,
         now,
         lastLoadedAt,
         lastSavedAt,
@@ -232,6 +240,7 @@ public record MapTemplate(
         type,
         MapState.ERROR,
         spawn,
+        settings,
         now,
         lastLoadedAt,
         lastSavedAt,
@@ -248,6 +257,7 @@ public record MapTemplate(
         type,
         value,
         spawn,
+        settings,
         updatedAt,
         lastLoadedAt,
         lastSavedAt,
@@ -262,6 +272,7 @@ public record MapTemplate(
       MapType nextType,
       MapState nextState,
       MapSpawn nextSpawn,
+      MapWorldSettings nextSettings,
       Instant nextUpdated,
       Optional<Instant> nextLoaded,
       Optional<Instant> nextSaved,
@@ -280,7 +291,7 @@ public record MapTemplate(
         environment,
         generatorType,
         nextSpawn,
-        settings,
+        nextSettings,
         createdAt,
         nextUpdated,
         nextLoaded,
@@ -291,6 +302,44 @@ public record MapTemplate(
         nextLinks,
         nextDirty,
         nextError);
+  }
+
+  public MapTemplate withSettings(MapWorldSettings value, Instant now) {
+    return copy(
+        revision + 1,
+        displayName,
+        type,
+        state,
+        spawn,
+        Objects.requireNonNull(value, "settings"),
+        now,
+        lastLoadedAt,
+        lastSavedAt,
+        linkedArenaIds,
+        true,
+        error);
+  }
+
+  public MapTemplate clearSpawn(double spawnY, Instant now) {
+    return withSpawn(MapSpawn.defaultSpawn(worldName, spawnY), now);
+  }
+
+  /** Runtime-only dirtiness does not create an administrative revision. */
+  public MapTemplate markedDirty() {
+    if (dirty) return this;
+    return copy(
+        revision,
+        displayName,
+        type,
+        state,
+        spawn,
+        settings,
+        updatedAt,
+        lastLoadedAt,
+        lastSavedAt,
+        linkedArenaIds,
+        true,
+        error);
   }
 
   private static String requireText(String value, String name) {

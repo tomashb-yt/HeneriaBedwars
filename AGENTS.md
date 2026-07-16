@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 007 livrent la fondation, les configurations, traductions, menus, items, arènes, éditeur et cartes modèles ; aucun gameplay n'est encore actif.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 008 livrent la fondation, les configurations, traductions, menus, items, arènes et l'éditeur guidé complet des cartes modèles ; aucun gameplay n'est encore actif.
 
 ## Lecture obligatoire
 
@@ -40,6 +40,8 @@ Le Ticket 007 sépare les métadonnées `maps/metadata/`, les marqueurs de propr
 Le Ticket 005 stocke une définition UTF-8 par fichier dans `arenas/`. Une suppression doit toujours passer par `ArenaRepository.deleteWithBackup`. Un fichier illisible au reload conserve sa définition active connue, tandis qu'une arène structurée mais invalide reste visible avec le statut `INVALID`.
 
 Au démarrage, l'ancien `config.yml` officiel du Ticket 001 sans `config-version` est reconnu par sa signature minimale, sauvegardé puis migré vers la version 1. Ne jamais élargir cette détection à n'importe quel YAML non versionné : un fichier vide, corrompu ou non reconnaissable doit rester intact et être refusé.
+
+Le Ticket 008 centralise l'administration des cartes dans le menu v4. Les commandes restent disponibles pour le diagnostic avancé. Toute sauvegarde complète, duplication ou suppression de dossier doit rester asynchrone, visible dans `MapOperationTracker` et protégée par `MapOperationLock`. Les associations d'arènes restent la source de vérité et les états d'éditeur sont nettoyés à la déconnexion et à l'arrêt.
 
 ## Règles architecturales
 

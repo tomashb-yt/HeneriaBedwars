@@ -15,6 +15,11 @@ public interface MapWorldService {
 
   MapWorldResult unload(MapTemplate template, boolean save);
 
+  /** Applies persisted construction settings to an already loaded managed world. */
+  default MapWorldResult applySettings(MapTemplate template) {
+    return MapWorldResult.success();
+  }
+
   boolean isLoaded(MapTemplate template);
 
   int playerCount(MapTemplate template);

@@ -179,6 +179,50 @@ class MapTemplateFrameworkTest {
     assertEquals("desert", fixture.service.find("desert").orElseThrow().displayName());
   }
 
+  @Test
+  void settingsTypeSpawnAndDirtyStateUseTransactionalServiceOperations() throws Exception {
+    Fixture fixture = new Fixture();
+    MapTemplate created =
+        fixture.service.create("desert", MapType.BEDWARS, "Admin").template().orElseThrow();
+    MapWorldSettings settings = created.settings().withPvp(true).withDifficulty("HARD");
+    MapTemplate configured =
+        fixture
+            .service
+            .setSettings("desert", settings, created.revision())
+            .template()
+            .orElseThrow();
+    assertTrue(configured.settings().pvp());
+    assertEquals("HARD", configured.settings().difficulty());
+
+    MapTemplate generic =
+        fixture
+            .service
+            .setType("desert", MapType.GENERIC, configured.revision())
+            .template()
+            .orElseThrow();
+    MapTemplate withoutSpawn =
+        fixture.service.clearSpawn("desert", generic.revision()).template().orElseThrow();
+    assertFalse(withoutSpawn.spawn().configured());
+    long revision = withoutSpawn.revision();
+    fixture.service.markDirty(withoutSpawn.id().value());
+    MapTemplate dirty = fixture.service.find("desert").orElseThrow();
+    assertTrue(dirty.dirty());
+    assertEquals(revision, dirty.revision());
+  }
+
+  @Test
+  void linkedBedWarsMapCannotChangeToAnIncompatibleType() throws Exception {
+    Fixture fixture = new Fixture();
+    MapTemplate created =
+        fixture.service.create("desert", MapType.BEDWARS, "Admin").template().orElseThrow();
+    MapTemplate linked = created.withLinks(java.util.Set.of("arena"), NOW.plusSeconds(3));
+    fixture.repository.save(linked);
+    fixture.registry.put(linked);
+    assertEquals(
+        MapOperationCode.MAP_LINKED,
+        fixture.service.setType("desert", MapType.GENERIC, linked.revision()).code());
+  }
+
   private static MapTemplate template(String id) {
     return MapTemplate.create(
         MapId.parse(id),

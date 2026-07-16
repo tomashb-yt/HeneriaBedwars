@@ -15,6 +15,8 @@ import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.core.map.MapTemplateValidator;
 import fr.heneria.bedwars.core.map.MapType;
 import fr.heneria.bedwars.core.map.MapWorldSettings;
+import fr.heneria.bedwars.core.map.editor.MapEditorStateStore;
+import fr.heneria.bedwars.core.map.operation.MapOperationTracker;
 import fr.heneria.bedwars.plugin.arena.ArenaEditorMenuFactory;
 import fr.heneria.bedwars.plugin.arena.ArenaLifecycleComponent;
 import fr.heneria.bedwars.plugin.arena.YamlArenaRepository;
@@ -29,9 +31,12 @@ import fr.heneria.bedwars.plugin.logging.BukkitProjectLogger;
 import fr.heneria.bedwars.plugin.map.BukkitMapWorldService;
 import fr.heneria.bedwars.plugin.map.MapLifecycleComponent;
 import fr.heneria.bedwars.plugin.map.MapMenuFactory;
+import fr.heneria.bedwars.plugin.map.MapMenuNavigation;
 import fr.heneria.bedwars.plugin.map.SecureMapFileService;
 import fr.heneria.bedwars.plugin.map.YamlMapTemplateRepository;
 import java.time.Clock;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -109,7 +114,13 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   worldSettings.animals(),
                   worldSettings.monsters(),
                   worldSettings.fixedTime(),
-                  worldSettings.clearWeather()),
+                  worldSettings.clearWeather(),
+                  false,
+                  false,
+                  worldSettings.difficulty(),
+                  worldSettings.pvp(),
+                  false,
+                  false),
               worldSettings.platformY(),
               worldSettings.saveBeforeUnload(),
               getDescription().getVersion(),
@@ -130,18 +141,48 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       itemService = new BukkitItemService(this, configurations, projectLogger);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       ArenaEditorStateStore editorStates = new ArenaEditorStateStore();
+      MapEditorStateStore mapEditorStates = new MapEditorStateStore();
+      MapOperationTracker mapOperations = new MapOperationTracker(clock);
       textInputService =
           new BukkitTextInputService(
-              this, new TextInputManager(clock), editorStates, projectLogger);
+              this,
+              new TextInputManager(clock),
+              playerId -> {
+                editorStates.remove(playerId);
+                mapEditorStates.remove(playerId);
+              },
+              () -> {
+                editorStates.clear();
+                mapEditorStates.clear();
+              },
+              projectLogger);
+      AtomicReference<ArenaEditorMenuFactory> arenaEditorReference = new AtomicReference<>();
+      MapMenuNavigation mapNavigation =
+          new MapMenuNavigation() {
+            @Override
+            public fr.heneria.bedwars.core.gui.Gui dashboard(UUID playerId) {
+              return arenaEditorReference.get().setup(playerId);
+            }
+
+            @Override
+            public fr.heneria.bedwars.core.gui.Gui arenaEditor(UUID playerId, String arenaId) {
+              return arenaEditorReference.get().editor(playerId, arenaId);
+            }
+          };
       mapMenus =
           new MapMenuFactory(
               this,
               mapService,
               mapWorldService,
+              arenaService,
               configurations,
               guiService,
               textInputService,
-              projectLogger);
+              mapEditorStates,
+              mapOperations,
+              mapNavigation,
+              projectLogger,
+              clock);
       arenaEditor =
           new ArenaEditorMenuFactory(
               this,
@@ -153,6 +194,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               projectLogger,
               mapService,
               mapMenus);
+      arenaEditorReference.set(arenaEditor);
       bootstrap =
           new BedWarsBootstrap(
               getDescription().getVersion(),
@@ -160,7 +202,13 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               arenaService,
               mapService,
               new MapLifecycleComponent(
-                  this, mapService, arenaService, worldSettings, projectLogger),
+                  this,
+                  mapService,
+                  arenaService,
+                  worldSettings,
+                  mapEditorStates,
+                  mapOperations,
+                  projectLogger),
               new ArenaLifecycleComponent(arenaService, projectLogger),
               textInputService,
               textInputService,

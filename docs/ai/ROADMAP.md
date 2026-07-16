@@ -7,6 +7,7 @@
 - [TERMINÉ] Ticket 005 — Modèle administratif, validation et stockage des arènes
 - [TERMINÉ] Ticket 006 — Éditeur complet des arènes via menus
 - [TERMINÉ] Ticket 007 — Gestionnaire autonome de mondes et cartes modèles
+- [TERMINÉ] Ticket 008 — Finalisation de l'éditeur graphique des cartes
 
 ## Grandes phases futures
 

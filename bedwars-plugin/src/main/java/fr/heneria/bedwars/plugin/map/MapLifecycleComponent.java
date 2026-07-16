@@ -7,7 +7,10 @@ import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.core.map.MapOperationResult;
 import fr.heneria.bedwars.core.map.MapTemplateLoadResult;
 import fr.heneria.bedwars.core.map.MapTemplateService;
+import fr.heneria.bedwars.core.map.editor.MapEditorStateStore;
+import fr.heneria.bedwars.core.map.operation.MapOperationTracker;
 import java.util.Objects;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -18,6 +21,9 @@ public final class MapLifecycleComponent implements LifecycleComponent {
   private final ArenaService arenas;
   private final WorldManagerSettings settings;
   private final ProjectLogger logger;
+  private final MapEditorStateStore editorStates;
+  private final MapOperationTracker operations;
+  private final MapDirtyListener dirtyListener;
   private BukkitTask autosaveTask;
 
   public MapLifecycleComponent(
@@ -25,12 +31,17 @@ public final class MapLifecycleComponent implements LifecycleComponent {
       MapTemplateService maps,
       ArenaService arenas,
       WorldManagerSettings settings,
+      MapEditorStateStore editorStates,
+      MapOperationTracker operations,
       ProjectLogger logger) {
     this.plugin = Objects.requireNonNull(plugin, "plugin");
     this.maps = Objects.requireNonNull(maps, "maps");
     this.arenas = Objects.requireNonNull(arenas, "arenas");
     this.settings = Objects.requireNonNull(settings, "settings");
+    this.editorStates = Objects.requireNonNull(editorStates, "editorStates");
+    this.operations = Objects.requireNonNull(operations, "operations");
     this.logger = Objects.requireNonNull(logger, "logger");
+    this.dirtyListener = new MapDirtyListener(maps);
   }
 
   @Override
@@ -40,6 +51,7 @@ public final class MapLifecycleComponent implements LifecycleComponent {
 
   @Override
   public void start() throws Exception {
+    plugin.getServer().getPluginManager().registerEvents(dirtyListener, plugin);
     MapTemplateLoadResult result = maps.reload();
     maps.synchronizeLinks(arenas.list());
     plugin.getServer().getScheduler().runTask(plugin, () -> maps.synchronizeLinks(arenas.list()));
@@ -69,6 +81,7 @@ public final class MapLifecycleComponent implements LifecycleComponent {
 
   @Override
   public void stop() {
+    HandlerList.unregisterAll(dirtyListener);
     if (autosaveTask != null) autosaveTask.cancel();
     for (var template : maps.list()) {
       if (!template.loaded()) continue;
@@ -76,6 +89,8 @@ public final class MapLifecycleComponent implements LifecycleComponent {
       if (!result.successful())
         logger.warning("Unable to unload managed map " + template.id() + ": " + result.detail());
     }
+    editorStates.clear();
+    operations.clear();
   }
 
   private void autosave() {

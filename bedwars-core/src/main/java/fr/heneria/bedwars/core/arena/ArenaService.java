@@ -101,6 +101,13 @@ public final class ArenaService {
                 mapTemplateId.trim(), managedWorldName.trim(), editStatus(arena), now()));
   }
 
+  public synchronized ArenaOperationResult clearMapTemplate(String rawId, long expectedRevision) {
+    return edit(
+        rawId,
+        Long.valueOf(expectedRevision),
+        arena -> arena.withoutTemplate(editStatus(arena), now()));
+  }
+
   public synchronized ArenaOperationResult setWorld(
       String rawId, String world, long expectedRevision) {
     return setWorld(rawId, world, Long.valueOf(expectedRevision));

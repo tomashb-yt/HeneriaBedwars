@@ -299,3 +299,142 @@ map:
     teleport: "<light_purple>Teleporter"
     set-spawn: "<gold>Definir le spawn"
     linked-arenas: "<gray>Arenes liees : {linked_arenas}"
+    list-title-v4: "<dark_green><bold>Cartes <gray>• <white>{visible_count}/{map_count}"
+    editor-title-v4: "<gold><bold>Carte <gray>• <white>{map_name}"
+    delete-v4: "<red>Supprimer définitivement {map_name} ?"
+    creation:
+      advanced-title: "<aqua><bold>Choisir le type de carte"
+      confirm-title: "<green>Créer la carte {map_id} ?"
+      input: "<yellow>Écrivez l'identifiant de la carte dans le chat. Tapez <white>annuler<yellow> pour abandonner."
+      ready: "<green>La carte <white>{map_name}<green> est prête. Construisez-la, placez son point d'arrivée puis sauvegardez-la."
+    type:
+      title: "<aqua>Type de {map_name}"
+    settings:
+      title: "<blue>Réglages de {map_name}"
+      time-input: "<yellow>Écrivez une heure comprise entre 0 et 24000."
+    associations:
+      title: "<yellow>Arènes liées à {map_name}"
+      create-input: "<yellow>Écrivez l'identifiant de la nouvelle arène."
+    validation:
+      title: "<gold>Vérification de {map_name}"
+    operation:
+      title: "<yellow>Opération sur {map_name}"
+    display-name-input: "<yellow>Écrivez le nouveau nom visible de {map_name}."
+    duplicate:
+      input: "<yellow>Écrivez l'identifiant de la copie de {map_name}."
+      confirm-title: "<gold>Dupliquer {map_name} vers {destination_id} ?"
+    deletion:
+      phrase: "<red>Écrivez exactement <white>{delete_phrase}<red> pour confirmer."
+    spawn:
+      clear-title: "<red>Retirer le point d'arrivée de {map_name} ?"
+    unload:
+      force-title: "<red>Forcer la fermeture de {map_name} ?"
+    missing:
+      title: "<red>Carte introuvable"
+  filter:
+    all: "Toutes"
+    bedwars: "BedWars"
+    lobby: "Lobbys"
+    generic: "Génériques"
+    loaded: "Ouvertes"
+    unloaded: "Fermées"
+    error: "En erreur"
+    unlinked: "Sans arène"
+  sort:
+    id: "Identifiant"
+    name: "Nom"
+    type: "Type"
+    state: "État"
+    updated: "Modification"
+    saved: "Sauvegarde"
+    ascending: "croissant"
+    descending: "décroissant"
+  dirty:
+    unsaved: "changements à sauvegarder"
+    saved: "sauvegardée"
+    possible: "première sauvegarde conseillée"
+  setting:
+    enabled: "activé"
+    disabled: "désactivé"
+    weather:
+      clear: "beau temps"
+      rain: "pluie"
+    difficulty:
+      peaceful: "Paisible"
+      easy: "Facile"
+      normal: "Normale"
+      hard: "Difficile"
+  workflow:
+    next:
+      spawn: "Définir le point d'arrivée"
+      save: "Sauvegarder la carte"
+      link-arena: "Associer ou créer une arène"
+      select-lobby: "Choisir cette carte comme lobby principal"
+      complete: "Configuration terminée"
+  operation:
+    type:
+      duplicate: "Duplication"
+      backup: "Sauvegarde complète"
+      delete: "Suppression"
+    status:
+      pending: "préparation"
+      running: "en cours"
+      success: "terminée"
+      failed: "échouée"
+      cancelled: "annulée"
+  validation:
+    problem:
+      not-found: "La carte n'existe plus."
+      missing-folder: "Le dossier modèle est introuvable."
+      invalid-folder: "Le dossier ne correspond pas à l'identifiant."
+      invalid-spawn: "Le point d'arrivée appartient à un autre monde."
+      technical-error: "La carte signale une erreur technique."
+      incompatible-links: "Une carte non-BedWars est liée à une arène."
+      unlinked: "Cette carte BedWars n'est liée à aucune arène."
+      spawn-missing: "Aucun point d'arrivée personnalisé n'est défini."
+      runtime-state: "L'état chargé ne correspond pas au serveur."
+      operation-active: "Une opération est actuellement en cours."
+      protected: "Cette carte est protégée par la configuration."
+    solution:
+      not-found: "Retournez au tableau de bord."
+      missing-folder: "Restaurez une sauvegarde ou recréez la carte."
+      invalid-folder: "Vérifiez les métadonnées et le dossier."
+      invalid-spawn: "Replacez le point dans cette carte."
+      technical-error: "Consultez les journaux puis rechargez la carte."
+      incompatible-links: "Repassez la carte en BedWars ou dissociez les arènes."
+      unlinked: "Ouvrez les associations pour choisir une arène."
+      spawn-missing: "Entrez dans la carte et placez le point."
+      runtime-state: "Actualisez ou rechargez les cartes."
+      operation-active: "Ouvrez le suivi de l'opération."
+      protected: "La suppression reste volontairement bloquée."
+  input:
+    already-active: "<red>Une saisie est déjà active."
+    invalid: "<red>Valeur invalide : <white>{problem}<red>. Réessayez ou tapez annuler."
+  feedback:
+    success: "<green>Modification enregistrée."
+    association-success: "<green>Association mise à jour."
+    entered: "<green>Vous êtes maintenant dans <white>{map_name}<green>."
+    teleported: "<green>Téléportation vers le point d'arrivée."
+  error:
+    not-found: "<red>Carte introuvable."
+    already-exists: "<red>Cet identifiant existe déjà."
+    invalid-argument: "<red>Valeur ou identifiant invalide."
+    already-loaded: "<yellow>Cette carte est déjà ouverte."
+    not-loaded: "<red>Ouvrez d'abord cette carte."
+    players-present: "<red>Des joueurs sont encore présents dans cette carte."
+    operation-running: "<red>Une opération est déjà en cours sur cette carte."
+    linked: "<red>Dissociez les arènes avant de supprimer cette carte."
+    protected: "<red>Cette carte est protégée et ne peut pas être supprimée."
+    world-creation: "<red>Impossible de créer le monde."
+    world-load: "<red>Impossible d'ouvrir le monde."
+    world-save: "<red>Impossible de sauvegarder le monde."
+    world-unload: "<red>Impossible de fermer le monde."
+    world-settings: "<red>Impossible d'appliquer les réglages du monde."
+    copy: "<red>La copie a échoué."
+    backup: "<red>La sauvegarde complète a échoué."
+    conflict: "<red>La carte a changé. Actualisez le menu."
+    invalid-type: "<red>Ce type de carte est incompatible avec ses associations."
+    storage: "<red>Impossible d'enregistrer les métadonnées."
+    association: "<red>Impossible de modifier l'association."
+    invalid-world: "<red>Placez-vous dans le monde <white>{world_name}<red>."
+    teleport: "<red>La téléportation a échoué."

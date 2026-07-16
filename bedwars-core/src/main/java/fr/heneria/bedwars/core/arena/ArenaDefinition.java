@@ -190,6 +190,27 @@ public record ArenaDefinition(
         metadata.touched(now));
   }
 
+  /** Removes the map relation and its derived managed world. */
+  public ArenaDefinition withoutTemplate(ArenaStatus newStatus, Instant now) {
+    return new ArenaDefinition(
+        configVersion,
+        revision + 1,
+        id,
+        displayName,
+        newStatus,
+        Optional.empty(),
+        Optional.empty(),
+        environment,
+        minimumPlayers,
+        maximumPlayers,
+        teamCount,
+        playersPerTeam,
+        waitingLocation,
+        spectatorLocation,
+        boundary,
+        metadata.touched(now));
+  }
+
   /** Changes only a derived status while loading; it does not create an administrative revision. */
   public ArenaDefinition normalizedStatus(ArenaStatus value) {
     return new ArenaDefinition(

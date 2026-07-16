@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 008 — Finalisation de l'éditeur graphique des cartes
+
+Terminé le 2026-07-16 côté code et validation automatisée. `MapMenuFactory` fournit une interface v4 cohérente avec le tableau de bord : bibliothèque paginée, filtres, tris et direction persistants par joueur; états vides explicites; création BedWars directe ou choix avancé `LOBBY`/`BEDWARS`/`GENERIC`; confirmation, création du monde et téléportation automatique.
+
+L'éditeur central affiche état, progression, sauvegarde, associations et prochaine action. Il gère nom visible, type sécurisé, point d'arrivée, heure, cycles, météo, difficulté, PVP, créatures, feu, dégâts environnementaux et autosauvegarde. Validation et solutions sont traduites. Les associations permettent de lier/délier une arène ou d'en créer une déjà liée. La suppression revient au tableau de bord et oublie les états obsolètes.
+
+`MapOperationTracker` rend sauvegarde complète, duplication et suppression visibles; `MapOperationLock` empêche les chevauchements. Les archives et copies restent hors du thread serveur. `MapDirtyListener` marque les cartes modifiées. Les états sont nettoyés à la déconnexion et à l'arrêt. Validation : 144 tests automatisés réussis, Spotless, build propre et Shadow JAR contrôlés. Aucun serveur Minecraft n'étant disponible, les interactions Paper restent à tester manuellement. Commit prévu : `feat(world): complete guided map template editor`.
+
 ## Ticket 007 — Gestionnaire autonome de mondes et cartes modèles
 
 Correctif d'expérience après test en jeu : le point d'entrée joueur est désormais le simple `/bedwars`, qui ouvre un tableau de bord compact. Les listes d'arènes/cartes et les diagnostics utilisent des apparences v2 fusionnées sans écraser les configurations existantes. La création d'arène enchaîne sur le choix de carte et peut créer/associer une carte `BEDWARS` depuis le même écran. Les codes techniques et textes anglais ne sont plus présentés dans la validation.

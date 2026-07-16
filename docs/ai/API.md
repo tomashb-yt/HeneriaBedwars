@@ -1,5 +1,7 @@
 # API publique
 
+Depuis le Ticket 008, `/bedwars map` ouvre l'éditeur graphique v4. Les sous-commandes historiques restent compatibles pour la console et les administrateurs avancés; aucune permission existante n'est supprimée. Menus et commandes utilisent les mêmes services métier.
+
 ## Commandes internes disponibles
 
 | Commande | Permission | Effet |

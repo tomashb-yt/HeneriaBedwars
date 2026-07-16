@@ -167,6 +167,8 @@ Une arène activable exige un monde chargé, une position d'attente, des capacit
 
 Les métadonnées sont enregistrées dans `maps/metadata/<id>.yml`. Le dossier `maps/templates/<id>/` contient un marqueur de propriété; le monde Bukkit actif se trouve sous le conteneur de mondes du serveur avec son nom préfixé. Les sauvegardes de suppression vont dans `backups/maps/<horodatage>/<id>/`. Voir `WORLD_SYSTEM.md`.
 
+Depuis le Ticket 008, chaque carte persiste aussi `daylight-cycle`, `weather-cycle`, `fire-tick` et `environmental-damage`. Les anciens fichiers sans ces clés reçoivent des valeurs sûres à la lecture. `menus.yml` contient les emplacements versionnés `map-editor` pour la liste, l'éditeur, les réglages, les associations et la validation. Les apparences correspondantes utilisent les clés `map.*-v4` de `items.yml`.
+
 ## Fichiers préparatoires
 
 `shops.yml`, `upgrades.yml` et `generators.yml` ont `config-version: 1` et `enabled: false`. Leurs définitions ne déclenchent ni achat, ni amélioration, ni génération. `arenas/` est désormais alimenté par les commandes du Ticket 005.

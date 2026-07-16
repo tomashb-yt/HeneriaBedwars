@@ -1,5 +1,9 @@
 # Architecture actuelle
 
+## Ticket 008 — éditeur graphique des cartes
+
+Le domaine pur contient préférences de vue, progression, validation, suivi d'opération et réglages persistants. `bedwars-plugin` adapte uniquement les événements Bukkit, mondes, inventaires et tâches asynchrones. Les menus délèguent aux services; le câblage différé `MapMenuNavigation` évite une dépendance circulaire entre tableau de bord, éditeur d'arènes et éditeur de cartes.
+
 ## Ticket 007 — cartes modèles autonomes
 
 `bedwars-core/map` contient les identifiants confinés, modèle immutable, états transitoires, registre copy-on-write, verrou par carte, validation et services. `bedwars-plugin/map` adapte les métadonnées YAML, les fichiers, le générateur vide, Bukkit, commandes, menus et cycle de vie. Aucun type Bukkit ne traverse la frontière du cœur.

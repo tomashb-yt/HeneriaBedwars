@@ -1,5 +1,13 @@
 # Limitations connues
 
+## Ticket 008
+
+- L'éditeur est validé automatiquement mais doit encore être essayé sur Paper pour les inventaires, saisies chat, téléportations et règles de monde.
+- Le suivi affiche état, durée et détail, pas un pourcentage d'octets copiés.
+- Les associations montrent les 21 premières arènes disponibles; une pagination sera nécessaire au-delà.
+- La détection de modifications couvre blocs, seaux, explosions et structures, pas toutes les mutations possibles d'autres plugins.
+- La sélection globale du lobby principal reste hors de ce menu; une carte déjà configurée comme lobby reste protégée.
+
 ## Ticket 007
 
 - Les cartes sont des modèles persistants administratifs; aucune instance temporaire, copie par partie, remise à zéro ou nettoyage de match n'est actif.

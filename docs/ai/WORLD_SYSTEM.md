@@ -1,5 +1,9 @@
 # Système de cartes modèles
 
+## Interface guidée Ticket 008
+
+Le menu v4 configure et applique heure, cycles, météo, difficulté, PVP, créatures, propagation du feu, dégâts environnementaux et autosauvegarde. Les changements sont d'abord persistés, puis appliqués au monde chargé; un échec restaure les anciennes métadonnées. Les archives complètes, duplications et suppressions sont préparées sur le thread serveur puis copiées hors thread avec verrou et suivi d'état.
+
 ## Périmètre
 
 Le Ticket 007 gère des cartes modèles administratives. Une carte peut être créée, chargée, éditée manuellement, sauvegardée, déchargée, dupliquée et associée à une arène. Elle n'est ni une instance de partie ni une copie jetable. Le dossier `instances/` et le préfixe `hbw_game_` sont réservés à un futur ticket.

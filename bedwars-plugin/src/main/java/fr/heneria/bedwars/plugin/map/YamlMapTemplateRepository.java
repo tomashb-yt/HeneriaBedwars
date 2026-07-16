@@ -117,7 +117,13 @@ public final class YamlMapTemplateRepository implements MapTemplateRepository {
             yaml.getBoolean("settings.allow-animals", false),
             yaml.getBoolean("settings.allow-monsters", false),
             yaml.getLong("settings.fixed-time", 6000),
-            yaml.getBoolean("settings.clear-weather", true)),
+            yaml.getBoolean("settings.clear-weather", true),
+            yaml.getBoolean("settings.daylight-cycle", false),
+            yaml.getBoolean("settings.weather-cycle", false),
+            yaml.getString("settings.difficulty", "PEACEFUL"),
+            yaml.getBoolean("settings.pvp", false),
+            yaml.getBoolean("settings.fire-tick", false),
+            yaml.getBoolean("settings.environmental-damage", false)),
         created,
         updated,
         optionalInstant(yaml.getString("timestamps.last-loaded-at")),
@@ -153,6 +159,12 @@ public final class YamlMapTemplateRepository implements MapTemplateRepository {
     yaml.set("settings.allow-monsters", template.settings().allowMonsters());
     yaml.set("settings.fixed-time", template.settings().fixedTime());
     yaml.set("settings.clear-weather", template.settings().clearWeather());
+    yaml.set("settings.daylight-cycle", template.settings().daylightCycle());
+    yaml.set("settings.weather-cycle", template.settings().weatherCycle());
+    yaml.set("settings.difficulty", template.settings().difficulty());
+    yaml.set("settings.pvp", template.settings().pvp());
+    yaml.set("settings.fire-tick", template.settings().fireTick());
+    yaml.set("settings.environmental-damage", template.settings().environmentalDamage());
     yaml.set("metadata.author", template.author());
     yaml.set("metadata.description", template.description());
     yaml.set("metadata.tags", template.tags().stream().sorted().toList());

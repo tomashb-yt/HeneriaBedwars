@@ -22,6 +22,7 @@ public record MenuSettings(
     boolean soundsEnabled,
     Map<String, SoundSettings> sounds,
     ArenaEditorSettings arenaEditor,
+    MapEditorSettings mapEditor,
     TextInputSettings textInput) {
   public MenuSettings {
     sounds = Map.copyOf(sounds);

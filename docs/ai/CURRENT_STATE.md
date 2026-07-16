@@ -1,10 +1,15 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 007.
+- Dernier ticket terminé : Ticket 008.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
 ## Disponible
+
+- éditeur graphique de cartes v4 : bibliothèque paginée avec filtres/tri par administrateur, création simple ou avancée, progression et prochaine action;
+- édition guidée du nom, type, point d'arrivée et règles du monde; sauvegarde, ouverture/fermeture, visite, duplication, archive complète et suppression sécurisée;
+- associations carte–arène, création d'une arène déjà liée, validation localisée et suivi visible des opérations longues;
+- détection des constructions à sauvegarder, nettoyage des sessions à la déconnexion et navigation déterministe;
 
 - tableau de bord administratif v2 ouvert directement par `/bedwars`, commandes avancées masquées de l'aide joueur et création guidée d'une carte `BEDWARS` associée à une nouvelle arène;
 - validation visuelle compacte, localisée et orientée action, sans exposer les codes internes; une carte modèle valide n'a pas besoin de rester chargée pour que l'arène soit administrativement valide;
@@ -44,4 +49,4 @@
 
 Aucune équipe BedWars détaillée ou couleur d'équipe, aucune instance temporaire de partie ou remise à zéro après match, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes sont des modèles administratifs persistants, pas des parties jouables.
 
-Les 138 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 144 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

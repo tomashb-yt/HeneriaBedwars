@@ -53,6 +53,44 @@ arena-editor:
     back-slot: 45
     refresh-slot: 49
     close-slot: 53
+map-editor:
+  list:
+    rows: 6
+    guide-slot: 4
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34]
+    previous-page-slot: 46
+    filter-slot: 47
+    create-slot: 49
+    refresh-slot: 50
+    sort-slot: 51
+    next-page-slot: 52
+    dashboard-slot: 45
+    close-slot: 53
+  editor:
+    rows: 6
+    summary-slot: 4
+    enter-slot: 10
+    save-slot: 12
+    spawn-slot: 14
+    world-state-slot: 16
+    display-name-slot: 19
+    type-slot: 20
+    settings-slot: 21
+    workflow-slot: 22
+    associations-slot: 23
+    validation-slot: 25
+    backup-slot: 29
+    duplicate-slot: 31
+    delete-slot: 33
+    list-slot: 45
+    refresh-slot: 49
+    close-slot: 53
+  settings:
+    rows: 5
+  associations:
+    rows: 6
+  validation:
+    rows: 6
 text-input:
   timeout-seconds: 60
   cancel-keywords: [annuler, cancel]

@@ -530,7 +530,7 @@ public final class ArenaEditorMenuFactory {
               .build());
     for (int index = 0; index < Math.min(slots.size(), templates.size()); index++) {
       var template = templates.get(index);
-      Map<String, Object> values = new LinkedHashMap<>(MapMenuFactory.placeholders(template));
+      Map<String, Object> values = new LinkedHashMap<>(mapMenus.menuPlaceholders(template));
       boolean selected = arena.template().filter(template.id().value()::equals).isPresent();
       values.put("selected", selected);
       values.put("selected_label", selected ? "✓ Déjà sélectionnée" : "Cliquez pour choisir");

@@ -330,7 +330,7 @@ items:
       assistant-choice-loaded: {material: LIME_CONCRETE, name: "<green><bold>{map_name}", lore: ["<gray>État: <green>{map_state_label}", "<gray>Arènes liées: <white>{arena_count}", "<gray>Sélection: <white>{selected_label}", "", "<yellow>▸ Cliquez pour associer"]}
       assistant-choice-unloaded: {material: GRAY_CONCRETE, name: "<gray><bold>{map_name}", lore: ["<gray>État: <white>{map_state_label}", "<gray>Arènes liées: <white>{arena_count}", "<gray>Sélection: <white>{selected_label}", "", "<yellow>▸ Cliquez pour associer", "<dark_gray>La carte peut rester fermée."]}
   map:
-    list:
+    legacy-list:
       create: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
       create-bedwars: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}
       guide-v3: {material: COMPASS, name: "<green><bold>Gérer les cartes BedWars", lore: ["<gray>Cartes disponibles: <white>{map_count}", "", "<yellow>▸ Gauche : ouvrir les outils", "<aqua>▸ Droit : charger et visiter", "<red>▸ Shift+droit : supprimer"]}
@@ -358,7 +358,7 @@ items:
       refresh: {inherit: "gui.refresh", name: "<aqua>Actualiser les cartes"}
       filter: {material: HOPPER, name: "<yellow>Filtrer les cartes"}
       sort: {material: COMPARATOR, name: "<yellow>Trier les cartes"}
-    editor:
+    legacy-editor:
       information: {material: BOOK, name: "<aqua>Informations", lore: ["<gray>ID: <white>{map_id}", "<gray>Nom: <white>{map_name}", "<gray>Type: <white>{map_type}", "<gray>Etat: <white>{map_state}", "<gray>Monde Bukkit: <white>{world_name}", "<gray>Dossier: <white>{folder_name}", "<gray>Chargee: <white>{loaded}", "<gray>Joueurs: <white>{player_count}", "<gray>Revision: <white>{revision}", "<gray>Auteur: <white>{author}"]}
       load: {material: LIME_DYE, name: "<green>Charger la carte"}
       teleport: {material: ENDER_PEARL, name: "<light_purple>Se teleporter"}
@@ -378,7 +378,111 @@ items:
       set-spawn-v3: {material: COMPASS, name: "<gold><bold>Définir le point d'arrivée", lore: ["<gray>Placez-vous où les administrateurs", "<gray>arriveront en visitant la carte.", "", "<yellow>▸ Cliquez pour utiliser votre position"]}
       associations-v3: {material: CHAIN, name: "<yellow><bold>Arènes associées", lore: ["<gray>Nombre d'arènes liées: <white>{arena_count}", "<gray>{linked_arenas}", "", "<dark_gray>Une carte liée ne peut pas être supprimée."]}
       delete-v3: {material: TNT, name: "<red><bold>Supprimer la carte", lore: ["<gray>Une sauvegarde complète est créée.", "<gray>La suppression est bloquée si une", "<gray>arène ou un joueur utilise la carte.", "", "<red>▸ Cliquez pour continuer"]}
-    type:
+    legacy-type:
       lobby: {material: NETHER_STAR, name: "<aqua>Lobby"}
       bedwars: {material: RED_BED, name: "<red>BedWars"}
       generic: {material: MAP, name: "<gray>Generique"}
+    list-v4: &map-list-v4 {material: MAP, name: "<white><bold>{map_name}", lore: ["<gray>Type : <white>{map_type_label}", "<gray>Etat : <white>{map_state_label}", "<gray>Sauvegarde : <white>{dirty_state}", "<gray>Progression : <white>{progress_percent}%", "", "<yellow>Gauche : gerer", "<aqua>Droit : ouvrir et visiter", "<red>Shift+droit : supprimer"]}
+    list:
+      guide-v4: {material: COMPASS, name: "<aqua><bold>Bibliotheque de cartes", lore: ["<gray>Affichees : <white>{visible_count}/{map_count}", "<gray>Filtre : <white>{filter}", "<gray>Tri : <white>{sort} ({sort_direction})", "", "<yellow>Choisissez une carte ou creez-en une."]}
+      empty-all-v4: {material: FILLED_MAP, name: "<gold><bold>Aucune carte", lore: ["<gray>L'assistant peut creer un monde vide", "<gray>et vous y teleporter automatiquement."]}
+      empty-filter-v4: {material: HOPPER, name: "<yellow><bold>Aucun resultat", lore: ["<gray>Aucune carte ne correspond au filtre.", "<yellow>Changez le filtre pour continuer."]}
+      entry-loaded-v4: {<<: *map-list-v4, material: LIME_CONCRETE, name: "<green><bold>{map_name}"}
+      entry-unloaded-v4: {<<: *map-list-v4, material: GRAY_CONCRETE, name: "<gray><bold>{map_name}"}
+      entry-error-v4: {<<: *map-list-v4, material: RED_CONCRETE, name: "<red><bold>{map_name}"}
+      create-v4: {material: EMERALD_BLOCK, name: "<green><bold>Creer une carte", lore: ["<yellow>Gauche : creation BedWars guidee", "<aqua>Droit : choisir le type"]}
+      filter-v4: {material: HOPPER, name: "<yellow>Filtre : <white>{filter}", lore: ["<yellow>Gauche/droit : parcourir", "<gray>Shift : reinitialiser"]}
+      sort-v4: {material: COMPARATOR, name: "<yellow>Tri : <white>{sort}", lore: ["<gray>Sens : <white>{sort_direction}", "<yellow>Gauche/droit : critere", "<aqua>Shift : inverser le sens"]}
+      refresh: {inherit: "gui.refresh", name: "<aqua>Actualiser les cartes"}
+      create: {inherit: "map.legacy-list.create"}
+      create-bedwars: {inherit: "map.legacy-list.create-bedwars"}
+      guide-v3: {inherit: "map.legacy-list.guide-v3"}
+      empty-v3: {inherit: "map.legacy-list.empty-v3"}
+      entry-loaded: {inherit: "map.legacy-list.entry-loaded"}
+      entry-unloaded: {inherit: "map.legacy-list.entry-unloaded"}
+      entry-error: {inherit: "map.legacy-list.entry-error"}
+      entry-loaded-v2: {inherit: "map.legacy-list.entry-loaded-v2"}
+      entry-unloaded-v2: {inherit: "map.legacy-list.entry-unloaded-v2"}
+      entry-error-v2: {inherit: "map.legacy-list.entry-error-v2"}
+      filter: {inherit: "map.legacy-list.filter"}
+      sort: {inherit: "map.legacy-list.sort"}
+    editor:
+      summary-v4: {material: NETHER_STAR, name: "<gold><bold>{map_name}", lore: ["<gray>ID : <white>{map_id}", "<gray>Type : <white>{map_type_label}", "<gray>Etat : <white>{map_state_label}", "<gray>Progression : <white>{progress_current}/{progress_total} ({progress_percent}%)", "<gray>Sauvegarde : <white>{dirty_state}", "<gray>Arenes : <white>{arena_count}"]}
+      operation-v4: {material: CLOCK, name: "<yellow><bold>Operation en cours", lore: ["<gray>{operation_type} - {operation_status}", "<gray>Duree : <white>{operation_duration}", "<yellow>Cliquez pour suivre"]}
+      enter-v4: {material: ENDER_PEARL, name: "<light_purple><bold>Entrer dans la carte", lore: ["<gray>La carte est ouverte.", "<yellow>Cliquez pour vous teleporter."]}
+      open-enter-v4: {material: LIME_CONCRETE, name: "<green><bold>Ouvrir et entrer", lore: ["<gray>Charge la carte puis vous y teleporte."]}
+      open-v4: {material: LIME_DYE, name: "<green>Ouvrir la carte", lore: ["<gray>Charge le monde de construction."]}
+      close-v4: {material: GRAY_DYE, name: "<yellow>Sauvegarder et fermer", lore: ["<gray>Refuse si des joueurs sont presents.", "<red>Shift+droit : fermeture forcee"]}
+      display-name-v4: {material: NAME_TAG, name: "<yellow>Nom visible", lore: ["<white>{map_name}", "<gray>ID stable : {map_id}", "<yellow>Cliquez pour modifier"]}
+      type-v4: {material: CARTOGRAPHY_TABLE, name: "<aqua>Type de carte", lore: ["<gray>Actuel : <white>{map_type_label}", "<yellow>Cliquez pour choisir"]}
+      settings-v4: {material: REPEATER, name: "<blue>Reglages du monde", lore: ["<gray>Heure, meteo, difficulte, PVP...", "<yellow>Cliquez pour configurer"]}
+      workflow-v4: {material: WRITABLE_BOOK, name: "<aqua><bold>Assistant", lore: ["<gray>Progression : <white>{progress_percent}%", "<yellow>Prochaine action :", "<white>{next_action}"]}
+      associations-v4: {material: CHAIN, name: "<yellow>Arenes associees", lore: ["<gray>Total : <white>{arena_count}", "<gray>{linked_arenas}", "<yellow>Cliquez pour gerer"]}
+      validation-v4: {material: SPYGLASS, name: "<gold>Verifier la carte", lore: ["<red>{validation_errors} erreur(s)", "<yellow>{validation_warnings} avertissement(s)", "<yellow>Cliquez pour les details"]}
+      backup-v4: {material: ENDER_CHEST, name: "<aqua>Sauvegarde complete", lore: ["<gray>Cree une archive sans bloquer le serveur."]}
+      duplicate-v4: {material: STRUCTURE_BLOCK, name: "<gold>Dupliquer", lore: ["<gray>Copie le dossier et les metadonnees."]}
+      delete-v4: {material: TNT, name: "<red><bold>Supprimer", lore: ["<gray>Sauvegarde obligatoire avant suppression.", "<red>Les cartes protegees restent bloquees."]}
+      save-v4: {material: CHEST, name: "<aqua>Sauvegarder", lore: ["<gray>Enregistre blocs et metadonnees."]}
+      spawn-v4: {material: COMPASS, name: "<gold>Point d'arrivee", lore: ["<gray>Etat : <white>{spawn_state}", "<yellow>Gauche : definir ici", "<aqua>Droit : teleporter", "<red>Shift+droit : retirer"]}
+      type-choice-v4: {material: CARTOGRAPHY_TABLE, name: "<aqua>{candidate_type}", lore: ["<gray>Selectionne : <white>{selected}", "<yellow>Cliquez pour appliquer"]}
+      force-close-v4: {material: BARRIER, name: "<red>Forcer la fermeture", lore: ["<gray>Joueurs presents : <white>{player_count}", "<red>Ils seront deplaces vers le monde de secours."]}
+      missing-v4: {material: BARRIER, name: "<red><bold>Carte introuvable", lore: ["<gray>Elle a ete supprimee ou rechargee.", "<yellow>Retournez au tableau de bord."]}
+      information: {inherit: "map.legacy-editor.information"}
+      load: {inherit: "map.legacy-editor.load"}
+      teleport: {inherit: "map.legacy-editor.teleport"}
+      save: {inherit: "map.legacy-editor.save"}
+      unload: {inherit: "map.legacy-editor.unload"}
+      duplicate: {inherit: "map.legacy-editor.duplicate"}
+      set-spawn: {inherit: "map.legacy-editor.set-spawn"}
+      associations: {inherit: "map.legacy-editor.associations"}
+      delete: {inherit: "map.legacy-editor.delete"}
+      information-v3: {inherit: "map.legacy-editor.information-v3"}
+      workflow-v3: {inherit: "map.legacy-editor.workflow-v3"}
+      load-v3: {inherit: "map.legacy-editor.load-v3"}
+      teleport-v3: {inherit: "map.legacy-editor.teleport-v3"}
+      save-v3: {inherit: "map.legacy-editor.save-v3"}
+      unload-v3: {inherit: "map.legacy-editor.unload-v3"}
+      duplicate-v3: {inherit: "map.legacy-editor.duplicate-v3"}
+      set-spawn-v3: {inherit: "map.legacy-editor.set-spawn-v3"}
+      associations-v3: {inherit: "map.legacy-editor.associations-v3"}
+      delete-v3: {inherit: "map.legacy-editor.delete-v3"}
+    type:
+      lobby: {inherit: "map.legacy-type.lobby"}
+      bedwars: {inherit: "map.legacy-type.bedwars"}
+      generic: {inherit: "map.legacy-type.generic"}
+    creation:
+      type-bedwars-v4: {material: RED_BED, name: "<red><bold>Carte BedWars", lore: ["<gray>Pour une arene de jeu."]}
+      type-lobby-v4: {material: NETHER_STAR, name: "<aqua><bold>Lobby", lore: ["<gray>Carte protegee d'accueil."]}
+      type-generic-v4: {material: FILLED_MAP, name: "<gray><bold>Carte generique", lore: ["<gray>Modele libre sans arene."]}
+      summary-v4: {material: BOOK, name: "<green><bold>Nouvelle carte", lore: ["<gray>ID : <white>{map_id}", "<gray>Type : <white>{map_type_label}", "<gray>Monde : <white>{world_name}"]}
+    settings:
+      summary-v4: {material: REPEATER, name: "<blue><bold>Reglages du monde", lore: ["<gray>Les changements sont appliques", "<gray>immediatement si le monde est ouvert."]}
+      time-v4: {material: CLOCK, name: "<yellow>Heure fixe : <white>{fixed_time}", lore: ["<yellow>Gauche/droit : +/- 1000", "<aqua>Shift : +/- 6000", "<white>Molette : saisir"]}
+      day-cycle-v4: {material: SUNFLOWER, name: "<yellow>Cycle du jour : <white>{day_cycle}"}
+      weather-v4: {material: WATER_BUCKET, name: "<aqua>Meteo : <white>{weather}"}
+      weather-cycle-v4: {material: LIGHTNING_ROD, name: "<aqua>Cycle meteo : <white>{weather_cycle}"}
+      difficulty-v4: {material: IRON_SWORD, name: "<red>Difficulte : <white>{difficulty}", lore: ["<yellow>Gauche/droit : changer"]}
+      pvp-v4: {material: DIAMOND_SWORD, name: "<red>PVP : <white>{pvp}"}
+      creatures-v4: {material: COW_SPAWN_EGG, name: "<green>Creatures : <white>{creatures}"}
+      fire-v4: {material: FLINT_AND_STEEL, name: "<gold>Propagation du feu : <white>{fire_tick}"}
+      environment-v4: {material: MAGMA_BLOCK, name: "<red>Degats environnementaux : <white>{environmental_damage}"}
+      autosave-v4: {material: CHEST_MINECART, name: "<aqua>Sauvegarde automatique : <white>{auto_save}"}
+    association:
+      summary-v4: {material: CHAIN, name: "<yellow><bold>Associations", lore: ["<gray>Carte : <white>{map_name}", "<gray>Arenes liees : <white>{arena_count}"]}
+      wrong-type-v4: {material: BARRIER, name: "<red>Type incompatible", lore: ["<gray>Seules les cartes BedWars peuvent", "<gray>etre associees a une arene."]}
+      empty-v4: {material: MINECART, name: "<gold>Aucune arene disponible", lore: ["<gray>Creez une arene avec le bouton vert."]}
+      linked-v4: {material: LIME_CONCRETE, name: "<green>{arena_name}", lore: ["<gray>Associee a cette carte.", "<red>Shift+droit : dissocier", "<yellow>Gauche : ouvrir l'arene"]}
+      available-v4: {material: GRAY_CONCRETE, name: "<white>{arena_name}", lore: ["<gray>Aucune carte associee.", "<yellow>Cliquez pour associer"]}
+      create-arena-v4: {material: EMERALD_BLOCK, name: "<green>Creer une arene liee", lore: ["<gray>L'association sera automatique."]}
+    validation:
+      success-v4: {material: LIME_CONCRETE, name: "<green><bold>Carte prete", lore: ["<gray>Aucun probleme detecte."]}
+      summary-v4: {material: ORANGE_CONCRETE, name: "<gold><bold>Verification", lore: ["<red>{validation_errors} erreur(s)", "<yellow>{validation_warnings} avertissement(s)"]}
+      info-v4: {material: LIGHT_BLUE_CONCRETE, name: "<aqua>Information", lore: ["<white>{problem}", "", "<gray>Conseil : <aqua>{solution}"]}
+      warning-v4: {material: YELLOW_CONCRETE, name: "<yellow>Avertissement", lore: ["<white>{problem}", "", "<gray>Solution : <aqua>{solution}"]}
+      error-v4: {material: RED_CONCRETE, name: "<red>Action requise", lore: ["<white>{problem}", "", "<gray>Solution : <aqua>{solution}", "<yellow>Cliquez pour corriger"]}
+    operation:
+      running-v4: {material: CLOCK, name: "<yellow><bold>{operation_type}", lore: ["<gray>Etat : <white>{operation_status}", "<gray>Duree : <white>{operation_duration}", "<gray>{operation_detail}"]}
+      success-v4: {material: LIME_CONCRETE, name: "<green><bold>Operation terminee", lore: ["<gray>{operation_detail}"]}
+      failed-v4: {material: RED_CONCRETE, name: "<red><bold>Operation echouee", lore: ["<gray>{operation_detail}"]}
+    duplicate:
+      summary-v4: {material: STRUCTURE_BLOCK, name: "<gold><bold>Confirmer la copie", lore: ["<gray>Source : <white>{map_id}", "<gray>Destination : <white>{destination_id}"]}
