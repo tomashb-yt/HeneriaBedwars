@@ -22,8 +22,12 @@
 | `/bedwars arena setworld|setwaiting|setspectator|setplayers|setteams|validate ...` | `heneriabedwars.admin.arena.edit` | modifie ou valide une définition |
 | `/bedwars arena enable|disable <id>` | `heneriabedwars.admin.arena.enable` / `.disable` | change le statut administratif |
 | `/bedwars arena delete <id>` | `heneriabedwars.admin.arena.delete` | ouvre la confirmation de sauvegarde/suppression |
+| `/bedwars setup` | `heneriabedwars.admin.setup` | ouvre le menu principal d'administration, joueur uniquement |
+| `/bedwars arena` | `heneriabedwars.admin.arena.menu` | ouvre directement la liste/éditeur, joueur uniquement |
 
 `heneriabedwars.admin` est accordée aux opérateurs et possède les permissions spécialisées comme enfants. La complétion ne propose que les sous-commandes autorisées.
+
+`heneriabedwars.admin.arena.teleport` protège toutes les téléportations depuis l'éditeur. Les permissions existantes `arena.create`, `arena.edit`, `arena.enable`, `arena.disable`, `arena.delete`, `arena.list`, `arena.info` et `arena.menu` continuent de protéger chaque action au clic et en commande.
 
 Le système de configuration reste interne. Ses points principaux sont `ConfigurationService`, `ConfigurationSnapshot`, `LanguageService`, `TranslationKey` et `PlaceholderContext`. L'API publique Ticket 001 (`HeneriaBedWarsApi`) est inchangée.
 

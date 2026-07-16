@@ -9,6 +9,7 @@ import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
 import fr.heneria.bedwars.plugin.arena.ArenaCommandHandler;
+import fr.heneria.bedwars.plugin.arena.ArenaEditorMenuFactory;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.DemoMenuFactory;
@@ -50,6 +51,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   private final ItemPreviewMenuFactory itemPreview;
   private final ArenaService arenaService;
   private final ArenaCommandHandler arenaCommands;
+  private final ArenaEditorMenuFactory arenaEditor;
 
   public BedWarsCommand(
       JavaPlugin plugin,
@@ -57,19 +59,22 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       ConfigurationService configurations,
       ArenaService arenaService,
       ItemService itemService,
-      GuiService guiService) {
+      GuiService guiService,
+      ArenaEditorMenuFactory arenaEditor) {
     this.plugin = plugin;
     this.bootstrap = bootstrap;
     this.configurations = configurations;
     this.arenaService = arenaService;
     this.guiService = guiService;
     this.itemService = itemService;
+    this.arenaEditor = arenaEditor;
     this.demoMenus =
         new DemoMenuFactory(configurations, guiService, plugin.getDescription().getVersion());
     this.itemPreview =
         new ItemPreviewMenuFactory(
             configurations, itemService, plugin.getDescription().getVersion());
-    this.arenaCommands = new ArenaCommandHandler(arenaService, configurations, guiService);
+    this.arenaCommands =
+        new ArenaCommandHandler(arenaService, configurations, guiService, arenaEditor);
   }
 
   @Override
@@ -88,6 +93,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "gui" -> gui(sender);
         case "item" -> item(sender, args);
         case "arena" -> arenaCommands.execute(sender, args);
+        case "setup" -> setup(sender);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
     } catch (RuntimeException exception) {
@@ -108,6 +114,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (sender.hasPermission(ITEM)) send(sender, TranslationKey.HELP_ITEM);
     if (sender.hasPermission(AdministrativeCommandPolicy.ARENA))
       send(sender, TranslationKey.HELP_ARENA);
+    if (sender.hasPermission(AdministrativeCommandPolicy.SETUP))
+      send(sender, TranslationKey.HELP_SETUP);
     return true;
   }
 
@@ -209,6 +217,13 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (!allowed(sender, GUI)) return true;
     if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
     guiService.open(player, demoMenus.main());
+    return true;
+  }
+
+  private boolean setup(CommandSender sender) {
+    if (!allowed(sender, AdministrativeCommandPolicy.SETUP)) return true;
+    if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
+    guiService.open(player, arenaEditor.setup(player.getUniqueId()));
     return true;
   }
 

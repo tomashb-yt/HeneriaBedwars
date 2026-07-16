@@ -157,6 +157,97 @@ class ArenaFrameworkTest {
     assertEquals(2, result.failures().size());
   }
 
+  @Test
+  void revisionsStartAtOneAndIncreaseAfterEverySuccessfulSave() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    assertEquals(1, created.revision());
+    ArenaDefinition changed =
+        service.setWorld("alpha", "world", created.revision()).arena().orElseThrow();
+    assertEquals(2, changed.revision());
+  }
+
+  @Test
+  void staleRevisionIsRejectedWithoutSaving() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    service.setWorld("alpha", "world", created.revision());
+    int saves = repository.saved.size();
+    ArenaOperationResult conflict = service.setDisplayName("alpha", "Stale", created.revision());
+    assertEquals(ArenaOperationCode.CONFLICT, conflict.code());
+    assertEquals(saves, repository.saved.size());
+    assertEquals("alpha", service.find("alpha").orElseThrow().displayName());
+  }
+
+  @Test
+  void currentRevisionAllowsDisplayNameChange() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    ArenaOperationResult result =
+        service.setDisplayName("alpha", "<green>Alpha", created.revision());
+    assertTrue(result.successful());
+    assertEquals("<green>Alpha", result.arena().orElseThrow().displayName());
+  }
+
+  @Test
+  void failedSaveDoesNotPublishOrIncrementRevision() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    repository.failSave = true;
+    assertEquals(
+        ArenaOperationCode.STORAGE_FAILED,
+        service.setDisplayName("alpha", "New", created.revision()).code());
+    assertEquals(created.revision(), service.find("alpha").orElseThrow().revision());
+  }
+
+  @Test
+  void positionsCanBeClearedOptimistically() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    ArenaLocation location = new ArenaLocation("world", new ArenaVector(1, 64, 1), 0, 0);
+    ArenaDefinition set =
+        service.setWaiting("alpha", location, created.revision()).arena().orElseThrow();
+    ArenaDefinition cleared = service.clearWaiting("alpha", set.revision()).arena().orElseThrow();
+    assertTrue(cleared.waitingLocation().isEmpty());
+  }
+
+  @Test
+  void boundarySupportsPartialAutosavedEditingAndReset() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    ArenaDefinition minimum =
+        service
+            .setBoundaryMinimum("alpha", new ArenaVector(0, 0, 0), created.revision())
+            .arena()
+            .orElseThrow();
+    assertTrue(minimum.boundary().orElseThrow().minimum().isPresent());
+    ArenaDefinition maximum =
+        service
+            .setBoundaryMaximum("alpha", new ArenaVector(10, 10, 10), minimum.revision())
+            .arena()
+            .orElseThrow();
+    assertTrue(maximum.boundary().orElseThrow().ordered());
+    ArenaDefinition cleared =
+        service.clearBoundary("alpha", maximum.revision()).arena().orElseThrow();
+    assertTrue(cleared.boundary().isEmpty());
+  }
+
+  @Test
+  void deleteRejectsAnObsoleteEditorRevision() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    service.setWorld("alpha", "world", created.revision());
+    assertEquals(ArenaOperationCode.CONFLICT, service.delete("alpha", created.revision()).code());
+    assertTrue(service.find("alpha").isPresent());
+  }
+
   private static ArenaService service(FakeRepository repository) {
     return new ArenaService(
         repository, new ArenaRegistry(), new ArenaValidator(world -> world.equals("world")), CLOCK);

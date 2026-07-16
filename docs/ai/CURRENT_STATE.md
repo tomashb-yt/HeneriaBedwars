@@ -1,6 +1,6 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 005.
+- Dernier ticket terminé : Ticket 006.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
@@ -25,9 +25,13 @@
 - définitions d'arènes immutables, registre atomique, validation monde/positions/capacités et statuts administratifs distincts du cycle des parties;
 - stockage `arenas/<id>.yml`, écriture atomique, reload tolérant fichier par fichier et sauvegarde datée obligatoire avant suppression;
 - commandes `/bedwars arena create|list|info|menu|setworld|setwaiting|setspectator|setplayers|setteams|validate|enable|disable|delete`, permissions, complétion et menus administratifs.
+- menu principal `/bedwars setup` et liste `/bedwars arena` avec pagination, filtres, tri, actualisation et création par saisie chat privée;
+- éditeur général des arènes : nom coloré, monde, lobby d'attente, spectateur, capacité, équipes générales, limites, validation visuelle, activation et suppression;
+- sauvegarde automatique après chaque modification, révision optimiste et refus des vues obsolètes;
+- téléportations administratives protégées par permission et persistance des modifications après redémarrage.
 
 ## Non disponible
 
-Aucun éditeur complet d'arène, clonage/reset de monde, instance de partie, équipe runtime, lit, générateur actif, boutique, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les définitions du Ticket 005 sont administratives uniquement.
+Aucune équipe BedWars détaillée ou couleur d'équipe, aucun clonage/reset de monde, template temporaire, instance de partie, lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les définitions éditées restent administratives uniquement et la saisie textuelle est limitée au chat.
 
-Les 88 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 113 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

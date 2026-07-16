@@ -8,7 +8,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version|reload|config|language|gui|item|arena]
+    usage: /bedwars [version|reload|config|language|gui|item|arena|setup]
     aliases:
       - hbw
 permissions:
@@ -22,6 +22,7 @@ permissions:
       heneriabedwars.admin.gui: true
       heneriabedwars.admin.item: true
       heneriabedwars.admin.arena: true
+      heneriabedwars.admin.setup: true
   heneriabedwars.admin.reload:
     description: Permet de recharger les configurations.
     default: op
@@ -58,6 +59,7 @@ permissions:
       heneriabedwars.admin.arena.disable: true
       heneriabedwars.admin.arena.delete: true
       heneriabedwars.admin.arena.menu: true
+      heneriabedwars.admin.arena.teleport: true
   heneriabedwars.admin.arena.create: {description: Creer une arene, default: op}
   heneriabedwars.admin.arena.list: {description: Lister les arenes, default: op}
   heneriabedwars.admin.arena.info: {description: Inspecter une arene, default: op}
@@ -66,3 +68,5 @@ permissions:
   heneriabedwars.admin.arena.disable: {description: Desactiver une arene, default: op}
   heneriabedwars.admin.arena.delete: {description: Supprimer une arene avec confirmation, default: op}
   heneriabedwars.admin.arena.menu: {description: Ouvrir le menu des arenes, default: op}
+  heneriabedwars.admin.arena.teleport: {description: Teleporter un administrateur depuis l'editeur, default: op}
+  heneriabedwars.admin.setup: {description: Ouvrir la configuration generale en jeu, default: op}

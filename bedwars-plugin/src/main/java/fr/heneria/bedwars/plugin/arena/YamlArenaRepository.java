@@ -113,6 +113,7 @@ public final class YamlArenaRepository implements ArenaRepository {
           .forEach(key -> attributes.put(key, String.valueOf(attributeSection.get(key))));
     return new ArenaDefinition(
         yaml.getInt("config-version", 0),
+        Math.max(1, yaml.getLong("revision", 1)),
         id,
         yaml.getString("display-name", id.value()),
         status(yaml.getString("status")),
@@ -132,6 +133,7 @@ public final class YamlArenaRepository implements ArenaRepository {
   private static String serialize(ArenaDefinition arena) {
     YamlConfiguration yaml = new YamlConfiguration();
     yaml.set("config-version", arena.configVersion());
+    yaml.set("revision", arena.revision());
     yaml.set("id", arena.id().value());
     yaml.set("display-name", arena.displayName());
     yaml.set("status", arena.status().name());
@@ -151,8 +153,9 @@ public final class YamlArenaRepository implements ArenaRepository {
         .boundary()
         .ifPresent(
             boundary -> {
-              setVector(yaml, "boundary.minimum", boundary.minimum());
-              setVector(yaml, "boundary.maximum", boundary.maximum());
+              yaml.set("boundary.enabled", boundary.enabled());
+              boundary.minimum().ifPresent(value -> setVector(yaml, "boundary.minimum", value));
+              boundary.maximum().ifPresent(value -> setVector(yaml, "boundary.maximum", value));
             });
     yaml.set("metadata.created-at", arena.metadata().createdAt().toString());
     yaml.set("metadata.updated-at", arena.metadata().updatedAt().toString());
@@ -190,9 +193,11 @@ public final class YamlArenaRepository implements ArenaRepository {
     if (section == null) return Optional.empty();
     ConfigurationSection minimum = section.getConfigurationSection("minimum");
     ConfigurationSection maximum = section.getConfigurationSection("maximum");
-    if (minimum == null || maximum == null)
-      throw new IllegalArgumentException("Incomplete boundary");
-    return Optional.of(new ArenaBoundary(vector(minimum), vector(maximum)));
+    return Optional.of(
+        new ArenaBoundary(
+            section.getBoolean("enabled", true),
+            minimum == null ? Optional.empty() : Optional.of(vector(minimum)),
+            maximum == null ? Optional.empty() : Optional.of(vector(maximum))));
   }
 
   private static ArenaVector vector(ConfigurationSection section) {

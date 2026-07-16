@@ -28,3 +28,31 @@ sounds:
   error: {sound: ENTITY_VILLAGER_NO, volume: 1.0, pitch: 1.0}
   back: {sound: UI_BUTTON_CLICK, volume: 0.5, pitch: 0.8}
   close: {sound: UI_BUTTON_CLICK, volume: 0.4, pitch: 0.8}
+arena-editor:
+  list:
+    rows: 6
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34]
+    create-slot: 49
+    filter-slot: 47
+    sort-slot: 51
+    previous-page-slot: 45
+    next-page-slot: 53
+  editor:
+    rows: 6
+    information-slot: 4
+    display-name-slot: 10
+    world-slot: 12
+    waiting-slot: 14
+    spectator-slot: 16
+    players-slot: 20
+    teams-slot: 22
+    boundary-slot: 24
+    validation-slot: 31
+    enable-slot: 39
+    delete-slot: 41
+    back-slot: 45
+    refresh-slot: 49
+    close-slot: 53
+text-input:
+  timeout-seconds: 60
+  cancel-keywords: [annuler, cancel]

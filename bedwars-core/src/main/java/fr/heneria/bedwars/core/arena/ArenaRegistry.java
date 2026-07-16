@@ -1,6 +1,7 @@
 package fr.heneria.bedwars.core.arena;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public final class ArenaRegistry {
               if (next.put(arena.id(), arena) != null)
                 throw new IllegalArgumentException("Duplicate arena " + arena.id());
             });
-    active.set(Map.copyOf(next));
+    active.set(Collections.unmodifiableMap(new LinkedHashMap<>(next)));
   }
 
   public Map<ArenaId, ArenaDefinition> snapshot() {

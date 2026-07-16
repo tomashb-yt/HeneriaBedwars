@@ -105,6 +105,10 @@ Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQ
 | `sounds.<id>.sound` | chaîne | son Bukkit valide; open/click/success/error/back/close |
 | `sounds.<id>.volume` | nombre | positif ou nul |
 | `sounds.<id>.pitch` | nombre | de 0 à 2 |
+| `arena-editor.list.*` | tailles, slots et liste de slots | mise en page de la liste, valeurs bornées à l'inventaire |
+| `arena-editor.editor.*` | taille et slots | mise en page de l'éditeur, valeurs bornées à l'inventaire |
+| `text-input.timeout-seconds` | entier | durée positive avant annulation de la saisie |
+| `text-input.cancel-keywords` | liste de chaînes | mots d'annulation normalisés, non vides |
 | `items.yml: config-version` | entier | `1` |
 | `fallback-item` | section item | fallback sûr obligatoire; `BARRIER` par défaut |
 | `items.<clé>` | section item | clé normalisée `[a-z0-9][a-z0-9._-]*` |
@@ -136,7 +140,7 @@ L'évolution depuis le Ticket 003 sauvegarde puis complète uniquement les clés
 
 ## Définitions `arenas/<id>.yml`
 
-Chaque arène possède un fichier UTF-8 version 1. L'id doit correspondre au nom du fichier et à `[a-z0-9_-]{2,32}`. Les champs persistés couvrent `display-name`, `status`, `enabled`, `world`, `template`, `environment`, `players.minimum/maximum`, `teams.count/players-per-team`, `locations.waiting/spectator`, `boundary` optionnelle et métadonnées de création/modification.
+Chaque arène possède un fichier UTF-8 version 1. L'id doit correspondre au nom du fichier et à `[a-z0-9_-]{2,32}`. Les champs persistés couvrent `revision`, `display-name`, `status`, `enabled`, `world`, `template`, `environment`, `players.minimum/maximum`, `teams.count/players-per-team`, `locations.waiting/spectator`, `boundary.enabled` et ses points optionnels, ainsi que les métadonnées de création/modification. Une ancienne définition sans `revision` est lue en révision 1.
 
 Une arène activable exige un monde chargé, une position d'attente, des capacités positives et cohérentes (`maximum = teams × players-per-team`) et des positions dans le monde configuré. La position spectateur absente produit un avertissement. `/bedwars reload` recharge les fichiers indépendamment : un YAML illisible conserve son ancienne définition active connue, tandis qu'une définition lisible mais invalide reste inspectable. La suppression crée d'abord `backups/arenas/yyyy-MM-dd/<id>.yml`.
 

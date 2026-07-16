@@ -1,5 +1,21 @@
 # Historique des tickets
 
+## Ticket 006 — Éditeur complet des arènes via menus
+
+Terminé le 2026-07-16 côté code et validation automatisée. L'objectif est de rendre toute la configuration administrative générale d'une arène accessible depuis `/bedwars setup`, `/bedwars arena` et `/bedwars arena menu`, sans créer de gameplay. `ArenaEditorMenuFactory` fournit accueil, diagnostic de configuration, liste paginée, filtres, tri, création, éditeur, mondes, joueurs, équipes générales, limites, validation visuelle et confirmations.
+
+`TextInputService`, `TextInputManager` et `BukkitTextInputService` gèrent une saisie chat privée et bornée par joueur avec validation, mots d'annulation, timeout, déconnexion et arrêt. Le message intercepté est annulé avant traitement sur le thread serveur. `ArenaEditorStateStore` conserve filtre, tri, page et révisions observées. INFO, WARNING, ERROR et CRITICAL ont des items distincts et chaque diagnostic route vers la section concernée.
+
+`ArenaDefinition` persiste une révision initiale 1. Chaque mutation réussie sauvegarde automatiquement, incrémente la révision et publie ensuite le registre; une sauvegarde échouée ne modifie rien. Menus et commandes utilisent le même `ArenaService`; une vue obsolète reçoit `CONFLICT`. Les anciennes arènes sans révision restent compatibles à la révision 1 et les limites peuvent être préparées point par point avant activation.
+
+Configuration : `menus.yml` ajoute les tailles/slots `arena-editor` et les paramètres `text-input`; `items.yml` ajoute les apparences `admin.*`, `arena.*`, `world.*`, `players.*`, `teams.*`, `boundary.*` et `validation.*`; les catalogues FR/EN restent strictement symétriques. Commandes : ajout de `/bedwars setup`, et `/bedwars arena` ouvre désormais la liste pour un joueur. Permissions ajoutées : `heneriabedwars.admin.setup` et `heneriabedwars.admin.arena.teleport`; les permissions d'arène existantes sont revérifiées au clic.
+
+Décisions : saisie par session de chat, autosauvegarde, conflit optimiste par révision, service unique pour commandes/menus, aucune lecture YAML depuis les menus et téléportation dédiée. Les opérations administratives importantes sont journalisées; l'audit persistant reste futur.
+
+Validation : 113 tests automatisés réussis, 0 échec et 0 ignoré. Ils couvrent saisie, révisions, mutations, état d'éditeur, mapping visuel, routage, validation des slots et compatibilité YAML. Aucun serveur Minecraft ni MockBukkit n'a été utilisé : ouverture réelle, inventaires, chat Bukkit, permissions, téléportations, conflit à deux comptes et persistance après redémarrage restent à tester manuellement.
+
+Limitations : aucune partie jouable, copie/reset de monde, équipe BedWars détaillée, couleur d'équipe, lit, générateur, boutique, PNJ ou instance temporaire. La saisie textuelle reste limitée au chat. Prochaine étape : Ticket 007, mondes templates et instances temporaires. Commit prévu : `feat(arena): add complete in-game arena editor`.
+
 ## Ticket 005 — Modèle administratif et stockage des arènes
 
 Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/arena` ajoute identifiants sûrs, positions/limites pures, définition et métadonnées immutables, six statuts administratifs, diagnostics, validation, registre copy-on-write, port de persistance et service transactionnel. `bedwars-plugin/arena` ajoute le dépôt YAML UTF-8, l'adaptation des mondes/positions Bukkit, le composant de cycle de vie, les commandes et les menus.

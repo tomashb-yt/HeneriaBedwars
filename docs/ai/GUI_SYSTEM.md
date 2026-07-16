@@ -95,9 +95,19 @@ Les inventaires sont toujours modifiés sur le thread serveur. Une ouverture hor
 
 `/bedwars gui` et `/hbw gui`, permission `heneriabedwars.admin.gui`, ouvrent un menu de 6 lignes avec informations dynamiques, cinq types de clic, 50 éléments paginés, confirmation, sous-menu, retour, refresh, fermeture et erreur contrôlée visible uniquement en debug. Ce menu ne modifie aucune donnée BedWars.
 
-## Menus d'arènes
+## Éditeur d'arènes
 
-`/bedwars arena menu` ouvre la liste paginée construite par `ArenaMenuFactory`. Chaque entrée utilise `arena.entry` dans `items.yml` et ouvre un détail avec monde, positions, validation, activation/désactivation et suppression. Les actions revérifient leur permission spécialisée au clic. La suppression passe par `ConfirmationGui` et `ArenaService.delete`; elle n'est jamais effectuée directement par le menu.
+`/bedwars setup` ouvre le menu administratif principal et `/bedwars arena` ou `/bedwars arena menu` ouvre directement la liste. `ArenaEditorMenuFactory` produit les vues suivantes : accueil, configuration, liste, éditeur, mondes, joueurs, équipes, limites, validation et confirmations. La console reçoit un message adapté au lieu de tenter d'ouvrir un inventaire.
+
+La liste est paginée avec filtre `ALL/ENABLED/DISABLED/INVALID/DRAFT` et tri `ID/NAME/STATUS/UPDATED`. `ArenaEditorStateStore` conserve filtre, tri et page lors des retours et rafraîchissements. Clic gauche ouvre l'éditeur, clic droit la validation et Shift-droit la suppression. La création ferme le menu puis démarre une saisie d'identifiant.
+
+`TextInputManager` autorise une saisie active par joueur. `BukkitTextInputService` annule le chat avant toute diffusion, traite le contenu sur le thread serveur, limite la longueur et gère validation, mots d'annulation, timeout, déconnexion et arrêt. Une saisie terminée ou expirée rouvre la vue pertinente; une déconnexion ou un arrêt ne tente pas de rouvrir un inventaire.
+
+L'éditeur sauvegarde automatiquement le nom, le monde, les positions, joueurs, équipes générales, limites et statut au moyen d'`ArenaService`. Les valeurs numériques offrent des pas au clic et une saisie directe au clic milieu. Les changements d'équipes passent par une confirmation montrant l'ancienne et la nouvelle capacité. La validation utilise une apparence INFO/WARNING/ERROR/CRITICAL et chaque problème ouvre la section associée.
+
+Chaque vue d'édition capture la révision de l'arène. Si une autre commande ou un autre administrateur a déjà sauvegardé, l'action obsolète est refusée avec `CONFLICT`; le joueur doit rafraîchir. Les positions, mondes et points de limite sont téléportables uniquement avec `heneriabedwars.admin.arena.teleport`. La suppression d'une arène active demande une seconde confirmation et passe toujours par la sauvegarde de `ArenaService.delete`.
+
+Les items visuels sont les clés `admin.*`, `arena.*`, `world.*`, `players.*`, `teams.*`, `boundary.*` et `validation.*` de `items.yml`. Les actions, permissions et données restent en Java. Les boutons retour utilisent l'historique, actualiser reconstruit la vue, fermer termine la session et une arène supprimée pendant l'édition renvoie vers une vue sûre.
 
 ## Créer un nouveau menu
 

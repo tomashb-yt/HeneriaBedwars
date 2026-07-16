@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 006
+
+La suite contient 113 tests : 90 dans le cœur et 23 dans le module plugin, tous réussis. Les 25 nouveaux scénarios couvrent sessions de saisie (démarrage, validation, refus, annulation, timeout, déconnexion, concurrence), révision initiale et incrément, conflit optimiste, sauvegarde échouée sans publication, nom, monde, positions, joueurs, équipes, limites et suppression, état de liste (filtre, tri, page, refresh), routage des problèmes et apparences INFO/WARNING/ERROR/CRITICAL, compatibilité YAML des révisions et limites partielles, ainsi que refus transactionnel des slots d'éditeur en collision.
+
+La non-diffusion du chat est garantie par l'annulation immédiate dans le listener avant la planification sur le thread serveur; l'exécution réelle de l'événement Bukkit reste dans la matrice manuelle. Aucun test en jeu n'a été effectué dans l'environnement Codex. Il faut notamment vérifier `/bedwars setup`, liste vide/pagination/filtres/tri, toutes les saisies, couleurs, téléportations, conflit avec deux comptes, sauvegarde de suppression et persistance après un arrêt `stop` puis redémarrage.
+
 ## Ticket 005
 
 La suite contient 88 tests : 68 dans le cœur et 20 dans le module plugin. Les 18 nouveaux scénarios couvrent ids sûrs, immutabilité, statuts, validation requise/avertissements/capacités/mondes, remplacement atomique du registre, persistance avant publication, échec d'écriture ou suppression sans mutation mémoire, recalcul des équipes, reload préservant une ancienne définition illisible, complétion permission-aware, round-trip YAML UTF-8, isolation d'un fichier cassé, nom de fichier dangereux et sauvegarde datée avant suppression.

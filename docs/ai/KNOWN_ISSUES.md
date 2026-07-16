@@ -1,9 +1,18 @@
 # Limitations connues
 
+## Ticket 006
+
+- L'éditeur configure une définition administrative mais ne crée aucune partie jouable et ne copie, charge ou réinitialise aucun monde.
+- Les équipes restent limitées au nombre et aux joueurs par équipe : pas de couleurs, membres runtime, lits, générateurs, boutiques ni PNJ.
+- La sélection de monde liste les mondes déjà chargés par Bukkit; aucun template ou import n'est disponible avant le Ticket 007.
+- La saisie textuelle est limitée au chat et doit être validée manuellement sur Paper, notamment annulation, timeout, déconnexion et non-diffusion.
+- Les menus, téléportations, permissions et conflits avec deux comptes n'ont pas été testés en jeu dans l'environnement Codex.
+- L'audit administratif est un log simple; aucun historique persistant n'est encore stocké.
+
 ## Ticket 005
 
 - Les arènes sont des définitions administratives : aucune partie, équipe runtime, lit, générateur, clonage ou reset de monde n'est actif.
-- L'éditeur GUI couvre les actions courantes mais pas encore tous les champs avancés, limites de zone, templates ou saisie textuelle complète ; ce périmètre relève du Ticket 006.
+- Le premier menu du Ticket 005 a été remplacé par l'éditeur Ticket 006; les templates et instances temporaires relèvent du Ticket 007.
 - Les mondes sont seulement résolus parmi les mondes actuellement chargés par Bukkit ; aucun chargement ou import automatique n'est effectué.
 - Les YAML d'arènes n'ont qu'une version 1 et aucune migration historique n'est nécessaire à ce stade.
 - Aucun test en jeu des commandes, permissions, téléportations futures ou inventaires d'arènes n'a été exécuté dans l'environnement Codex.

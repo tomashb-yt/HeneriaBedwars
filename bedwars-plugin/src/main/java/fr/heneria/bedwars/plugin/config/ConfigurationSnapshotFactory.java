@@ -1,5 +1,6 @@
 package fr.heneria.bedwars.plugin.config;
 
+import fr.heneria.bedwars.core.config.ArenaEditorSettings;
 import fr.heneria.bedwars.core.config.ConfigurationDocument;
 import fr.heneria.bedwars.core.config.ConfigurationId;
 import fr.heneria.bedwars.core.config.ConfigurationProblem;
@@ -11,6 +12,7 @@ import fr.heneria.bedwars.core.config.PluginSettings;
 import fr.heneria.bedwars.core.config.ProblemSeverity;
 import fr.heneria.bedwars.core.config.SoundSettings;
 import fr.heneria.bedwars.core.config.StorageSettings;
+import fr.heneria.bedwars.core.config.TextInputSettings;
 import fr.heneria.bedwars.core.config.TranslationBundle;
 import fr.heneria.bedwars.core.config.TranslationKey;
 import fr.heneria.bedwars.core.item.ItemRegistry;
@@ -18,6 +20,7 @@ import fr.heneria.bedwars.plugin.item.ItemDefinitionLoader;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -140,7 +143,13 @@ public final class ConfigurationSnapshotFactory {
                 "success", sound(menus, "success", "ENTITY_PLAYER_LEVELUP", problems),
                 "error", sound(menus, "error", "ENTITY_VILLAGER_NO", problems),
                 "back", sound(menus, "back", "UI_BUTTON_CLICK", problems),
-                "close", sound(menus, "close", "UI_BUTTON_CLICK", problems)));
+                "close", sound(menus, "close", "UI_BUTTON_CLICK", problems)),
+            arenaEditor(menus),
+            new TextInputSettings(
+                java.time.Duration.ofSeconds(
+                    menus.integer("text-input.timeout-seconds", 60, 5, 600)),
+                menus.stringSet(
+                    "text-input.cancel-keywords", java.util.Set.of("annuler", "cancel"))));
 
     Map<String, TranslationBundle> languages = languages(languageDocuments, problems);
     ItemRegistry items =
@@ -206,6 +215,125 @@ public final class ConfigurationSnapshotFactory {
       pitch = 1;
     }
     return new SoundSettings(value, volume, pitch);
+  }
+
+  private static ArenaEditorSettings arenaEditor(Reader menus) {
+    int listRows = menus.integer("arena-editor.list.rows", 6, 1, 6);
+    int listSize = listRows * 9;
+    int editorRows = menus.integer("arena-editor.editor.rows", 6, 1, 6);
+    int editorSize = editorRows * 9;
+    List<Integer> contentSlots =
+        menus.integerList(
+            "arena-editor.list.content-slots",
+            List.of(
+                10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34),
+            listSize);
+    int createSlot = menus.integer("arena-editor.list.create-slot", 49, 0, listSize - 1);
+    int filterSlot = menus.integer("arena-editor.list.filter-slot", 47, 0, listSize - 1);
+    int sortSlot = menus.integer("arena-editor.list.sort-slot", 51, 0, listSize - 1);
+    int previousSlot = menus.integer("arena-editor.list.previous-page-slot", 45, 0, listSize - 1);
+    int nextSlot = menus.integer("arena-editor.list.next-page-slot", 53, 0, listSize - 1);
+
+    int informationSlot =
+        menus.integer("arena-editor.editor.information-slot", 4, 0, editorSize - 1);
+    int displayNameSlot =
+        menus.integer("arena-editor.editor.display-name-slot", 10, 0, editorSize - 1);
+    int worldSlot = menus.integer("arena-editor.editor.world-slot", 12, 0, editorSize - 1);
+    int waitingSlot = menus.integer("arena-editor.editor.waiting-slot", 14, 0, editorSize - 1);
+    int spectatorSlot = menus.integer("arena-editor.editor.spectator-slot", 16, 0, editorSize - 1);
+    int playersSlot = menus.integer("arena-editor.editor.players-slot", 20, 0, editorSize - 1);
+    int teamsSlot = menus.integer("arena-editor.editor.teams-slot", 22, 0, editorSize - 1);
+    int boundarySlot = menus.integer("arena-editor.editor.boundary-slot", 24, 0, editorSize - 1);
+    int validationSlot =
+        menus.integer("arena-editor.editor.validation-slot", 31, 0, editorSize - 1);
+    int enableSlot = menus.integer("arena-editor.editor.enable-slot", 39, 0, editorSize - 1);
+    int deleteSlot = menus.integer("arena-editor.editor.delete-slot", 41, 0, editorSize - 1);
+    int backSlot = menus.integer("arena-editor.editor.back-slot", 45, 0, editorSize - 1);
+    int refreshSlot = menus.integer("arena-editor.editor.refresh-slot", 49, 0, editorSize - 1);
+    int closeSlot = menus.integer("arena-editor.editor.close-slot", 53, 0, editorSize - 1);
+
+    List<Integer> listSlots =
+        combine(
+            contentSlots,
+            createSlot,
+            filterSlot,
+            sortSlot,
+            previousSlot,
+            nextSlot,
+            listSize - 8,
+            listSize - 6,
+            listSize - 4);
+    List<Integer> editorSlots =
+        List.of(
+            informationSlot,
+            displayNameSlot,
+            worldSlot,
+            waitingSlot,
+            spectatorSlot,
+            playersSlot,
+            teamsSlot,
+            boundarySlot,
+            validationSlot,
+            enableSlot,
+            deleteSlot,
+            backSlot,
+            refreshSlot,
+            closeSlot);
+    validateSlotRange(menus, "arena-editor.list", listSlots, listSize);
+    validateSlotRange(menus, "arena-editor.editor", editorSlots, editorSize);
+    validateDistinctSlots(menus, "arena-editor.list", listSlots);
+    validateDistinctSlots(menus, "arena-editor.editor", editorSlots);
+    return new ArenaEditorSettings(
+        listRows,
+        contentSlots,
+        createSlot,
+        filterSlot,
+        sortSlot,
+        previousSlot,
+        nextSlot,
+        editorRows,
+        informationSlot,
+        displayNameSlot,
+        worldSlot,
+        waitingSlot,
+        spectatorSlot,
+        playersSlot,
+        teamsSlot,
+        boundarySlot,
+        validationSlot,
+        enableSlot,
+        deleteSlot,
+        backSlot,
+        refreshSlot,
+        closeSlot);
+  }
+
+  private static List<Integer> combine(List<Integer> content, Integer... controls) {
+    List<Integer> values = new ArrayList<>(content);
+    values.addAll(List.of(controls));
+    return values;
+  }
+
+  private static void validateDistinctSlots(Reader reader, String path, List<Integer> slots) {
+    Set<Integer> distinct = new HashSet<>();
+    for (int slot : slots) {
+      if (!distinct.add(slot)) {
+        reader.error(path, slot, "distinct slots", "Duplicate arena editor slot");
+      }
+    }
+  }
+
+  private static void validateSlotRange(
+      Reader reader, String path, List<Integer> slots, int inventorySize) {
+    for (int slot : slots) {
+      if (slot < 0 || slot >= inventorySize) {
+        reader.error(
+            path,
+            slot,
+            "slot between 0 and " + (inventorySize - 1),
+            "Arena editor slot outside inventory");
+      }
+    }
   }
 
   private static Map<String, TranslationBundle> languages(
@@ -299,6 +427,39 @@ public final class ConfigurationSnapshotFactory {
       return fallback;
     }
 
+    List<Integer> integerList(String key, List<Integer> fallback, int exclusiveMaximum) {
+      Object value = document.value(key);
+      if (value instanceof List<?> list) {
+        List<Integer> result =
+            list.stream()
+                .filter(Number.class::isInstance)
+                .map(Number.class::cast)
+                .map(Number::intValue)
+                .filter(slot -> slot >= 0 && slot < exclusiveMaximum)
+                .distinct()
+                .toList();
+        if (!result.isEmpty() && result.size() == list.size()) return result;
+      }
+      problem(key, value, "unique valid slot list", fallback, "Invalid slot list");
+      return fallback;
+    }
+
+    java.util.Set<String> stringSet(String key, java.util.Set<String> fallback) {
+      Object value = document.value(key);
+      if (value instanceof List<?> list) {
+        java.util.Set<String> result =
+            list.stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .map(String::trim)
+                .filter(text -> !text.isEmpty())
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+        if (!result.isEmpty() && result.size() == list.size()) return result;
+      }
+      problem(key, value, "non-empty string list", fallback, "Invalid string list");
+      return fallback;
+    }
+
     void problem(String key, Object value, Object expected, Object fallback, String message) {
       problems.add(
           new ConfigurationProblem(
@@ -308,6 +469,18 @@ public final class ConfigurationSnapshotFactory {
               String.valueOf(value),
               String.valueOf(expected),
               String.valueOf(fallback),
+              message));
+    }
+
+    void error(String key, Object value, Object expected, String message) {
+      problems.add(
+          new ConfigurationProblem(
+              ProblemSeverity.ERROR,
+              document.fileName(),
+              key,
+              String.valueOf(value),
+              String.valueOf(expected),
+              "none",
               message));
     }
   }

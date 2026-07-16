@@ -1,6 +1,7 @@
 package fr.heneria.bedwars.core.gui;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Objects;
 
 /** Reusable immutable confirmation menu factory with guarded confirm and cancel actions. */
@@ -18,6 +19,7 @@ public final class ConfirmationGui {
     private GuiItem confirm = GuiItem.of("LIME_CONCRETE", "Confirm");
     private GuiItem cancel = GuiItem.of("RED_CONCRETE", "Cancel");
     private String informationKey;
+    private Map<String, ?> informationPlaceholders = Map.of();
     private String confirmKey;
     private String cancelKey;
     private GuiAction onConfirm;
@@ -43,6 +45,11 @@ public final class ConfirmationGui {
 
     public Builder informationKey(String value) {
       informationKey = value;
+      return this;
+    }
+
+    public Builder informationPlaceholders(Map<String, ?> value) {
+      informationPlaceholders = Map.copyOf(Objects.requireNonNull(value));
       return this;
     }
 
@@ -98,7 +105,11 @@ public final class ConfirmationGui {
           .title(Objects.requireNonNull(title, "title"))
           .rows(3)
           .fillEmptySlots(true)
-          .button(13, source(information, informationKey).build())
+          .button(
+              13,
+              source(information, informationKey)
+                  .itemPlaceholders(context -> informationPlaceholders)
+                  .build())
           .button(11, confirmButton.build())
           .button(15, source(cancel, cancelKey).cooldown(cooldown).onLeftClick(onCancel).build())
           .build();

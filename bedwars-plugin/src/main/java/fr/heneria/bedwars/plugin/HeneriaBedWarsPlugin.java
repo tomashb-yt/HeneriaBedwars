@@ -4,6 +4,9 @@ import fr.heneria.bedwars.api.PluginStatus;
 import fr.heneria.bedwars.core.arena.ArenaRegistry;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.arena.ArenaValidator;
+import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
+import fr.heneria.bedwars.core.gui.TextInputManager;
+import fr.heneria.bedwars.plugin.arena.ArenaEditorMenuFactory;
 import fr.heneria.bedwars.plugin.arena.ArenaLifecycleComponent;
 import fr.heneria.bedwars.plugin.arena.YamlArenaRepository;
 import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
@@ -11,6 +14,7 @@ import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
+import fr.heneria.bedwars.plugin.gui.BukkitTextInputService;
 import fr.heneria.bedwars.plugin.item.BukkitItemService;
 import fr.heneria.bedwars.plugin.logging.BukkitProjectLogger;
 import java.time.Clock;
@@ -25,6 +29,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private BukkitGuiService guiService;
   private BukkitItemService itemService;
   private ArenaService arenaService;
+  private BukkitTextInputService textInputService;
+  private ArenaEditorMenuFactory arenaEditor;
 
   @Override
   public void onEnable() {
@@ -47,12 +53,27 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               clock);
       itemService = new BukkitItemService(this, configurations, projectLogger);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
+      ArenaEditorStateStore editorStates = new ArenaEditorStateStore();
+      textInputService =
+          new BukkitTextInputService(
+              this, new TextInputManager(clock), editorStates, projectLogger);
+      arenaEditor =
+          new ArenaEditorMenuFactory(
+              this,
+              arenaService,
+              configurations,
+              guiService,
+              textInputService,
+              editorStates,
+              projectLogger);
       bootstrap =
           new BedWarsBootstrap(
               getDescription().getVersion(),
               configurations,
               arenaService,
               new ArenaLifecycleComponent(arenaService, projectLogger),
+              textInputService,
+              textInputService,
               itemService,
               guiService,
               projectLogger);
@@ -85,7 +106,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       throw new IllegalStateException("The 'bedwars' command is not declared in plugin.yml");
     }
     BedWarsCommand executor =
-        new BedWarsCommand(this, bootstrap, configurations, arenaService, itemService, guiService);
+        new BedWarsCommand(
+            this, bootstrap, configurations, arenaService, itemService, guiService, arenaEditor);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }

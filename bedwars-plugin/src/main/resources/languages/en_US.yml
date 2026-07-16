@@ -16,6 +16,7 @@ command:
     gui: "<gray>/bedwars gui <dark_gray>- <white>Opens the GUI test menu."
     item: "<gray>/bedwars item <dark_gray>- <white>Inspects configurable items."
     arena: "<gray>/bedwars arena <dark_gray>- <white>Manages arena definitions."
+    setup: "<gray>/bedwars setup <dark_gray>- <white>Opens in-game configuration."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Plugin version: <white>{plugin_version}"
@@ -74,6 +75,89 @@ command:
     problem: "<gray>[{severity}] <white>{field}<gray> - {code}: {problem}"
     storage-error: "<red>The operation on <white>{arena}<red> could not be saved."
     reload: "<gray>Reloaded arenas: <white>{arena_count}<gray>, preserved: <white>{arena_preserved}<gray>, errors: <white>{arena_errors}"
+    menu-console: "<yellow>The console cannot open the editor. Use the textual /bedwars arena subcommands."
+admin:
+  main:
+    title: "<aqua><bold>HeneriaBedWars <gray>- Configuration"
+    arenas: "<aqua>Arena management"
+    configuration: "<yellow>General configuration"
+    lobby: "<gray>Lobby - future ticket"
+    close: "<red>Close"
+arena:
+  gui:
+    list:
+      title: "<aqua>Arenas <gray>({count}) - {filter} / {sort}"
+      create: "<green>Create an arena"
+      empty: "<gray>No arena matches this filter."
+      filter: "<yellow>Filter: {filter}"
+      sort: "<yellow>Sort: {sort}"
+      refreshed: "<green>List refreshed."
+    editor:
+      title: "<aqua>Editing - {arena_name} <gray>r{arena_revision}"
+      autosave: "<green>Change saved automatically."
+      information: "<aqua>General information"
+      display-name: "<yellow>Display name"
+      world: "<green>World"
+      waiting: "<yellow>Waiting lobby"
+      spectator: "<aqua>Spectator point"
+      players: "<gold>Player settings"
+      teams: "<light_purple>Team settings"
+      boundary: "<blue>Map boundary"
+      validation: "<red>Validation"
+      enable: "<green>Enable {arena_name}?"
+      disable: "<yellow>Disable {arena_name}?"
+      delete: "<red>Delete"
+      conflict: "<red>This arena was changed by another administrator. Refresh the menu."
+      failed: "<red>The change could not be saved: {detail}"
+      missing: "<red>This arena no longer exists."
+    position:
+      missing: "<red>This position is not configured."
+      clear-title: "<red>Reset this position for {arena_id}?"
+  input:
+    arena-id: "<yellow>Enter the new arena id in chat. Type cancel to abort."
+    display-name: "<yellow>Enter the new name for {arena_id}. Type cancel to abort."
+    number: "<yellow>Enter a positive value for {field}. Type cancel to abort."
+    cancel: "<yellow>Input cancelled."
+    timeout: "<red>Input timed out."
+    invalid: "<red>Invalid value: {problem}. Try again or type cancel."
+    already-active: "<red>An input session is already active."
+  world:
+    title: "<green>World for {arena_name}"
+    selected: "<green>Selected world: {world}"
+    current: "<aqua>Current world: {world}"
+    not-found: "<red>World {world} is not loaded."
+    teleport-success: "<green>Teleported to {world}."
+  players:
+    title: "<gold>Players - {arena_name}"
+    minimum: "<yellow>Minimum: {minimum_players}"
+    maximum: "<yellow>Maximum: {maximum_players}"
+    capacity: "<gray>Team capacity: {capacity}"
+  teams:
+    title: "<light_purple>Teams - {arena_name}"
+    count: "<yellow>Count: {team_count}"
+    players-per-team: "<yellow>Players/team: {players_per_team}"
+    format: "<gray>Format: {team_count} x {players_per_team}"
+    confirm-title: "<gold>Confirm {new_team_count} x {new_players_per_team}?"
+  boundary:
+    title: "<blue>Boundary - {arena_name}"
+    enabled: "<green>Boundary enabled"
+    disabled: "<gray>Boundary disabled"
+    minimum: "<yellow>Minimum point"
+    maximum: "<yellow>Maximum point"
+    invalid: "<red>Invalid boundary"
+    reset: "<red>Reset boundary for {arena_id}?"
+  validation:
+    title: "<red>Validation - {arena_name}"
+    success: "<green>No blocking problem."
+    errors: "<red>Errors: {validation_errors}"
+    warnings: "<yellow>Warnings: {validation_warnings}"
+    open-section: "<gray>Click to open the related section."
+  delete:
+    title: "<red>Delete {arena_name}?"
+    warning: "<yellow>A backup will be created."
+    confirm-enabled: "<red>This arena is enabled. Confirm a second time."
+    success: "<green>Arena {arena_id} was backed up and deleted."
+    failed: "<red>Deletion failed."
 gui:
   general:
     back: "<yellow>Back"

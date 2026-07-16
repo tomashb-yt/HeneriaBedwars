@@ -306,3 +306,20 @@ Considérer ce fichier comme version source 0 seulement s'il est lisible et cont
 
 ### Conséquences
 Les installations Ticket 001 sont mises à niveau sans suppression de données. Un YAML vide, corrompu ou non reconnaissable n'est jamais « réparé » automatiquement. Les commentaires peuvent être reformattés par `YamlConfiguration`, limitation explicitement documentée.
+
+## ADR-032 à ADR-037 — Édition administrative des arènes
+
+### Statut
+Accepté.
+
+### Décisions
+
+- **ADR-032** — La saisie administrative utilise une session de chat unique par joueur. Le message est annulé de façon asynchrone puis traité sur le thread serveur; timeout, annulation, déconnexion et arrêt terminent la session.
+- **ADR-033** — Chaque modification d'arène est sauvegardée automatiquement. L'état mémoire n'est publié qu'après réussite de la persistance.
+- **ADR-034** — Une révision persistée, initialisée à 1 et incrémentée par mutation réussie, fournit un verrouillage optimiste. Une révision attendue obsolète produit `CONFLICT` sans écriture.
+- **ADR-035** — Commandes et menus utilisent la même instance injectée d'`ArenaService` afin de conserver validation, sauvegarde et conflits identiques.
+- **ADR-036** — Les menus ne lisent et n'écrivent jamais directement `arenas/*.yml`; `ArenaRepository` reste derrière le service.
+- **ADR-037** — Les téléportations administratives exigent `heneriabedwars.admin.arena.teleport`; aucune téléportation n'est une conséquence implicite d'une sauvegarde.
+
+### Conséquences
+L'éditeur reste testable sans Bukkit pour ses règles principales et deux administrateurs ne peuvent pas écraser silencieusement leurs modifications. Les opérations création, suppression, activation, monde, positions, capacité et équipes sont journalisées simplement; un audit persistant reste futur.

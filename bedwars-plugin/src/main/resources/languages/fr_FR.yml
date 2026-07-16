@@ -16,6 +16,7 @@ command:
     gui: "<gray>/bedwars gui <dark_gray>- <white>Ouvre le menu de test des interfaces."
     item: "<gray>/bedwars item <dark_gray>- <white>Inspecte les items configurables."
     arena: "<gray>/bedwars arena <dark_gray>- <white>Administre les definitions d'arenes."
+    setup: "<gray>/bedwars setup <dark_gray>- <white>Ouvre la configuration en jeu."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Version du plugin : <white>{plugin_version}"
@@ -74,6 +75,89 @@ command:
     problem: "<gray>[{severity}] <white>{field}<gray> - {code}: {problem}"
     storage-error: "<red>L'operation sur <white>{arena}<red> n'a pas pu etre enregistree."
     reload: "<gray>Arenes rechargees : <white>{arena_count}<gray>, preservees : <white>{arena_preserved}<gray>, erreurs : <white>{arena_errors}"
+    menu-console: "<yellow>La console ne peut pas ouvrir l'editeur. Utilisez les sous-commandes textuelles /bedwars arena."
+admin:
+  main:
+    title: "<aqua><bold>HeneriaBedWars <gray>- Configuration"
+    arenas: "<aqua>Gestion des arenes"
+    configuration: "<yellow>Configuration generale"
+    lobby: "<gray>Lobby - prochain ticket"
+    close: "<red>Fermer"
+arena:
+  gui:
+    list:
+      title: "<aqua>Arenes <gray>({count}) - {filter} / {sort}"
+      create: "<green>Creer une arene"
+      empty: "<gray>Aucune arene pour ce filtre."
+      filter: "<yellow>Filtre : {filter}"
+      sort: "<yellow>Tri : {sort}"
+      refreshed: "<green>Liste actualisee."
+    editor:
+      title: "<aqua>Edition - {arena_name} <gray>r{arena_revision}"
+      autosave: "<green>Modification enregistree automatiquement."
+      information: "<aqua>Informations generales"
+      display-name: "<yellow>Nom d'affichage"
+      world: "<green>Monde"
+      waiting: "<yellow>Lobby d'attente"
+      spectator: "<aqua>Point spectateur"
+      players: "<gold>Parametres joueurs"
+      teams: "<light_purple>Parametres equipes"
+      boundary: "<blue>Limites de carte"
+      validation: "<red>Validation"
+      enable: "<green>Activer {arena_name} ?"
+      disable: "<yellow>Desactiver {arena_name} ?"
+      delete: "<red>Supprimer"
+      conflict: "<red>Cette arene a ete modifiee par un autre administrateur. Actualisez le menu."
+      failed: "<red>La modification n'a pas pu etre enregistree : {detail}"
+      missing: "<red>Cette arene n'existe plus."
+    position:
+      missing: "<red>Cette position n'est pas configuree."
+      clear-title: "<red>Reinitialiser cette position de {arena_id} ?"
+  input:
+    arena-id: "<yellow>Ecrivez l'identifiant de la nouvelle arene. Tapez annuler pour abandonner."
+    display-name: "<yellow>Ecrivez le nouveau nom de {arena_id}. Tapez annuler pour abandonner."
+    number: "<yellow>Ecrivez une valeur positive pour {field}. Tapez annuler pour abandonner."
+    cancel: "<yellow>Saisie annulee."
+    timeout: "<red>La saisie a expire."
+    invalid: "<red>Valeur invalide : {problem}. Reessayez ou tapez annuler."
+    already-active: "<red>Une saisie est deja active."
+  world:
+    title: "<green>Monde de {arena_name}"
+    selected: "<green>Monde selectionne : {world}"
+    current: "<aqua>Monde actuel : {world}"
+    not-found: "<red>Le monde {world} n'est pas charge."
+    teleport-success: "<green>Teleportation vers {world}."
+  players:
+    title: "<gold>Joueurs - {arena_name}"
+    minimum: "<yellow>Minimum : {minimum_players}"
+    maximum: "<yellow>Maximum : {maximum_players}"
+    capacity: "<gray>Capacite des equipes : {capacity}"
+  teams:
+    title: "<light_purple>Equipes - {arena_name}"
+    count: "<yellow>Nombre : {team_count}"
+    players-per-team: "<yellow>Joueurs/equipe : {players_per_team}"
+    format: "<gray>Format : {team_count} x {players_per_team}"
+    confirm-title: "<gold>Confirmer {new_team_count} x {new_players_per_team} ?"
+  boundary:
+    title: "<blue>Limites - {arena_name}"
+    enabled: "<green>Limites activees"
+    disabled: "<gray>Limites desactivees"
+    minimum: "<yellow>Point minimum"
+    maximum: "<yellow>Point maximum"
+    invalid: "<red>Limites incoherentes"
+    reset: "<red>Reinitialiser les limites de {arena_id} ?"
+  validation:
+    title: "<red>Validation - {arena_name}"
+    success: "<green>Aucun probleme bloquant."
+    errors: "<red>Erreurs : {validation_errors}"
+    warnings: "<yellow>Avertissements : {validation_warnings}"
+    open-section: "<gray>Cliquez pour ouvrir la section concernee."
+  delete:
+    title: "<red>Supprimer {arena_name} ?"
+    warning: "<yellow>Une sauvegarde sera creee."
+    confirm-enabled: "<red>Cette arene est activee. Confirmez une seconde fois."
+    success: "<green>L'arene {arena_id} a ete sauvegardee puis supprimee."
+    failed: "<red>Suppression impossible."
 gui:
   general:
     back: "<yellow>Retour"

@@ -20,7 +20,9 @@ public record MenuSettings(
     boolean refreshEnabled,
     int minimumRefreshTicks,
     boolean soundsEnabled,
-    Map<String, SoundSettings> sounds) {
+    Map<String, SoundSettings> sounds,
+    ArenaEditorSettings arenaEditor,
+    TextInputSettings textInput) {
   public MenuSettings {
     sounds = Map.copyOf(sounds);
   }

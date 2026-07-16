@@ -1,5 +1,23 @@
 # Architecture actuelle
 
+## Ticket 006 — éditeur administratif d'arènes
+
+`ArenaEditorMenuFactory` compose le menu principal, `ArenaListGui`, l'éditeur, la validation, la sélection du monde et les sous-menus joueurs, équipes et limites au moyen du modèle GUI interne. Ces noms décrivent des vues produites par la factory, pas des classes publiques séparées. Les actions appellent toutes le même `ArenaService` que les commandes et ne lisent jamais les YAML.
+
+`TextInputService` est la frontière pure du cœur. `TextInputManager` conserve une session bornée par UUID et `BukkitTextInputService` intercepte le chat, l'annule avant diffusion, puis replanifie la validation sur le thread serveur. Déconnexion, kick, timeout et arrêt nettoient les sessions. `ArenaEditorStateStore` conserve filtre, tri, page et révisions observées sans conserver de `Player`.
+
+Chaque mutation sauvegarde avant de publier le nouveau snapshot et incrémente la révision. Une action issue d'une vue obsolète reçoit `CONFLICT` et doit rafraîchir l'éditeur. Les téléportations sont confinées à l'adaptateur Bukkit et exigent `heneriabedwars.admin.arena.teleport`.
+
+```mermaid
+flowchart LR
+  SETUP["/bedwars setup ou arena"] --> EDITOR["ArenaEditorMenuFactory"]
+  EDITOR --> STATE["ArenaEditorStateStore"]
+  EDITOR --> INPUT["TextInputService"]
+  INPUT --> CHAT["BukkitTextInputService"]
+  EDITOR --> SERVICE["ArenaService + revision"]
+  SERVICE --> REPOSITORY["YamlArenaRepository"]
+```
+
 ## Ticket 005 — définitions d'arènes
 
 `bedwars-core/arena` contient les identifiants sûrs, positions pures, définition immutable, statuts administratifs, diagnostics, validation, registre, port de persistance et cas d'usage. `bedwars-plugin/arena` adapte les mondes Bukkit, YAML UTF-8, commandes et menus. `ArenaService` est enregistré dans `ServiceRegistry` et chargé par `ArenaLifecycleComponent`.
@@ -14,7 +32,7 @@ flowchart LR
   VALIDATOR --> SERVICE
   SERVICE --> REGISTRY["ArenaRegistry snapshot"]
   SERVICE --> COMMAND["/bedwars arena"]
-  SERVICE --> MENU["ArenaMenuFactory"]
+  SERVICE --> MENU["ArenaEditorMenuFactory"]
 ```
 
 ## Ticket 004 — items configurables

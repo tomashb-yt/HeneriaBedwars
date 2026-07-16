@@ -7,5 +7,6 @@ public enum ArenaOperationCode {
   INVALID_ID,
   INVALID_ARGUMENT,
   VALIDATION_FAILED,
+  CONFLICT,
   STORAGE_FAILED
 }

@@ -52,11 +52,20 @@ public final class ArenaValidator {
     }
     arena
         .boundary()
-        .filter(boundary -> !boundary.ordered())
         .ifPresent(
-            boundary ->
+            boundary -> {
+              if (boundary.enabled()
+                  && (boundary.minimum().isEmpty() || boundary.maximum().isEmpty()))
                 error(
-                    problems, "invalid-boundary", "boundary", "Boundary minimum exceeds maximum"));
+                    problems,
+                    "incomplete-boundary",
+                    "boundary",
+                    "Enabled boundary needs two points");
+              else if (boundary.minimum().isPresent()
+                  && boundary.maximum().isPresent()
+                  && !boundary.ordered())
+                error(problems, "invalid-boundary", "boundary", "Boundary minimum exceeds maximum");
+            });
     return new ArenaValidationResult(problems);
   }
 

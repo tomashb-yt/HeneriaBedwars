@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.heneria.bedwars.core.arena.ArenaBoundary;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
 import fr.heneria.bedwars.core.arena.ArenaId;
 import fr.heneria.bedwars.core.arena.ArenaLoadResult;
+import fr.heneria.bedwars.core.arena.ArenaVector;
 import fr.heneria.bedwars.plugin.config.SafeYamlWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,6 +17,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Comparator;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,5 +84,31 @@ class YamlArenaRepositoryTest {
     repository.deleteWithBackup(new ArenaId("alpha"));
     assertFalse(Files.exists(work.resolve("arenas/alpha.yml")));
     assertTrue(Files.isRegularFile(work.resolve("backups/arenas/2026-07-16/alpha.yml")));
+  }
+
+  @Test
+  void ticket005FileWithoutRevisionLoadsAtRevisionOne() throws Exception {
+    Files.createDirectories(work.resolve("arenas"));
+    Files.writeString(
+        work.resolve("arenas/legacy.yml"),
+        "config-version: 1\nid: legacy\ndisplay-name: Legacy\nstatus: DRAFT\nplayers:\n  minimum: 2\n  maximum: 8\nteams:\n  count: 2\n  players-per-team: 4\n",
+        StandardCharsets.UTF_8);
+    assertEquals(1, repository.loadAll().definitions().getFirst().revision());
+  }
+
+  @Test
+  void partialBoundaryAndRevisionRoundTrip() throws Exception {
+    ArenaDefinition draft = ArenaDefinition.draft(new ArenaId("alpha"), CLOCK.instant());
+    ArenaDefinition changed =
+        draft.withBoundary(
+            Optional.of(
+                new ArenaBoundary(false, Optional.of(new ArenaVector(1, 2, 3)), Optional.empty())),
+            draft.status(),
+            CLOCK.instant());
+    repository.save(changed);
+    ArenaDefinition loaded = repository.loadAll().definitions().getFirst();
+    assertEquals(2, loaded.revision());
+    assertTrue(loaded.boundary().orElseThrow().minimum().isPresent());
+    assertTrue(loaded.boundary().orElseThrow().maximum().isEmpty());
   }
 }

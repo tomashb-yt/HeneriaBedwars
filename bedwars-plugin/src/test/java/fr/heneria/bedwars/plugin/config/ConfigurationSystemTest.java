@@ -77,6 +77,20 @@ class ConfigurationSystemTest {
   }
 
   @Test
+  void duplicateArenaEditorSlotsRefuseReloadAndPreserveSnapshot() throws Exception {
+    ConfigurationService service = service();
+    service.initialize();
+    var previous = service.snapshot();
+
+    replace("menus.yml", "create-slot: 49", "create-slot: 47");
+
+    ConfigurationReloadResult result = service.reloadAll();
+    assertFalse(result.successful());
+    assertTrue(result.errors() > 0);
+    assertSame(previous, service.snapshot());
+  }
+
+  @Test
   void missingLocaleUsesDocumentedDefaultWithWarning() throws Exception {
     ConfigurationService service = service();
     service.initialize();

@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 005 livrent la fondation, les configurations, traductions, menus, items et définitions administratives d'arènes ; aucun gameplay n'est encore actif.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 006 livrent la fondation, les configurations, traductions, menus, items, définitions administratives d'arènes et leur éditeur en jeu ; aucun gameplay n'est encore actif.
 
 ## Lecture obligatoire
 

@@ -25,6 +25,8 @@ public final class AdministrativeCommandPolicy {
   public static final String ARENA_DISABLE = "heneriabedwars.admin.arena.disable";
   public static final String ARENA_DELETE = "heneriabedwars.admin.arena.delete";
   public static final String ARENA_MENU = "heneriabedwars.admin.arena.menu";
+  public static final String ARENA_TELEPORT = "heneriabedwars.admin.arena.teleport";
+  public static final String SETUP = "heneriabedwars.admin.setup";
 
   public List<String> complete(
       Predicate<String> permitted, String[] arguments, List<String> locales) {
@@ -60,7 +62,8 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(LANGUAGE)) choices.add("language");
       if (permitted.test(GUI)) choices.add("gui");
       if (permitted.test(ITEM)) choices.add("item");
-      if (permitted.test(ARENA)) choices.add("arena");
+      if (permitted.test(ARENA) || permitted.test(ARENA_MENU)) choices.add("arena");
+      if (permitted.test(SETUP)) choices.add("setup");
     } else if (arguments.length == 2
         && arguments[0].equalsIgnoreCase("language")
         && permitted.test(LANGUAGE)) {

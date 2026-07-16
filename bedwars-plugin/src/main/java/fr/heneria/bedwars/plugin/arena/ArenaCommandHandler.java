@@ -19,24 +19,26 @@ public final class ArenaCommandHandler {
   private final ArenaService arenas;
   private final ConfigurationService configurations;
   private final GuiService gui;
-  private final ArenaMenuFactory menus;
+  private final ArenaEditorMenuFactory menus;
 
   public ArenaCommandHandler(
-      ArenaService arenas, ConfigurationService configurations, GuiService gui) {
+      ArenaService arenas,
+      ConfigurationService configurations,
+      GuiService gui,
+      ArenaEditorMenuFactory menus) {
     this.arenas = arenas;
     this.configurations = configurations;
     this.gui = gui;
-    this.menus = new ArenaMenuFactory(arenas, configurations);
+    this.menus = menus;
   }
 
   public boolean execute(CommandSender sender, String[] args) {
+    if (args.length < 2 || args[1].equalsIgnoreCase("menu")) return menu(sender);
     if (!allowed(sender, AdministrativeCommandPolicy.ARENA)) return true;
-    if (args.length < 2) return send(sender, TranslationKey.ARENA_HELP);
     return switch (args[1].toLowerCase(Locale.ROOT)) {
       case "create" -> create(sender, args);
       case "list" -> list(sender);
       case "info" -> info(sender, args);
-      case "menu" -> menu(sender);
       case "setworld" -> setWorld(sender, args);
       case "setwaiting" -> setLocation(sender, args, true);
       case "setspectator" -> setLocation(sender, args, false);
@@ -80,8 +82,8 @@ public final class ArenaCommandHandler {
 
   private boolean menu(CommandSender sender) {
     if (!allowed(sender, AdministrativeCommandPolicy.ARENA_MENU)) return true;
-    if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
-    gui.open(player, menus.list(0));
+    if (!(sender instanceof Player player)) return send(sender, TranslationKey.ARENA_MENU_CONSOLE);
+    gui.open(player, menus.list(player.getUniqueId()));
     return true;
   }
 
@@ -177,7 +179,7 @@ public final class ArenaCommandHandler {
     ArenaDefinition arena = arena(args);
     if (arena == null) return notFound(sender, args);
     if (!(sender instanceof Player player)) return send(sender, TranslationKey.PLAYER_ONLY);
-    gui.open(player, menus.confirmDelete(arena.id().value()));
+    gui.open(player, menus.deleteMenu(player.getUniqueId(), arena.id().value()));
     return true;
   }
 
@@ -195,6 +197,7 @@ public final class ArenaCommandHandler {
           case NOT_FOUND -> TranslationKey.ARENA_NOT_FOUND;
           case INVALID_ARGUMENT -> TranslationKey.ARENA_INVALID_ARGUMENT;
           case VALIDATION_FAILED -> TranslationKey.ARENA_INVALID;
+          case CONFLICT -> TranslationKey.ARENA_STORAGE_ERROR;
           case STORAGE_FAILED -> TranslationKey.ARENA_STORAGE_ERROR;
           default -> TranslationKey.INTERNAL_ERROR;
         };

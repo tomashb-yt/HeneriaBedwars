@@ -144,21 +144,73 @@ items:
         category: demo
     close:
       inherit: "gui.close"
+  admin:
+    main:
+      arenas:
+        material: MAP
+        name: "<aqua>Gestion des arenes"
+        lore: ["<gray>Total: <white>{arena_count}", "<green>Activees: {enabled_count}", "<red>Invalides: {invalid_count}", "<yellow>Brouillons: {draft_count}"]
+      configuration:
+        material: COMPARATOR
+        name: "<yellow>Configuration generale"
+        lore: ["<gray>Langue: <white>{language}", "<gray>Debug: <white>{debug}", "<gray>Stockage: <white>{storage}", "<gray>Items: <white>{items}", "<gray>Fichiers: <white>{loaded_files}"]
+      lobby: {material: LIGHT_GRAY_DYE, name: "<gray>Lobby - prochain ticket", lore: ["<dark_gray>Aucune action disponible."]}
   arena:
-    entry:
-      material: MAP
-      name: "<aqua>{arena_name}"
-      lore: ["<gray>ID: <white>{arena_id}", "<gray>Status: <white>{arena_status}", "<gray>World: <white>{world}", "<gray>Players: <white>{min_players}-{max_players}"]
-      required-placeholders: [arena_name, arena_id, arena_status, world, min_players, max_players]
-    info:
-      inherit: "arena.entry"
-      material: BOOK
-      lore: ["<gray>ID: <white>{arena_id}", "<gray>Status: <white>{arena_status}", "<gray>World: <white>{world}", "<gray>Teams: <white>{teams} x {players_per_team}"]
-      required-placeholders: [arena_name, arena_id, arena_status, world, teams, players_per_team]
-    set-world: {material: GRASS_BLOCK, name: "<green>Use current world"}
-    set-waiting: {material: CLOCK, name: "<yellow>Set waiting location"}
-    set-spectator: {material: ENDER_EYE, name: "<aqua>Set spectator location"}
-    validate: {material: COMPARATOR, name: "<gold>Validate"}
-    enable: {material: LIME_DYE, name: "<green>Enable"}
-    disable: {material: GRAY_DYE, name: "<yellow>Disable"}
-    delete: {material: TNT, name: "<red>Delete arena"}
+    list:
+      create: {material: EMERALD, name: "<green>Creer une arene", lore: ["<gray>Saisie securisee dans le chat."]}
+      filter: {material: HOPPER, name: "<yellow>Filtre: {filter}", lore: ["<gray>Cliquez pour changer."]}
+      sort: {material: COMPARATOR, name: "<yellow>Tri: {sort}", lore: ["<gray>Cliquez pour changer."]}
+      entry-enabled: &arena-entry
+        material: LIME_CONCRETE
+        name: "<green>{arena_name}"
+        lore: ["<gray>ID: <white>{arena_id}", "<gray>Statut: <white>{arena_status}", "<gray>Monde: <white>{world}", "<gray>Format: <white>{team_count} x {players_per_team}", "<gray>Joueurs: <white>{minimum_players}-{maximum_players}", "<red>Erreurs: {validation_errors}", "<yellow>Avertissements: {validation_warnings}", "", "<white>Clic gauche: editer", "<white>Clic droit: validation", "<red>Shift+droit: supprimer"]
+      entry-disabled:
+        <<: *arena-entry
+        material: GRAY_CONCRETE
+        name: "<gray>{arena_name}"
+      entry-invalid:
+        <<: *arena-entry
+        material: RED_CONCRETE
+        name: "<red>{arena_name}"
+      entry-draft:
+        <<: *arena-entry
+        material: ORANGE_CONCRETE
+        name: "<gold>{arena_name}"
+    editor:
+      information:
+        material: BOOK
+        name: "<aqua>Informations generales"
+        lore: ["<gray>ID: <white>{arena_id}", "<gray>Nom: <white>{arena_name}", "<gray>Statut: <white>{arena_status}", "<gray>Revision: <white>{arena_revision}", "<gray>Fichier: <white>{arena_file}", "<gray>Creee: <white>{created_at}", "<gray>Modifiee: <white>{updated_at}", "<red>Erreurs: {validation_errors}", "<yellow>Avertissements: {validation_warnings}"]
+      display-name: {material: NAME_TAG, name: "<yellow>Nom d'affichage", lore: ["<white>{arena_name}", "<gray>Cliquez pour modifier dans le chat."]}
+      world: {material: GRASS_BLOCK, name: "<green>Monde", lore: ["<gray>Actuel: <white>{world}", "<gray>Cliquez pour choisir."]}
+      waiting-lobby: {material: CLOCK, name: "<yellow>Lobby d'attente", lore: ["<gray>Configure: <white>{position_configured}", "<gray>Monde: <white>{position_world}", "<gray>{x}, {y}, {z}", "<white>Gauche: definir ici", "<white>Droit: teleporter", "<red>Shift+droit: reinitialiser"]}
+      spectator: {material: ENDER_EYE, name: "<aqua>Point spectateur", lore: ["<gray>Configure: <white>{position_configured}", "<gray>Monde: <white>{position_world}", "<gray>{x}, {y}, {z}", "<white>Gauche: definir ici", "<white>Droit: teleporter", "<red>Shift+droit: reinitialiser"]}
+      players: {material: PLAYER_HEAD, name: "<gold>Joueurs", lore: ["<gray>Minimum: <white>{minimum_players}", "<gray>Maximum: <white>{maximum_players}", "<gray>Capacite equipes: <white>{capacity}"]}
+      teams: {material: WHITE_BANNER, name: "<light_purple>Equipes", lore: ["<gray>Format: <white>{team_count} x {players_per_team}", "<gray>Capacite: <white>{capacity}"]}
+      boundary: {material: STRUCTURE_VOID, name: "<blue>Limites de carte", lore: ["<gray>Configuration administrative uniquement."]}
+      validation-valid: {material: LIME_DYE, name: "<green>Validation reussie", lore: ["<yellow>Avertissements: {validation_warnings}"]}
+      validation-invalid: {material: RED_DYE, name: "<red>Validation incomplete", lore: ["<red>Erreurs: {validation_errors}", "<yellow>Avertissements: {validation_warnings}"]}
+      enable: {material: LIME_DYE, name: "<green>Activer l'arene"}
+      enable-invalid: {material: BARRIER, name: "<red>Activation impossible", lore: ["<gray>Cliquez pour afficher les problemes."]}
+      disable: {material: GRAY_DYE, name: "<yellow>Desactiver l'arene"}
+      delete: {material: TNT, name: "<red>Supprimer l'arene", lore: ["<yellow>Une sauvegarde sera creee."]}
+    world:
+      entry: {material: GRASS_BLOCK, name: "<green>{world}", lore: ["<gray>Environnement: <white>{environment}", "<gray>Joueurs: <white>{world_players}", "<gray>Monde actuel: <white>{world_current}", "<gray>Selectionne: <white>{world_selected}", "<white>Gauche: selectionner", "<white>Droit: teleporter"]}
+    players:
+      minimum: &number-item {material: REDSTONE, name: "<yellow>Minimum: {minimum_players}", lore: ["<white>Gauche: +1", "<white>Droit: -1", "<white>Shift+gauche: +5", "<white>Shift+droit: -5", "<white>Milieu: saisir"]}
+      maximum: {<<: *number-item, material: GLOWSTONE_DUST, name: "<yellow>Maximum: {maximum_players}"}
+    teams:
+      count: {<<: *number-item, material: WHITE_BANNER, name: "<yellow>Equipes: {team_count}"}
+      players-per-team: {<<: *number-item, material: PLAYER_HEAD, name: "<yellow>Joueurs/equipe: {players_per_team}"}
+      confirm: {material: PAPER, name: "<gold>Nouveau format", lore: ["<gray>Avant: <white>{team_count} x {players_per_team}", "<gray>Apres: <white>{new_team_count} x {new_players_per_team}", "<gray>Maximum: <white>{new_capacity}"]}
+    boundary:
+      minimum: {material: BLUE_CONCRETE, name: "<blue>Definir le minimum", lore: ["<gray>Configure: <white>{minimum_configured}"]}
+      maximum: {material: RED_CONCRETE, name: "<red>Definir le maximum", lore: ["<gray>Configure: <white>{maximum_configured}"]}
+      enabled: {material: LIME_DYE, name: "<green>Limites activees", lore: ["<gray>Cliquez pour desactiver."]}
+      disabled: {material: GRAY_DYE, name: "<gray>Limites desactivees", lore: ["<gray>Cliquez pour activer."]}
+      reset: {material: BARRIER, name: "<red>Reinitialiser les limites"}
+    validation:
+      info: {material: BOOK, name: "<aqua>Information", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}"]}
+      warning: {material: ORANGE_DYE, name: "<yellow>Avertissement: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
+      error: {material: RED_DYE, name: "<red>Erreur: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
+      critical: {material: BARRIER, name: "<dark_red>Critique: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
