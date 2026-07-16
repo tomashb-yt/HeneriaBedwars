@@ -7,6 +7,7 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 ### Added
 
 - Parcours d'administration simplifié : `/bedwars` ouvre directement un tableau de bord visuel, création guidée carte–arène et menus v2 ajoutés sans écraser les personnalisations existantes.
+- Assistant continu dans l'éditeur d'arène : progression, prochaine action, étapes carte/attente/équipes/joueurs/spectateur, limites optionnelles et sous-menus explicatifs harmonisés.
 - Gestionnaire autonome de cartes modèles : modèle immutable, registre, métadonnées YAML atomiques, mondes vides Bukkit, chargement, sauvegarde, déchargement, téléportation et autosauvegarde optionnelle.
 - Duplication confinée hors thread serveur, exclusions des données joueurs, suppression avec sauvegarde complète obligatoire et refus des cartes liées à une arène ou au lobby.
 - Commandes et menus `/bedwars map`, permissions détaillées, liaisons arène–carte `BEDWARS`, configuration `worlds.yml` et ressources FR/EN.

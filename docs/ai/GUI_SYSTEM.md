@@ -10,6 +10,8 @@ Pour un joueur autorisé, `/bedwars` ouvre le tableau de bord au lieu d'imprimer
 
 Les nouvelles apparences et traductions utilisent des clés v2 distinctes. L'installateur les fusionne dans les anciens `items.yml` et catalogues sans remplacer les valeurs personnalisées. Les sous-commandes restent exécutables pour la console, l'automatisation et le diagnostic, mais ne saturent plus l'aide ni la complétion de premier niveau des joueurs.
 
+L'éditeur principal est également un assistant : carte BedWars, point d'attente, format des équipes, plage de joueurs et point spectateur apparaissent dans l'ordre. Un résumé calcule quatre étapes obligatoires, un pourcentage et la prochaine action. Le spectateur est conseillé et les limites sont explicitement optionnelles. Chaque sous-menu conserve les interactions rapides (clics, Shift et molette) mais les explique dans son lore; aucune connaissance préalable des commandes n'est nécessaire.
+
 ## Architecture
 
 Le framework Ticket 003 est interne et séparé en deux frontières :

@@ -263,10 +263,14 @@ class ConfigurationSystemTest {
     assertTrue(evolvedItems.contains("arenas-v2:"));
     assertTrue(evolvedItems.contains("step-error:"));
     assertTrue(evolvedItems.contains("create-bedwars:"));
+    assertTrue(evolvedItems.contains("assistant-progress:"));
+    assertTrue(evolvedItems.contains("minimum-assisted:"));
+    assertTrue(evolvedItems.contains("assistant-choice-loaded:"));
     assertTrue(Files.readString(french).contains("gui:"));
     assertTrue(Files.readString(english).contains("gui:"));
     assertTrue(Files.readString(french).contains("title-v2:"));
     assertTrue(Files.readString(french).contains("map-template-missing:"));
+    assertTrue(Files.readString(french).contains("assistant-title:"));
     assertTrue(
         service
             .snapshot()

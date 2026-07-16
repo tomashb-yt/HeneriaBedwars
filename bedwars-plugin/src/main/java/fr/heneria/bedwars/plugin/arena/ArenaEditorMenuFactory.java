@@ -329,7 +329,7 @@ public final class ArenaEditorMenuFactory {
     ArenaEditorSettings settings = settings();
     return Gui.builder()
         .id("arena.editor." + id)
-        .title(message("arena.gui.editor.title", placeholders(arena, validation)))
+        .title(message("arena.gui.editor.assistant-title", placeholders(arena, validation)))
         .rows(settings.editorRows())
         .fillEmptySlots(true)
         .data("arena_id", id)
@@ -338,14 +338,14 @@ public final class ArenaEditorMenuFactory {
         .button(
             settings.displayNameSlot(),
             action(
-                "arena.editor.display-name",
+                "arena.editor.assistant-name",
                 AdministrativeCommandPolicy.ARENA_EDIT,
                 placeholders(arena, validation),
                 context -> requestDisplayName(playerId, id, expected)))
         .button(
             settings.worldSlot(),
             GuiButton.builder()
-                .itemKey("arena.editor.map-template")
+                .itemKey("arena.editor.assistant-map")
                 .itemPlaceholders(context -> placeholders(arena, validation))
                 .permission(AdministrativeCommandPolicy.ARENA_EDIT)
                 .onLeftClick(context -> context.open(mapTemplates(playerId, id, expected)))
@@ -363,25 +363,24 @@ public final class ArenaEditorMenuFactory {
                 .build())
         .button(settings.waitingSlot(), positionButton(playerId, arena, expected, true, validation))
         .button(
-            settings.spectatorSlot(), positionButton(playerId, arena, expected, false, validation))
-        .button(
-            settings.playersSlot(),
+            settings.spectatorSlot(),
             action(
-                "arena.editor.players",
-                AdministrativeCommandPolicy.ARENA_EDIT,
-                placeholders(arena, validation),
-                context -> context.open(players(playerId, id, expected))))
-        .button(
-            settings.teamsSlot(),
-            action(
-                "arena.editor.teams",
+                "arena.editor.assistant-teams",
                 AdministrativeCommandPolicy.ARENA_EDIT,
                 placeholders(arena, validation),
                 context -> context.open(teams(playerId, id, expected))))
         .button(
+            settings.playersSlot(),
+            action(
+                "arena.editor.assistant-players",
+                AdministrativeCommandPolicy.ARENA_EDIT,
+                placeholders(arena, validation),
+                context -> context.open(players(playerId, id, expected))))
+        .button(settings.teamsSlot(), positionButton(playerId, arena, expected, false, validation))
+        .button(
             settings.boundarySlot(),
             action(
-                "arena.editor.boundary",
+                "arena.editor.assistant-boundary",
                 AdministrativeCommandPolicy.ARENA_EDIT,
                 placeholders(arena, validation),
                 context -> context.open(boundary(playerId, id, expected))))
@@ -390,8 +389,8 @@ public final class ArenaEditorMenuFactory {
             GuiButton.builder()
                 .itemKey(
                     validation.valid()
-                        ? "arena.editor.setup-valid"
-                        : "arena.editor.setup-incomplete")
+                        ? "arena.editor.assistant-review-ready"
+                        : "arena.editor.assistant-review")
                 .itemPlaceholders(context -> placeholders(arena, validation))
                 .onLeftClick(context -> context.open(validation(playerId, id)))
                 .build())
@@ -399,7 +398,7 @@ public final class ArenaEditorMenuFactory {
         .button(
             settings.deleteSlot(),
             action(
-                "arena.editor.delete",
+                "arena.editor.assistant-delete",
                 AdministrativeCommandPolicy.ARENA_DELETE,
                 placeholders(arena, validation),
                 context -> context.open(deleteConfirmation(playerId, id, false))))
@@ -465,9 +464,15 @@ public final class ArenaEditorMenuFactory {
     Gui.Builder builder =
         Gui.builder()
             .id("arena.map-templates." + id)
-            .title(message("arena.map.title", Map.of("arena_name", arena.displayName())))
+            .title(message("arena.map.assistant-title", Map.of("arena_name", arena.displayName())))
             .rows(6)
-            .fillEmptySlots(true);
+            .fillEmptySlots(true)
+            .button(
+                4,
+                GuiButton.builder()
+                    .itemKey("arena.map.assistant-guide")
+                    .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
+                    .build());
     List<Integer> slots = settings().contentSlots();
     if (templates.isEmpty())
       builder.button(
@@ -479,11 +484,16 @@ public final class ArenaEditorMenuFactory {
     for (int index = 0; index < Math.min(slots.size(), templates.size()); index++) {
       var template = templates.get(index);
       Map<String, Object> values = new LinkedHashMap<>(MapMenuFactory.placeholders(template));
-      values.put("selected", arena.template().filter(template.id().value()::equals).isPresent());
+      boolean selected = arena.template().filter(template.id().value()::equals).isPresent();
+      values.put("selected", selected);
+      values.put("selected_label", selected ? "✓ Déjà sélectionnée" : "Cliquez pour choisir");
       builder.button(
           slots.get(index),
           GuiButton.builder()
-              .itemKey(template.loaded() ? "map.list.entry-loaded" : "map.list.entry-unloaded")
+              .itemKey(
+                  template.loaded()
+                      ? "arena.map.assistant-choice-loaded"
+                      : "arena.map.assistant-choice-unloaded")
               .itemPlaceholders(context -> values)
               .permission(AdministrativeCommandPolicy.ARENA_EDIT)
               .onLeftClick(
@@ -515,12 +525,17 @@ public final class ArenaEditorMenuFactory {
     ArenaValidationResult validation = arenas.validate(arena);
     return Gui.builder()
         .id("arena.players." + id)
-        .title(message("arena.players.title", placeholders(arena, validation)))
+        .title(message("arena.players.assistant-title", placeholders(arena, validation)))
         .rows(3)
         .fillEmptySlots(true)
         .button(11, numberButton(playerId, arena, expected, true))
         .button(15, numberButton(playerId, arena, expected, false))
-        .button(13, infoButton(arena, validation))
+        .button(
+            13,
+            GuiButton.builder()
+                .itemKey("arena.players.assistant-summary")
+                .itemPlaceholders(context -> placeholders(arena, validation))
+                .build())
         .button(22, standard.back())
         .build();
   }
@@ -530,12 +545,17 @@ public final class ArenaEditorMenuFactory {
     if (arena == null) return missing(playerId);
     return Gui.builder()
         .id("arena.teams." + id)
-        .title(message("arena.teams.title", placeholders(arena, arenas.validate(arena))))
+        .title(message("arena.teams.assistant-title", placeholders(arena, arenas.validate(arena))))
         .rows(3)
         .fillEmptySlots(true)
         .button(11, teamNumberButton(playerId, arena, expected, true))
         .button(15, teamNumberButton(playerId, arena, expected, false))
-        .button(13, infoButton(arena, arenas.validate(arena)))
+        .button(
+            13,
+            GuiButton.builder()
+                .itemKey("arena.teams.assistant-summary")
+                .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
+                .build())
         .button(22, standard.back())
         .build();
   }
@@ -547,13 +567,13 @@ public final class ArenaEditorMenuFactory {
     Map<String, Object> placeholders = placeholders(arena, arenas.validate(arena));
     return Gui.builder()
         .id("arena.boundary." + id)
-        .title(message("arena.boundary.title", placeholders))
+        .title(message("arena.boundary.assistant-title", placeholders))
         .rows(4)
         .fillEmptySlots(true)
         .button(
             10,
             GuiButton.builder()
-                .itemKey("arena.boundary.minimum")
+                .itemKey("arena.boundary.assistant-minimum")
                 .itemPlaceholders(context -> boundaryPlaceholders(placeholders, value))
                 .permission(AdministrativeCommandPolicy.ARENA_EDIT)
                 .onLeftClick(
@@ -579,7 +599,7 @@ public final class ArenaEditorMenuFactory {
         .button(
             12,
             GuiButton.builder()
-                .itemKey("arena.boundary.maximum")
+                .itemKey("arena.boundary.assistant-maximum")
                 .itemPlaceholders(context -> boundaryPlaceholders(placeholders, value))
                 .permission(AdministrativeCommandPolicy.ARENA_EDIT)
                 .onLeftClick(
@@ -605,7 +625,9 @@ public final class ArenaEditorMenuFactory {
         .button(
             14,
             action(
-                value.enabled() ? "arena.boundary.enabled" : "arena.boundary.disabled",
+                value.enabled()
+                    ? "arena.boundary.assistant-enabled"
+                    : "arena.boundary.assistant-disabled",
                 AdministrativeCommandPolicy.ARENA_EDIT,
                 boundaryPlaceholders(placeholders, value),
                 context ->
@@ -618,7 +640,7 @@ public final class ArenaEditorMenuFactory {
         .button(
             16,
             action(
-                "arena.boundary.reset",
+                "arena.boundary.assistant-reset",
                 AdministrativeCommandPolicy.ARENA_EDIT,
                 placeholders,
                 context -> context.open(clearBoundaryConfirmation(playerId, id, expected))))
@@ -704,7 +726,7 @@ public final class ArenaEditorMenuFactory {
       ArenaValidationResult validation) {
     Optional<ArenaLocation> location =
         waiting ? arena.waitingLocation() : arena.spectatorLocation();
-    String key = waiting ? "arena.editor.waiting-lobby" : "arena.editor.spectator";
+    String key = waiting ? "arena.editor.assistant-waiting" : "arena.editor.assistant-spectator";
     return GuiButton.builder()
         .itemKey(key)
         .itemPlaceholders(context -> positionPlaceholders(arena, validation, location))
@@ -748,7 +770,7 @@ public final class ArenaEditorMenuFactory {
 
   private GuiButton numberButton(
       UUID playerId, ArenaDefinition arena, long expected, boolean minimum) {
-    String key = minimum ? "arena.players.minimum" : "arena.players.maximum";
+    String key = minimum ? "arena.players.minimum-assisted" : "arena.players.maximum-assisted";
     return GuiButton.builder()
         .itemKey(key)
         .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
@@ -771,7 +793,7 @@ public final class ArenaEditorMenuFactory {
 
   private GuiButton teamNumberButton(
       UUID playerId, ArenaDefinition arena, long expected, boolean count) {
-    String key = count ? "arena.teams.count" : "arena.teams.players-per-team";
+    String key = count ? "arena.teams.count-assisted" : "arena.teams.size-assisted";
     return GuiButton.builder()
         .itemKey(key)
         .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
@@ -796,12 +818,14 @@ public final class ArenaEditorMenuFactory {
       UUID playerId, ArenaDefinition arena, long expected, ArenaValidationResult validation) {
     if (!arena.enabled() && !validation.valid())
       return GuiButton.builder()
-          .itemKey("arena.editor.enable-invalid")
+          .itemKey("arena.editor.assistant-activation-blocked")
           .itemPlaceholders(context -> placeholders(arena, validation))
           .onLeftClick(context -> context.open(validation(playerId, arena.id().value())))
           .build();
     return action(
-        arena.enabled() ? "arena.editor.disable" : "arena.editor.enable",
+        arena.enabled()
+            ? "arena.editor.assistant-disable"
+            : "arena.editor.assistant-activation-ready",
         arena.enabled()
             ? AdministrativeCommandPolicy.ARENA_DISABLE
             : AdministrativeCommandPolicy.ARENA_ENABLE,
@@ -811,7 +835,7 @@ public final class ArenaEditorMenuFactory {
 
   private GuiButton infoButton(ArenaDefinition arena, ArenaValidationResult validation) {
     return GuiButton.builder()
-        .itemKey("arena.editor.information")
+        .itemKey("arena.editor.assistant-progress")
         .itemPlaceholders(context -> placeholders(arena, validation))
         .build();
   }
@@ -824,7 +848,10 @@ public final class ArenaEditorMenuFactory {
             message(
                 arena.enabled() ? "arena.gui.editor.disable" : "arena.gui.editor.enable",
                 Map.of("arena_name", arena.displayName())))
-        .informationKey(arena.enabled() ? "arena.editor.disable" : "arena.editor.enable")
+        .informationKey(
+            arena.enabled()
+                ? "arena.editor.assistant-disable"
+                : "arena.editor.assistant-activation-ready")
         .informationPlaceholders(placeholders(arena, arenas.validate(arena)))
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
@@ -849,7 +876,7 @@ public final class ArenaEditorMenuFactory {
     return ConfirmationGui.builder()
         .id("arena.delete." + id + '.' + enabledConfirmed)
         .title(message("arena.delete.title", Map.of("arena_name", arena.displayName())))
-        .informationKey("arena.editor.delete")
+        .informationKey("arena.editor.assistant-delete")
         .informationPlaceholders(placeholders(arena, arenas.validate(arena)))
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
@@ -876,7 +903,8 @@ public final class ArenaEditorMenuFactory {
     return ConfirmationGui.builder()
         .id("arena.position.clear." + id + '.' + waiting)
         .title(message("arena.gui.position.clear-title", Map.of("arena_id", id)))
-        .informationKey(waiting ? "arena.editor.waiting-lobby" : "arena.editor.spectator")
+        .informationKey(
+            waiting ? "arena.editor.assistant-waiting" : "arena.editor.assistant-spectator")
         .informationPlaceholders(placeholders(arena, arenas.validate(arena)))
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
@@ -898,7 +926,7 @@ public final class ArenaEditorMenuFactory {
     return ConfirmationGui.builder()
         .id("arena.boundary.clear." + id)
         .title(message("arena.boundary.reset", Map.of("arena_id", id)))
-        .informationKey("arena.boundary.reset")
+        .informationKey("arena.boundary.assistant-reset")
         .informationPlaceholders(Map.of("arena_id", id))
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
@@ -918,7 +946,7 @@ public final class ArenaEditorMenuFactory {
     return ConfirmationGui.builder()
         .id("arena.teams.confirm." + arena.id())
         .title(message("arena.teams.confirm-title", values))
-        .informationKey("arena.teams.confirm")
+        .informationKey("arena.teams.confirm-assisted")
         .informationPlaceholders(values)
         .confirmItemKey("gui.confirm")
         .cancelItemKey("gui.cancel")
@@ -1351,6 +1379,48 @@ public final class ArenaEditorMenuFactory {
     values.put("capacity", arena.teamCount() * arena.playersPerTeam());
     values.put("validation_errors", errors(validation));
     values.put("validation_warnings", validation.warnings());
+    boolean mapConfigured = arena.template().isPresent();
+    boolean waitingConfigured = arena.waitingLocation().isPresent();
+    boolean spectatorConfigured = arena.spectatorLocation().isPresent();
+    boolean teamsConfigured =
+        arena.teamCount() >= 2
+            && arena.playersPerTeam() >= 1
+            && arena.maximumPlayers() == arena.teamCount() * arena.playersPerTeam();
+    boolean playersConfigured =
+        arena.minimumPlayers() >= 1 && arena.maximumPlayers() >= arena.minimumPlayers();
+    int completed =
+        (mapConfigured ? 1 : 0)
+            + (waitingConfigured ? 1 : 0)
+            + (teamsConfigured ? 1 : 0)
+            + (playersConfigured ? 1 : 0);
+    values.put("map_configured", mapConfigured);
+    values.put("waiting_configured", waitingConfigured);
+    values.put("spectator_configured", spectatorConfigured);
+    values.put("teams_configured", teamsConfigured);
+    values.put("players_configured", playersConfigured);
+    values.put("map_step", stepLabel(mapConfigured));
+    values.put("waiting_step", stepLabel(waitingConfigured));
+    values.put("spectator_step", stepLabel(spectatorConfigured));
+    values.put("teams_step", stepLabel(teamsConfigured));
+    values.put("players_step", stepLabel(playersConfigured));
+    values.put("setup_steps_complete", completed);
+    values.put("setup_steps_total", 4);
+    values.put("setup_percent", completed * 25);
+    values.put(
+        "next_step",
+        !mapConfigured
+            ? "Choisir la carte BedWars"
+            : !waitingConfigured
+                ? "Placer le point d'attente"
+                : !teamsConfigured
+                    ? "Configurer les équipes"
+                    : !playersConfigured
+                        ? "Vérifier les joueurs"
+                        : !spectatorConfigured
+                            ? "Ajouter le point spectateur (conseillé)"
+                            : validation.valid()
+                                ? "Activer l'arène"
+                                : "Consulter les étapes restantes");
     values.put("created_at", DATE.format(arena.metadata().createdAt()));
     values.put("updated_at", DATE.format(arena.metadata().updatedAt()));
     values.put("author", arena.metadata().attributes().getOrDefault("author", "unknown"));
@@ -1363,6 +1433,7 @@ public final class ArenaEditorMenuFactory {
       ArenaDefinition arena, ArenaValidationResult validation, Optional<ArenaLocation> location) {
     Map<String, Object> values = new LinkedHashMap<>(placeholders(arena, validation));
     values.put("position_configured", location.isPresent());
+    values.put("position_status", stepLabel(location.isPresent()));
     values.put("position_world", location.map(ArenaLocation::world).orElse("-"));
     values.put("x", location.map(value -> value.position().x()).orElse(0.0));
     values.put("y", location.map(value -> value.position().y()).orElse(0.0));
@@ -1379,7 +1450,18 @@ public final class ArenaEditorMenuFactory {
     values.put("minimum_configured", boundary.minimum().isPresent());
     values.put("maximum_configured", boundary.maximum().isPresent());
     values.put("boundary_valid", boundary.ordered());
+    values.put(
+        "boundary_status",
+        !boundary.enabled()
+            ? "Option désactivée"
+            : boundary.minimum().isPresent() && boundary.maximum().isPresent() && boundary.ordered()
+                ? "✓ Limites prêtes"
+                : "À terminer");
     return Map.copyOf(values);
+  }
+
+  private static String stepLabel(boolean complete) {
+    return complete ? "✓ Terminé" : "À faire";
   }
 
   private String message(String key, Map<String, ?> values) {

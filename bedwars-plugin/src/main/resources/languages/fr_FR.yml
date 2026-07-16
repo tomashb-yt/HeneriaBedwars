@@ -97,6 +97,7 @@ arena:
       refreshed: "<green>Liste actualisee."
     editor:
       title: "<aqua>Edition - {arena_name} <gray>r{arena_revision}"
+      assistant-title: "<dark_aqua><bold>Assistant <gray>• <white>{arena_name}"
       autosave: "<green>Modification enregistree automatiquement."
       information: "<aqua>Informations generales"
       display-name: "<yellow>Nom d'affichage"
@@ -133,17 +134,20 @@ arena:
     teleport-success: "<green>Teleportation vers {world}."
   players:
     title: "<gold>Joueurs - {arena_name}"
+    assistant-title: "<gold><bold>Étape 4 <gray>• <white>Joueurs"
     minimum: "<yellow>Minimum : {minimum_players}"
     maximum: "<yellow>Maximum : {maximum_players}"
     capacity: "<gray>Capacite des equipes : {capacity}"
   teams:
     title: "<light_purple>Equipes - {arena_name}"
+    assistant-title: "<light_purple><bold>Étape 3 <gray>• <white>Équipes"
     count: "<yellow>Nombre : {team_count}"
     players-per-team: "<yellow>Joueurs/equipe : {players_per_team}"
     format: "<gray>Format : {team_count} x {players_per_team}"
     confirm-title: "<gold>Confirmer {new_team_count} x {new_players_per_team} ?"
   boundary:
     title: "<blue>Limites - {arena_name}"
+    assistant-title: "<blue><bold>Option <gray>• <white>Limites"
     enabled: "<green>Limites activees"
     disabled: "<gray>Limites desactivees"
     minimum: "<yellow>Point minimum"
@@ -178,6 +182,7 @@ arena:
       invalid-boundary: {message: "Les deux points des limites sont incohérents.", solution: "Replacez les points minimum et maximum."}
   map:
     title: "<aqua>Carte modele - {arena_name}"
+    assistant-title: "<aqua><bold>Étape 1 <gray>• <white>Carte BedWars"
     created-and-linked: "<green>La carte <white>{map_id}<green> a été créée et associée à l'arène."
   delete:
     title: "<red>Supprimer {arena_name} ?"

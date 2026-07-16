@@ -243,21 +243,50 @@ items:
       enable-invalid: {material: BARRIER, name: "<red>Activation impossible", lore: ["<gray>Cliquez pour afficher les problemes."]}
       disable: {material: GRAY_DYE, name: "<yellow>Desactiver l'arene"}
       delete: {material: TNT, name: "<red>Supprimer l'arene", lore: ["<yellow>Une sauvegarde sera creee."]}
+      assistant-progress:
+        material: NETHER_STAR
+        name: "<aqua><bold>Assistant de configuration"
+        lore: ["<gray>Progression: <white>{setup_percent}%", "<gray>Étapes: <white>{setup_steps_complete}/{setup_steps_total}", "", "<yellow>Prochaine action :", "<white>{next_step}", "", "<dark_gray>Les changements sont sauvegardés automatiquement."]
+      assistant-name: {material: NAME_TAG, name: "<yellow>Présentation de l'arène", lore: ["<gray>Nom actuel: <white>{arena_name}", "", "<yellow>▸ Cliquez pour le modifier"]}
+      assistant-map: {material: GRASS_BLOCK, name: "<aqua><bold>1. Carte BedWars", lore: ["<gray>État: <white>{map_step}", "<gray>Carte: <white>{map_template}", "", "<yellow>▸ Cliquez pour choisir ou créer"]}
+      assistant-waiting: {material: CLOCK, name: "<gold><bold>2. Point d'attente", lore: ["<gray>État: <white>{position_status}", "<gray>Les joueurs attendront ici avant", "<gray>le lancement de la partie.", "", "<yellow>▸ Gauche : placer ici", "<aqua>▸ Droit : s'y téléporter", "<red>▸ Shift+droit : retirer"]}
+      assistant-teams: {material: WHITE_BANNER, name: "<light_purple><bold>3. Format des équipes", lore: ["<gray>État: <white>{teams_step}", "<gray>Format: <white>{team_count} équipe(s) de {players_per_team}", "<gray>Capacité totale: <white>{capacity}", "", "<yellow>▸ Cliquez pour configurer"]}
+      assistant-players: {material: PLAYER_HEAD, name: "<gold><bold>4. Nombre de joueurs", lore: ["<gray>État: <white>{players_step}", "<gray>Minimum: <white>{minimum_players}", "<gray>Maximum: <white>{maximum_players}", "", "<yellow>▸ Cliquez pour configurer"]}
+      assistant-spectator: {material: ENDER_EYE, name: "<aqua><bold>5. Point spectateur <gray>(conseillé)", lore: ["<gray>État: <white>{position_status}", "<gray>Les joueurs éliminés seront placés ici.", "", "<yellow>▸ Gauche : placer ici", "<aqua>▸ Droit : s'y téléporter", "<red>▸ Shift+droit : retirer"]}
+      assistant-boundary: {material: STRUCTURE_VOID, name: "<blue>Option : limites de construction", lore: ["<gray>Empêche de construire hors de la zone.", "<gray>Inutile pour commencer.", "", "<yellow>▸ Cliquez pour configurer"]}
+      assistant-review: {material: ORANGE_CONCRETE, name: "<gold><bold>Vérifier les étapes", lore: ["<white>{validation_errors} <gray>étape(s) obligatoire(s)", "<white>{validation_warnings} <gray>conseil(s)", "", "<yellow>Prochaine action :", "<white>{next_step}", "", "<yellow>▸ Cliquez pour être guidé"]}
+      assistant-review-ready: {material: LIME_CONCRETE, name: "<green><bold>Configuration terminée", lore: ["<gray>Toutes les étapes obligatoires", "<gray>sont correctement configurées.", "", "<yellow>▸ Cliquez pour vérifier"]}
+      assistant-activation-ready: {material: LIME_CONCRETE, name: "<green><bold>Activer l'arène", lore: ["<gray>L'arène est prête à être utilisée.", "", "<yellow>▸ Cliquez pour confirmer"]}
+      assistant-activation-blocked: {material: IRON_BARS, name: "<gray><bold>Activation verrouillée", lore: ["<gold>{validation_errors} étape(s) sont encore requises.", "", "<yellow>▸ Cliquez pour voir quoi faire"]}
+      assistant-disable: {material: GRAY_DYE, name: "<yellow>Désactiver l'arène", lore: ["<gray>La configuration sera conservée.", "", "<yellow>▸ Cliquez pour confirmer"]}
+      assistant-delete: {material: TNT, name: "<red>Supprimer définitivement", lore: ["<gray>Une sauvegarde sera créée avant", "<gray>la suppression de l'arène.", "", "<red>▸ Cliquez pour continuer"]}
     world:
       entry: {material: GRASS_BLOCK, name: "<green>{world}", lore: ["<gray>Environnement: <white>{environment}", "<gray>Joueurs: <white>{world_players}", "<gray>Monde actuel: <white>{world_current}", "<gray>Selectionne: <white>{world_selected}", "<white>Gauche: selectionner", "<white>Droit: teleporter"]}
     players:
       minimum: &number-item {material: REDSTONE, name: "<yellow>Minimum: {minimum_players}", lore: ["<white>Gauche: +1", "<white>Droit: -1", "<white>Shift+gauche: +5", "<white>Shift+droit: -5", "<white>Milieu: saisir"]}
       maximum: {<<: *number-item, material: GLOWSTONE_DUST, name: "<yellow>Maximum: {maximum_players}"}
+      assistant-summary: {material: PLAYER_HEAD, name: "<gold><bold>Réglage des joueurs", lore: ["<gray>Choisissez combien de joueurs sont", "<gray>nécessaires pour lancer la partie.", "", "<gray>Capacité des équipes: <white>{capacity}", "<gray>Plage actuelle: <white>{minimum_players} à {maximum_players}"]}
+      minimum-assisted: {material: REDSTONE, name: "<yellow>Minimum : <white>{minimum_players}", lore: ["<gray>Nombre requis pour démarrer.", "", "<green>▸ Gauche : +1", "<red>▸ Droit : -1", "<green>▸ Shift+gauche : +5", "<red>▸ Shift+droit : -5", "<aqua>▸ Molette : écrire une valeur"]}
+      maximum-assisted: {material: GLOWSTONE_DUST, name: "<yellow>Maximum : <white>{maximum_players}", lore: ["<gray>Ne doit pas dépasser la capacité", "<gray>définie par les équipes: <white>{capacity}", "", "<green>▸ Gauche : +1", "<red>▸ Droit : -1", "<green>▸ Shift+gauche : +5", "<red>▸ Shift+droit : -5", "<aqua>▸ Molette : écrire une valeur"]}
     teams:
       count: {<<: *number-item, material: WHITE_BANNER, name: "<yellow>Equipes: {team_count}"}
       players-per-team: {<<: *number-item, material: PLAYER_HEAD, name: "<yellow>Joueurs/equipe: {players_per_team}"}
       confirm: {material: PAPER, name: "<gold>Nouveau format", lore: ["<gray>Avant: <white>{team_count} x {players_per_team}", "<gray>Apres: <white>{new_team_count} x {new_players_per_team}", "<gray>Maximum: <white>{new_capacity}"]}
+      assistant-summary: {material: RED_BED, name: "<light_purple><bold>Format de la partie", lore: ["<gray>Exemple: 4 équipes de 4 joueurs", "<gray>donne une capacité totale de 16.", "", "<gray>Format actuel: <white>{team_count} × {players_per_team}", "<gray>Capacité: <white>{capacity}"]}
+      count-assisted: {material: WHITE_BANNER, name: "<light_purple>Nombre d'équipes : <white>{team_count}", lore: ["<gray>Minimum recommandé: 2 équipes.", "", "<green>▸ Gauche : +1", "<red>▸ Droit : -1", "<green>▸ Shift+gauche : +2", "<red>▸ Shift+droit : -2", "<aqua>▸ Molette : écrire une valeur"]}
+      size-assisted: {material: PLAYER_HEAD, name: "<light_purple>Joueurs par équipe : <white>{players_per_team}", lore: ["<gray>Capacité calculée: <white>{capacity}", "", "<green>▸ Gauche : +1", "<red>▸ Droit : -1", "<green>▸ Shift+gauche : +2", "<red>▸ Shift+droit : -2", "<aqua>▸ Molette : écrire une valeur"]}
+      confirm-assisted: {material: PAPER, name: "<gold><bold>Confirmer le nouveau format", lore: ["<gray>Avant: <white>{team_count} × {players_per_team}", "<gray>Après: <white>{new_team_count} × {new_players_per_team}", "<gray>Nouvelle capacité: <white>{new_capacity}"]}
     boundary:
       minimum: {material: BLUE_CONCRETE, name: "<blue>Definir le minimum", lore: ["<gray>Configure: <white>{minimum_configured}"]}
       maximum: {material: RED_CONCRETE, name: "<red>Definir le maximum", lore: ["<gray>Configure: <white>{maximum_configured}"]}
       enabled: {material: LIME_DYE, name: "<green>Limites activees", lore: ["<gray>Cliquez pour desactiver."]}
       disabled: {material: GRAY_DYE, name: "<gray>Limites desactivees", lore: ["<gray>Cliquez pour activer."]}
       reset: {material: BARRIER, name: "<red>Reinitialiser les limites"}
+      assistant-minimum: {material: BLUE_CONCRETE, name: "<blue><bold>Point minimum", lore: ["<gray>État: <white>{minimum_configured}", "<gray>Placez-vous dans un premier coin.", "", "<yellow>▸ Gauche : placer ici", "<aqua>▸ Droit : s'y téléporter"]}
+      assistant-maximum: {material: RED_CONCRETE, name: "<red><bold>Point maximum", lore: ["<gray>État: <white>{maximum_configured}", "<gray>Placez-vous dans le coin opposé.", "", "<yellow>▸ Gauche : placer ici", "<aqua>▸ Droit : s'y téléporter"]}
+      assistant-enabled: {material: LIME_CONCRETE, name: "<green><bold>Limites activées", lore: ["<gray>État: <white>{boundary_status}", "", "<yellow>▸ Cliquez pour désactiver"]}
+      assistant-disabled: {material: GRAY_CONCRETE, name: "<gray><bold>Limites désactivées", lore: ["<gray>Cette option n'est pas obligatoire.", "", "<yellow>▸ Cliquez pour activer"]}
+      assistant-reset: {material: BARRIER, name: "<red>Réinitialiser les limites", lore: ["<gray>Retire les deux points configurés.", "", "<red>▸ Cliquez pour confirmer"]}
     validation:
       info: {material: LIME_CONCRETE, name: "<green><bold>Tout est prêt", lore: ["<gray>Aucun problème bloquant.", "", "<white>Vous pouvez activer cette arène."]}
       warning: {material: YELLOW_CONCRETE, name: "<yellow><bold>Conseil", lore: ["<white>{problem}", "", "<gray>À faire :", "<aqua>{solution}", "", "<yellow>▸ Cliquez pour ouvrir"]}
@@ -272,6 +301,9 @@ items:
     map:
       empty: {material: MINECART, name: "<gold><bold>Aucune carte BedWars", lore: ["<gray>Cette arène a besoin d'une carte.", "", "<white>Utilisez le bouton ci-dessous pour", "<white>créer un monde vide automatiquement."]}
       create: {material: EMERALD_BLOCK, name: "<green><bold>Créer et associer une carte", lore: ["<gray>Le monde sera créé puis lié", "<gray>automatiquement à cette arène.", "", "<yellow>▸ Cliquez pour commencer"]}
+      assistant-guide: {material: COMPASS, name: "<aqua><bold>Étape 1 : choisir la carte", lore: ["<gray>Cette carte servira de modèle BedWars.", "<gray>Vous pourrez la construire et la", "<gray>sauvegarder sans lancer de partie.", "", "<yellow>▸ Choisissez une carte ci-dessous"]}
+      assistant-choice-loaded: {material: LIME_CONCRETE, name: "<green><bold>{map_name}", lore: ["<gray>État: <green>{map_state_label}", "<gray>Arènes liées: <white>{arena_count}", "<gray>Sélection: <white>{selected_label}", "", "<yellow>▸ Cliquez pour associer"]}
+      assistant-choice-unloaded: {material: GRAY_CONCRETE, name: "<gray><bold>{map_name}", lore: ["<gray>État: <white>{map_state_label}", "<gray>Arènes liées: <white>{arena_count}", "<gray>Sélection: <white>{selected_label}", "", "<yellow>▸ Cliquez pour associer", "<dark_gray>La carte peut rester fermée."]}
   map:
     list:
       create: {material: EMERALD_BLOCK, name: "<green><bold>Créer une carte BedWars", lore: ["<gray>Un monde vide sera créé.", "", "<yellow>▸ Cliquez puis écrivez son nom"]}

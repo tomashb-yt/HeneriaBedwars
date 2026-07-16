@@ -97,6 +97,7 @@ arena:
       refreshed: "<green>List refreshed."
     editor:
       title: "<aqua>Editing - {arena_name} <gray>r{arena_revision}"
+      assistant-title: "<dark_aqua><bold>Setup assistant <gray>• <white>{arena_name}"
       autosave: "<green>Change saved automatically."
       information: "<aqua>General information"
       display-name: "<yellow>Display name"
@@ -133,17 +134,20 @@ arena:
     teleport-success: "<green>Teleported to {world}."
   players:
     title: "<gold>Players - {arena_name}"
+    assistant-title: "<gold><bold>Step 4 <gray>• <white>Players"
     minimum: "<yellow>Minimum: {minimum_players}"
     maximum: "<yellow>Maximum: {maximum_players}"
     capacity: "<gray>Team capacity: {capacity}"
   teams:
     title: "<light_purple>Teams - {arena_name}"
+    assistant-title: "<light_purple><bold>Step 3 <gray>• <white>Teams"
     count: "<yellow>Count: {team_count}"
     players-per-team: "<yellow>Players/team: {players_per_team}"
     format: "<gray>Format: {team_count} x {players_per_team}"
     confirm-title: "<gold>Confirm {new_team_count} x {new_players_per_team}?"
   boundary:
     title: "<blue>Boundary - {arena_name}"
+    assistant-title: "<blue><bold>Optional <gray>• <white>Boundaries"
     enabled: "<green>Boundary enabled"
     disabled: "<gray>Boundary disabled"
     minimum: "<yellow>Minimum point"
@@ -178,6 +182,7 @@ arena:
       invalid-boundary: {message: "The two boundary points are inconsistent.", solution: "Set the minimum and maximum points again."}
   map:
     title: "<aqua>Map template - {arena_name}"
+    assistant-title: "<aqua><bold>Step 1 <gray>• <white>BedWars map"
     created-and-linked: "<green>Map <white>{map_id}<green> was created and linked to the arena."
   delete:
     title: "<red>Delete {arena_name}?"

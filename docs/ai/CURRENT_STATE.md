@@ -8,6 +8,7 @@
 
 - tableau de bord administratif v2 ouvert directement par `/bedwars`, commandes avancées masquées de l'aide joueur et création guidée d'une carte `BEDWARS` associée à une nouvelle arène;
 - validation visuelle compacte, localisée et orientée action, sans exposer les codes internes; une carte modèle valide n'a pas besoin de rester chargée pour que l'arène soit administrativement valide;
+- éditeur d'arène présenté comme un assistant continu avec pourcentage, prochaine action et étapes numérotées; les menus carte, joueurs, équipes, positions, limites, activation et suppression expliquent leurs effets au lieu d'exposer des réglages bruts;
 - gestion autonome de cartes modèles `LOBBY`, `BEDWARS` et `GENERIC`, identifiants sûrs, métadonnées immutables/révisionnées et registre ordonné;
 - création de mondes vides préfixés, plateforme de sécurité configurable, chargement, téléportation, spawn, sauvegarde, déchargement et autosauvegarde centrale optionnelle;
 - duplication asynchrone avec exclusions, suppression asynchrone après sauvegarde complète, confinement des chemins et refus des liens symboliques;
