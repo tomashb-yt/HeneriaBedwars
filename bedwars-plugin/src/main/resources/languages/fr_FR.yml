@@ -15,6 +15,7 @@ command:
     language: "<gray>/bedwars language [set <locale>] <dark_gray>- <white>Gère la langue globale."
     gui: "<gray>/bedwars gui <dark_gray>- <white>Ouvre le menu de test des interfaces."
     item: "<gray>/bedwars item <dark_gray>- <white>Inspecte les items configurables."
+    arena: "<gray>/bedwars arena <dark_gray>- <white>Administre les definitions d'arenes."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Version du plugin : <white>{plugin_version}"
@@ -41,6 +42,7 @@ command:
     warnings: "<gray>Avertissements actifs : <white>{warnings}"
     gui-sessions: "<gray>Sessions GUI actives : <white>{gui_sessions}"
     items: "<gray>Items configurables actifs : <white>{items}"
+    arenas: "<gray>Arenes chargees : <white>{arena_count}"
   language:
     current: "<gray>Langue actuelle : <white>{language}"
     available: "<gray>Langues disponibles : <white>{locales}"
@@ -54,6 +56,24 @@ command:
     given: "<green>Une copie de <white>{item_key}<green> a été ajoutée à votre inventaire."
     inventory-full: "<red>Votre inventaire est plein. Aucun item n'a été ajouté."
     preview-title: "<aqua>Prévisualisation des items"
+  arena:
+    help: "<yellow>Utilisation : /bedwars arena <create|list|info|menu|setworld|setwaiting|setspectator|setplayers|setteams|validate|enable|disable|delete>"
+    created: "<green>Arene <white>{arena}<green> creee en brouillon."
+    exists: "<red>L'arene <white>{arena}<red> existe deja."
+    invalid-id: "<red>Identifiant invalide : 2 a 32 caracteres parmi a-z, 0-9, _ et -."
+    not-found: "<red>Arene inconnue : <white>{arena}"
+    list: "<gray>Arenes (<white>{count}<gray>) : <white>{arenas}"
+    info: "<aqua>{arena_name} <gray>(<white>{arena_id}<gray>) - <white>{arena_status}<gray>, monde <white>{world}<gray>, joueurs <white>{min_players}-{max_players}<gray>, equipes <white>{teams}x{players_per_team}"
+    updated: "<green>Arene <white>{arena}<green> enregistree."
+    enabled: "<green>Arene <white>{arena}<green> activee."
+    disabled: "<yellow>Arene <white>{arena}<yellow> desactivee."
+    deleted: "<green>Arene <white>{arena}<green> sauvegardee puis supprimee."
+    invalid-argument: "<red>Arguments invalides. Consultez /bedwars arena."
+    valid: "<green>L'arene <white>{arena}<green> est valide."
+    invalid: "<red>L'arene <white>{arena}<red> n'est pas activable."
+    problem: "<gray>[{severity}] <white>{field}<gray> - {code}: {problem}"
+    storage-error: "<red>L'operation sur <white>{arena}<red> n'a pas pu etre enregistree."
+    reload: "<gray>Arenes rechargees : <white>{arena_count}<gray>, preservees : <white>{arena_preserved}<gray>, erreurs : <white>{arena_errors}"
 gui:
   general:
     back: "<yellow>Retour"

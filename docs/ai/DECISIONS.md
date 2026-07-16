@@ -1,5 +1,25 @@
 # Décisions d'architecture
 
+## ADR-029 — Définition d'arène distincte d'une partie
+
+Accepté. `ArenaDefinition` décrit uniquement une configuration administrative persistante. `ArenaStatus` ne réutilise aucun futur état `WAITING/PLAYING/RESETTING` et aucune arène activée ne lance de gameplay.
+
+## ADR-030 — Un YAML UTF-8 sûr par arène
+
+Accepté. `ArenaId` limite les noms à `[a-z0-9_-]{2,32}` et le dépôt écrit `arenas/<id>.yml` par remplacement atomique. Le cœur dépend seulement d'`ArenaRepository`.
+
+## ADR-031 — Publication mémoire après persistance
+
+Accepté. Toute création ou modification est sauvegardée avant le remplacement copy-on-write d'`ArenaRegistry`. Une panne d'écriture laisse l'ancienne définition intacte.
+
+## ADR-032 — Reload partiel et diagnostic visible
+
+Accepté. Une définition structurée mais non activable reste visible comme `INVALID`. Un YAML illisible conserve l'ancienne définition du même id au reload ; au premier chargement il est journalisé et ignoré sans désactiver le plugin.
+
+## ADR-033 — Sauvegarde obligatoire avant suppression
+
+Accepté. Le seul contrat de suppression est `deleteWithBackup`. Le fichier est copié sous `backups/arenas/<date>/` avant sa suppression, avec suffixe anti-collision.
+
 ## ADR-022 — Clés logiques et définitions d'items immuables
 
 Accepté. Les items sont adressés par des clés minuscules pointées, normalisées par `ItemKey`. `ItemDefinition` ne contient aucune section YAML ni donnée Bukkit mutable.

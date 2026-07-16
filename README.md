@@ -36,7 +36,7 @@ Lire d'abord [AGENTS.md](AGENTS.md), puis la documentation de reprise dans [docs
 
 Au premier démarrage, le plugin crée les neuf YAML principaux, `languages/fr_FR.yml`, `languages/en_US.yml` et les dossiers `arenas`, `languages` et `backups`, sans écraser les fichiers existants. `/bedwars reload` recharge tout de manière transactionnelle, `/bedwars config` affiche un diagnostic sans secret et `/bedwars language set <locale>` persiste la langue. L'alias `/hbw` accepte les mêmes sous-commandes.
 
-Les arènes, équipes, lits, menus métier, achats, générateurs actifs, stockage SQL et parties ne sont pas implémentés.
+Les définitions administratives d'arènes sont stockées dans `arenas/<id>.yml`. `/bedwars arena` permet création, inspection, positions, capacités, validation, activation, désactivation et suppression confirmée avec sauvegarde. Une définition activée n'est pas encore une partie jouable : équipes runtime, lits, générateurs, reset de monde et matchmaking restent à venir.
 
 Le framework interne de menus est disponible via `/bedwars gui` ou `/hbw gui` avec `heneriabedwars.admin.gui`. Il démontre navigation, pagination, confirmation, rafraîchissement et protection des inventaires, sans fonctionnalité BedWars.
 

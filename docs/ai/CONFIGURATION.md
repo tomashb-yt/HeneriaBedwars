@@ -134,9 +134,15 @@ Les placeholders sont insérés après le rendu des couleurs : une valeur dynami
 
 L'évolution depuis le Ticket 003 sauvegarde puis complète uniquement les clés absentes de `items.yml`; les personnalisations existantes ne sont pas écrasées. Au reload, langues, définitions, héritage et validation sont préparés ensemble. Une erreur `ERROR/CRITICAL` conserve l'ancien snapshot; les menus ouverts ne ferment pas et reflètent les nouvelles définitions valides à leur prochain rafraîchissement.
 
+## Définitions `arenas/<id>.yml`
+
+Chaque arène possède un fichier UTF-8 version 1. L'id doit correspondre au nom du fichier et à `[a-z0-9_-]{2,32}`. Les champs persistés couvrent `display-name`, `status`, `enabled`, `world`, `template`, `environment`, `players.minimum/maximum`, `teams.count/players-per-team`, `locations.waiting/spectator`, `boundary` optionnelle et métadonnées de création/modification.
+
+Une arène activable exige un monde chargé, une position d'attente, des capacités positives et cohérentes (`maximum = teams × players-per-team`) et des positions dans le monde configuré. La position spectateur absente produit un avertissement. `/bedwars reload` recharge les fichiers indépendamment : un YAML illisible conserve son ancienne définition active connue, tandis qu'une définition lisible mais invalide reste inspectable. La suppression crée d'abord `backups/arenas/yyyy-MM-dd/<id>.yml`.
+
 ## Fichiers préparatoires
 
-`shops.yml`, `upgrades.yml` et `generators.yml` ont `config-version: 1` et `enabled: false`. Leurs définitions ne déclenchent ni achat, ni amélioration, ni génération. `arenas/` reste vide jusqu'au ticket des arènes.
+`shops.yml`, `upgrades.yml` et `generators.yml` ont `config-version: 1` et `enabled: false`. Leurs définitions ne déclenchent ni achat, ni amélioration, ni génération. `arenas/` est désormais alimenté par les commandes du Ticket 005.
 
 ## Langues et messages
 

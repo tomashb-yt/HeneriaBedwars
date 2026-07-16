@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 et 002 livrent la fondation, les configurations et les traductions ; aucun gameplay n'est encore actif.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 005 livrent la fondation, les configurations, traductions, menus, items et définitions administratives d'arènes ; aucun gameplay n'est encore actif.
 
 ## Lecture obligatoire
 
@@ -33,7 +33,9 @@ Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne
 
 Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est produit par `:bedwars-plugin:shadowJar`.
 
-Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui` et `item`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge uniquement les fichiers HeneriaBedWars, y compris le registre d'items.
+Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui`, `item` et `arena`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge les fichiers HeneriaBedWars, le registre d'items et les définitions d'arènes.
+
+Le Ticket 005 stocke une définition UTF-8 par fichier dans `arenas/`. Une suppression doit toujours passer par `ArenaRepository.deleteWithBackup`. Un fichier illisible au reload conserve sa définition active connue, tandis qu'une arène structurée mais invalide reste visible avec le statut `INVALID`.
 
 Au démarrage, l'ancien `config.yml` officiel du Ticket 001 sans `config-version` est reconnu par sa signature minimale, sauvegardé puis migré vers la version 1. Ne jamais élargir cette détection à n'importe quel YAML non versionné : un fichier vide, corrompu ou non reconnaissable doit rester intact et être refusé.
 

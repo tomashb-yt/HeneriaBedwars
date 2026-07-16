@@ -1,5 +1,22 @@
 # Architecture actuelle
 
+## Ticket 005 — définitions d'arènes
+
+`bedwars-core/arena` contient les identifiants sûrs, positions pures, définition immutable, statuts administratifs, diagnostics, validation, registre, port de persistance et cas d'usage. `bedwars-plugin/arena` adapte les mondes Bukkit, YAML UTF-8, commandes et menus. `ArenaService` est enregistré dans `ServiceRegistry` et chargé par `ArenaLifecycleComponent`.
+
+Une mutation n'est publiée dans le registre qu'après sauvegarde atomique réussie. Au reload, chaque fichier valide remplace sa définition ; un fichier illisible dont l'id est connu conserve l'ancienne valeur. Une suppression copie d'abord le YAML sous `backups/arenas/<date>/`. Les statuts `DRAFT/READY/ENABLED/DISABLED/INVALID/ERROR` sont distincts des futurs états de partie.
+
+```mermaid
+flowchart LR
+  FILES["arenas/*.yml"] --> REPOSITORY["YamlArenaRepository"]
+  REPOSITORY --> SERVICE["ArenaService"]
+  WORLD["Bukkit world resolver"] --> VALIDATOR["ArenaValidator"]
+  VALIDATOR --> SERVICE
+  SERVICE --> REGISTRY["ArenaRegistry snapshot"]
+  SERVICE --> COMMAND["/bedwars arena"]
+  SERVICE --> MENU["ArenaMenuFactory"]
+```
+
 ## Ticket 004 — items configurables
 
 `bedwars-core/item` contient clés, textes, contexte, définitions/templates immuables, registre et résolveur d'héritage sans Bukkit. `bedwars-plugin/item` charge et valide `items.yml`, construit des `ItemStack` neufs, applique les métadonnées/PDC et fournit `ItemService` au GUI et aux commandes. `ConfigurationSnapshot` contient le registre : le même échange atomique active configuration, langues et items, ou conserve l'ancien ensemble.

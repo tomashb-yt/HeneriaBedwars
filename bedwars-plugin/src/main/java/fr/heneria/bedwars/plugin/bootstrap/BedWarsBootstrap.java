@@ -2,6 +2,7 @@ package fr.heneria.bedwars.plugin.bootstrap;
 
 import fr.heneria.bedwars.api.HeneriaBedWarsApi;
 import fr.heneria.bedwars.api.PluginStatus;
+import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.lifecycle.LifecycleManager;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
@@ -24,16 +25,21 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
   public BedWarsBootstrap(
       String version,
       ConfigurationService configuration,
+      ArenaService arenaService,
+      LifecycleComponent arenaLifecycle,
       ItemService itemService,
       BukkitGuiService guiService,
       ProjectLogger logger) {
     this.version = Objects.requireNonNull(version, "version");
     this.logger = Objects.requireNonNull(logger, "logger");
     services.register(ConfigurationService.class, configuration);
+    services.register(ArenaService.class, arenaService);
     services.register(ItemService.class, itemService);
     services.register(GuiService.class, guiService);
     services.register(HeneriaBedWarsApi.class, this);
-    lifecycle = new LifecycleManager(List.of(new FoundationComponent(), guiService), logger);
+    lifecycle =
+        new LifecycleManager(
+            List.of(new FoundationComponent(), arenaLifecycle, guiService), logger);
   }
 
   @Override

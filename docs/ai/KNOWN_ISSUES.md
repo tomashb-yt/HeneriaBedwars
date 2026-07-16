@@ -1,5 +1,13 @@
 # Limitations connues
 
+## Ticket 005
+
+- Les arènes sont des définitions administratives : aucune partie, équipe runtime, lit, générateur, clonage ou reset de monde n'est actif.
+- L'éditeur GUI couvre les actions courantes mais pas encore tous les champs avancés, limites de zone, templates ou saisie textuelle complète ; ce périmètre relève du Ticket 006.
+- Les mondes sont seulement résolus parmi les mondes actuellement chargés par Bukkit ; aucun chargement ou import automatique n'est effectué.
+- Les YAML d'arènes n'ont qu'une version 1 et aucune migration historique n'est nécessaire à ce stade.
+- Aucun test en jeu des commandes, permissions, téléportations futures ou inventaires d'arènes n'a été exécuté dans l'environnement Codex.
+
 ## Ticket 004
 
 - Aucun éditeur complet d'items en jeu, aucune boutique et aucun objet de gameplay actif.

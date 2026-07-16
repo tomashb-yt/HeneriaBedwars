@@ -95,6 +95,10 @@ Les inventaires sont toujours modifiés sur le thread serveur. Une ouverture hor
 
 `/bedwars gui` et `/hbw gui`, permission `heneriabedwars.admin.gui`, ouvrent un menu de 6 lignes avec informations dynamiques, cinq types de clic, 50 éléments paginés, confirmation, sous-menu, retour, refresh, fermeture et erreur contrôlée visible uniquement en debug. Ce menu ne modifie aucune donnée BedWars.
 
+## Menus d'arènes
+
+`/bedwars arena menu` ouvre la liste paginée construite par `ArenaMenuFactory`. Chaque entrée utilise `arena.entry` dans `items.yml` et ouvre un détail avec monde, positions, validation, activation/désactivation et suppression. Les actions revérifient leur permission spécialisée au clic. La suppression passe par `ConfirmationGui` et `ArenaService.delete`; elle n'est jamais effectuée directement par le menu.
+
 ## Créer un nouveau menu
 
 1. Utiliser un identifiant stable et un titre traduit.

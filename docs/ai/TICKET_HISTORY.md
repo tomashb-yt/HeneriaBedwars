@@ -1,5 +1,15 @@
 # Historique des tickets
 
+## Ticket 005 — Modèle administratif et stockage des arènes
+
+Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/arena` ajoute identifiants sûrs, positions/limites pures, définition et métadonnées immutables, six statuts administratifs, diagnostics, validation, registre copy-on-write, port de persistance et service transactionnel. `bedwars-plugin/arena` ajoute le dépôt YAML UTF-8, l'adaptation des mondes/positions Bukkit, le composant de cycle de vie, les commandes et les menus.
+
+Une écriture doit réussir avant publication mémoire. Le reload traite les fichiers indépendamment et préserve une ancienne définition lorsque son YAML devient illisible. Les définitions structurées non activables restent visibles comme `INVALID`. La suppression passe par une confirmation et une sauvegarde datée sous `backups/arenas/`.
+
+Commandes : `/bedwars arena create|list|info|menu|setworld|setwaiting|setspectator|setplayers|setteams|validate|enable|disable|delete`, avec permissions et complétion dédiées. La liste et le détail GUI utilisent uniquement les apparences `arena.*` de `items.yml`; les actions restent en Java.
+
+Validation : 88 tests automatisés réussis, dont 18 nouveaux. Aucun test Paper/MockBukkit ou en jeu n'a été effectué. Les définitions ne lancent aucun gameplay. Prochaine étape : Ticket 006, éditeur complet d'arènes et préparation des mondes/templates. Commit prévu : `feat(arenas): add persistent arena definition system`.
+
 ## Ticket 004 — Système complet d'items configurables
 
 Terminé le 2026-07-15 côté code et validation automatisée. `bedwars-core/item` ajoute `ItemKey`, `ItemText`, `ItemDefinition`, `ItemDefinitionTemplate`, `ItemContext`, `ItemRegistry`, `ItemInheritanceResolver` et exceptions/résultat de reload. `bedwars-plugin/item` ajoute `ItemDefinitionLoader`, `BukkitItemFactory`, `BukkitItemService`, `ItemContexts` et `ItemPreviewMenuFactory`.

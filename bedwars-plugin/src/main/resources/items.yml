@@ -144,3 +144,21 @@ items:
         category: demo
     close:
       inherit: "gui.close"
+  arena:
+    entry:
+      material: MAP
+      name: "<aqua>{arena_name}"
+      lore: ["<gray>ID: <white>{arena_id}", "<gray>Status: <white>{arena_status}", "<gray>World: <white>{world}", "<gray>Players: <white>{min_players}-{max_players}"]
+      required-placeholders: [arena_name, arena_id, arena_status, world, min_players, max_players]
+    info:
+      inherit: "arena.entry"
+      material: BOOK
+      lore: ["<gray>ID: <white>{arena_id}", "<gray>Status: <white>{arena_status}", "<gray>World: <white>{world}", "<gray>Teams: <white>{teams} x {players_per_team}"]
+      required-placeholders: [arena_name, arena_id, arena_status, world, teams, players_per_team]
+    set-world: {material: GRASS_BLOCK, name: "<green>Use current world"}
+    set-waiting: {material: CLOCK, name: "<yellow>Set waiting location"}
+    set-spectator: {material: ENDER_EYE, name: "<aqua>Set spectator location"}
+    validate: {material: COMPARATOR, name: "<gold>Validate"}
+    enable: {material: LIME_DYE, name: "<green>Enable"}
+    disable: {material: GRAY_DYE, name: "<yellow>Disable"}
+    delete: {material: TNT, name: "<red>Delete arena"}

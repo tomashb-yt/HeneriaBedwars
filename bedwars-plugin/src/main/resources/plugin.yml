@@ -8,7 +8,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version|reload|config|language|gui|item]
+    usage: /bedwars [version|reload|config|language|gui|item|arena]
     aliases:
       - hbw
 permissions:
@@ -21,6 +21,7 @@ permissions:
       heneriabedwars.admin.language: true
       heneriabedwars.admin.gui: true
       heneriabedwars.admin.item: true
+      heneriabedwars.admin.arena: true
   heneriabedwars.admin.reload:
     description: Permet de recharger les configurations.
     default: op
@@ -45,3 +46,23 @@ permissions:
   heneriabedwars.admin.item.preview:
     description: Permet d'ouvrir la prévisualisation des items.
     default: op
+  heneriabedwars.admin.arena:
+    description: Permet d'administrer les definitions d'arenes.
+    default: op
+    children:
+      heneriabedwars.admin.arena.create: true
+      heneriabedwars.admin.arena.list: true
+      heneriabedwars.admin.arena.info: true
+      heneriabedwars.admin.arena.edit: true
+      heneriabedwars.admin.arena.enable: true
+      heneriabedwars.admin.arena.disable: true
+      heneriabedwars.admin.arena.delete: true
+      heneriabedwars.admin.arena.menu: true
+  heneriabedwars.admin.arena.create: {description: Creer une arene, default: op}
+  heneriabedwars.admin.arena.list: {description: Lister les arenes, default: op}
+  heneriabedwars.admin.arena.info: {description: Inspecter une arene, default: op}
+  heneriabedwars.admin.arena.edit: {description: Modifier une arene, default: op}
+  heneriabedwars.admin.arena.enable: {description: Activer une arene valide, default: op}
+  heneriabedwars.admin.arena.disable: {description: Desactiver une arene, default: op}
+  heneriabedwars.admin.arena.delete: {description: Supprimer une arene avec confirmation, default: op}
+  heneriabedwars.admin.arena.menu: {description: Ouvrir le menu des arenes, default: op}

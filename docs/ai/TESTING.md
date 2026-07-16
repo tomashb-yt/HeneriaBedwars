@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 005
+
+La suite contient 88 tests : 68 dans le cœur et 20 dans le module plugin. Les 18 nouveaux scénarios couvrent ids sûrs, immutabilité, statuts, validation requise/avertissements/capacités/mondes, remplacement atomique du registre, persistance avant publication, échec d'écriture ou suppression sans mutation mémoire, recalcul des équipes, reload préservant une ancienne définition illisible, complétion permission-aware, round-trip YAML UTF-8, isolation d'un fichier cassé, nom de fichier dangereux et sauvegarde datée avant suppression.
+
+Les commandes Bukkit, positions réelles, existence des mondes, rendu des menus et permissions au clic compilent contre Spigot 1.21 mais nécessitent encore la matrice manuelle sur Paper. Aucun serveur ni MockBukkit compatible n'a été utilisé dans cet environnement.
+
 ## Ticket 004
 
 La suite contient 70 tests : 54 dans le cœur et 16 dans le module plugin. Les nouveaux scénarios couvrent format/casse des clés, immutabilité, valeurs par défaut, contexte typé, registre, source GUI exclusive, héritage profond, surcharge, fusion, parent inconnu, cycles directs/indirects, profondeur déterministe même avec cache, matériaux/fallback, quantité, flags, enchantements sûrs, couleur incompatible, fallback critique, complétion des commandes, évolution sauvegardée d'un `items.yml` Ticket 003 et conservation du registre lors d'un reload cyclique.

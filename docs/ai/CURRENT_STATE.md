@@ -1,6 +1,6 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 004.
+- Dernier ticket terminé : Ticket 005.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
@@ -22,9 +22,12 @@
 - registre d'items immuable intégré au snapshot de configuration, définitions YAML, validation, fallback, héritage borné, placeholders, traductions et construction Bukkit;
 - chaque rendu produit un `ItemStack` distinct avec glow, enchantements sûrs, flags, unbreakable, custom model data, cuir, tête de joueur contextuelle et PDC contrôlé;
 - le framework GUI et sa démonstration utilisent des clés d'items; `/bedwars item list|give|preview` fournit les outils administratifs de test.
+- définitions d'arènes immutables, registre atomique, validation monde/positions/capacités et statuts administratifs distincts du cycle des parties;
+- stockage `arenas/<id>.yml`, écriture atomique, reload tolérant fichier par fichier et sauvegarde datée obligatoire avant suppression;
+- commandes `/bedwars arena create|list|info|menu|setworld|setwaiting|setspectator|setplayers|setteams|validate|enable|disable|delete`, permissions, complétion et menus administratifs.
 
 ## Non disponible
 
-Aucun éditeur complet d'items, objet de gameplay actif, boutique, menu métier d'arène/lobby, arène, équipe, lit, générateur actif, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les fichiers correspondants sont préparatoires.
+Aucun éditeur complet d'arène, clonage/reset de monde, instance de partie, équipe runtime, lit, générateur actif, boutique, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les définitions du Ticket 005 sont administratives uniquement.
 
-Les 70 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 88 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

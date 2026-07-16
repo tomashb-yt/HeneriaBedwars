@@ -1,6 +1,11 @@
 package fr.heneria.bedwars.plugin;
 
 import fr.heneria.bedwars.api.PluginStatus;
+import fr.heneria.bedwars.core.arena.ArenaRegistry;
+import fr.heneria.bedwars.core.arena.ArenaService;
+import fr.heneria.bedwars.core.arena.ArenaValidator;
+import fr.heneria.bedwars.plugin.arena.ArenaLifecycleComponent;
+import fr.heneria.bedwars.plugin.arena.YamlArenaRepository;
 import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
@@ -19,6 +24,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private ConfigurationService configurations;
   private BukkitGuiService guiService;
   private BukkitItemService itemService;
+  private ArenaService arenaService;
 
   @Override
   public void onEnable() {
@@ -32,12 +38,21 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               Clock.systemDefaultZone());
       configurations.initialize();
       projectLogger.setDebug(configurations.snapshot().plugin().debug());
+      Clock clock = Clock.systemDefaultZone();
+      arenaService =
+          new ArenaService(
+              new YamlArenaRepository(getDataFolder().toPath(), clock),
+              new ArenaRegistry(),
+              new ArenaValidator(world -> getServer().getWorld(world) != null),
+              clock);
       itemService = new BukkitItemService(this, configurations, projectLogger);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       bootstrap =
           new BedWarsBootstrap(
               getDescription().getVersion(),
               configurations,
+              arenaService,
+              new ArenaLifecycleComponent(arenaService, projectLogger),
               itemService,
               guiService,
               projectLogger);
@@ -70,7 +85,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       throw new IllegalStateException("The 'bedwars' command is not declared in plugin.yml");
     }
     BedWarsCommand executor =
-        new BedWarsCommand(this, bootstrap, configurations, itemService, guiService);
+        new BedWarsCommand(this, bootstrap, configurations, arenaService, itemService, guiService);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }

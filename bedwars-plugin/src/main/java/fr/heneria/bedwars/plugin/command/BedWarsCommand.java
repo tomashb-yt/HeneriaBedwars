@@ -1,11 +1,14 @@
 package fr.heneria.bedwars.plugin.command;
 
+import fr.heneria.bedwars.core.arena.ArenaReloadResult;
+import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.command.AdministrativeCommandPolicy;
 import fr.heneria.bedwars.core.config.ConfigurationId;
 import fr.heneria.bedwars.core.config.ConfigurationReloadResult;
 import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
+import fr.heneria.bedwars.plugin.arena.ArenaCommandHandler;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.DemoMenuFactory;
@@ -45,16 +48,20 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   private final ItemService itemService;
   private final DemoMenuFactory demoMenus;
   private final ItemPreviewMenuFactory itemPreview;
+  private final ArenaService arenaService;
+  private final ArenaCommandHandler arenaCommands;
 
   public BedWarsCommand(
       JavaPlugin plugin,
       PluginBootstrap bootstrap,
       ConfigurationService configurations,
+      ArenaService arenaService,
       ItemService itemService,
       GuiService guiService) {
     this.plugin = plugin;
     this.bootstrap = bootstrap;
     this.configurations = configurations;
+    this.arenaService = arenaService;
     this.guiService = guiService;
     this.itemService = itemService;
     this.demoMenus =
@@ -62,6 +69,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     this.itemPreview =
         new ItemPreviewMenuFactory(
             configurations, itemService, plugin.getDescription().getVersion());
+    this.arenaCommands = new ArenaCommandHandler(arenaService, configurations, guiService);
   }
 
   @Override
@@ -79,6 +87,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "language" -> language(sender, args);
         case "gui" -> gui(sender);
         case "item" -> item(sender, args);
+        case "arena" -> arenaCommands.execute(sender, args);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
     } catch (RuntimeException exception) {
@@ -97,6 +106,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (sender.hasPermission(LANGUAGE)) send(sender, TranslationKey.HELP_LANGUAGE);
     if (sender.hasPermission(GUI)) send(sender, TranslationKey.HELP_GUI);
     if (sender.hasPermission(ITEM)) send(sender, TranslationKey.HELP_ITEM);
+    if (sender.hasPermission(AdministrativeCommandPolicy.ARENA))
+      send(sender, TranslationKey.HELP_ARENA);
     return true;
   }
 
@@ -123,6 +134,14 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (!allowed(sender, RELOAD)) return true;
     send(sender, TranslationKey.RELOAD_STARTED);
     ConfigurationReloadResult result = configurations.reloadAll();
+    ArenaReloadResult arenaResult = null;
+    if (result.successful()) {
+      try {
+        arenaResult = arenaService.reload();
+      } catch (java.io.IOException exception) {
+        plugin.getLogger().log(java.util.logging.Level.SEVERE, "Arena reload failed", exception);
+      }
+    }
     PlaceholderContext context =
         PlaceholderContext.builder()
             .put("loaded_files", result.loadedFiles())
@@ -135,6 +154,15 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     send(sender, TranslationKey.RELOAD_WARNINGS, context);
     send(sender, TranslationKey.RELOAD_ERRORS, context);
     if (!result.successful()) send(sender, TranslationKey.RELOAD_PRESERVED);
+    if (arenaResult != null)
+      send(
+          sender,
+          TranslationKey.ARENA_RELOAD,
+          PlaceholderContext.builder()
+              .put("arena_count", arenaResult.loaded())
+              .put("arena_preserved", arenaResult.preserved())
+              .put("arena_errors", arenaResult.failures().size())
+              .build());
     return true;
   }
 
@@ -170,6 +198,10 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     send(sender, TranslationKey.CONFIG_WARNINGS, context);
     send(sender, TranslationKey.CONFIG_GUI_SESSIONS, context);
     send(sender, TranslationKey.CONFIG_ITEMS, context);
+    send(
+        sender,
+        TranslationKey.CONFIG_ARENAS,
+        PlaceholderContext.builder().put("arena_count", arenaService.list().size()).build());
     return true;
   }
 
@@ -288,6 +320,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         sender::hasPermission,
         args,
         configurations.availableLocales(),
-        itemService.registeredKeys().stream().sorted().toList());
+        itemService.registeredKeys().stream().sorted().toList(),
+        arenaService.list().stream().map(arena -> arena.id().value()).toList(),
+        plugin.getServer().getWorlds().stream().map(org.bukkit.World::getName).sorted().toList());
   }
 }
