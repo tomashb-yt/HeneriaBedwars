@@ -15,6 +15,7 @@ import fr.heneria.bedwars.core.config.StorageSettings;
 import fr.heneria.bedwars.core.config.TextInputSettings;
 import fr.heneria.bedwars.core.config.TranslationBundle;
 import fr.heneria.bedwars.core.config.TranslationKey;
+import fr.heneria.bedwars.core.config.WorldManagerSettings;
 import fr.heneria.bedwars.core.item.ItemRegistry;
 import fr.heneria.bedwars.plugin.item.ItemDefinitionLoader;
 import java.time.Clock;
@@ -108,6 +109,9 @@ public final class ConfigurationSnapshotFactory {
             storage.string("redis.host", "localhost"),
             storage.integer("redis.port", 6379, 1, 65535));
 
+    Reader worldReader = new Reader(documents.get(ConfigurationId.WORLDS), problems);
+    WorldManagerSettings worldSettings = worldManager(worldReader);
+
     Reader menus = new Reader(documents.get(ConfigurationId.MENUS), problems);
     int menuSize = menus.integer("global.default-size", 54, 9, 54);
     if (menuSize % 9 != 0) {
@@ -170,6 +174,7 @@ public final class ConfigurationSnapshotFactory {
         gameplaySettings,
         lobbySettings,
         storageSettings,
+        worldSettings,
         menuSettings,
         items,
         documents,
@@ -192,6 +197,119 @@ public final class ConfigurationSnapshotFactory {
               document.version() < 1
                   ? "Missing configuration version"
                   : "Unsupported configuration version"));
+  }
+
+  private static WorldManagerSettings worldManager(Reader reader) {
+    String material = reader.string("world-manager.void-world.platform-material", "GLASS");
+    try {
+      org.bukkit.Material parsed = org.bukkit.Material.valueOf(material.toUpperCase(Locale.ROOT));
+      material = parsed.name();
+    } catch (IllegalArgumentException exception) {
+      reader.problem(
+          "world-manager.void-world.platform-material",
+          material,
+          "Bukkit block material",
+          "GLASS",
+          "Invalid safety platform material");
+      material = "GLASS";
+    }
+    String environment =
+        enumValue(
+            reader,
+            "world-manager.defaults.environment",
+            "NORMAL",
+            org.bukkit.World.Environment.class);
+    String difficulty =
+        enumValue(
+            reader, "world-manager.defaults.difficulty", "PEACEFUL", org.bukkit.Difficulty.class);
+    String templatePrefix =
+        safePrefix(
+            reader,
+            "world-manager.naming.template-world-prefix",
+            reader.string("world-manager.naming.template-world-prefix", "hbw_template_"),
+            "hbw_template_");
+    String instancePrefix =
+        safePrefix(
+            reader,
+            "world-manager.naming.instance-world-prefix",
+            reader.string("world-manager.naming.instance-world-prefix", "hbw_game_"),
+            "hbw_game_");
+    return new WorldManagerSettings(
+        reader.bool("world-manager.enabled", true),
+        relativePath(
+            reader,
+            "world-manager.directories.templates",
+            reader.string("world-manager.directories.templates", "maps/templates"),
+            "maps/templates"),
+        relativePath(
+            reader,
+            "world-manager.directories.metadata",
+            reader.string("world-manager.directories.metadata", "maps/metadata"),
+            "maps/metadata"),
+        relativePath(
+            reader,
+            "world-manager.directories.instances",
+            reader.string("world-manager.directories.instances", "instances"),
+            "instances"),
+        relativePath(
+            reader,
+            "world-manager.directories.backups",
+            reader.string("world-manager.directories.backups", "backups/maps"),
+            "backups/maps"),
+        templatePrefix,
+        instancePrefix,
+        reader.string("world-manager.fallback-world", "world"),
+        reader.bool("world-manager.void-world.create-safety-platform", true),
+        material,
+        reader.integer("world-manager.void-world.platform-radius", 3, 0, 32),
+        reader.integer("world-manager.void-world.platform-y", 64, -64, 319),
+        environment,
+        difficulty,
+        (long) reader.decimal("world-manager.defaults.fixed-time", 6000),
+        reader.bool("world-manager.defaults.clear-weather", true),
+        reader.bool("world-manager.defaults.pvp", false),
+        reader.bool("world-manager.defaults.animals", false),
+        reader.bool("world-manager.defaults.monsters", false),
+        reader.bool("world-manager.auto-save.enabled", false),
+        reader.integer("world-manager.auto-save.interval-minutes", 10, 1, 1440),
+        reader.bool("world-manager.unload.save-before-unload", true),
+        reader.bool("world-manager.unload.refuse-if-players-present", true),
+        reader.stringSet("world-manager.copy.excluded-files", Set.of("uid.dat", "session.lock")),
+        reader.stringSet(
+            "world-manager.copy.excluded-directories",
+            Set.of("playerdata", "stats", "advancements")));
+  }
+
+  private static <E extends Enum<E>> String enumValue(
+      Reader reader, String path, String fallback, Class<E> type) {
+    String value = reader.string(path, fallback).toUpperCase(Locale.ROOT);
+    try {
+      return Enum.valueOf(type, value).name();
+    } catch (IllegalArgumentException exception) {
+      reader.problem(path, value, type.getSimpleName(), fallback, "Invalid enum value");
+      return fallback;
+    }
+  }
+
+  private static String safePrefix(Reader reader, String path, String value, String fallback) {
+    String normalized = value.toLowerCase(Locale.ROOT);
+    if (!normalized.matches("[a-z0-9_-]{1,32}")) {
+      reader.problem(path, value, "safe world prefix", fallback, "Invalid world prefix");
+      return fallback;
+    }
+    return normalized;
+  }
+
+  private static String relativePath(Reader reader, String path, String value, String fallback) {
+    try {
+      java.nio.file.Path parsed = java.nio.file.Path.of(value).normalize();
+      if (parsed.isAbsolute() || parsed.startsWith("..") || value.contains(":"))
+        throw new IllegalArgumentException("unsafe path");
+      return parsed.toString().replace('\\', '/');
+    } catch (RuntimeException exception) {
+      reader.error(path, value, "safe relative path", "Unsafe world-manager directory");
+      return fallback;
+    }
   }
 
   private static SoundSettings sound(

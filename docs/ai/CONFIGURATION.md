@@ -2,7 +2,7 @@
 
 ## Cycle de vie
 
-Les ressources par défaut sont embarquées dans `bedwars-plugin/src/main/resources`. Au premier démarrage, seules les ressources absentes sont copiées en UTF-8; aucun fichier existant n'est écrasé. Les dossiers `arenas`, `languages` et `backups` sont créés. Chaque YAML doit contenir `config-version: 1`.
+Les ressources par défaut sont embarquées dans `bedwars-plugin/src/main/resources`. Au premier démarrage, seules les ressources absentes sont copiées en UTF-8; aucun fichier existant n'est écrasé. Les dossiers `arenas`, `languages`, `backups`, `maps/templates`, `maps/metadata` et `instances` sont créés. Chaque YAML doit contenir `config-version: 1`.
 
 `/bedwars reload` lit tous les fichiers, valide les références croisées et construit les records Java dans une structure temporaire. Le snapshot actif n'est remplacé que si aucune erreur `ERROR` ou `CRITICAL` n'existe. Les `WARNING` appliquent le défaut documenté. Le chargement reste synchrone car les fichiers sont petits et aucune API Bukkit n'est appelée hors du thread serveur.
 
@@ -143,6 +143,29 @@ L'évolution depuis le Ticket 003 sauvegarde puis complète uniquement les clés
 Chaque arène possède un fichier UTF-8 version 1. L'id doit correspondre au nom du fichier et à `[a-z0-9_-]{2,32}`. Les champs persistés couvrent `revision`, `display-name`, `status`, `enabled`, `world`, `template`, `environment`, `players.minimum/maximum`, `teams.count/players-per-team`, `locations.waiting/spectator`, `boundary.enabled` et ses points optionnels, ainsi que les métadonnées de création/modification. Une ancienne définition sans `revision` est lue en révision 1.
 
 Une arène activable exige un monde chargé, une position d'attente, des capacités positives et cohérentes (`maximum = teams × players-per-team`) et des positions dans le monde configuré. La position spectateur absente produit un avertissement. `/bedwars reload` recharge les fichiers indépendamment : un YAML illisible conserve son ancienne définition active connue, tandis qu'une définition lisible mais invalide reste inspectable. La suppression crée d'abord `backups/arenas/yyyy-MM-dd/<id>.yml`.
+
+## `worlds.yml`
+
+`WorldManagerSettings` est rechargé transactionnellement. Les dossiers doivent être relatifs et sûrs; un chemin absolu ou contenant `..` refuse le snapshot. Changer les racines ou préfixes pendant que des mondes sont chargés exige un redémarrage complet.
+
+| Clé | Défaut / contrainte |
+|---|---|
+| `world-manager.enabled` | `true` |
+| `directories.templates/metadata/instances/backups` | chemins relatifs confinés |
+| `naming.template-world-prefix` | `hbw_template_` |
+| `naming.instance-world-prefix` | `hbw_game_`, réservé |
+| `fallback-world` | `world`, utilisé pour évacuer lors d'un déchargement forcé |
+| `void-world.create-safety-platform` | `true` |
+| `void-world.platform-material/radius/y` | `GLASS`, `3`, `64` |
+| `defaults.environment/difficulty` | `NORMAL`, `PEACEFUL` |
+| `defaults.fixed-time/clear-weather/pvp` | `6000`, `true`, `false` |
+| `defaults.animals/monsters` | `false`, `false` |
+| `auto-save.enabled/interval-minutes` | `false`, `10` |
+| `unload.save-before-unload/refuse-if-players-present` | `true`, `true` |
+| `copy.excluded-files` | `uid.dat`, `session.lock` |
+| `copy.excluded-directories` | `playerdata`, `stats`, `advancements` |
+
+Les métadonnées sont enregistrées dans `maps/metadata/<id>.yml`. Le dossier `maps/templates/<id>/` contient un marqueur de propriété; le monde Bukkit actif se trouve sous le conteneur de mondes du serveur avec son nom préfixé. Les sauvegardes de suppression vont dans `backups/maps/<horodatage>/<id>/`. Voir `WORLD_SYSTEM.md`.
 
 ## Fichiers préparatoires
 

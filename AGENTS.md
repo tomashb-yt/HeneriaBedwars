@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 006 livrent la fondation, les configurations, traductions, menus, items, définitions administratives d'arènes et leur éditeur en jeu ; aucun gameplay n'est encore actif.
+HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 007 livrent la fondation, les configurations, traductions, menus, items, arènes, éditeur et cartes modèles ; aucun gameplay n'est encore actif.
 
 ## Lecture obligatoire
 
@@ -33,7 +33,9 @@ Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne
 
 Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est produit par `:bedwars-plugin:shadowJar`.
 
-Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui`, `item` et `arena`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge les fichiers HeneriaBedWars, le registre d'items et les définitions d'arènes.
+Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui`, `item`, `arena`, `setup` et `map`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge les configurations, items, métadonnées de cartes et arènes sans charger automatiquement les mondes.
+
+Le Ticket 007 sépare les métadonnées `maps/metadata/`, les marqueurs de propriété `maps/templates/`, les mondes de travail Bukkit préfixés dans le conteneur de mondes du serveur et les sauvegardes `backups/maps/`. Ne jamais accepter un chemin arbitraire ou suivre un lien symbolique. Toute suppression passe par `MapTemplateService.prepareDelete` sur le thread serveur puis `completeDelete` hors thread ; les relations d'arènes actives sont la source de vérité.
 
 Le Ticket 005 stocke une définition UTF-8 par fichier dans `arenas/`. Une suppression doit toujours passer par `ArenaRepository.deleteWithBackup`. Un fichier illisible au reload conserve sa définition active connue, tandis qu'une arène structurée mais invalide reste visible avec le statut `INVALID`.
 

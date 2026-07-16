@@ -8,7 +8,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version|reload|config|language|gui|item|arena|setup]
+    usage: /bedwars [version|reload|config|language|gui|item|arena|map|setup]
     aliases:
       - hbw
 permissions:
@@ -23,6 +23,7 @@ permissions:
       heneriabedwars.admin.item: true
       heneriabedwars.admin.arena: true
       heneriabedwars.admin.setup: true
+      heneriabedwars.admin.map: true
   heneriabedwars.admin.reload:
     description: Permet de recharger les configurations.
     default: op
@@ -70,3 +71,27 @@ permissions:
   heneriabedwars.admin.arena.menu: {description: Ouvrir le menu des arenes, default: op}
   heneriabedwars.admin.arena.teleport: {description: Teleporter un administrateur depuis l'editeur, default: op}
   heneriabedwars.admin.setup: {description: Ouvrir la configuration generale en jeu, default: op}
+  heneriabedwars.admin.map:
+    description: Administrer les cartes modeles.
+    default: op
+    children:
+      heneriabedwars.admin.map.menu: true
+      heneriabedwars.admin.map.create: true
+      heneriabedwars.admin.map.load: true
+      heneriabedwars.admin.map.unload: true
+      heneriabedwars.admin.map.save: true
+      heneriabedwars.admin.map.teleport: true
+      heneriabedwars.admin.map.edit: true
+      heneriabedwars.admin.map.duplicate: true
+      heneriabedwars.admin.map.delete: true
+      heneriabedwars.admin.map.force: true
+  heneriabedwars.admin.map.menu: {description: Ouvrir le menu des cartes, default: op}
+  heneriabedwars.admin.map.create: {description: Creer une carte modele, default: op}
+  heneriabedwars.admin.map.load: {description: Charger une carte modele, default: op}
+  heneriabedwars.admin.map.unload: {description: Decharger une carte modele, default: op}
+  heneriabedwars.admin.map.save: {description: Sauvegarder une carte modele, default: op}
+  heneriabedwars.admin.map.teleport: {description: Se teleporter dans une carte modele, default: op}
+  heneriabedwars.admin.map.edit: {description: Modifier une carte modele, default: op}
+  heneriabedwars.admin.map.duplicate: {description: Dupliquer une carte modele, default: op}
+  heneriabedwars.admin.map.delete: {description: Supprimer une carte modele avec sauvegarde, default: op}
+  heneriabedwars.admin.map.force: {description: Forcer un dechargement apres evacuation, default: op}

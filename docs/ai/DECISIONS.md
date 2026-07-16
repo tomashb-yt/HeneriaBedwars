@@ -323,3 +323,21 @@ Accepté.
 
 ### Conséquences
 L'éditeur reste testable sans Bukkit pour ses règles principales et deux administrateurs ne peuvent pas écraser silencieusement leurs modifications. Les opérations création, suppression, activation, monde, positions, capacité et équipes sont journalisées simplement; un audit persistant reste futur.
+
+## ADR-038 à ADR-044 — Cartes modèles autonomes
+
+### Statut
+Accepté.
+
+### Décisions
+
+- **ADR-038** — Une carte modèle possède un identifiant normalisé `[a-z0-9_-]{2,32}`; tous les chemins sont reconstruits depuis cet identifiant et confinés aux racines configurées.
+- **ADR-039** — Bukkit charge les mondes modèles dans son conteneur de mondes avec le préfixe contrôlé `hbw_template_`. `maps/templates/<id>/managed-world.txt` matérialise la propriété du plugin sans prétendre que Bukkit peut charger un monde depuis le dossier de données du plugin.
+- **ADR-040** — Métadonnées, dossier de monde et état chargé sont distincts. Les états transitoires ne sont pas restaurés après redémarrage; la présence réelle dans Bukkit détermine `LOADED` ou `UNLOADED`.
+- **ADR-041** — Chargement, sauvegarde, déchargement et téléportation utilisent le thread serveur. Les copies et suppressions lourdes utilisent le scheduler asynchrone, avec un verrou par carte.
+- **ADR-042** — Une suppression produit obligatoirement une sauvegarde complète avec manifeste avant toute suppression. Une carte liée à une arène active ou protégée comme lobby est refusée.
+- **ADR-043** — Les arènes sont la source de vérité des associations; les liens inverses de carte sont des données dérivées et réparables.
+- **ADR-044** — Le Ticket 007 réserve `instances/` mais ne crée aucune instance de partie. Les cartes modèles ne sont jamais modifiées automatiquement par un match.
+
+### Conséquences
+Les opérations restent sûres face aux traversées de chemin, liens symboliques, copies partielles et vues concurrentes. Une installation qui change le préfixe ou les dossiers doit redémarrer complètement et ne doit pas déplacer manuellement un monde chargé.

@@ -8,6 +8,8 @@ import fr.heneria.bedwars.core.arena.ArenaValidationResult;
 import fr.heneria.bedwars.core.command.AdministrativeCommandPolicy;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
+import fr.heneria.bedwars.core.map.MapTemplateService;
+import fr.heneria.bedwars.core.map.MapType;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.GuiService;
 import java.util.Locale;
@@ -20,16 +22,19 @@ public final class ArenaCommandHandler {
   private final ConfigurationService configurations;
   private final GuiService gui;
   private final ArenaEditorMenuFactory menus;
+  private final MapTemplateService maps;
 
   public ArenaCommandHandler(
       ArenaService arenas,
       ConfigurationService configurations,
       GuiService gui,
-      ArenaEditorMenuFactory menus) {
+      ArenaEditorMenuFactory menus,
+      MapTemplateService maps) {
     this.arenas = arenas;
     this.configurations = configurations;
     this.gui = gui;
     this.menus = menus;
+    this.maps = maps;
   }
 
   public boolean execute(CommandSender sender, String[] args) {
@@ -40,6 +45,7 @@ public final class ArenaCommandHandler {
       case "list" -> list(sender);
       case "info" -> info(sender, args);
       case "setworld" -> setWorld(sender, args);
+      case "setmap" -> setMap(sender, args);
       case "setwaiting" -> setLocation(sender, args, true);
       case "setspectator" -> setLocation(sender, args, false);
       case "setplayers" -> setPlayers(sender, args);
@@ -96,6 +102,18 @@ public final class ArenaCommandHandler {
             : sender instanceof Player player ? player.getWorld().getName() : null;
     if (world == null) return send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
     return result(sender, arenas.setWorld(args[2], world), TranslationKey.ARENA_UPDATED);
+  }
+
+  private boolean setMap(CommandSender sender, String[] args) {
+    if (!allowed(sender, AdministrativeCommandPolicy.ARENA_EDIT)) return true;
+    if (args.length != 4) return send(sender, TranslationKey.ARENA_HELP);
+    var map = maps.find(args[3]).orElse(null);
+    if (map == null || map.type() != MapType.BEDWARS || !maps.validBedWarsTemplate(args[3]))
+      return send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
+    ArenaOperationResult operation =
+        arenas.setMapTemplate(args[2], map.id().value(), map.worldName());
+    if (operation.successful()) maps.synchronizeLinks(arenas.list());
+    return result(sender, operation, TranslationKey.ARENA_UPDATED);
   }
 
   private boolean setLocation(CommandSender sender, String[] args, boolean waiting) {

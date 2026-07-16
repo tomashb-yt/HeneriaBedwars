@@ -1,10 +1,15 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 006.
+- Dernier ticket terminé : Ticket 007.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
 ## Disponible
+
+- gestion autonome de cartes modèles `LOBBY`, `BEDWARS` et `GENERIC`, identifiants sûrs, métadonnées immutables/révisionnées et registre ordonné;
+- création de mondes vides préfixés, plateforme de sécurité configurable, chargement, téléportation, spawn, sauvegarde, déchargement et autosauvegarde centrale optionnelle;
+- duplication asynchrone avec exclusions, suppression asynchrone après sauvegarde complète, confinement des chemins et refus des liens symboliques;
+- commandes et menus `/bedwars map`; association des arènes à une carte `BEDWARS` via `/bedwars arena setmap` et l'éditeur;
 
 - bootstrap et cycle de vie déterministes;
 - API publique minimale de statut;
@@ -32,6 +37,6 @@
 
 ## Non disponible
 
-Aucune équipe BedWars détaillée ou couleur d'équipe, aucun clonage/reset de monde, template temporaire, instance de partie, lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les définitions éditées restent administratives uniquement et la saisie textuelle est limitée au chat.
+Aucune équipe BedWars détaillée ou couleur d'équipe, aucune instance temporaire de partie ou remise à zéro après match, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes sont des modèles administratifs persistants, pas des parties jouables.
 
-Les 113 tests automatisés passent. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 136 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

@@ -8,9 +8,22 @@ import java.util.Objects;
 /** Pure structural validation with world existence delegated through a port. */
 public final class ArenaValidator {
   private final ArenaWorldResolver worlds;
+  private final ArenaMapTemplateResolver maps;
+  private final boolean requireMapTemplate;
 
   public ArenaValidator(ArenaWorldResolver worlds) {
+    this(worlds, mapId -> ArenaMapTemplateStatus.VALID, false);
+  }
+
+  public ArenaValidator(ArenaWorldResolver worlds, ArenaMapTemplateResolver maps) {
+    this(worlds, maps, true);
+  }
+
+  private ArenaValidator(
+      ArenaWorldResolver worlds, ArenaMapTemplateResolver maps, boolean requireMapTemplate) {
     this.worlds = Objects.requireNonNull(worlds, "worlds");
+    this.maps = Objects.requireNonNull(maps, "maps");
+    this.requireMapTemplate = requireMapTemplate;
   }
 
   public ArenaValidationResult validate(ArenaDefinition arena) {
@@ -19,6 +32,7 @@ public final class ArenaValidator {
       error(problems, "unsupported-version", "config-version", "Unsupported arena version");
     if (arena.displayName().isBlank())
       error(problems, "blank-name", "display-name", "Display name is blank");
+    if (requireMapTemplate) validateMapTemplate(problems, arena);
     if (arena.worldName().isEmpty()) {
       error(problems, "missing-world", "world", "No world is configured");
     } else if (!worlds.exists(arena.worldName().orElseThrow())) {
@@ -67,6 +81,34 @@ public final class ArenaValidator {
                 error(problems, "invalid-boundary", "boundary", "Boundary minimum exceeds maximum");
             });
     return new ArenaValidationResult(problems);
+  }
+
+  private void validateMapTemplate(List<ArenaProblem> problems, ArenaDefinition arena) {
+    if (arena.template().isEmpty()) {
+      error(problems, "MAP_TEMPLATE_MISSING", "map.template-id", "No map template is associated");
+      return;
+    }
+    switch (maps.status(arena.template().orElseThrow())) {
+      case VALID -> {}
+      case NOT_FOUND ->
+          error(
+              problems,
+              "MAP_TEMPLATE_NOT_FOUND",
+              "map.template-id",
+              "Associated map template does not exist");
+      case INVALID_TYPE ->
+          error(
+              problems,
+              "MAP_TEMPLATE_INVALID_TYPE",
+              "map.template-id",
+              "Associated map is not a BedWars template");
+      case ERROR ->
+          error(
+              problems,
+              "MAP_TEMPLATE_ERROR",
+              "map.template-id",
+              "Associated map template is in error");
+    }
   }
 
   private static void checkLocationWorld(

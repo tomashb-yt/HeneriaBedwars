@@ -12,6 +12,7 @@ public record ConfigurationSnapshot(
     GameplaySettings gameplay,
     LobbySettings lobby,
     StorageSettings storage,
+    WorldManagerSettings worlds,
     MenuSettings menus,
     ItemRegistry items,
     Map<ConfigurationId, ConfigurationDocument> documents,

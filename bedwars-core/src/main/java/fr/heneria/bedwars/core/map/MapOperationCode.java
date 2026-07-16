@@ -1,0 +1,24 @@
+package fr.heneria.bedwars.core.map;
+
+/** Stable outcome codes shared by commands, menus and tests. */
+public enum MapOperationCode {
+  SUCCESS,
+  NOT_FOUND,
+  ALREADY_EXISTS,
+  INVALID_ID,
+  INVALID_ARGUMENT,
+  ALREADY_LOADED,
+  NOT_LOADED,
+  PLAYERS_PRESENT,
+  WORLD_CREATION_FAILED,
+  WORLD_LOAD_FAILED,
+  WORLD_SAVE_FAILED,
+  WORLD_UNLOAD_FAILED,
+  COPY_FAILED,
+  BACKUP_FAILED,
+  STORAGE_ERROR,
+  OPERATION_IN_PROGRESS,
+  MAP_LINKED,
+  INVALID_TYPE,
+  CONFLICT
+}

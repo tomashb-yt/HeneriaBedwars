@@ -7,6 +7,7 @@ public final class ArenaProblemRouter {
   public static ArenaEditorSection section(String field) {
     if (field == null) return ArenaEditorSection.VALIDATION;
     if (field.startsWith("world")) return ArenaEditorSection.WORLD;
+    if (field.startsWith("map")) return ArenaEditorSection.WORLD;
     if (field.startsWith("locations.waiting")) return ArenaEditorSection.WAITING;
     if (field.startsWith("locations.spectator")) return ArenaEditorSection.SPECTATOR;
     if (field.startsWith("players")) return ArenaEditorSection.PLAYERS;

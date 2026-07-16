@@ -27,6 +27,17 @@ public final class AdministrativeCommandPolicy {
   public static final String ARENA_MENU = "heneriabedwars.admin.arena.menu";
   public static final String ARENA_TELEPORT = "heneriabedwars.admin.arena.teleport";
   public static final String SETUP = "heneriabedwars.admin.setup";
+  public static final String MAP = "heneriabedwars.admin.map";
+  public static final String MAP_MENU = "heneriabedwars.admin.map.menu";
+  public static final String MAP_CREATE = "heneriabedwars.admin.map.create";
+  public static final String MAP_LOAD = "heneriabedwars.admin.map.load";
+  public static final String MAP_UNLOAD = "heneriabedwars.admin.map.unload";
+  public static final String MAP_SAVE = "heneriabedwars.admin.map.save";
+  public static final String MAP_TELEPORT = "heneriabedwars.admin.map.teleport";
+  public static final String MAP_EDIT = "heneriabedwars.admin.map.edit";
+  public static final String MAP_DUPLICATE = "heneriabedwars.admin.map.duplicate";
+  public static final String MAP_DELETE = "heneriabedwars.admin.map.delete";
+  public static final String MAP_FORCE = "heneriabedwars.admin.map.force";
 
   public List<String> complete(
       Predicate<String> permitted, String[] arguments, List<String> locales) {
@@ -48,12 +59,24 @@ public final class AdministrativeCommandPolicy {
       List<String> itemKeys,
       List<String> arenaIds,
       List<String> worlds) {
+    return complete(permitted, arguments, locales, itemKeys, arenaIds, worlds, List.of());
+  }
+
+  public List<String> complete(
+      Predicate<String> permitted,
+      String[] arguments,
+      List<String> locales,
+      List<String> itemKeys,
+      List<String> arenaIds,
+      List<String> worlds,
+      List<String> mapIds) {
     Objects.requireNonNull(permitted, "permitted");
     Objects.requireNonNull(arguments, "arguments");
     Objects.requireNonNull(locales, "locales");
     Objects.requireNonNull(itemKeys, "itemKeys");
     Objects.requireNonNull(arenaIds, "arenaIds");
     Objects.requireNonNull(worlds, "worlds");
+    Objects.requireNonNull(mapIds, "mapIds");
     List<String> choices = new ArrayList<>();
     if (arguments.length == 1) {
       if (permitted.test(ADMIN)) choices.add("version");
@@ -64,6 +87,7 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(ITEM)) choices.add("item");
       if (permitted.test(ARENA) || permitted.test(ARENA_MENU)) choices.add("arena");
       if (permitted.test(SETUP)) choices.add("setup");
+      if (permitted.test(MAP) || permitted.test(MAP_MENU)) choices.add("map");
     } else if (arguments.length == 2
         && arguments[0].equalsIgnoreCase("language")
         && permitted.test(LANGUAGE)) {
@@ -94,7 +118,13 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(ARENA_EDIT))
         choices.addAll(
             List.of(
-                "setworld", "setwaiting", "setspectator", "setplayers", "setteams", "validate"));
+                "setworld",
+                "setmap",
+                "setwaiting",
+                "setspectator",
+                "setplayers",
+                "setteams",
+                "validate"));
       if (permitted.test(ARENA_ENABLE)) choices.add("enable");
       if (permitted.test(ARENA_DISABLE)) choices.add("disable");
       if (permitted.test(ARENA_DELETE)) choices.add("delete");
@@ -110,6 +140,33 @@ public final class AdministrativeCommandPolicy {
         && arguments[1].equalsIgnoreCase("setworld")
         && permitted.test(ARENA_EDIT)) {
       choices.addAll(worlds);
+    } else if (arguments.length == 4
+        && arguments[0].equalsIgnoreCase("arena")
+        && arguments[1].equalsIgnoreCase("setmap")
+        && permitted.test(ARENA_EDIT)) {
+      choices.addAll(mapIds);
+    } else if (arguments.length == 2
+        && arguments[0].equalsIgnoreCase("map")
+        && (permitted.test(MAP) || permitted.test(MAP_MENU))) {
+      if (permitted.test(MAP_MENU)) choices.addAll(List.of("menu", "list", "info"));
+      if (permitted.test(MAP_CREATE)) choices.add("create");
+      if (permitted.test(MAP_LOAD)) choices.add("load");
+      if (permitted.test(MAP_UNLOAD)) choices.add("unload");
+      if (permitted.test(MAP_SAVE)) choices.add("save");
+      if (permitted.test(MAP_TELEPORT)) choices.addAll(List.of("teleport", "tp"));
+      if (permitted.test(MAP_EDIT)) choices.addAll(List.of("setspawn", "setdisplayname"));
+      if (permitted.test(MAP_DUPLICATE)) choices.add("duplicate");
+      if (permitted.test(MAP_DELETE)) choices.add("delete");
+    } else if (arguments.length == 3
+        && arguments[0].equalsIgnoreCase("map")
+        && !arguments[1].equalsIgnoreCase("create")
+        && (permitted.test(MAP) || permitted.test(MAP_MENU))) {
+      choices.addAll(mapIds);
+    } else if (arguments.length == 4
+        && arguments[0].equalsIgnoreCase("map")
+        && arguments[1].equalsIgnoreCase("create")
+        && permitted.test(MAP_CREATE)) {
+      choices.addAll(List.of("lobby", "bedwars", "generic"));
     }
     String input =
         arguments.length == 0 ? "" : arguments[arguments.length - 1].toLowerCase(Locale.ROOT);

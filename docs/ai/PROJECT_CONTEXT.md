@@ -8,4 +8,6 @@ Les opérations courantes devront être configurables en jeu afin que l'administ
 
 Depuis le Ticket 005, le projet gère des définitions administratives d'arènes persistantes et validables. Elles ne représentent ni une instance de partie, ni un monde cloné, ni un état de match. Cette séparation doit rester stricte dans les tickets gameplay.
 
-Depuis le Ticket 006, toute la configuration générale de ces définitions est réalisable en jeu. L'éditeur réutilise exclusivement `ArenaService`, sauvegarde après chaque mutation et détecte les vues obsolètes par révision. La saisie chat est réservée aux sessions administratives et n'est pas diffusée. Le Ticket 007 devra introduire les mondes templates et instances temporaires sans confondre définition et partie.
+Depuis le Ticket 006, toute la configuration générale de ces définitions est réalisable en jeu. L'éditeur réutilise exclusivement `ArenaService`, sauvegarde après chaque mutation et détecte les vues obsolètes par révision. La saisie chat est réservée aux sessions administratives et n'est pas diffusée.
+
+Depuis le Ticket 007, les cartes modèles sont autonomes, persistantes et chargeables comme mondes Bukkit vides. Une arène peut référencer une carte `BEDWARS`, mais la carte, la définition d'arène et la future instance de partie restent trois concepts distincts. Le dossier `instances/` est réservé : la copie temporaire, le reset et le cycle de match restent futurs.

@@ -28,9 +28,13 @@ import fr.heneria.bedwars.core.gui.TextInputCancelReason;
 import fr.heneria.bedwars.core.gui.TextInputRequest;
 import fr.heneria.bedwars.core.gui.TextInputService;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
+import fr.heneria.bedwars.core.map.MapState;
+import fr.heneria.bedwars.core.map.MapTemplateService;
+import fr.heneria.bedwars.core.map.MapType;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.GuiService;
 import fr.heneria.bedwars.plugin.gui.StandardGuiButtons;
+import fr.heneria.bedwars.plugin.map.MapMenuFactory;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
@@ -87,6 +91,7 @@ public final class ArenaEditorMenuFactory {
   private final TextInputService input;
   private final ArenaEditorStateStore states;
   private final ProjectLogger logger;
+  private final MapTemplateService maps;
   private final StandardGuiButtons standard = new StandardGuiButtons();
 
   public ArenaEditorMenuFactory(
@@ -96,7 +101,8 @@ public final class ArenaEditorMenuFactory {
       GuiService gui,
       TextInputService input,
       ArenaEditorStateStore states,
-      ProjectLogger logger) {
+      ProjectLogger logger,
+      MapTemplateService maps) {
     this.plugin = plugin;
     this.arenas = arenas;
     this.configurations = configurations;
@@ -104,6 +110,7 @@ public final class ArenaEditorMenuFactory {
     this.input = input;
     this.states = states;
     this.logger = logger;
+    this.maps = maps;
   }
 
   public Gui setup(UUID playerId) {
@@ -289,7 +296,7 @@ public final class ArenaEditorMenuFactory {
                 .itemKey("arena.editor.world")
                 .itemPlaceholders(context -> placeholders(arena, validation))
                 .permission(AdministrativeCommandPolicy.ARENA_EDIT)
-                .onLeftClick(context -> context.open(worlds(playerId, id, expected)))
+                .onLeftClick(context -> context.open(mapTemplates(playerId, id, expected)))
                 .onRightClick(
                     context ->
                         withPlayer(
@@ -389,6 +396,45 @@ public final class ArenaEditorMenuFactory {
                           arenas.setWorld(id, world.getName(), expected),
                           "world"))
               .onRightClick(context -> teleportWorld(context, playerId, world))
+              .build());
+    }
+    return builder.button(45, standard.back()).button(49, standard.close()).build();
+  }
+
+  /** Selects a persistent BedWars map id; arena YAML remains the relation source of truth. */
+  public Gui mapTemplates(UUID playerId, String id, long expected) {
+    ArenaDefinition arena = arenas.find(id).orElse(null);
+    if (arena == null) return missing(playerId);
+    var templates =
+        maps.list().stream()
+            .filter(template -> template.type() == MapType.BEDWARS)
+            .filter(template -> template.state() != MapState.ERROR)
+            .toList();
+    Gui.Builder builder =
+        Gui.builder()
+            .id("arena.map-templates." + id)
+            .title(message("arena.map.title", Map.of("arena_name", arena.displayName())))
+            .rows(6)
+            .fillEmptySlots(true);
+    List<Integer> slots = settings().contentSlots();
+    for (int index = 0; index < Math.min(slots.size(), templates.size()); index++) {
+      var template = templates.get(index);
+      Map<String, Object> values = new LinkedHashMap<>(MapMenuFactory.placeholders(template));
+      values.put("selected", arena.template().filter(template.id().value()::equals).isPresent());
+      builder.button(
+          slots.get(index),
+          GuiButton.builder()
+              .itemKey(template.loaded() ? "map.list.entry-loaded" : "map.list.entry-unloaded")
+              .itemPlaceholders(context -> values)
+              .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+              .onLeftClick(
+                  context -> {
+                    ArenaOperationResult result =
+                        arenas.setMapTemplate(
+                            id, template.id().value(), template.worldName(), expected);
+                    if (result.successful()) maps.synchronizeLinks(arenas.list());
+                    mutate(context, playerId, id, result, "map-template");
+                  })
               .build());
     }
     return builder.button(45, standard.back()).button(49, standard.close()).build();
@@ -561,7 +607,7 @@ public final class ArenaEditorMenuFactory {
     ArenaDefinition arena = arenas.find(id).orElse(null);
     if (arena == null) return missing(playerId);
     return switch (section) {
-      case WORLD -> worlds(playerId, id, arena.revision());
+      case WORLD -> mapTemplates(playerId, id, arena.revision());
       case PLAYERS -> players(playerId, id, arena.revision());
       case TEAMS -> teams(playerId, id, arena.revision());
       case BOUNDARY -> boundary(playerId, id, arena.revision());
@@ -1136,6 +1182,7 @@ public final class ArenaEditorMenuFactory {
     values.put("arena_enabled", arena.enabled());
     values.put("arena_revision", arena.revision());
     values.put("world", arena.worldName().orElse("-"));
+    values.put("map_template", arena.template().orElse("-"));
     values.put("minimum_players", arena.minimumPlayers());
     values.put("maximum_players", arena.maximumPlayers());
     values.put("min_players", arena.minimumPlayers());

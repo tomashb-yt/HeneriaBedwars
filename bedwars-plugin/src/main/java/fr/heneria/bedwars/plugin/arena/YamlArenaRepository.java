@@ -118,7 +118,7 @@ public final class YamlArenaRepository implements ArenaRepository {
         yaml.getString("display-name", id.value()),
         status(yaml.getString("status")),
         optional(yaml.getString("world")),
-        optional(yaml.getString("template")),
+        optional(yaml.getString("map.template-id", yaml.getString("template"))),
         yaml.getString("environment", "NORMAL"),
         yaml.getInt("players.minimum", 0),
         yaml.getInt("players.maximum", 0),
@@ -139,7 +139,7 @@ public final class YamlArenaRepository implements ArenaRepository {
     yaml.set("status", arena.status().name());
     yaml.set("enabled", arena.enabled());
     yaml.set("world", arena.worldName().orElse(null));
-    yaml.set("template", arena.template().orElse(null));
+    yaml.set("map.template-id", arena.template().orElse(null));
     yaml.set("environment", arena.environment());
     yaml.set("players.minimum", arena.minimumPlayers());
     yaml.set("players.maximum", arena.maximumPlayers());

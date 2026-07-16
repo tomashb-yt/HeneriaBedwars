@@ -15,6 +15,7 @@ public enum TranslationKey {
   HELP_ITEM("command.help.item"),
   HELP_ARENA("command.help.arena"),
   HELP_SETUP("command.help.setup"),
+  HELP_MAP("command.help.map"),
   VERSION_HEADER("command.version.header"),
   VERSION_PLUGIN("command.version.plugin-version"),
   VERSION_JAVA("command.version.java-version"),

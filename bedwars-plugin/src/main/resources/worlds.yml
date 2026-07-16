@@ -1,0 +1,40 @@
+config-version: 1
+
+world-manager:
+  enabled: true
+  directories:
+    templates: maps/templates
+    metadata: maps/metadata
+    instances: instances
+    backups: backups/maps
+  naming:
+    template-world-prefix: "hbw_template_"
+    instance-world-prefix: "hbw_game_"
+  fallback-world: world
+  void-world:
+    create-safety-platform: true
+    platform-material: GLASS
+    platform-radius: 3
+    platform-y: 64
+  defaults:
+    environment: NORMAL
+    difficulty: PEACEFUL
+    fixed-time: 6000
+    clear-weather: true
+    pvp: false
+    animals: false
+    monsters: false
+  auto-save:
+    enabled: false
+    interval-minutes: 10
+  unload:
+    save-before-unload: true
+    refuse-if-players-present: true
+  copy:
+    excluded-files:
+      - uid.dat
+      - session.lock
+    excluded-directories:
+      - playerdata
+      - stats
+      - advancements

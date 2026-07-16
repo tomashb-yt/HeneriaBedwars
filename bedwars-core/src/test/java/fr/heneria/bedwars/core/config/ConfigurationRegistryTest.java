@@ -14,7 +14,7 @@ class ConfigurationRegistryTest {
     ConfigurationRegistry registry = new ConfigurationRegistry();
     registerAll(registry);
     registry.activate(completeDocuments(1));
-    assertEquals(9, registry.loaded().size());
+    assertEquals(10, registry.loaded().size());
     assertEquals(1, registry.version(ConfigurationId.GENERAL));
     assertTrue(registry.find(ConfigurationId.MENUS).isPresent());
   }

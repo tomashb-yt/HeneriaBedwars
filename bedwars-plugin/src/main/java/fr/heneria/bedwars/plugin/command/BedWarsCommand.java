@@ -8,6 +8,8 @@ import fr.heneria.bedwars.core.config.ConfigurationReloadResult;
 import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
+import fr.heneria.bedwars.core.logging.ProjectLogger;
+import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.plugin.arena.ArenaCommandHandler;
 import fr.heneria.bedwars.plugin.arena.ArenaEditorMenuFactory;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
@@ -17,6 +19,9 @@ import fr.heneria.bedwars.plugin.gui.GuiService;
 import fr.heneria.bedwars.plugin.item.ItemContexts;
 import fr.heneria.bedwars.plugin.item.ItemPreviewMenuFactory;
 import fr.heneria.bedwars.plugin.item.ItemService;
+import fr.heneria.bedwars.plugin.map.BukkitMapWorldService;
+import fr.heneria.bedwars.plugin.map.MapCommandHandler;
+import fr.heneria.bedwars.plugin.map.MapMenuFactory;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -52,19 +57,26 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   private final ArenaService arenaService;
   private final ArenaCommandHandler arenaCommands;
   private final ArenaEditorMenuFactory arenaEditor;
+  private final MapTemplateService mapService;
+  private final MapCommandHandler mapCommands;
 
   public BedWarsCommand(
       JavaPlugin plugin,
       PluginBootstrap bootstrap,
       ConfigurationService configurations,
       ArenaService arenaService,
+      MapTemplateService mapService,
+      BukkitMapWorldService mapWorldService,
       ItemService itemService,
       GuiService guiService,
-      ArenaEditorMenuFactory arenaEditor) {
+      ArenaEditorMenuFactory arenaEditor,
+      MapMenuFactory mapMenus,
+      ProjectLogger logger) {
     this.plugin = plugin;
     this.bootstrap = bootstrap;
     this.configurations = configurations;
     this.arenaService = arenaService;
+    this.mapService = mapService;
     this.guiService = guiService;
     this.itemService = itemService;
     this.arenaEditor = arenaEditor;
@@ -74,7 +86,10 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         new ItemPreviewMenuFactory(
             configurations, itemService, plugin.getDescription().getVersion());
     this.arenaCommands =
-        new ArenaCommandHandler(arenaService, configurations, guiService, arenaEditor);
+        new ArenaCommandHandler(arenaService, configurations, guiService, arenaEditor, mapService);
+    this.mapCommands =
+        new MapCommandHandler(
+            plugin, mapService, mapWorldService, configurations, guiService, mapMenus, logger);
   }
 
   @Override
@@ -93,6 +108,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "gui" -> gui(sender);
         case "item" -> item(sender, args);
         case "arena" -> arenaCommands.execute(sender, args);
+        case "map" -> mapCommands.execute(sender, args);
         case "setup" -> setup(sender);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
@@ -116,6 +132,9 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       send(sender, TranslationKey.HELP_ARENA);
     if (sender.hasPermission(AdministrativeCommandPolicy.SETUP))
       send(sender, TranslationKey.HELP_SETUP);
+    if (sender.hasPermission(AdministrativeCommandPolicy.MAP)
+        || sender.hasPermission(AdministrativeCommandPolicy.MAP_MENU))
+      send(sender, TranslationKey.HELP_MAP);
     return true;
   }
 
@@ -145,7 +164,9 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     ArenaReloadResult arenaResult = null;
     if (result.successful()) {
       try {
+        mapService.reload();
         arenaResult = arenaService.reload();
+        mapService.synchronizeLinks(arenaService.list());
       } catch (java.io.IOException exception) {
         plugin.getLogger().log(java.util.logging.Level.SEVERE, "Arena reload failed", exception);
       }
@@ -337,6 +358,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         configurations.availableLocales(),
         itemService.registeredKeys().stream().sorted().toList(),
         arenaService.list().stream().map(arena -> arena.id().value()).toList(),
-        plugin.getServer().getWorlds().stream().map(org.bukkit.World::getName).sorted().toList());
+        plugin.getServer().getWorlds().stream().map(org.bukkit.World::getName).sorted().toList(),
+        mapService.list().stream().map(map -> map.id().value()).toList());
   }
 }

@@ -1,6 +1,6 @@
 # HeneriaBedWars
 
-HeneriaBedWars est un plugin BedWars expérimental pour Spigot/Paper 1.21.x, développé en Java 21. Le dépôt contient la fondation technique, un système multi-fichiers de configuration et les traductions françaises/anglaises. Aucun gameplay BedWars n'est encore disponible.
+HeneriaBedWars est un plugin BedWars expérimental pour Spigot/Paper 1.21.x, développé en Java 21. Le dépôt contient la fondation technique, la configuration, les menus administratifs, les arènes et un gestionnaire autonome de cartes modèles vides. Aucun gameplay BedWars n'est encore disponible.
 
 ## Prérequis et compilation
 
@@ -34,7 +34,9 @@ Lire d'abord [AGENTS.md](AGENTS.md), puis la documentation de reprise dans [docs
 
 ## Configuration et commandes
 
-Au premier démarrage, le plugin crée les neuf YAML principaux, `languages/fr_FR.yml`, `languages/en_US.yml` et les dossiers `arenas`, `languages` et `backups`, sans écraser les fichiers existants. `/bedwars reload` recharge tout de manière transactionnelle, `/bedwars config` affiche un diagnostic sans secret et `/bedwars language set <locale>` persiste la langue. L'alias `/hbw` accepte les mêmes sous-commandes.
+Au premier démarrage, le plugin crée les dix YAML principaux, `languages/fr_FR.yml`, `languages/en_US.yml` et les dossiers runtime nécessaires, sans écraser les fichiers existants. `/bedwars reload` recharge les configurations et métadonnées, `/bedwars config` affiche un diagnostic sans secret et `/bedwars language set <locale>` persiste la langue. L'alias `/hbw` accepte les mêmes sous-commandes.
+
+`/bedwars map` ouvre le gestionnaire de cartes modèles. Il permet de créer un monde vide, le charger, s'y téléporter, définir son spawn, le sauvegarder, le décharger, le dupliquer et le supprimer après sauvegarde. `/bedwars arena setmap <arène> <carte>` ou le sélecteur de l'éditeur lie une arène à une carte `BEDWARS`. Les dossiers de parties `instances/` sont seulement réservés : aucune partie ou copie temporaire n'est créée par ce ticket. Voir [docs/ai/WORLD_SYSTEM.md](docs/ai/WORLD_SYSTEM.md).
 
 Les définitions administratives d'arènes sont stockées dans `arenas/<id>.yml`. `/bedwars setup`, `/bedwars arena` et `/bedwars arena menu` ouvrent l'éditeur complet : création par chat privé, filtres et tri, monde, positions, capacités, équipes générales, limites, validation, activation et suppression sauvegardée. Chaque modification est sauvegardée automatiquement et protégée par une révision contre les écrasements entre administrateurs. Une définition activée n'est pas encore une partie jouable : équipes runtime détaillées, lits, générateurs, copie/reset de monde et matchmaking restent à venir.
 

@@ -34,6 +34,10 @@ public final class DefaultConfigurationInstaller {
     Files.createDirectories(dataDirectory.resolve("arenas"));
     Files.createDirectories(dataDirectory.resolve("languages"));
     Files.createDirectories(dataDirectory.resolve("backups"));
+    Files.createDirectories(dataDirectory.resolve("maps/templates"));
+    Files.createDirectories(dataDirectory.resolve("maps/metadata"));
+    Files.createDirectories(dataDirectory.resolve("instances"));
+    Files.createDirectories(dataDirectory.resolve("backups/maps"));
     List<String> resourcesToInstall = new java.util.ArrayList<>();
     for (ConfigurationId id : ConfigurationId.values()) resourcesToInstall.add(id.fileName());
     resourcesToInstall.add("languages/fr_FR.yml");

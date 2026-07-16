@@ -6,6 +6,10 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Gestionnaire autonome de cartes modèles : modèle immutable, registre, métadonnées YAML atomiques, mondes vides Bukkit, chargement, sauvegarde, déchargement, téléportation et autosauvegarde optionnelle.
+- Duplication confinée hors thread serveur, exclusions des données joueurs, suppression avec sauvegarde complète obligatoire et refus des cartes liées à une arène ou au lobby.
+- Commandes et menus `/bedwars map`, permissions détaillées, liaisons arène–carte `BEDWARS`, configuration `worlds.yml` et ressources FR/EN.
+
 - Structure Gradle Kotlin DSL à trois modules et Wrapper reproductible.
 - Bootstrap initial du plugin Paper et commande `/bedwars version`.
 - Gestion déterministe du cycle de vie avec rollback.

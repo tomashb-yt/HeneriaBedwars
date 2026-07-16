@@ -1,5 +1,13 @@
 # Tests
 
+## Ticket 007
+
+Les tests purs couvrent l'identifiant sécurisé, l'immutabilité/révision/état, l'ordre et les snapshots du registre, les verrous, la publication après persistance, les pannes de création et nettoyage, sauvegarde/déchargement, présence de joueurs, duplication indépendante, suppression avec sauvegarde, relations d'arènes en direct et conflits de révision. La validation d'arène couvre carte absente, inconnue, mauvais type, erreur et association valide.
+
+Les tests plugin couvrent le round-trip YAML UTF-8, l'isolation des métadonnées cassées, les exclusions de copie, dossiers temporaires, sauvegardes et refus de chemins externes. La configuration vérifie `worlds.yml`, les chemins dangereux, la parité FR/EN et la complétion permission-aware. La suite complète contient 136 tests, 0 échec et 0 ignoré.
+
+Aucun serveur Minecraft n'est disponible dans l'environnement Codex. Il faut tester manuellement sur Paper : monde réellement vide, plateforme, règles de jeu, persistance des blocs et du spawn, présence de joueurs, évacuation forcée, téléportation, copie volumineuse, sauvegarde de suppression, redémarrage, associations et deux opérations concurrentes.
+
 ## Ticket 006
 
 La suite contient 113 tests : 90 dans le cœur et 23 dans le module plugin, tous réussis. Les 25 nouveaux scénarios couvrent sessions de saisie (démarrage, validation, refus, annulation, timeout, déconnexion, concurrence), révision initiale et incrément, conflit optimiste, sauvegarde échouée sans publication, nom, monde, positions, joueurs, équipes, limites et suppression, état de liste (filtre, tri, page, refresh), routage des problèmes et apparences INFO/WARNING/ERROR/CRITICAL, compatibilité YAML des révisions et limites partielles, ainsi que refus transactionnel des slots d'éditeur en collision.

@@ -1,5 +1,23 @@
 # Architecture actuelle
 
+## Ticket 007 — cartes modèles autonomes
+
+`bedwars-core/map` contient les identifiants confinés, modèle immutable, états transitoires, registre copy-on-write, verrou par carte, validation et services. `bedwars-plugin/map` adapte les métadonnées YAML, les fichiers, le générateur vide, Bukkit, commandes, menus et cycle de vie. Aucun type Bukkit ne traverse la frontière du cœur.
+
+Une création n'est publiée qu'après création du monde et persistance des métadonnées. Les appels Bukkit de chargement, sauvegarde, déchargement et téléportation restent sur le thread serveur. La duplication, la sauvegarde de suppression et l'effacement confiné s'exécutent hors thread. La suppression est scindée en préparation Bukkit puis phase fichier, avec un même verrou jusqu'au résultat final.
+
+Les définitions d'arènes sont la source de vérité des associations. Les liens inverses dans les métadonnées de cartes sont dérivés et resynchronisés au chargement. `ArenaValidator` exige une carte existante, de type `BEDWARS` et hors état `ERROR` pour les nouvelles arènes liées.
+
+```mermaid
+flowchart LR
+  CMD["/bedwars map + menus"] --> SERVICE["MapTemplateService"]
+  SERVICE --> REGISTRY["MapTemplateRegistry"]
+  SERVICE --> META["YamlMapTemplateRepository"]
+  SERVICE --> FILES["SecureMapFileService async"]
+  SERVICE --> WORLD["BukkitMapWorldService main thread"]
+  ARENA["ArenaService"] --> SERVICE
+```
+
 ## Ticket 006 — éditeur administratif d'arènes
 
 `ArenaEditorMenuFactory` compose le menu principal, `ArenaListGui`, l'éditeur, la validation, la sélection du monde et les sous-menus joueurs, équipes et limites au moyen du modèle GUI interne. Ces noms décrivent des vues produites par la factory, pas des classes publiques séparées. Les actions appellent toutes le même `ArenaService` que les commandes et ne lisent jamais les YAML.

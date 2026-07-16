@@ -75,6 +75,32 @@ public final class ArenaService {
     return setWorld(rawId, world, null);
   }
 
+  /** Associates an already validated map-template id and its managed working world. */
+  public synchronized ArenaOperationResult setMapTemplate(
+      String rawId, String mapTemplateId, String managedWorldName) {
+    return setMapTemplate(rawId, mapTemplateId, managedWorldName, null);
+  }
+
+  public synchronized ArenaOperationResult setMapTemplate(
+      String rawId, String mapTemplateId, String managedWorldName, long expectedRevision) {
+    return setMapTemplate(rawId, mapTemplateId, managedWorldName, Long.valueOf(expectedRevision));
+  }
+
+  private ArenaOperationResult setMapTemplate(
+      String rawId, String mapTemplateId, String managedWorldName, Long expectedRevision) {
+    if (mapTemplateId == null
+        || mapTemplateId.isBlank()
+        || managedWorldName == null
+        || managedWorldName.isBlank())
+      return ArenaOperationResult.failure(ArenaOperationCode.INVALID_ARGUMENT, "map template");
+    return edit(
+        rawId,
+        expectedRevision,
+        arena ->
+            arena.withTemplate(
+                mapTemplateId.trim(), managedWorldName.trim(), editStatus(arena), now()));
+  }
+
   public synchronized ArenaOperationResult setWorld(
       String rawId, String world, long expectedRevision) {
     return setWorld(rawId, world, Long.valueOf(expectedRevision));

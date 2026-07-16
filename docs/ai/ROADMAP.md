@@ -6,8 +6,8 @@
 - [TERMINÉ] Ticket 004 — Système d'items configurables
 - [TERMINÉ] Ticket 005 — Modèle administratif, validation et stockage des arènes
 - [TERMINÉ] Ticket 006 — Éditeur complet des arènes via menus
-- [À FAIRE] Ticket 007 — Système de mondes templates et instances temporaires
+- [TERMINÉ] Ticket 007 — Gestionnaire autonome de mondes et cartes modèles
 
 ## Grandes phases futures
 
-Fondation, configurations, interfaces, items, définitions d'arènes et éditeur administratif sont terminés. Le prochain développement est le Ticket 007, consacré aux mondes templates et aux instances temporaires. Équipes détaillées, lits, cycle des parties, générateurs, boutiques, améliorations, combat, lobby, statistiques, stockage SQL et API restent futurs.
+Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif et cartes modèles sont terminés. Les instances temporaires et leur remise à zéro restent à livrer avec le futur cycle des parties. Équipes détaillées, lits, générateurs, boutiques, améliorations, combat, lobby, statistiques, stockage SQL et API restent futurs.

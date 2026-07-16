@@ -12,3 +12,5 @@ Ces états ne sont pas implémentés. Leur définition exacte, les transitions a
 Les statuts administratifs d'une définition (`DRAFT`, `READY`, `ENABLED`, `DISABLED`, `INVALID`, `ERROR`) sont implémentés depuis le Ticket 005 mais ne font pas partie de ce cycle. `ENABLED` signifie seulement « autorisée pour un futur gestionnaire de parties ».
 
 Le Ticket 006 permet de modifier et valider ces statuts depuis les menus. L'activation refuse une définition invalide et ne démarre toujours aucune partie, ne clone aucun monde et ne crée aucune équipe runtime.
+
+Le Ticket 007 ajoute des cartes modèles persistantes et leur association aux arènes, pas des instances de match. Un futur passage vers `WAITING` devra copier une carte `BEDWARS` vers une instance isolée, ne jamais faire jouer directement dans le modèle, puis supprimer ou réinitialiser cette instance à la fin. Aucun de ces changements d'état n'est encore implémenté.

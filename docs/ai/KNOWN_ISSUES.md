@@ -1,5 +1,15 @@
 # Limitations connues
 
+## Ticket 007
+
+- Les cartes sont des modèles persistants administratifs; aucune instance temporaire, copie par partie, remise à zéro ou nettoyage de match n'est actif.
+- Seul le générateur `VOID` est livré. L'import d'un monde externe, les générateurs tiers et les dimensions personnalisées ne sont pas pris en charge.
+- Les mondes Bukkit vivent dans le conteneur de mondes du serveur avec un préfixe contrôlé; `maps/templates/` contient les marqueurs de propriété, pas les chunks actifs.
+- Un changement des chemins ou préfixes de `worlds.yml` demande un redémarrage complet et ne déplace pas les anciens mondes.
+- La duplication et la suppression peuvent prendre du temps selon la taille du monde; elles sont asynchrones mais aucune barre de progression persistante n'est fournie.
+- La création/édition réelle de mondes, les téléportations, l'évacuation forcée, les règles de jeu et le comportement après crash doivent être testés manuellement sur Paper.
+- Les anciennes arènes utilisant `map.template` sont lues pour compatibilité, puis écrites sous `map.template-id` lors d'une prochaine sauvegarde.
+
 ## Ticket 006
 
 - L'éditeur configure une définition administrative mais ne crée aucune partie jouable et ne copie, charge ou réinitialise aucun monde.

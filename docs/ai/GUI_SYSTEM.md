@@ -1,5 +1,9 @@
 # Système de menus interne
 
+## Intégration Ticket 007
+
+`MapMenuFactory` réutilise le framework pour la liste paginée, les informations, la création par chat, les actions de monde et la confirmation de suppression. Les apparences `map.*` viennent de `items.yml`; le menu ne lit jamais les YAML. La copie et la phase fichier de suppression quittent le thread serveur, puis le résultat revient sur le thread Bukkit avant tout message ou changement de vue. L'éditeur d'arènes ouvre aussi un sélecteur des cartes `BEDWARS` valides.
+
 ## Architecture
 
 Le framework Ticket 003 est interne et séparé en deux frontières :

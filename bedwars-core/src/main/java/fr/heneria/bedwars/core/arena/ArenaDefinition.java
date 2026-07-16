@@ -168,6 +168,28 @@ public record ArenaDefinition(
         metadata.touched(now));
   }
 
+  /** Associates a stable map-template id and its managed Bukkit working-world name. */
+  public ArenaDefinition withTemplate(
+      String mapTemplateId, String managedWorldName, ArenaStatus newStatus, Instant now) {
+    return new ArenaDefinition(
+        configVersion,
+        revision + 1,
+        id,
+        displayName,
+        newStatus,
+        Optional.ofNullable(managedWorldName),
+        Optional.ofNullable(mapTemplateId),
+        environment,
+        minimumPlayers,
+        maximumPlayers,
+        teamCount,
+        playersPerTeam,
+        waitingLocation,
+        spectatorLocation,
+        boundary,
+        metadata.touched(now));
+  }
+
   /** Changes only a derived status while loading; it does not create an administrative revision. */
   public ArenaDefinition normalizedStatus(ArenaStatus value) {
     return new ArenaDefinition(

@@ -1,6 +1,7 @@
 package fr.heneria.bedwars.core.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -80,6 +81,7 @@ class AdministrativeCommandPolicyTest {
         List.of(
             "list",
             "setworld",
+            "setmap",
             "setwaiting",
             "setspectator",
             "setplayers",
@@ -115,5 +117,48 @@ class AdministrativeCommandPolicyTest {
             List.of(),
             List.of("alpha"),
             List.of("world", "world_nether")));
+  }
+
+  @Test
+  void completesMapCommandsTypesIdsAndArenaAssociation() {
+    Set<String> permissions =
+        Set.of(
+            AdministrativeCommandPolicy.MAP,
+            AdministrativeCommandPolicy.MAP_MENU,
+            AdministrativeCommandPolicy.MAP_CREATE,
+            AdministrativeCommandPolicy.MAP_LOAD,
+            AdministrativeCommandPolicy.ARENA,
+            AdministrativeCommandPolicy.ARENA_EDIT);
+    assertTrue(
+        policy
+            .complete(
+                permissions::contains,
+                new String[] {"map", ""},
+                List.of(),
+                List.of(),
+                List.of("arena"),
+                List.of("world"),
+                List.of("desert"))
+            .containsAll(List.of("menu", "create", "load")));
+    assertEquals(
+        List.of("lobby", "bedwars", "generic"),
+        policy.complete(
+            permissions::contains,
+            new String[] {"map", "create", "desert", ""},
+            List.of(),
+            List.of(),
+            List.of(),
+            List.of(),
+            List.of("desert")));
+    assertEquals(
+        List.of("desert"),
+        policy.complete(
+            permissions::contains,
+            new String[] {"arena", "setmap", "arena", ""},
+            List.of(),
+            List.of(),
+            List.of("arena"),
+            List.of(),
+            List.of("desert")));
   }
 }

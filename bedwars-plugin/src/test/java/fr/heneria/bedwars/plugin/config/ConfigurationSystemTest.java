@@ -36,7 +36,7 @@ class ConfigurationSystemTest {
   void createsEveryMissingFileAndPreservesExistingContent() throws Exception {
     TestLogger logger = new TestLogger();
     DefaultConfigurationInstaller installer = installer(logger);
-    assertEquals(11, installer.installMissing());
+    assertEquals(12, installer.installMissing());
     Path config = temporary.resolve("config.yml");
     Files.writeString(config, "custom: true\n");
     assertEquals(0, installer.installMissing());
@@ -53,11 +53,26 @@ class ConfigurationSystemTest {
     assertEquals("fr_FR", service.snapshot().plugin().locale());
     assertEquals(5, service.snapshot().gameplay().respawnDelaySeconds());
     assertEquals(54, service.snapshot().menus().defaultSize());
+    assertEquals("hbw_template_", service.snapshot().worlds().templateWorldPrefix());
+    assertEquals("maps/templates", service.snapshot().worlds().templatesDirectory());
     assertEquals(1, service.registry().version(ConfigurationId.GENERAL));
     assertEquals(List.of("en_US", "fr_FR"), service.availableLocales());
     assertEquals(
         service.snapshot().languages().get("fr_FR").keys(),
         service.snapshot().languages().get("en_US").keys());
+  }
+
+  @Test
+  void unsafeWorldManagerDirectoryRejectsReloadAndPreservesSnapshot() throws Exception {
+    ConfigurationService service = service();
+    service.initialize();
+    var previous = service.snapshot();
+    replace("worlds.yml", "templates: maps/templates", "templates: ../outside");
+
+    ConfigurationReloadResult result = service.reloadAll();
+
+    assertFalse(result.successful());
+    assertSame(previous, service.snapshot());
   }
 
   @Test

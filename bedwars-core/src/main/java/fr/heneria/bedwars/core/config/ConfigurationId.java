@@ -10,7 +10,8 @@ public enum ConfigurationId {
   ITEMS("items.yml"),
   SHOPS("shops.yml"),
   UPGRADES("upgrades.yml"),
-  GENERATORS("generators.yml");
+  GENERATORS("generators.yml"),
+  WORLDS("worlds.yml");
 
   private final String fileName;
 

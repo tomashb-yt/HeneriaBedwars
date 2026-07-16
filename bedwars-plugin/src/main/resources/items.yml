@@ -214,3 +214,29 @@ items:
       warning: {material: ORANGE_DYE, name: "<yellow>Avertissement: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
       error: {material: RED_DYE, name: "<red>Erreur: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
       critical: {material: BARRIER, name: "<dark_red>Critique: {code}", lore: ["<gray>{problem}", "<gray>Solution: <white>{solution}", "<white>Cliquez pour ouvrir la section."]}
+  map:
+    list:
+      create: {material: EMERALD, name: "<green>Creer une carte", lore: ["<gray>Saisie securisee dans le chat."]}
+      entry-loaded: &map-entry
+        material: LIME_CONCRETE
+        name: "<green>{map_name}"
+        lore: ["<gray>ID: <white>{map_id}", "<gray>Type: <white>{map_type}", "<gray>Etat: <white>{map_state}", "<gray>Monde: <white>{world_name}", "<gray>Joueurs: <white>{player_count}", "<gray>Arenes: <white>{arena_count}", "<gray>Revision: <white>{revision}", "<gray>Derniere sauvegarde: <white>{last_saved_at}", "", "<white>Gauche: informations", "<white>Droit: charger/teleporter", "<red>Shift+droit: supprimer"]
+      entry-unloaded: {<<: *map-entry, material: GRAY_CONCRETE, name: "<gray>{map_name}"}
+      entry-error: {<<: *map-entry, material: RED_CONCRETE, name: "<red>{map_name}"}
+      refresh: {inherit: "gui.refresh", name: "<aqua>Actualiser les cartes"}
+      filter: {material: HOPPER, name: "<yellow>Filtrer les cartes"}
+      sort: {material: COMPARATOR, name: "<yellow>Trier les cartes"}
+    editor:
+      information: {material: BOOK, name: "<aqua>Informations", lore: ["<gray>ID: <white>{map_id}", "<gray>Nom: <white>{map_name}", "<gray>Type: <white>{map_type}", "<gray>Etat: <white>{map_state}", "<gray>Monde Bukkit: <white>{world_name}", "<gray>Dossier: <white>{folder_name}", "<gray>Chargee: <white>{loaded}", "<gray>Joueurs: <white>{player_count}", "<gray>Revision: <white>{revision}", "<gray>Auteur: <white>{author}"]}
+      load: {material: LIME_DYE, name: "<green>Charger la carte"}
+      teleport: {material: ENDER_PEARL, name: "<light_purple>Se teleporter"}
+      save: {material: CHEST, name: "<aqua>Sauvegarder"}
+      unload: {material: GRAY_DYE, name: "<yellow>Decharger"}
+      duplicate: {material: STRUCTURE_BLOCK, name: "<gold>Dupliquer", lore: ["<gray>La copie est executee hors du thread serveur."]}
+      set-spawn: {material: COMPASS, name: "<gold>Definir le spawn"}
+      associations: {material: CHAIN, name: "<yellow>Associations", lore: ["<gray>Arenes: <white>{linked_arenas}", "<gray>Total: <white>{arena_count}"]}
+      delete: {material: TNT, name: "<red>Supprimer", lore: ["<yellow>Sauvegarde complete obligatoire."]}
+    type:
+      lobby: {material: NETHER_STAR, name: "<aqua>Lobby"}
+      bedwars: {material: RED_BED, name: "<red>BedWars"}
+      generic: {material: MAP, name: "<gray>Generique"}
