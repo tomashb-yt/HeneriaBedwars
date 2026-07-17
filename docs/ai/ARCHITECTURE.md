@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Correctif de préparation Ticket 012 — configuration des équipes
+
+`ArenaEditorMenuFactory` possède une vue liste et une fiche par `TeamId`; toutes les mutations continuent de passer par `ArenaService` avec la révision observée. Une sauvegarde réussie reconstruit la même fiche avec la nouvelle révision. `BukkitArenaBeds` reste à la frontière plugin : il transforme le bloc regardé en position normalisée du pied après vérification des deux moitiés. Le cœur refuse les doublons par coordonnées de bloc sans dépendre de Bukkit.
+
+Les commandes avancées utilisent exactement les mêmes opérations métier. Leur complétion imbriquée est déléguée à `ArenaCommandHandler`, qui connaît les arènes, cartes, mondes et équipes actifs; aucun accès YAML n'est ajouté dans la commande ou le menu.
+
 ## Ticket 011 - équipes et parcours public
 
 `ArenaTeamDefinition`, `TeamId` et `TeamColor` résident dans le cœur, sans type Bukkit. `ArenaDefinition` conserve les équipes détaillées et les anciens champs de capacité pour la compatibilité YAML. `GameInstance` en dérive des `RuntimeTeam` bornées; `GameInstanceManager.selectTeam` reste la frontière métier atomique.

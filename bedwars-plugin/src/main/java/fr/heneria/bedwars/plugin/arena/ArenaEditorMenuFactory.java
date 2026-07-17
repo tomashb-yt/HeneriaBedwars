@@ -8,8 +8,11 @@ import fr.heneria.bedwars.core.arena.ArenaOperationResult;
 import fr.heneria.bedwars.core.arena.ArenaProblem;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.arena.ArenaStatus;
+import fr.heneria.bedwars.core.arena.ArenaTeamDefinition;
 import fr.heneria.bedwars.core.arena.ArenaValidationResult;
 import fr.heneria.bedwars.core.arena.ArenaVector;
+import fr.heneria.bedwars.core.arena.TeamColor;
+import fr.heneria.bedwars.core.arena.TeamId;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorSection;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorViewState;
@@ -637,56 +640,158 @@ public final class ArenaEditorMenuFactory {
   public Gui teams(UUID playerId, String id, long expected) {
     ArenaDefinition arena = arenas.find(id).orElse(null);
     if (arena == null) return missing(playerId);
+    ArenaValidationResult validation = arenas.validate(arena);
     Gui.Builder builder =
         Gui.builder()
             .id("arena.teams." + id)
-            .title(
-                message("arena.teams.assistant-title", placeholders(arena, arenas.validate(arena))))
-            .rows(4)
+            .title(message("arena.teams.assistant-title", placeholders(arena, validation)))
+            .rows(5)
             .fillEmptySlots(true)
-            .button(11, teamNumberButton(playerId, arena, expected, true))
-            .button(15, teamNumberButton(playerId, arena, expected, false))
+            .button(10, teamNumberButton(playerId, arena, expected, true))
+            .button(16, teamNumberButton(playerId, arena, expected, false))
             .button(
                 13,
                 GuiButton.builder()
-                    .itemKey("arena.teams.assistant-summary")
-                    .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
+                    .itemKey("arena.teams.assistant-overview-v2")
+                    .itemPlaceholders(context -> placeholders(arena, validation))
                     .build())
-            .button(31, editorBackButton(playerId, id));
-    List<Integer> slots = List.of(10, 12, 14, 16, 19, 21, 23, 25);
+            .button(40, editorBackButton(playerId, id))
+            .button(44, standard.close());
+    List<Integer> slots = List.of(19, 20, 21, 22, 23, 24, 25, 31);
     for (int index = 0; index < Math.min(slots.size(), arena.teams().size()); index++) {
-      var team = arena.teams().get(index);
-      Map<String, Object> values = new LinkedHashMap<>(placeholders(arena, arenas.validate(arena)));
-      values.put("team_id", team.id().value());
-      values.put("team_name", team.displayName());
-      values.put("team_color", team.color().name());
-      values.put("team_capacity", team.capacity());
-      values.put(
-          "team_spawn_status", team.spawn().isPresent() ? "✓ Spawn configuré" : "Spawn manquant");
+      ArenaTeamDefinition team = arena.teams().get(index);
+      Map<String, Object> values = teamPlaceholders(arena, validation, team);
       builder.button(
           slots.get(index),
           GuiButton.builder()
-              .itemKey("arena.teams.assistant-summary")
+              .itemKey(teamEntryKey(team.color()))
               .itemPlaceholders(context -> values)
               .permission(AdministrativeCommandPolicy.ARENA_EDIT)
-              .onLeftClick(
-                  context ->
-                      withPlayer(
-                          playerId,
-                          player ->
-                              mutate(
-                                  context,
-                                  playerId,
-                                  id,
-                                  arenas.setTeamSpawn(
-                                      id,
-                                      team.id(),
-                                      BukkitArenaLocations.from(player.getLocation()),
-                                      expected),
-                                  "team-spawn")))
-              .onRightClick(
-                  context -> team.spawn().ifPresent(value -> teleport(context, playerId, value)))
+              .onLeftClick(context -> context.open(teamEditor(playerId, id, team.id(), expected)))
               .build());
+    }
+    return builder.build();
+  }
+
+  private Gui teamEditor(UUID playerId, String id, TeamId teamId, long expected) {
+    ArenaDefinition arena = arenas.find(id).orElse(null);
+    if (arena == null) return missing(playerId);
+    ArenaTeamDefinition team =
+        arena.teams().stream().filter(value -> value.id().equals(teamId)).findFirst().orElse(null);
+    if (team == null) return teams(playerId, id, arena.revision());
+    ArenaValidationResult validation = arenas.validate(arena);
+    Map<String, Object> values = teamPlaceholders(arena, validation, team);
+    Gui.Builder builder =
+        Gui.builder()
+            .id("arena.team." + id + '.' + team.id().value())
+            .title(message("arena.teams.team-title", values))
+            .rows(5)
+            .fillEmptySlots(true)
+            .button(
+                4,
+                GuiButton.builder()
+                    .itemKey(teamEntryKey(team.color()))
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                11,
+                GuiButton.builder()
+                    .itemKey(
+                        team.spawn().isPresent()
+                            ? "arena.teams.spawn-configured"
+                            : "arena.teams.spawn-missing")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                15,
+                GuiButton.builder()
+                    .itemKey(
+                        team.bedLocation().isPresent()
+                            ? "arena.teams.bed-configured"
+                            : "arena.teams.bed-missing")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                13,
+                GuiButton.builder()
+                    .itemKey("arena.teams.future-features")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                19,
+                action(
+                    "arena.teams.set-spawn",
+                    AdministrativeCommandPolicy.ARENA_EDIT,
+                    values,
+                    context -> setTeamSpawn(context, playerId, arena, team, expected)))
+            .button(
+                23,
+                action(
+                    "arena.teams.set-bed",
+                    AdministrativeCommandPolicy.ARENA_EDIT,
+                    values,
+                    context -> selectTeamBed(context, playerId, arena, team, expected)))
+            .button(
+                36,
+                GuiButton.builder()
+                    .itemKey("gui.back")
+                    .onLeftClick(context -> context.replace(teams(playerId, id, arena.revision())))
+                    .build())
+            .button(
+                40,
+                GuiButton.builder()
+                    .itemKey("arena.teams.review")
+                    .itemPlaceholders(context -> values)
+                    .onLeftClick(context -> context.open(validation(playerId, id)))
+                    .build())
+            .button(44, standard.close());
+    if (team.spawn().isPresent()) {
+      builder
+          .button(
+              20,
+              action(
+                  "arena.teams.teleport-spawn",
+                  AdministrativeCommandPolicy.ARENA_TELEPORT,
+                  values,
+                  context -> teleport(context, playerId, team.spawn().orElseThrow())))
+          .button(
+              21,
+              action(
+                  "arena.teams.clear-spawn",
+                  AdministrativeCommandPolicy.ARENA_EDIT,
+                  values,
+                  context ->
+                      mutateTeam(
+                          context,
+                          playerId,
+                          id,
+                          team.id(),
+                          arenas.clearTeamSpawn(id, team.id(), expected),
+                          "team-spawn-clear")));
+    }
+    if (team.bedLocation().isPresent()) {
+      builder
+          .button(
+              24,
+              action(
+                  "arena.teams.teleport-bed",
+                  AdministrativeCommandPolicy.ARENA_TELEPORT,
+                  values,
+                  context -> teleportBed(context, playerId, team.bedLocation().orElseThrow())))
+          .button(
+              25,
+              action(
+                  "arena.teams.clear-bed",
+                  AdministrativeCommandPolicy.ARENA_EDIT,
+                  values,
+                  context ->
+                      mutateTeam(
+                          context,
+                          playerId,
+                          id,
+                          team.id(),
+                          arenas.clearTeamBed(id, team.id(), expected),
+                          "team-bed-clear")));
     }
     return builder.build();
   }
@@ -1419,6 +1524,96 @@ public final class ArenaEditorMenuFactory {
     context.open(teamConfirmation(playerId, arena, expected, newCount, newPerTeam));
   }
 
+  private void setTeamSpawn(
+      GuiClickContext context,
+      UUID playerId,
+      ArenaDefinition arena,
+      ArenaTeamDefinition team,
+      long expected) {
+    Player player = player(playerId);
+    if (!correctArenaWorld(playerId, player, arena)) return;
+    mutateTeam(
+        context,
+        playerId,
+        arena.id().value(),
+        team.id(),
+        arenas.setTeamSpawn(
+            arena.id().value(),
+            team.id(),
+            BukkitArenaLocations.from(player.getLocation()),
+            expected),
+        "team-spawn");
+  }
+
+  private void selectTeamBed(
+      GuiClickContext context,
+      UUID playerId,
+      ArenaDefinition arena,
+      ArenaTeamDefinition team,
+      long expected) {
+    Player player = player(playerId);
+    BukkitArenaBeds.Selection selection = BukkitArenaBeds.select(player, arena);
+    if (!selection.successful()) {
+      String key =
+          switch (selection.code()) {
+            case WRONG_WORLD -> "arena.team.wrong-world";
+            case NOT_A_BED -> "arena.team.bed.invalid-block";
+            case INCOMPLETE_BED -> "arena.team.bed.incomplete";
+            case SUCCESS ->
+                throw new IllegalArgumentException("Successful selection is not a failure");
+          };
+      send(
+          playerId,
+          key,
+          Map.of(
+              "world", arena.worldName().orElse("-"),
+              "current_world", player.getWorld().getName()));
+      return;
+    }
+    ArenaOperationResult operation =
+        arenas.setTeamBed(
+            arena.id().value(), team.id(), selection.location().orElseThrow(), expected);
+    if (operation.code() == ArenaOperationCode.INVALID_ARGUMENT
+        && operation.detail().startsWith("Bed already belongs to team ")) {
+      send(
+          playerId,
+          "arena.team.bed.duplicate",
+          Map.of("team", operation.detail().substring("Bed already belongs to team ".length())));
+      return;
+    }
+    mutateTeam(context, playerId, arena.id().value(), team.id(), operation, "team-bed");
+  }
+
+  private boolean correctArenaWorld(UUID playerId, Player player, ArenaDefinition arena) {
+    String expected = arena.worldName().orElse("-");
+    if (player.getWorld().getName().equals(expected)) return true;
+    send(
+        playerId,
+        "arena.team.wrong-world",
+        Map.of("world", expected, "current_world", player.getWorld().getName()));
+    return false;
+  }
+
+  private void mutateTeam(
+      GuiClickContext context,
+      UUID playerId,
+      String id,
+      TeamId teamId,
+      ArenaOperationResult result,
+      String operation) {
+    if (result.successful()) {
+      logger.info(
+          "[Arena] " + playerName(playerId) + " changed " + operation + " of '" + id + "'.");
+      send(playerId, "arena.gui.editor.autosave", Map.of("arena_id", id));
+      ArenaDefinition updated = result.arena().orElseThrow();
+      context.replace(teamEditor(playerId, id, teamId, updated.revision()));
+    } else {
+      mutationFailure(playerId, result);
+      if (result.code() == ArenaOperationCode.NOT_FOUND) openDashboard(playerId);
+      else if (result.code() == ArenaOperationCode.CONFLICT) context.replace(editor(playerId, id));
+    }
+  }
+
   private void mutate(
       GuiClickContext context,
       UUID playerId,
@@ -1479,6 +1674,28 @@ public final class ArenaEditorMenuFactory {
             value.position().x(),
             value.position().y(),
             value.position().z(),
+            value.yaw(),
+            value.pitch()));
+    send(playerId, "arena.world.teleport-success", Map.of("world", world.getName()));
+  }
+
+  private void teleportBed(GuiClickContext context, UUID playerId, ArenaLocation value) {
+    Player player = player(playerId);
+    if (!player.hasPermission(AdministrativeCommandPolicy.ARENA_TELEPORT)) {
+      send(playerId, "general.no-permission", Map.of());
+      return;
+    }
+    World world = Bukkit.getWorld(value.world());
+    if (world == null) {
+      send(playerId, "arena.world.not-found", Map.of("world", value.world()));
+      return;
+    }
+    player.teleport(
+        new Location(
+            world,
+            value.position().x() + 0.5,
+            value.position().y() + 1.0,
+            value.position().z() + 0.5,
             value.yaw(),
             value.pitch()));
     send(playerId, "arena.world.teleport-success", Map.of("world", world.getName()));
@@ -1615,6 +1832,12 @@ public final class ArenaEditorMenuFactory {
     values.put("teams", arena.teamCount());
     values.put("players_per_team", arena.playersPerTeam());
     values.put("capacity", arena.teamCount() * arena.playersPerTeam());
+    values.put(
+        "team_spawns_configured",
+        arena.teams().stream().filter(team -> team.spawn().isPresent()).count());
+    values.put(
+        "team_beds_configured",
+        arena.teams().stream().filter(team -> team.bedLocation().isPresent()).count());
     values.put("validation_errors", errors(validation));
     values.put("validation_warnings", validation.warnings());
     boolean mapConfigured = arena.template().isPresent();
@@ -1665,6 +1888,51 @@ public final class ArenaEditorMenuFactory {
     values.put("description", arena.metadata().attributes().getOrDefault("description", "-"));
     values.put("arena_file", "arenas/" + arena.id().value() + ".yml");
     return Map.copyOf(values);
+  }
+
+  private Map<String, Object> teamPlaceholders(
+      ArenaDefinition arena, ArenaValidationResult validation, ArenaTeamDefinition team) {
+    Map<String, Object> values = new LinkedHashMap<>(placeholders(arena, validation));
+    values.put("team_id", team.id().value());
+    values.put("team_name", team.displayName());
+    values.put("team_color", team.color().name());
+    values.put("team_capacity", team.capacity());
+    values.put(
+        "team_spawn_status",
+        message(
+            team.spawn().isPresent()
+                ? "arena.teams.status.configured"
+                : "arena.teams.status.missing",
+            Map.of()));
+    values.put(
+        "team_bed_status",
+        message(
+            team.bedLocation().isPresent()
+                ? "arena.teams.status.configured"
+                : "arena.teams.status.missing",
+            Map.of()));
+    values.put(
+        "team_ready",
+        message(
+            team.spawn().isPresent() && team.bedLocation().isPresent()
+                ? "arena.teams.status.yes"
+                : "arena.teams.status.no",
+            Map.of()));
+    putLocation(values, "spawn", team.spawn());
+    putLocation(values, "bed", team.bedLocation());
+    return Map.copyOf(values);
+  }
+
+  private static void putLocation(
+      Map<String, Object> values, String prefix, Optional<ArenaLocation> location) {
+    values.put(prefix + "_world", location.map(ArenaLocation::world).orElse("-"));
+    values.put(prefix + "_x", location.map(value -> value.position().x()).orElse(0.0));
+    values.put(prefix + "_y", location.map(value -> value.position().y()).orElse(0.0));
+    values.put(prefix + "_z", location.map(value -> value.position().z()).orElse(0.0));
+  }
+
+  private static String teamEntryKey(TeamColor color) {
+    return "arena.teams.entry-" + color.name().toLowerCase(Locale.ROOT);
   }
 
   private static Map<String, Object> positionPlaceholders(

@@ -1,5 +1,11 @@
 # Limitations connues
 
+## Préparation Ticket 012 — configuration des équipes
+
+- La sélection GUI doit encore être validée sur Paper : l'administrateur doit être dans le monde modèle, regarder un lit complet à moins de huit blocs avant de cliquer sur « Sélectionner le lit regardé ».
+- La définition persistante conserve actuellement le bloc pied normalisé du lit. La destruction runtime, les réapparitions, les éliminations et la victoire du Ticket 012 ne sont pas encore implémentées.
+- Huit équipes au maximum sont affichées dans la vue compacte actuelle; les formats supérieurs restent persistables mais nécessiteront une pagination du menu.
+
 ## Correctif Ticket 010.1
 
 - Le matchmaking public, les PNJ et la commande courte `/bw` restent futurs; `game join|leave` est la surface publique temporaire.

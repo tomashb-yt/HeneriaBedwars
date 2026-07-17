@@ -14,7 +14,10 @@ import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.core.map.MapType;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.GuiService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -59,6 +62,63 @@ public final class ArenaCommandHandler {
       case "delete" -> delete(sender, args);
       default -> send(sender, TranslationKey.ARENA_HELP);
     };
+  }
+
+  /** Completes the full nested arena command, including the team setup actions. */
+  public List<String> complete(CommandSender sender, String[] args) {
+    List<String> choices = new ArrayList<>();
+    if (args.length == 2 && sender.hasPermission(AdministrativeCommandPolicy.ARENA)) {
+      choices.addAll(
+          List.of(
+              "create",
+              "list",
+              "info",
+              "menu",
+              "setworld",
+              "setmap",
+              "setwaiting",
+              "setspectator",
+              "setplayers",
+              "setteams",
+              "team",
+              "validate",
+              "enable",
+              "disable",
+              "delete"));
+    } else if (args.length == 3
+        && args[1].equalsIgnoreCase("team")
+        && sender.hasPermission(AdministrativeCommandPolicy.ARENA_EDIT)) {
+      choices.addAll(
+          List.of(
+              "list", "setspawn", "clearspawn", "teleport", "setbed", "clearbed", "teleportbed"));
+    } else if (args.length == 3
+        && !args[1].equalsIgnoreCase("create")
+        && !args[1].equalsIgnoreCase("list")
+        && !args[1].equalsIgnoreCase("menu")) {
+      choices.addAll(arenaIds());
+    } else if (args.length == 4 && args[1].equalsIgnoreCase("team")) {
+      choices.addAll(arenaIds());
+    } else if (args.length == 4 && args[1].equalsIgnoreCase("setworld")) {
+      choices.addAll(
+          org.bukkit.Bukkit.getWorlds().stream().map(org.bukkit.World::getName).sorted().toList());
+    } else if (args.length == 4 && args[1].equalsIgnoreCase("setmap")) {
+      choices.addAll(maps.list().stream().map(map -> map.id().value()).sorted().toList());
+    } else if (args.length == 5 && args[1].equalsIgnoreCase("team")) {
+      arenas
+          .find(args[3])
+          .ifPresent(
+              arena ->
+                  choices.addAll(
+                      arena.teams().stream().map(team -> team.id().value()).sorted().toList()));
+    }
+    String input = args.length == 0 ? "" : args[args.length - 1].toLowerCase(Locale.ROOT);
+    return choices.stream()
+        .filter(choice -> choice.toLowerCase(Locale.ROOT).startsWith(input))
+        .toList();
+  }
+
+  private List<String> arenaIds() {
+    return arenas.list().stream().map(arena -> arena.id().value()).sorted().toList();
   }
 
   private boolean create(CommandSender sender, String[] args) {
@@ -159,18 +219,28 @@ public final class ArenaCommandHandler {
 
   private boolean team(CommandSender sender, String[] args) {
     if (!allowed(sender, AdministrativeCommandPolicy.ARENA_EDIT)) return true;
-    if (args.length < 4) return send(sender, TranslationKey.ARENA_HELP);
+    if (args.length < 4) return send(sender, "command.arena.team-help", Map.of());
     ArenaDefinition arena = arenas.find(args[3]).orElse(null);
     if (arena == null) return notFound(sender, new String[] {"arena", "info", args[3]});
     if (args[2].equalsIgnoreCase("list")) {
-      sender.sendMessage(
-          "§bÉquipes : §f"
-              + String.join(", ", arena.teams().stream().map(team -> team.id().value()).toList()));
-      return true;
-    }
-    if (!(sender instanceof Player player) || args.length != 5)
+      if (args.length != 4) return send(sender, "command.arena.team-help", Map.of());
+      String values =
+          String.join(
+              ", ",
+              arena.teams().stream()
+                  .map(
+                      team ->
+                          team.id().value()
+                              + " [spawn="
+                              + (team.spawn().isPresent() ? "ok" : "-")
+                              + ", bed="
+                              + (team.bedLocation().isPresent() ? "ok" : "-")
+                              + "]")
+                  .toList());
       return send(
-          sender, args.length == 5 ? TranslationKey.PLAYER_ONLY : TranslationKey.ARENA_HELP);
+          sender, "command.arena.team-list", Map.of("arena", arena.id().value(), "teams", values));
+    }
+    if (args.length != 5) return send(sender, "command.arena.team-help", Map.of());
     TeamId teamId;
     try {
       teamId = new TeamId(args[4]);
@@ -178,57 +248,134 @@ public final class ArenaCommandHandler {
       return send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
     }
     return switch (args[2].toLowerCase(Locale.ROOT)) {
-      case "setspawn" ->
-          result(
-              sender,
-              arenas.setTeamSpawn(
-                  arena.id().value(),
-                  teamId,
-                  BukkitArenaLocations.from(player.getLocation()),
-                  arena.revision()),
-              TranslationKey.ARENA_UPDATED);
+      case "setspawn" -> {
+        Player player = requirePlayer(sender);
+        if (player == null) yield true;
+        if (!correctWorld(sender, player, arena)) yield true;
+        yield result(
+            sender,
+            arenas.setTeamSpawn(
+                arena.id().value(),
+                teamId,
+                BukkitArenaLocations.from(player.getLocation()),
+                arena.revision()),
+            TranslationKey.ARENA_UPDATED);
+      }
       case "clearspawn" ->
           result(
               sender,
               arenas.clearTeamSpawn(arena.id().value(), teamId, arena.revision()),
               TranslationKey.ARENA_UPDATED);
       case "teleport" -> {
+        Player player = requirePlayer(sender);
+        if (player == null) yield true;
+        if (!allowed(sender, AdministrativeCommandPolicy.ARENA_TELEPORT)) yield true;
         var team =
             arena.teams().stream()
                 .filter(value -> value.id().equals(teamId))
                 .findFirst()
                 .orElse(null);
         if (team == null || team.spawn().isEmpty())
-          yield send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
-        ArenaLocation spawn = team.spawn().orElseThrow();
-        org.bukkit.World world = org.bukkit.Bukkit.getWorld(spawn.world());
-        if (world == null) yield send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
-        player.teleport(
-            new org.bukkit.Location(
-                world,
-                spawn.position().x(),
-                spawn.position().y(),
-                spawn.position().z(),
-                spawn.yaw(),
-                spawn.pitch()));
-        yield true;
+          yield send(sender, "arena.team.spawn.missing", Map.of("team", teamId.value()));
+        yield teleport(sender, player, team.spawn().orElseThrow(), false);
       }
-      case "setbed" ->
-          result(
-              sender,
-              arenas.setTeamBed(
-                  arena.id().value(),
-                  teamId,
-                  BukkitArenaLocations.from(player.getLocation()),
-                  arena.revision()),
-              TranslationKey.ARENA_UPDATED);
+      case "setbed" -> {
+        Player player = requirePlayer(sender);
+        if (player == null) yield true;
+        BukkitArenaBeds.Selection selection = BukkitArenaBeds.select(player, arena);
+        if (!selection.successful()) yield bedSelectionFailure(sender, selection.code(), arena);
+        ArenaOperationResult operation =
+            arenas.setTeamBed(
+                arena.id().value(), teamId, selection.location().orElseThrow(), arena.revision());
+        if (!operation.successful()) yield bedOperationFailure(sender, operation);
+        yield send(
+            sender,
+            "arena.team.bed.selected",
+            Map.of("team", teamId.value(), "arena", arena.id().value()));
+      }
       case "clearbed" ->
           result(
               sender,
               arenas.clearTeamBed(arena.id().value(), teamId, arena.revision()),
               TranslationKey.ARENA_UPDATED);
-      default -> send(sender, TranslationKey.ARENA_HELP);
+      case "teleportbed" -> {
+        Player player = requirePlayer(sender);
+        if (player == null) yield true;
+        if (!allowed(sender, AdministrativeCommandPolicy.ARENA_TELEPORT)) yield true;
+        var team =
+            arena.teams().stream()
+                .filter(value -> value.id().equals(teamId))
+                .findFirst()
+                .orElse(null);
+        if (team == null || team.bedLocation().isEmpty())
+          yield send(sender, "arena.team.bed.missing", Map.of("team", teamId.value()));
+        yield teleport(sender, player, team.bedLocation().orElseThrow(), true);
+      }
+      default -> send(sender, "command.arena.team-help", Map.of());
     };
+  }
+
+  private Player requirePlayer(CommandSender sender) {
+    if (sender instanceof Player player) return player;
+    send(sender, TranslationKey.PLAYER_ONLY);
+    return null;
+  }
+
+  private boolean correctWorld(CommandSender sender, Player player, ArenaDefinition arena) {
+    String expected = arena.worldName().orElse("-");
+    if (player.getWorld().getName().equals(expected)) return true;
+    send(
+        sender,
+        "arena.team.wrong-world",
+        Map.of("world", expected, "current_world", player.getWorld().getName()));
+    return false;
+  }
+
+  private boolean bedSelectionFailure(
+      CommandSender sender, BukkitArenaBeds.SelectionCode code, ArenaDefinition arena) {
+    String key =
+        switch (code) {
+          case WRONG_WORLD -> "arena.team.wrong-world";
+          case NOT_A_BED -> "arena.team.bed.invalid-block";
+          case INCOMPLETE_BED -> "arena.team.bed.incomplete";
+          case SUCCESS ->
+              throw new IllegalArgumentException("Successful selection is not a failure");
+        };
+    return send(
+        sender,
+        key,
+        Map.of(
+            "world",
+            arena.worldName().orElse("-"),
+            "current_world",
+            sender instanceof Player player ? player.getWorld().getName() : "-"));
+  }
+
+  private boolean bedOperationFailure(CommandSender sender, ArenaOperationResult operation) {
+    if (operation.code() == ArenaOperationCode.INVALID_ARGUMENT
+        && operation.detail().startsWith("Bed already belongs to team "))
+      return send(
+          sender,
+          "arena.team.bed.duplicate",
+          Map.of("team", operation.detail().substring("Bed already belongs to team ".length())));
+    return result(sender, operation, TranslationKey.ARENA_UPDATED);
+  }
+
+  private boolean teleport(
+      CommandSender sender, Player player, ArenaLocation location, boolean aboveBlock) {
+    org.bukkit.World world = org.bukkit.Bukkit.getWorld(location.world());
+    if (world == null)
+      return send(sender, "arena.world.not-found", Map.of("world", location.world()));
+    double offset = aboveBlock ? 0.5 : 0.0;
+    player.teleport(
+        new org.bukkit.Location(
+            world,
+            location.position().x() + offset,
+            location.position().y() + (aboveBlock ? 1.0 : 0.0),
+            location.position().z() + offset,
+            location.yaw(),
+            location.pitch()));
+    return send(sender, "arena.world.teleport-success", Map.of("world", world.getName()));
   }
 
   private boolean validate(CommandSender sender, String[] args) {
@@ -352,6 +499,16 @@ public final class ArenaCommandHandler {
 
   private boolean send(CommandSender sender, TranslationKey key, PlaceholderContext context) {
     sender.sendMessage(configurations.language().message(key, context));
+    return true;
+  }
+
+  private boolean send(CommandSender sender, String key, Map<String, ?> values) {
+    PlaceholderContext.Builder context = PlaceholderContext.builder();
+    values.forEach(context::put);
+    sender.sendMessage(
+        configurations
+            .language()
+            .message(key, configurations.snapshot().plugin().locale(), context.build()));
     return true;
   }
 }

@@ -60,7 +60,9 @@ command:
     inventory-full: "<red>Your inventory is full. No item was added."
     preview-title: "<aqua>Item preview"
   arena:
-    help: "<yellow>Usage: /bedwars arena <create|list|info|menu|setworld|setwaiting|setspectator|setplayers|setteams|validate|enable|disable|delete>"
+    help: "<yellow>Usage: /bedwars arena <create|list|info|menu|setworld|setmap|setwaiting|setspectator|setplayers|setteams|team|validate|enable|disable|delete>"
+    team-help: "<yellow>Teams: /bedwars arena team <list|setspawn|clearspawn|teleport|setbed|clearbed|teleportbed> <arena> [team]"
+    team-list: "<aqua>Teams for <white>{arena}<aqua>: <white>{teams}"
     created: "<green>Arena <white>{arena}<green> created as a draft."
     exists: "<red>Arena <white>{arena}<red> already exists."
     invalid-id: "<red>Invalid id: use 2 to 32 characters among a-z, 0-9, _ and -."
@@ -150,10 +152,26 @@ arena:
   teams:
     title: "<light_purple>Teams - {arena_name}"
     assistant-title: "<light_purple><bold>Step 3 <gray>• <white>Teams"
+    team-title: "<light_purple><bold>Team <gray>• <white>{team_name}"
     count: "<yellow>Count: {team_count}"
     players-per-team: "<yellow>Players/team: {players_per_team}"
     format: "<gray>Format: {team_count} x {players_per_team}"
     confirm-title: "<gold>Confirm {new_team_count} x {new_players_per_team}?"
+    status:
+      configured: "<green>✓ Configured"
+      missing: "<red>✗ Missing"
+      yes: "<green>Yes"
+      no: "<red>No"
+  team:
+    wrong-world: "<red>You must be in template world <white>{world}<red>. Current world: <white>{current_world}<red>."
+    spawn:
+      missing: "<red>No spawn is configured for team <white>{team}<red>."
+    bed:
+      missing: "<red>No bed is configured for team <white>{team}<red>."
+      invalid-block: "<red>Look directly at a placed bed block within 8 blocks, then try again."
+      incomplete: "<red>This bed is incomplete or its two halves do not match. Place it again and retry."
+      duplicate: "<red>This bed is already assigned to team <white>{team}<red>."
+      selected: "<green>The targeted bed is now assigned to team <white>{team}<green> in arena <white>{arena}<green>."
   boundary:
     title: "<blue>Boundary - {arena_name}"
     assistant-title: "<blue><bold>Optional <gray>• <white>Boundaries"
@@ -191,6 +209,7 @@ arena:
       invalid-boundary: {message: "The two boundary points are inconsistent.", solution: "Set the minimum and maximum points again."}
       missing-teams: {message: "No complete team is configured.", solution: "Configure at least two teams."}
       missing-team-spawn: {message: "The spawn for team {team_name} is not configured.", solution: "Stand at this team's spawn and save the position."}
+      team-bed-missing: {message: "This team's bed is not configured.", solution: "Open the team, look at its bed, then click Select targeted bed."}
       duplicate-team-id: {message: "Several teams use the same identifier.", solution: "Give every team a unique identifier."}
       duplicate-team-color: {message: "Several teams use the same color.", solution: "Choose a different color for each team."}
       duplicate-team-order: {message: "Several teams use the same order.", solution: "Reorder the teams."}

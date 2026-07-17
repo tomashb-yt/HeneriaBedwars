@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Correctif de préparation Ticket 012 — configuration des équipes
+
+Ajouté le 2026-07-17 après constat en jeu que les sous-commandes d'équipe étaient invisibles et que le clic du menu modifiait directement le spawn. Le menu général affiche maintenant un résumé spawn/lit et ouvre une fiche colorée par équipe. Cette fiche sépare définir, téléporter et retirer; chaque mutation sauvegarde puis reste sur la fiche avec la nouvelle révision.
+
+`setbed` et l'action GUI utilisent le bloc réellement regardé, vérifient un lit complet dans le monde modèle et normalisent sa partie pied. Le service refuse les positions déjà associées à une autre équipe. Les commandes `list`, `setspawn`, `clearspawn`, `teleport`, `setbed`, `clearbed` et `teleportbed` disposent d'une aide et d'une complétion imbriquée. Ce correctif ne livre pas encore le gameplay lit → mort → réapparition → élimination du Ticket 012.
+
+Validation : 162 tests automatisés réussis, aucun échec, Spotless et Shadow JAR validés. Les clics et la détection physique du lit restent à confirmer sur un serveur Paper réel.
+
 ## Correctif Ticket 010.1 - Accès, items du lobby et scoreboard
 
 Ajustement d'interface : le menu ouvert par le livre ne duplique plus le départ. Il présente informations générales, état/countdown, joueurs et fermeture. Le navigateur public `/bw`, quick play, filtres et sélection par clic sont explicitement reportés au Ticket 011 et documentés dans `TICKET_011_SCOPE.md`.

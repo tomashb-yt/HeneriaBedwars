@@ -1,10 +1,14 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 010.
+- Dernier ticket terminé : Ticket 011. Le Ticket 012 reste en cours et ne doit pas être considéré comme livré.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
 ## Disponible
+
+- correctif de préparation du Ticket 012 : menu général des équipes avec résumé des spawns/lits, fiche colorée par équipe, sauvegarde automatique et retour sur la même fiche;
+- actions GUI distinctes pour définir, visiter et retirer le spawn; sélection d'un vrai lit regardé à moins de 8 blocs, contrôle des deux moitiés, du monde modèle et des doublons;
+- commandes de secours `/bedwars arena team list|setspawn|clearspawn|teleport|setbed|clearbed|teleportbed`, aide et autocomplétion des arènes/équipes;
 
 - Correctif 010.1 : `/bedwars` strictement réservé au dashboard administrateur, aide publique adaptée et complétion joueur limitée à `game join|leave`;
 - items d'attente interactifs identifiés par PDC avec UUID d'instance, filtrage off-hand, cooldown et protection contre les anciens items;
@@ -64,9 +68,9 @@
 
 ## Non disponible
 
-Aucune équipe BedWars configurable ou mécanique de couleur, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes restent des modèles administratifs persistants; leurs clones runtime ne fournissent encore aucun gameplay.
+Les équipes, leurs couleurs, spawns et positions administratives de lit sont configurables. En revanche, le cycle gameplay du Ticket 012 n'est pas encore livré : aucune destruction runtime de lit, mort BedWars, réapparition, élimination finale, victoire ou scoreboard `PLAYING`. Aucun générateur actif, boutique, PNJ, achat, amélioration, base de données, resource pack ou PlaceholderAPI n'est disponible.
 
-Les 161 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 162 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
 ## Ticket 011 - livraison initiale
 
 Les arènes portent désormais des définitions d'équipes immuables et persistantes (identifiant, nom, couleur, ordre, capacité et spawn). Les anciens YAML à base de `teams.count` et `teams.players-per-team` sont relus avec des équipes générées déterministes, sans perdre la définition; les spawns restent à renseigner avant validation complète.

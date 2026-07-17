@@ -1,5 +1,13 @@
 # Décisions d'architecture
 
+## ADR-059 à ADR-061 — Configuration guidée des équipes
+
+Accepté.
+
+- **ADR-059** — Une équipe s'édite dans une fiche dédiée; un clic sur son entrée ne modifie jamais silencieusement une position.
+- **ADR-060** — La frontière Bukkit valide le lit physique et normalise sa partie pied; `ArenaService` conserve la persistance, la révision optimiste et l'unicité entre équipes.
+- **ADR-061** — Les commandes d'équipe restent des outils de secours complets et autocomplétés, tandis que le parcours recommandé reste le menu `/bedwars`.
+
 ## ADR-051 à ADR-058 - Correctif lobby Ticket 010.1
 
 Accepté.

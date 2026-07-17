@@ -131,6 +131,29 @@ class ArenaFrameworkTest {
   }
 
   @Test
+  void teamSetupUpdatesOnlyTheTargetAndRejectsAReusedBedBlock() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    TeamId red = created.teams().get(0).id();
+    TeamId blue = created.teams().get(1).id();
+    ArenaLocation bed = new ArenaLocation("world", new ArenaVector(10, 64, 10), 0, 0);
+    ArenaDefinition withBed =
+        service.setTeamBed("alpha", red, bed, created.revision()).arena().orElseThrow();
+    ArenaLocation spawn = new ArenaLocation("world", new ArenaVector(20, 65, 20), 90, 0);
+    ArenaDefinition withSpawn =
+        service.setTeamSpawn("alpha", red, spawn, withBed.revision()).arena().orElseThrow();
+
+    assertEquals(bed, withSpawn.teams().get(0).bedLocation().orElseThrow());
+    assertEquals(spawn, withSpawn.teams().get(0).spawn().orElseThrow());
+    assertTrue(withSpawn.teams().get(1).bedLocation().isEmpty());
+
+    ArenaOperationResult duplicate = service.setTeamBed("alpha", blue, bed, withSpawn.revision());
+    assertEquals(ArenaOperationCode.INVALID_ARGUMENT, duplicate.code());
+    assertTrue(service.find("alpha").orElseThrow().teams().get(1).bedLocation().isEmpty());
+  }
+
+  @Test
   void deleteMustSucceedInRepositoryBeforeRegistryChanges() {
     FakeRepository repository = new FakeRepository();
     ArenaService service = service(repository);

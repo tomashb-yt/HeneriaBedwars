@@ -12,9 +12,12 @@
 
 - [TERMINE] Ticket 010 - Lobby de partie, file d'attente et compte a rebours
 - [TERMINE] Correctif 010.1 - accès administrateur, items du lobby et scoreboard
+- [TERMINÉ] Ticket 011 — Équipes BedWars et navigateur public
+- [TERMINÉ] Correctif de configuration — fiches d'équipes, spawns, sélection des lits et commandes de secours
+- [EN COURS] Ticket 012 — Destruction des lits, morts, réapparitions, éliminations et victoire
 
 ## Grandes phases futures
 
-Le prochain ticket recommandé est le Ticket 011 : équipes BedWars détaillées, couleurs, spawns et assignation, ainsi que le premier navigateur public `/bw` avec quick play, résolution unique par carte, nettoyage fiable après déconnexion et aide de commandes localisée. Le périmètre détaillé est dans `TICKET_011_SCOPE.md`. Lits actifs, générateurs, boutiques, améliorations, combat, victoire, matchmaking automatique, stockage SQL et réseau proxy restent futurs.
+La prochaine étape est la suite réelle du Ticket 012 : remappage runtime des lits, destruction protégée, mort, réapparition, élimination et victoire. Générateurs, boutiques, améliorations, combat complet, matchmaking automatique, stockage SQL et réseau proxy restent futurs.
 
 Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.

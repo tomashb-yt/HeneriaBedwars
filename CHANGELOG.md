@@ -48,6 +48,9 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Fixed
 
+- Correctif de configuration des équipes : chaque équipe possède désormais une fiche GUI dédiée avec actions séparées pour définir, visiter et retirer son spawn ou son lit. La sélection du lit vérifie le monde modèle, un vrai lit complet et les doublons entre équipes.
+- Les sous-commandes `/bedwars arena team` sont documentées et complétées jusqu'aux identifiants d'équipe; `setbed` sélectionne le lit réellement regardé et `teleportbed` est disponible.
+
 - Les déconnexions restaurent le snapshot avant la sauvegarde Bukkit; une reconnexion retire exclusivement les items runtime marqués PDC restés d'une ancienne session.
 
 - `/bedwars` et sa complétion ne révèlent plus le tableau de bord ni les commandes de configuration aux joueurs ordinaires.

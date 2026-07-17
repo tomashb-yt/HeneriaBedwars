@@ -403,6 +403,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (args.length >= 1 && args[0].equalsIgnoreCase("game"))
       return gameCommands.complete(
           sender, args, arenaService.list().stream().map(arena -> arena.id().value()).toList());
+    if (args.length >= 1 && args[0].equalsIgnoreCase("arena"))
+      return arenaCommands.complete(sender, args);
     List<String> completions =
         completionPolicy.complete(
             sender::hasPermission,

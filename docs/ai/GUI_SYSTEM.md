@@ -1,5 +1,11 @@
 # Système de menus interne
 
+## Fiche guidée d'une équipe
+
+Le menu « Équipes » n'enregistre plus une position par effet secondaire du clic. Il affiche jusqu'à huit laines colorées avec capacité, état du spawn, état du lit et préparation. Un clic ouvre une fiche dédiée qui sépare les actions `définir`, `téléporter` et `retirer` pour chaque position.
+
+Le spawn utilise la position actuelle uniquement dans le monde modèle. Pour le lit, l'administrateur regarde un lit à moins de huit blocs puis clique sur l'action de sélection; l'adaptateur Bukkit vérifie les parties pied/tête et `ArenaService` refuse qu'un même bloc soit attribué à deux équipes. Après chaque sauvegarde, la fiche est reconstruite avec la nouvelle révision afin d'éviter les conflits silencieux.
+
 ## Menu public Ticket 010.1
 
 Le livre du lobby ouvre un menu de trois lignes distinct de l'administration. Il contient quatre éléments seulement : informations générales, état/countdown, liste des joueurs et fermer. Le départ reste réservé au lit rouge ou à `/bedwars game leave`; aucune route ne mène au dashboard, à l'arrêt forcé ou à la suppression du monde.

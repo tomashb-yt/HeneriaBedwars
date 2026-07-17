@@ -60,7 +60,9 @@ command:
     inventory-full: "<red>Votre inventaire est plein. Aucun item n'a été ajouté."
     preview-title: "<aqua>Prévisualisation des items"
   arena:
-    help: "<yellow>Utilisation : /bedwars arena <create|list|info|menu|setworld|setwaiting|setspectator|setplayers|setteams|validate|enable|disable|delete>"
+    help: "<yellow>Utilisation : /bedwars arena <create|list|info|menu|setworld|setmap|setwaiting|setspectator|setplayers|setteams|team|validate|enable|disable|delete>"
+    team-help: "<yellow>Équipes : /bedwars arena team <list|setspawn|clearspawn|teleport|setbed|clearbed|teleportbed> <arène> [équipe]"
+    team-list: "<aqua>Équipes de <white>{arena}<aqua> : <white>{teams}"
     created: "<green>Arene <white>{arena}<green> creee en brouillon."
     exists: "<red>L'arene <white>{arena}<red> existe deja."
     invalid-id: "<red>Identifiant invalide : 2 a 32 caracteres parmi a-z, 0-9, _ et -."
@@ -150,10 +152,26 @@ arena:
   teams:
     title: "<light_purple>Equipes - {arena_name}"
     assistant-title: "<light_purple><bold>Étape 3 <gray>• <white>Équipes"
+    team-title: "<light_purple><bold>Équipe <gray>• <white>{team_name}"
     count: "<yellow>Nombre : {team_count}"
     players-per-team: "<yellow>Joueurs/equipe : {players_per_team}"
     format: "<gray>Format : {team_count} x {players_per_team}"
     confirm-title: "<gold>Confirmer {new_team_count} x {new_players_per_team} ?"
+    status:
+      configured: "<green>✓ Configuré"
+      missing: "<red>✗ Manquant"
+      yes: "<green>Oui"
+      no: "<red>Non"
+  team:
+    wrong-world: "<red>Vous devez être dans le monde modèle <white>{world}<red>. Monde actuel : <white>{current_world}<red>."
+    spawn:
+      missing: "<red>Aucun spawn n'est configuré pour l'équipe <white>{team}<red>."
+    bed:
+      missing: "<red>Aucun lit n'est configuré pour l'équipe <white>{team}<red>."
+      invalid-block: "<red>Regardez directement un bloc de lit placé à moins de 8 blocs, puis réessayez."
+      incomplete: "<red>Ce lit est incomplet ou ses deux parties ne correspondent pas. Replacez-le puis réessayez."
+      duplicate: "<red>Ce lit est déjà associé à l'équipe <white>{team}<red>."
+      selected: "<green>Le lit regardé est maintenant associé à l'équipe <white>{team}<green> de l'arène <white>{arena}<green>."
   boundary:
     title: "<blue>Limites - {arena_name}"
     assistant-title: "<blue><bold>Option <gray>• <white>Limites"
@@ -191,6 +209,7 @@ arena:
       invalid-boundary: {message: "Les deux points des limites sont incohérents.", solution: "Replacez les points minimum et maximum."}
       missing-teams: {message: "Aucune équipe complète n'est configurée.", solution: "Configurez au moins deux équipes."}
       missing-team-spawn: {message: "Le spawn de l'équipe {team_name} n'est pas configuré.", solution: "Placez-vous au spawn de cette équipe puis enregistrez sa position."}
+      team-bed-missing: {message: "Le lit de cette équipe n'est pas configuré.", solution: "Ouvrez l'équipe, regardez son lit puis cliquez sur Sélectionner le lit."}
       duplicate-team-id: {message: "Plusieurs équipes utilisent le même identifiant.", solution: "Attribuez un identifiant unique à chaque équipe."}
       duplicate-team-color: {message: "Plusieurs équipes utilisent la même couleur.", solution: "Choisissez une couleur différente pour chaque équipe."}
       duplicate-team-order: {message: "Plusieurs équipes utilisent le même ordre.", solution: "Réorganisez les équipes."}

@@ -261,12 +261,30 @@ public final class ArenaService {
 
   public synchronized ArenaOperationResult setTeamBed(
       String rawId, TeamId teamId, ArenaLocation location, long expectedRevision) {
-    return updateTeam(rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.of(location)));
+    ArenaDefinition current = find(rawId).orElse(null);
+    if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
+    if (conflict(current, expectedRevision)) return conflict(current);
+    if (current.teams().stream().noneMatch(team -> team.id().equals(teamId)))
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "Unknown team " + teamId.value());
+    Optional<ArenaTeamDefinition> duplicate =
+        current.teams().stream()
+            .filter(team -> !team.id().equals(teamId))
+            .filter(
+                team -> team.bedLocation().filter(value -> sameBlock(value, location)).isPresent())
+            .findFirst();
+    if (duplicate.isPresent())
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT,
+          "Bed already belongs to team " + duplicate.orElseThrow().id().value());
+    return updateTeam(
+        rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.of(location)));
   }
 
   public synchronized ArenaOperationResult clearTeamBed(
       String rawId, TeamId teamId, long expectedRevision) {
-    return updateTeam(rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.empty()));
+    return updateTeam(
+        rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.empty()));
   }
 
   private ArenaOperationResult updateTeam(
@@ -482,6 +500,13 @@ public final class ArenaService {
 
   private static ArenaStatus editStatus(ArenaDefinition arena) {
     return ArenaStatus.INVALID;
+  }
+
+  private static boolean sameBlock(ArenaLocation first, ArenaLocation second) {
+    return first.world().equalsIgnoreCase(second.world())
+        && (int) Math.floor(first.position().x()) == (int) Math.floor(second.position().x())
+        && (int) Math.floor(first.position().y()) == (int) Math.floor(second.position().y())
+        && (int) Math.floor(first.position().z()) == (int) Math.floor(second.position().z());
   }
 
   private static boolean conflict(ArenaDefinition arena, Long expectedRevision) {

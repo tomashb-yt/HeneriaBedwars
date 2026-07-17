@@ -126,7 +126,10 @@ public final class ArenaValidator {
             "Team bed is missing");
       else
         checkLocationWorld(
-            problems, arena, team.bedLocation().orElseThrow(), "teams." + team.id().value() + ".bed");
+            problems,
+            arena,
+            team.bedLocation().orElseThrow(),
+            "teams." + team.id().value() + ".bed");
     }
     if (total != arena.maximumPlayers())
       error(

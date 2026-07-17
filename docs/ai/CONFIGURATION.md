@@ -107,6 +107,8 @@ Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQ
 
 `menus.yml` configure le framework GUI; `items.yml` contient le registre Ticket 004 complet. Les deux sont rechargeables par `/bedwars reload`.
 
+Les apparences `arena.teams.*` couvrent désormais le résumé, les laines des douze couleurs, les états spawn/lit et toutes les actions de la fiche d'équipe. Les nouvelles clés sont fusionnées dans un ancien `items.yml` sans remplacer les personnalisations existantes.
+
 | Fichier / clé | Type | Défaut / contrainte |
 |---|---|---|
 | `menus.yml: config-version` | entier | `1` |

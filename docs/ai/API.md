@@ -22,6 +22,9 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 | `/bedwars arena info <id>` | `heneriabedwars.admin.arena.info` | affiche la définition |
 | `/bedwars arena menu` | `heneriabedwars.admin.arena.menu` | ouvre la liste paginée |
 | `/bedwars arena setworld|setwaiting|setspectator|setplayers|setteams|validate ...` | `heneriabedwars.admin.arena.edit` | modifie ou valide une définition |
+| `/bedwars arena team list <arène>` | `heneriabedwars.admin.arena.edit` | affiche les équipes et l'état spawn/lit |
+| `/bedwars arena team setspawn|clearspawn|teleport <arène> <équipe>` | `heneriabedwars.admin.arena.edit` / `.teleport` | configure ou visite le spawn ciblé |
+| `/bedwars arena team setbed|clearbed|teleportbed <arène> <équipe>` | `heneriabedwars.admin.arena.edit` / `.teleport` | sélectionne le lit regardé, retire ou visite sa position |
 | `/bedwars arena enable|disable <id>` | `heneriabedwars.admin.arena.enable` / `.disable` | change le statut administratif |
 | `/bedwars arena delete <id>` | `heneriabedwars.admin.arena.delete` | ouvre la confirmation de sauvegarde/suppression |
 | `/bedwars setup` | `heneriabedwars.admin.setup` | ouvre le menu principal d'administration, joueur uniquement |
