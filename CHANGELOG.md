@@ -6,6 +6,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Ticket 011 (livraison initiale) : définitions persistantes d'équipes, capacités runtime, sélection métier, `/bw`/`/bedwars play` par carte et déduplication des complétions publiques.
+
 - Correctif 010.1 : menu public d'informations, registre d'actions runtime par PDC et templates configurables du scoreboard d'attente.
 - Sessions de sidebar personnelles et stables, placeholders localisés et masquage optionnel des nombres sur Paper avec fallback Spigot.
 
@@ -45,6 +47,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Sauvegarde automatique des arènes et révisions optimistes empêchant une vue obsolète d'écraser une modification plus récente.
 
 ### Fixed
+
+- Les déconnexions restaurent le snapshot avant la sauvegarde Bukkit; une reconnexion retire exclusivement les items runtime marqués PDC restés d'une ancienne session.
 
 - `/bedwars` et sa complétion ne révèlent plus le tableau de bord ni les commandes de configuration aux joueurs ordinaires.
 - Les items quitter/informations répondent aux clics air/bloc, gauche/droit, ignorent l'off-hand et refusent les anciens identifiants d'instance.

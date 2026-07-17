@@ -11,6 +11,7 @@ commands:
     usage: /bedwars [version|reload|config|language|gui|item|arena|map|game|setup]
     aliases:
       - hbw
+      - bw
 permissions:
   heneriabedwars.admin:
     description: Permet d'utiliser les commandes administratives de HeneriaBedWars.

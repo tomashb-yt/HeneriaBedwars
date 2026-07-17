@@ -83,7 +83,21 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
 
   @Override
   public void disconnect(UUID playerId) {
-    snapshots.discard(playerId);
+    Runnable action =
+        () -> {
+          Player player = Bukkit.getPlayer(playerId);
+          if (player == null) return;
+          if (!snapshots.restore(player)) clearRuntimeItems(player);
+        };
+    if (Bukkit.isPrimaryThread()) action.run();
+    else plugin.getServer().getScheduler().runTask(plugin, action);
+  }
+
+  /** Removes only PDC-authenticated runtime objects left by an interrupted older session. */
+  public void sanitizeJoin(Player player, boolean belongsToActiveGame) {
+    if (belongsToActiveGame) return;
+    clearRuntimeItems(player);
+    player.updateInventory();
   }
 
   @Override
@@ -140,6 +154,15 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
     player.setFlying(false);
     prepareWaitingItems(player, context);
     player.updateInventory();
+  }
+
+  private void clearRuntimeItems(Player player) {
+    for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+      org.bukkit.inventory.ItemStack item = player.getInventory().getItem(slot);
+      if (runtimeItems.clearIfRuntime(item)) player.getInventory().setItem(slot, null);
+    }
+    org.bukkit.inventory.ItemStack offHand = player.getInventory().getItemInOffHand();
+    if (runtimeItems.clearIfRuntime(offHand)) player.getInventory().setItemInOffHand(null);
   }
 
   private void prepareWaitingItems(Player player, WaitingPlayerContext context) {

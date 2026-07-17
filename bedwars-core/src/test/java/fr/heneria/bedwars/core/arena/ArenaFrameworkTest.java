@@ -256,17 +256,22 @@ class ArenaFrameworkTest {
   private static ArenaDefinition complete(String id) {
     ArenaLocation waiting = new ArenaLocation("world", new ArenaVector(0, 64, 0), 0, 0);
     ArenaLocation spectator = new ArenaLocation("world", new ArenaVector(0, 70, 0), 0, 0);
-    return ArenaDefinition.draft(new ArenaId(id), NOW)
-        .edited(
-            ArenaStatus.READY,
-            Optional.of("world"),
-            2,
-            8,
-            2,
-            4,
-            Optional.of(waiting),
-            Optional.of(spectator),
-            NOW);
+    ArenaDefinition base =
+        ArenaDefinition.draft(new ArenaId(id), NOW)
+            .edited(
+                ArenaStatus.READY,
+                Optional.of("world"),
+                2,
+                8,
+                2,
+                4,
+                Optional.of(waiting),
+                Optional.of(spectator),
+                NOW);
+    return base.withTeams(
+        base.teams().stream().limit(2).map(team -> team.withSpawn(Optional.of(waiting))).toList(),
+        ArenaStatus.READY,
+        NOW);
   }
 
   private static final class FakeRepository implements ArenaRepository {

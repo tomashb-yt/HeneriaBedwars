@@ -1,6 +1,7 @@
 package fr.heneria.bedwars.core.game;
 
 import fr.heneria.bedwars.api.game.RuntimeTeamSnapshot;
+import fr.heneria.bedwars.core.arena.ArenaTeamDefinition;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,15 +13,37 @@ public final class RuntimeTeam {
   private final String id;
   private final String displayName;
   private final String color;
+  private final int capacity;
   private final Set<UUID> players = new LinkedHashSet<>();
   private Optional<RuntimeLocation> spawn = Optional.empty();
   private boolean bedAlive = true;
   private boolean eliminated;
 
-  public RuntimeTeam(String id, String displayName, String color) {
+  public RuntimeTeam(String id, String displayName, String color, int capacity) {
     this.id = text(id, "id");
     this.displayName = text(displayName, "displayName");
     this.color = text(color, "color");
+    if (capacity < 1) throw new IllegalArgumentException("capacity must be positive");
+    this.capacity = capacity;
+  }
+
+  public RuntimeTeam(ArenaTeamDefinition definition) {
+    this(
+        definition.id().value(),
+        definition.displayName(),
+        definition.color().name(),
+        definition.capacity());
+    definition
+        .spawn()
+        .ifPresent(
+            location ->
+                spawn(
+                    new RuntimeLocation(
+                        location.position().x(),
+                        location.position().y(),
+                        location.position().z(),
+                        location.yaw(),
+                        location.pitch())));
   }
 
   public String id() {
@@ -29,6 +52,14 @@ public final class RuntimeTeam {
 
   public synchronized int size() {
     return players.size();
+  }
+
+  public int capacity() {
+    return capacity;
+  }
+
+  public synchronized boolean full() {
+    return players.size() >= capacity;
   }
 
   synchronized void add(UUID playerId) {

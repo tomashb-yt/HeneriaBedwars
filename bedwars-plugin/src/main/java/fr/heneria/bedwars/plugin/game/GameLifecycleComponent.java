@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +25,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
   private final GameLobbyService lobby;
   private final BukkitGameDisplayService displays;
   private final GameWaitingListener waitingListener;
+  private final BukkitRuntimePlayerGateway players;
   private final ConfigurationService configurations;
   private final ProjectLogger logger;
   private AutoCloseable eventSubscription;
@@ -38,6 +40,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
       GameLobbyService lobby,
       BukkitGameDisplayService displays,
       GameWaitingListener waitingListener,
+      BukkitRuntimePlayerGateway players,
       ConfigurationService configurations,
       ProjectLogger logger) {
     this.plugin = plugin;
@@ -47,6 +50,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     this.lobby = lobby;
     this.displays = displays;
     this.waitingListener = waitingListener;
+    this.players = players;
     this.configurations = configurations;
     this.logger = logger;
   }
@@ -93,6 +97,12 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
   public void onKick(PlayerKickEvent event) {
     lobby.disconnect(event.getPlayer().getUniqueId());
     waitingListener.forget(event.getPlayer().getUniqueId());
+  }
+
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    players.sanitizeJoin(
+        event.getPlayer(), games.byPlayer(event.getPlayer().getUniqueId()).isPresent());
   }
 
   private void tick() {

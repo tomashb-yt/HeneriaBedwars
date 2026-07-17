@@ -38,4 +38,15 @@ final class RuntimeItemPdc {
     String gameId = pdc.get(gameIdKey, PersistentDataType.STRING);
     return action == null ? Optional.empty() : Optional.of(new Token(action, gameId));
   }
+
+  boolean clearIfRuntime(ItemStack stack) {
+    if (read(stack).isEmpty()) return false;
+    ItemMeta meta = stack.getItemMeta();
+    if (meta == null) return false;
+    PersistentDataContainer pdc = meta.getPersistentDataContainer();
+    pdc.remove(runtimeItemKey);
+    pdc.remove(gameIdKey);
+    stack.setItemMeta(meta);
+    return true;
+  }
 }

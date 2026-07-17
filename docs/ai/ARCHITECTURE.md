@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 011 - équipes et parcours public
+
+`ArenaTeamDefinition`, `TeamId` et `TeamColor` résident dans le cœur, sans type Bukkit. `ArenaDefinition` conserve les équipes détaillées et les anciens champs de capacité pour la compatibilité YAML. `GameInstance` en dérive des `RuntimeTeam` bornées; `GameInstanceManager.selectTeam` reste la frontière métier atomique.
+
+`/bw` est une surface joueur : les arguments sont des ids publics de carte et `GameCommandHandler` choisit la meilleure instance disponible. Les UUID restent réservés aux actions administratives. `BukkitRuntimePlayerGateway` restaure le snapshot au quit/kick et le listener de cycle applique un nettoyage PDC défensif au join.
+
 ## Correctif 010.1 - accès, items runtime et affichage
 
 `AdministrativeCommandPolicy` sépare `heneriabedwars.admin.*` de `heneriabedwars.game.join|leave`. Le dashboard possède sa permission dédiée. `RuntimeItemActionRegistry` valide action, main, état, UUID d'instance et cooldown avant que `GameWaitingListener` délègue à `GameLobbyService`. `GamePublicInfoMenuFactory` ne contient aucune navigation administrative.

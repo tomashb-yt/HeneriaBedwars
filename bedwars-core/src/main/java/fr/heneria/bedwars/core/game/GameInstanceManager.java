@@ -239,6 +239,27 @@ public final class GameInstanceManager {
             });
   }
 
+  /** Selects a persistent-team-backed runtime team while the instance is waiting. */
+  public GameOperationResult selectTeam(UUID playerId, String teamId) {
+    synchronized (this) {
+      GameId gameId = byPlayer.get(playerId);
+      GameInstance instance = gameId == null ? null : instances.get(gameId);
+      if (instance == null)
+        return GameOperationResult.failure(GameOperationCode.NOT_FOUND, playerId.toString());
+      if (instance.state() != GameState.WAITING)
+        return GameOperationResult.failure(
+            GameOperationCode.TEAM_LOCKED, instance, instance.state().name());
+      var team = instance.team(teamId).orElse(null);
+      if (team == null)
+        return GameOperationResult.failure(GameOperationCode.TEAM_NOT_FOUND, instance, teamId);
+      if (team.full())
+        return GameOperationResult.failure(GameOperationCode.TEAM_FULL, instance, teamId);
+      return instance.selectTeam(playerId, teamId, now())
+          ? GameOperationResult.success(instance)
+          : GameOperationResult.failure(GameOperationCode.INTERNAL_ERROR, instance, teamId);
+    }
+  }
+
   /** Removes a disconnected player without attempting a platform teleport. */
   public GameOperationResult disconnect(UUID playerId) {
     GameInstance instance;

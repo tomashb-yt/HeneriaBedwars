@@ -109,6 +109,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull String label,
       @NotNull String[] args) {
     try {
+      if (label.equalsIgnoreCase("bw")) return gameCommands.executePublic(sender, args);
       if (args.length == 0
           && sender instanceof Player
           && sender.hasPermission(AdministrativeCommandPolicy.ADMIN_DASHBOARD))
@@ -126,6 +127,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "arena" -> arenaCommands.execute(sender, args);
         case "map" -> mapCommands.execute(sender, args);
         case "game" -> gameCommands.execute(sender, args);
+        case "play" -> gameCommands.executePublic(sender, new String[] {"play"});
         case "setup" -> setup(sender);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
@@ -395,6 +397,9 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       @NotNull Command command,
       @NotNull String alias,
       @NotNull String[] args) {
+    if (alias.equalsIgnoreCase("bw")) return gameCommands.completePublic(sender, args);
+    if (args.length >= 1 && args[0].equalsIgnoreCase("play"))
+      return gameCommands.completePublic(sender, new String[] {"play"});
     if (args.length >= 1 && args[0].equalsIgnoreCase("game"))
       return gameCommands.complete(
           sender, args, arenaService.list().stream().map(arena -> arena.id().value()).toList());

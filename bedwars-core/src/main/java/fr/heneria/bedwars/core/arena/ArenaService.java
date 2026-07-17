@@ -233,16 +233,19 @@ public final class ArenaService {
         rawId,
         expectedRevision,
         arena ->
-            arena.edited(
-                editStatus(arena),
-                arena.worldName(),
-                Math.min(arena.minimumPlayers(), maximum),
-                maximum,
-                teams,
-                playersPerTeam,
-                arena.waitingLocation(),
-                arena.spectatorLocation(),
-                now()));
+            arena.withTeams(
+                ArenaDefinition.defaultTeams(teams, playersPerTeam), editStatus(arena), now()));
+  }
+
+  /**
+   * Replaces detailed team definitions after the caller has built and validated a complete list.
+   */
+  public synchronized ArenaOperationResult setTeamDefinitions(
+      String rawId, List<ArenaTeamDefinition> teams, long expectedRevision) {
+    if (teams == null || teams.size() < 2)
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "At least two teams");
+    return edit(rawId, expectedRevision, arena -> arena.withTeams(teams, editStatus(arena), now()));
   }
 
   public synchronized ArenaOperationResult setDisplayName(

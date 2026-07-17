@@ -60,6 +60,29 @@ public final class GameCommandHandler {
     };
   }
 
+  /** Public player surface: stable map names only, never runtime instance ids. */
+  public boolean executePublic(CommandSender sender, String[] args) {
+    if (!(sender instanceof Player player))
+      return send(sender, "game.command.player-only", Map.of());
+    if (!allowed(sender, AdministrativeCommandPolicy.GAME_JOIN)) return true;
+    if (args.length == 0 || args[0].equalsIgnoreCase("play")) return publicHelp(sender);
+    return switch (args[0].toLowerCase(Locale.ROOT)) {
+      case "join" -> publicJoin(player, args);
+      case "leave" -> leave(sender);
+      default -> publicHelp(sender);
+    };
+  }
+
+  public List<String> completePublic(CommandSender sender, String[] args) {
+    if (!sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN)) return List.of();
+    List<String> values =
+        args.length <= 1
+            ? List.of("play", "join", "leave")
+            : args.length == 2 && args[0].equalsIgnoreCase("join") ? publicMapIds() : List.of();
+    String input = args.length == 0 ? "" : args[args.length - 1].toLowerCase(Locale.ROOT);
+    return values.stream().filter(value -> value.startsWith(input)).toList();
+  }
+
   public List<String> complete(CommandSender sender, String[] args, List<String> arenaIds) {
     boolean administrator = sender.hasPermission(AdministrativeCommandPolicy.GAME);
     boolean canJoin = sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN);
@@ -84,8 +107,7 @@ public final class GameCommandHandler {
     } else if (args.length == 3 && args[1].equalsIgnoreCase("create")) {
       values.addAll(arenaIds);
     } else if (args.length == 3 && args[1].equalsIgnoreCase("join")) {
-      values.addAll(arenaIds);
-      values.addAll(shortIds());
+      values.addAll(publicMapIds());
     } else if (args.length == 3
         && List.of("info", "start", "stop", "destroy").contains(args[1].toLowerCase(Locale.ROOT))) {
       values.addAll(shortIds());
@@ -141,6 +163,11 @@ public final class GameCommandHandler {
     if (!(sender instanceof Player player))
       return send(sender, "game.command.player-only", Map.of());
     if (args.length != 3) return send(sender, "game.command.help", Map.of());
+    GameInstance publicMatch = bestPublicGame(args[2]);
+    if (publicMatch != null) {
+      join(sender, player, publicMatch);
+      return true;
+    }
     GameLookupResult lookup = games.lookup(args[2]);
     if (lookup.status() == GameLookupStatus.AMBIGUOUS)
       return send(sender, "game.command.ambiguous", Map.of());
@@ -165,6 +192,21 @@ public final class GameCommandHandler {
     }
     join(sender, player, instance);
     return true;
+  }
+
+  private boolean publicJoin(Player player, String[] args) {
+    if (args.length != 2)
+      return send(
+          player, "game.help.usage.join", Map.of("maps", String.join(", ", publicMapIds())));
+    GameInstance instance = bestPublicGame(args[1]);
+    if (instance == null)
+      return send(player, "game.error.no-available-instance", Map.of("map", args[1]));
+    join(player, player, instance);
+    return true;
+  }
+
+  private boolean publicHelp(CommandSender sender) {
+    return send(sender, "game.help.public", Map.of("maps", String.join(", ", publicMapIds())));
   }
 
   private void join(CommandSender sender, Player player, GameInstance instance) {
@@ -302,6 +344,43 @@ public final class GameCommandHandler {
 
   private List<String> shortIds() {
     return games.all().stream().map(game -> game.id().shortId()).toList();
+  }
+
+  private List<String> publicMapIds() {
+    return games.all().stream()
+        .filter(
+            game ->
+                game.state() == fr.heneria.bedwars.api.game.GameState.WAITING
+                    || game.state() == fr.heneria.bedwars.api.game.GameState.STARTING)
+        .map(game -> game.arena().template().id().value())
+        .distinct()
+        .sorted()
+        .toList();
+  }
+
+  private GameInstance bestPublicGame(String reference) {
+    String wanted = reference.trim();
+    return games.all().stream()
+        .filter(
+            game ->
+                game.state() == fr.heneria.bedwars.api.game.GameState.WAITING
+                    || game.state() == fr.heneria.bedwars.api.game.GameState.STARTING)
+        .filter(game -> game.playerIds().size() < game.arena().definition().maximumPlayers())
+        .filter(
+            game ->
+                game.arena().template().id().value().equalsIgnoreCase(wanted)
+                    || game.arena().template().displayName().equalsIgnoreCase(wanted)
+                    || game.arena().definition().id().value().equalsIgnoreCase(wanted))
+        .sorted(
+            java.util.Comparator.comparingInt(
+                    (GameInstance game) ->
+                        game.state() == fr.heneria.bedwars.api.game.GameState.WAITING ? 0 : 1)
+                .thenComparing(
+                    java.util.Comparator.comparingInt(
+                            (GameInstance game) -> game.playerIds().size())
+                        .reversed()))
+        .findFirst()
+        .orElse(null);
   }
 
   private boolean allowed(CommandSender sender, String permission) {

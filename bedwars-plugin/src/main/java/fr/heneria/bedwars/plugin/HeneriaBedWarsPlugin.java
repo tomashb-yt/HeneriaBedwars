@@ -284,6 +284,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   gameLobby,
                   gameDisplays,
                   waitingListener,
+                  runtimePlayers,
                   configurations,
                   projectLogger),
               textInputService,

@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,24 +15,6 @@ import java.util.UUID;
 /** One isolated live match scaffold. It intentionally contains no BedWars mechanics yet. */
 public final class GameInstance {
   private static final Map<GameState, Set<GameState>> TRANSITIONS = transitions();
-  private static final List<String> TEAM_COLORS =
-      List.of(
-          "RED",
-          "BLUE",
-          "GREEN",
-          "YELLOW",
-          "AQUA",
-          "WHITE",
-          "PINK",
-          "GRAY",
-          "PURPLE",
-          "ORANGE",
-          "LIME",
-          "CYAN",
-          "MAGENTA",
-          "LIGHT_BLUE",
-          "BLACK",
-          "BROWN");
 
   private final GameId id;
   private final RuntimeArena arena;
@@ -51,12 +32,9 @@ public final class GameInstance {
     this.id = arena.gameId();
     this.createdAt = Objects.requireNonNull(now, "now");
     this.updatedAt = now;
-    int count = Math.max(1, arena.definition().teamCount());
-    for (int index = 0; index < count; index++) {
-      String color = TEAM_COLORS.get(index % TEAM_COLORS.size());
-      String teamId = "team-" + (index + 1);
-      teams.put(teamId, new RuntimeTeam(teamId, "Team " + (index + 1), color));
-    }
+    arena.definition().teams().stream()
+        .sorted(Comparator.comparingInt(team -> team.order()))
+        .forEach(team -> teams.put(team.id().value(), new RuntimeTeam(team)));
   }
 
   public GameId id() {
@@ -92,12 +70,13 @@ public final class GameInstance {
     if (state != GameState.WAITING && state != GameState.STARTING)
       throw new GameTransitionException(state, state);
     RuntimePlayer player = new RuntimePlayer(playerId, now);
-    RuntimeTeam team =
+    RuntimeTeam selectedTeam =
         teams.values().stream()
+            .filter(candidate -> !candidate.full())
             .min(Comparator.comparingInt(RuntimeTeam::size).thenComparing(RuntimeTeam::id))
-            .orElseThrow();
-    player.assignTeam(team.id());
-    team.add(playerId);
+            .orElseThrow(() -> new IllegalStateException("No team capacity remains"));
+    player.assignTeam(selectedTeam.id());
+    selectedTeam.add(playerId);
     players.put(playerId, player);
     updatedAt = now;
     return player;
@@ -117,6 +96,23 @@ public final class GameInstance {
 
   public synchronized Set<UUID> playerIds() {
     return Set.copyOf(players.keySet());
+  }
+
+  public synchronized Optional<RuntimeTeam> team(String id) {
+    return Optional.ofNullable(teams.get(id));
+  }
+
+  /** Reassigns a waiting player only when the destination has capacity. */
+  synchronized boolean selectTeam(UUID playerId, String teamId, Instant now) {
+    if (state != GameState.WAITING) return false;
+    RuntimePlayer player = players.get(playerId);
+    RuntimeTeam destination = teams.get(teamId);
+    if (player == null || destination == null || destination.full()) return false;
+    player.teamId().map(teams::get).ifPresent(team -> team.remove(playerId));
+    destination.add(playerId);
+    player.assignTeam(destination.id());
+    updatedAt = now;
+    return true;
   }
 
   public synchronized void timer(String key, long ticksRemaining, Instant now) {

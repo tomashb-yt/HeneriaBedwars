@@ -200,6 +200,12 @@ arena:
     success: "<green>Arena {arena_id} was backed up and deleted."
     failed: "<red>Deletion failed."
 game:
+  help:
+    public: "<aqua><bold>HeneriaBedWars</bold> <gray>— Play\n<white>/bw join <map> <gray>Joins the best available game.\n<white>/bw leave <gray>Leaves your game.\n<gray>Available maps: <white>{maps}"
+    usage:
+      join: "<red>Map missing. <gray>Usage: <white>/bw join <map><gray>. Maps: <white>{maps}"
+  error:
+    no-available-instance: "<red>No available game for <white>{map}<red>."
   public-info:
     title: "<aqua><bold>Game — {arena_name}"
     missing-title: "<red>Game unavailable"

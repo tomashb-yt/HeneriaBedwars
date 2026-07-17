@@ -200,6 +200,12 @@ arena:
     success: "<green>L'arene {arena_id} a ete sauvegardee puis supprimee."
     failed: "<red>Suppression impossible."
 game:
+  help:
+    public: "<aqua><bold>HeneriaBedWars</bold> <gray>— Jouer\n<white>/bw join <carte> <gray>Rejoint la meilleure partie disponible.\n<white>/bw leave <gray>Quitte votre partie.\n<gray>Cartes disponibles : <white>{maps}"
+    usage:
+      join: "<red>Carte manquante. <gray>Utilisation : <white>/bw join <carte><gray>. Cartes : <white>{maps}"
+  error:
+    no-available-instance: "<red>Aucune partie disponible pour <white>{map}<red>."
   public-info:
     title: "<aqua><bold>Partie — {arena_name}"
     missing-title: "<red>Partie indisponible"

@@ -2,6 +2,7 @@ package fr.heneria.bedwars.core.arena;
 
 import fr.heneria.bedwars.core.config.ProblemSeverity;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,6 +54,7 @@ public final class ArenaValidator {
         && arena.playersPerTeam() > 0
         && arena.maximumPlayers() != arena.teamCount() * arena.playersPerTeam())
       error(problems, "capacity-mismatch", "players.maximum", "Maximum must equal team capacity");
+    validateTeams(problems, arena);
     if (arena.waitingLocation().isEmpty())
       error(problems, "missing-waiting", "locations.waiting", "Waiting location is missing");
     checkLocationWorld(problems, arena, arena.waitingLocation().orElse(null), "locations.waiting");
@@ -84,6 +86,45 @@ public final class ArenaValidator {
                 error(problems, "invalid-boundary", "boundary", "Boundary minimum exceeds maximum");
             });
     return new ArenaValidationResult(problems);
+  }
+
+  private static void validateTeams(List<ArenaProblem> problems, ArenaDefinition arena) {
+    if (arena.teams().size() < 2) {
+      error(
+          problems,
+          "missing-teams",
+          "teams.definitions",
+          "At least two team definitions are required");
+      return;
+    }
+    HashSet<TeamId> ids = new HashSet<>();
+    HashSet<TeamColor> colors = new HashSet<>();
+    HashSet<Integer> orders = new HashSet<>();
+    int total = 0;
+    for (ArenaTeamDefinition team : arena.teams()) {
+      total += team.capacity();
+      if (!ids.add(team.id()))
+        error(problems, "duplicate-team-id", "teams.definitions", "Team id is duplicated");
+      if (!colors.add(team.color()))
+        error(problems, "duplicate-team-color", "teams.definitions", "Team color is duplicated");
+      if (!orders.add(team.order()))
+        error(problems, "duplicate-team-order", "teams.definitions", "Team order is duplicated");
+      if (team.spawn().isEmpty())
+        error(
+            problems,
+            "missing-team-spawn",
+            "teams." + team.id().value() + ".spawn",
+            "Team spawn is missing");
+      else
+        checkLocationWorld(
+            problems, arena, team.spawn().orElseThrow(), "teams." + team.id().value() + ".spawn");
+    }
+    if (total != arena.maximumPlayers())
+      error(
+          problems,
+          "team-capacity-mismatch",
+          "teams.definitions",
+          "Team capacities must equal maximum players");
   }
 
   private void validateMapTemplate(List<ArenaProblem> problems, ArenaDefinition arena) {

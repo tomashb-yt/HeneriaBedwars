@@ -67,3 +67,10 @@
 Aucune équipe BedWars configurable ou mécanique de couleur, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes restent des modèles administratifs persistants; leurs clones runtime ne fournissent encore aucun gameplay.
 
 Les 161 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+## Ticket 011 - livraison initiale
+
+Les arènes portent désormais des définitions d'équipes immuables et persistantes (identifiant, nom, couleur, ordre, capacité et spawn). Les anciens YAML à base de `teams.count` et `teams.players-per-team` sont relus avec des équipes générées déterministes, sans perdre la définition; les spawns restent à renseigner avant validation complète.
+
+Le runtime construit ses équipes depuis l'arène, respecte les capacités et permet une sélection métier uniquement pendant `WAITING`. Le parcours public `/bw` et `/bedwars play` résout une carte de façon insensible à la casse, choisit l'instance rejoignable la plus peuplée et ne complète jamais les UUID ou identifiants courts. `/bw leave` conserve la sortie sûre existante.
+
+Au quit/kick, le snapshot est restauré avant la sauvegarde du profil Bukkit. Au join, une protection retire seulement les items portant le PDC `heneriabedwars:runtime_item` lorsqu'aucune instance ne correspond au joueur; les objets normaux ne sont pas ciblés.

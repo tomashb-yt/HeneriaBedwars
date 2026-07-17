@@ -8,7 +8,10 @@ import fr.heneria.bedwars.core.arena.ArenaLocation;
 import fr.heneria.bedwars.core.arena.ArenaMetadata;
 import fr.heneria.bedwars.core.arena.ArenaRepository;
 import fr.heneria.bedwars.core.arena.ArenaStatus;
+import fr.heneria.bedwars.core.arena.ArenaTeamDefinition;
 import fr.heneria.bedwars.core.arena.ArenaVector;
+import fr.heneria.bedwars.core.arena.TeamColor;
+import fr.heneria.bedwars.core.arena.TeamId;
 import fr.heneria.bedwars.plugin.config.SafeYamlWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -127,7 +130,8 @@ public final class YamlArenaRepository implements ArenaRepository {
         location(yaml.getConfigurationSection("locations.waiting")),
         location(yaml.getConfigurationSection("locations.spectator")),
         boundary(yaml.getConfigurationSection("boundary")),
-        new ArenaMetadata(created, updated, attributes));
+        new ArenaMetadata(created, updated, attributes),
+        teams(yaml.getConfigurationSection("teams.definitions")));
   }
 
   private static String serialize(ArenaDefinition arena) {
@@ -145,6 +149,19 @@ public final class YamlArenaRepository implements ArenaRepository {
     yaml.set("players.maximum", arena.maximumPlayers());
     yaml.set("teams.count", arena.teamCount());
     yaml.set("teams.players-per-team", arena.playersPerTeam());
+    for (ArenaTeamDefinition team : arena.teams()) {
+      String prefix = "teams.definitions." + team.id().value();
+      yaml.set(prefix + ".display-name", team.displayName());
+      yaml.set(prefix + ".color", team.color().name());
+      yaml.set(prefix + ".order", team.order());
+      yaml.set(prefix + ".capacity", team.capacity());
+      team.spawn().ifPresent(location -> setLocation(yaml, prefix + ".spawn", location));
+      team.bedLocation().ifPresent(location -> setLocation(yaml, prefix + ".bed", location));
+      team.shopLocation().ifPresent(location -> setLocation(yaml, prefix + ".shop", location));
+      team.upgradeShopLocation()
+          .ifPresent(location -> setLocation(yaml, prefix + ".upgrade-shop", location));
+      team.metadata().forEach((key, value) -> yaml.set(prefix + ".metadata." + key, value));
+    }
     arena.waitingLocation().ifPresent(location -> setLocation(yaml, "locations.waiting", location));
     arena
         .spectatorLocation()
@@ -187,6 +204,34 @@ public final class YamlArenaRepository implements ArenaRepository {
             vector(section),
             (float) section.getDouble("yaw"),
             (float) section.getDouble("pitch")));
+  }
+
+  private static List<ArenaTeamDefinition> teams(ConfigurationSection section) {
+    if (section == null) return List.of();
+    List<ArenaTeamDefinition> teams = new ArrayList<>();
+    for (String rawId : section.getKeys(false)) {
+      ConfigurationSection value = section.getConfigurationSection(rawId);
+      if (value == null) throw new IllegalArgumentException("Invalid team " + rawId);
+      Map<String, String> metadata = new LinkedHashMap<>();
+      ConfigurationSection metadataSection = value.getConfigurationSection("metadata");
+      if (metadataSection != null)
+        metadataSection
+            .getKeys(false)
+            .forEach(key -> metadata.put(key, String.valueOf(metadataSection.get(key))));
+      teams.add(
+          new ArenaTeamDefinition(
+              new TeamId(rawId),
+              requiredString(value, "display-name"),
+              TeamColor.valueOf(requiredString(value, "color").toUpperCase(java.util.Locale.ROOT)),
+              value.getInt("order"),
+              value.getInt("capacity"),
+              location(value.getConfigurationSection("spawn")),
+              location(value.getConfigurationSection("bed")),
+              location(value.getConfigurationSection("shop")),
+              location(value.getConfigurationSection("upgrade-shop")),
+              metadata));
+    }
+    return List.copyOf(teams);
   }
 
   private static Optional<ArenaBoundary> boundary(ConfigurationSection section) {
