@@ -45,6 +45,21 @@ public record ArenaTeamDefinition(
         metadata);
   }
 
+  /** Stores the foot-half selection of the team's administrative bed. */
+  public ArenaTeamDefinition withBedLocation(Optional<ArenaLocation> value) {
+    return new ArenaTeamDefinition(
+        id,
+        displayName,
+        color,
+        order,
+        capacity,
+        spawn,
+        value,
+        shopLocation,
+        upgradeShopLocation,
+        metadata);
+  }
+
   public ArenaTeamDefinition withDisplayName(String value) {
     return new ArenaTeamDefinition(
         id,

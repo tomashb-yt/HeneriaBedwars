@@ -213,6 +213,20 @@ public final class ArenaCommandHandler {
                 spawn.pitch()));
         yield true;
       }
+      case "setbed" ->
+          result(
+              sender,
+              arenas.setTeamBed(
+                  arena.id().value(),
+                  teamId,
+                  BukkitArenaLocations.from(player.getLocation()),
+                  arena.revision()),
+              TranslationKey.ARENA_UPDATED);
+      case "clearbed" ->
+          result(
+              sender,
+              arenas.clearTeamBed(arena.id().value(), teamId, arena.revision()),
+              TranslationKey.ARENA_UPDATED);
       default -> send(sender, TranslationKey.ARENA_HELP);
     };
   }

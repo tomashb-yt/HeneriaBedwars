@@ -269,7 +269,10 @@ class ArenaFrameworkTest {
                 Optional.of(spectator),
                 NOW);
     return base.withTeams(
-        base.teams().stream().limit(2).map(team -> team.withSpawn(Optional.of(waiting))).toList(),
+        base.teams().stream()
+            .limit(2)
+            .map(team -> team.withSpawn(Optional.of(waiting)).withBedLocation(Optional.of(waiting)))
+            .toList(),
         ArenaStatus.READY,
         NOW);
   }

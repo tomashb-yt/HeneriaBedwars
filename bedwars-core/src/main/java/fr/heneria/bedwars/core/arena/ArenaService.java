@@ -259,6 +259,16 @@ public final class ArenaService {
     return updateTeam(rawId, teamId, expectedRevision, team -> team.withSpawn(Optional.empty()));
   }
 
+  public synchronized ArenaOperationResult setTeamBed(
+      String rawId, TeamId teamId, ArenaLocation location, long expectedRevision) {
+    return updateTeam(rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.of(location)));
+  }
+
+  public synchronized ArenaOperationResult clearTeamBed(
+      String rawId, TeamId teamId, long expectedRevision) {
+    return updateTeam(rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.empty()));
+  }
+
   private ArenaOperationResult updateTeam(
       String rawId,
       TeamId teamId,

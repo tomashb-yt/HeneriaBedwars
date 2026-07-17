@@ -118,6 +118,15 @@ public final class ArenaValidator {
       else
         checkLocationWorld(
             problems, arena, team.spawn().orElseThrow(), "teams." + team.id().value() + ".spawn");
+      if (team.bedLocation().isEmpty())
+        error(
+            problems,
+            "team-bed-missing",
+            "teams." + team.id().value() + ".bed",
+            "Team bed is missing");
+      else
+        checkLocationWorld(
+            problems, arena, team.bedLocation().orElseThrow(), "teams." + team.id().value() + ".bed");
     }
     if (total != arena.maximumPlayers())
       error(
