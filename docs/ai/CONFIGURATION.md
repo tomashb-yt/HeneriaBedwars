@@ -59,6 +59,28 @@ Toutes les valeurs sont rechargeables et préparatoires; aucune protection de lo
 | `protection.cancel-hunger` | booléen | `true` |
 | `items.enabled` | booléen | `true` |
 
+## `game.yml`
+
+Toutes les valeurs sont rechargeables dans `GameSettings`. Elles agissent uniquement sur les instances runtime `WAITING` et `STARTING`; elles ne modifient pas le lobby principal ni une carte modele administrative.
+
+| Cle | Defaut | Effet |
+|---|---:|---|
+| `game.waiting.game-mode` | `ADVENTURE` | mode impose dans le lobby de partie |
+| `game.waiting.protect-players` | `true` | bloque les actions de protection runtime |
+| `game.waiting.disable-*` | `true` | faim, drop et pickup controles pendant l'attente |
+| `game.waiting.void-rescue-y` | `0` | hauteur de retour au spawn d'attente |
+| `game.waiting.destroy-empty-instance` | `true` | active le nettoyage d'une partie vide |
+| `game.waiting.empty-destroy-delay-seconds` | `30` | delai avant destruction d'une partie vide |
+| `game.countdown.normal-seconds` | `30` | duree au minimum de joueurs atteint |
+| `game.countdown.full-game-seconds` | `10` | duree reduite si capacite maximale atteinte |
+| `game.countdown.cancel-below-minimum` | `true` | annule `STARTING` si le minimum est perdu |
+| `game.countdown.allow-join-during-countdown` | `true` | autorise l'entree en `STARTING` |
+| `game.countdown.announcements.*` | listes | secondes annoncees dans chat et titres |
+| `game.countdown.bossbar.*` | active, bleu, solide | bossbar facultative du compteur |
+| `game.scoreboard.*` | actif, 20, `play.heneria.fr` | affichage et cadence de rafraichissement |
+| `game.inventory.leave-slot/info-slot` | `8` / `4` | positions hotbar, distinctes et de 0 a 8 |
+| `game.forced-start.enabled` | `true` | autorise le test `start --force` |
+
 ## `storage.yml`
 
 Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQL ou Redis n'est ouverte.

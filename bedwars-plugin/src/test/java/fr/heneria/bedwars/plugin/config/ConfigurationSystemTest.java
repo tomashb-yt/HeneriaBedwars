@@ -36,7 +36,7 @@ class ConfigurationSystemTest {
   void createsEveryMissingFileAndPreservesExistingContent() throws Exception {
     TestLogger logger = new TestLogger();
     DefaultConfigurationInstaller installer = installer(logger);
-    assertEquals(12, installer.installMissing());
+    assertEquals(13, installer.installMissing());
     Path config = temporary.resolve("config.yml");
     Files.writeString(config, "custom: true\n");
     assertEquals(0, installer.installMissing());
@@ -55,6 +55,10 @@ class ConfigurationSystemTest {
     assertEquals(54, service.snapshot().menus().defaultSize());
     assertEquals("hbw_template_", service.snapshot().worlds().templateWorldPrefix());
     assertEquals("maps/templates", service.snapshot().worlds().templatesDirectory());
+    assertEquals("ADVENTURE", service.snapshot().game().waitingGameMode());
+    assertEquals(30, service.snapshot().game().normalCountdownSeconds());
+    assertEquals(8, service.snapshot().game().leaveItemSlot());
+    assertEquals(4, service.snapshot().game().infoItemSlot());
     assertEquals(1, service.registry().version(ConfigurationId.GENERAL));
     assertEquals(List.of("en_US", "fr_FR"), service.availableLocales());
     assertEquals(
@@ -98,6 +102,20 @@ class ConfigurationSystemTest {
     var previous = service.snapshot();
 
     replace("menus.yml", "create-slot: 49", "create-slot: 47");
+
+    ConfigurationReloadResult result = service.reloadAll();
+    assertFalse(result.successful());
+    assertTrue(result.errors() > 0);
+    assertSame(previous, service.snapshot());
+  }
+
+  @Test
+  void duplicateWaitingInventorySlotsRefuseReloadAndPreserveSnapshot() throws Exception {
+    ConfigurationService service = service();
+    service.initialize();
+    var previous = service.snapshot();
+
+    replace("game.yml", "info-slot: 4", "info-slot: 8");
 
     ConfigurationReloadResult result = service.reloadAll();
     assertFalse(result.successful());

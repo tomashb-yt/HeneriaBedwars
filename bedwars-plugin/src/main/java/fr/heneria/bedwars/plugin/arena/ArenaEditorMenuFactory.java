@@ -21,6 +21,8 @@ import fr.heneria.bedwars.core.config.ProblemSeverity;
 import fr.heneria.bedwars.core.game.GameInstance;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.game.GameOperationResult;
+import fr.heneria.bedwars.core.game.lobby.GameJoinResult;
+import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.gui.ConfirmationGui;
 import fr.heneria.bedwars.core.gui.Gui;
 import fr.heneria.bedwars.core.gui.GuiButton;
@@ -34,6 +36,7 @@ import fr.heneria.bedwars.core.map.MapState;
 import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.core.map.MapType;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.GameAdminMenuFactory;
 import fr.heneria.bedwars.plugin.gui.GuiService;
 import fr.heneria.bedwars.plugin.gui.StandardGuiButtons;
 import fr.heneria.bedwars.plugin.map.MapMenuFactory;
@@ -98,6 +101,8 @@ public final class ArenaEditorMenuFactory {
   private final MapTemplateService maps;
   private final MapMenuFactory mapMenus;
   private final GameInstanceManager games;
+  private final GameLobbyService lobby;
+  private final GameAdminMenuFactory gameMenus;
   private final StandardGuiButtons standard = new StandardGuiButtons();
 
   public ArenaEditorMenuFactory(
@@ -110,7 +115,9 @@ public final class ArenaEditorMenuFactory {
       ProjectLogger logger,
       MapTemplateService maps,
       MapMenuFactory mapMenus,
-      GameInstanceManager games) {
+      GameInstanceManager games,
+      GameLobbyService lobby,
+      GameAdminMenuFactory gameMenus) {
     this.plugin = plugin;
     this.arenas = arenas;
     this.configurations = configurations;
@@ -121,6 +128,8 @@ public final class ArenaEditorMenuFactory {
     this.maps = maps;
     this.mapMenus = mapMenus;
     this.games = games;
+    this.lobby = lobby;
+    this.gameMenus = gameMenus;
   }
 
   public Gui setup(UUID playerId) {
@@ -195,6 +204,38 @@ public final class ArenaEditorMenuFactory {
                 .itemKey("admin.main.create-map")
                 .permission(AdministrativeCommandPolicy.MAP_CREATE)
                 .onLeftClick(context -> mapMenus.beginCreate(playerId))
+                .build())
+        .button(
+            29,
+            GuiButton.builder()
+                .itemKey("admin.main.games-v5")
+                .itemPlaceholders(
+                    context ->
+                        Map.of(
+                            "game_count", games.size(),
+                            "waiting_count",
+                                games.all().stream()
+                                    .filter(
+                                        game ->
+                                            game.state()
+                                                == fr.heneria.bedwars.api.game.GameState.WAITING)
+                                    .count(),
+                            "starting_count",
+                                games.all().stream()
+                                    .filter(
+                                        game ->
+                                            game.state()
+                                                == fr.heneria.bedwars.api.game.GameState.STARTING)
+                                    .count(),
+                            "playing_count",
+                                games.all().stream()
+                                    .filter(
+                                        game ->
+                                            game.state()
+                                                == fr.heneria.bedwars.api.game.GameState.PLAYING)
+                                    .count()))
+                .permission(AdministrativeCommandPolicy.GAME_LIST)
+                .onLeftClick(context -> context.open(gameMenus.list(playerId)))
                 .build())
         .button(
             31,
@@ -931,7 +972,7 @@ public final class ArenaEditorMenuFactory {
   }
 
   private void joinRuntime(UUID playerId, GameInstance instance) {
-    games
+    lobby
         .join(instance.id(), playerId)
         .whenComplete(
             (result, failure) ->
@@ -946,11 +987,18 @@ public final class ArenaEditorMenuFactory {
                           "arena.runtime.joined",
                           Map.of(
                               "arena_id", instance.arena().definition().id().value(),
-                              "game_id", instance.id()));
+                              "game_id", instance.id().shortId()));
                     }));
   }
 
   private void runtimeFailure(UUID playerId, GameOperationResult result) {
+    send(
+        playerId,
+        "arena.runtime.failed",
+        Map.of("code", result == null ? "INTERNAL_ERROR" : result.code().name()));
+  }
+
+  private void runtimeFailure(UUID playerId, GameJoinResult result) {
     send(
         playerId,
         "arena.runtime.failed",

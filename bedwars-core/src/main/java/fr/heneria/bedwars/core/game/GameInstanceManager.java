@@ -3,7 +3,6 @@ package fr.heneria.bedwars.core.game;
 import fr.heneria.bedwars.api.game.GameSnapshot;
 import fr.heneria.bedwars.api.game.GameState;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
-import fr.heneria.bedwars.core.arena.ArenaLocation;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.game.event.GameCreateEvent;
 import fr.heneria.bedwars.core.game.event.GameDestroyEvent;
@@ -11,18 +10,20 @@ import fr.heneria.bedwars.core.game.event.GameEndEvent;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.event.GameStartEvent;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
-import fr.heneria.bedwars.core.game.event.PlayerJoinGameEvent;
-import fr.heneria.bedwars.core.game.event.PlayerLeaveGameEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameLeaveEvent;
 import fr.heneria.bedwars.core.map.MapTemplate;
 import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.core.map.MapType;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -45,9 +46,11 @@ public final class GameInstanceManager {
   private final GameEventBus events;
   private final Clock clock;
   private final Supplier<UUID> ids;
+  private final GameLocationMapper locations = new GameLocationMapper();
   private final Map<GameId, GameInstance> instances = new LinkedHashMap<>();
   private final Map<String, GameId> byArena = new LinkedHashMap<>();
   private final Map<UUID, GameId> byPlayer = new LinkedHashMap<>();
+  private final Set<GameId> destroying = new HashSet<>();
 
   public GameInstanceManager(
       ArenaService arenas,
@@ -142,6 +145,28 @@ public final class GameInstanceManager {
   }
 
   public CompletionStage<GameOperationResult> join(GameId gameId, UUID playerId) {
+    GameInstance instance = find(gameId).orElse(null);
+    WaitingPlayerContext context =
+        instance == null
+            ? new WaitingPlayerContext("ADVENTURE", 8, 4, Map.of())
+            : new WaitingPlayerContext(
+                "ADVENTURE",
+                8,
+                4,
+                Map.of(
+                    "game_id", instance.id().shortId(),
+                    "arena_id", instance.arena().definition().id().value(),
+                    "arena_name", instance.arena().definition().displayName(),
+                    "players", instance.playerIds().size() + 1,
+                    "minimum_players", instance.arena().definition().minimumPlayers(),
+                    "maximum_players", instance.arena().definition().maximumPlayers(),
+                    "countdown", 0,
+                    "state", instance.state().name()));
+    return join(gameId, playerId, context);
+  }
+
+  public CompletionStage<GameOperationResult> join(
+      GameId gameId, UUID playerId, WaitingPlayerContext context) {
     GameInstance instance;
     RuntimeWorldHandle world;
     synchronized (this) {
@@ -167,9 +192,9 @@ public final class GameInstanceManager {
       instance.addPlayer(playerId, now());
       byPlayer.put(playerId, gameId);
     }
-    RuntimeLocation destination = waitingLocation(instance);
+    RuntimeLocation destination = locations.waiting(instance);
     return players
-        .enter(playerId, world, destination)
+        .enter(playerId, world, destination, context)
         .handle(
             (teleported, failure) -> {
               if (failure != null || !Boolean.TRUE.equals(teleported)) {
@@ -182,7 +207,7 @@ public final class GameInstanceManager {
                     instance,
                     failure == null ? playerId.toString() : rootMessage(failure));
               }
-              events.publish(new PlayerJoinGameEvent(gameId, playerId, now()));
+              events.publish(new PlayerGameJoinEvent(gameId, playerId, now()));
               return GameOperationResult.success(instance);
             });
   }
@@ -203,8 +228,13 @@ public final class GameInstanceManager {
     return players
         .leave(playerId)
         .handle(
-            (ignored, failure) -> {
-              events.publish(new PlayerLeaveGameEvent(instance.id(), playerId, now()));
+            (restored, failure) -> {
+              events.publish(new PlayerGameLeaveEvent(instance.id(), playerId, now()));
+              if (failure != null || !Boolean.TRUE.equals(restored))
+                return GameOperationResult.failure(
+                    GameOperationCode.RESTORE_FAILED,
+                    instance,
+                    failure == null ? playerId.toString() : rootMessage(failure));
               return GameOperationResult.success(instance);
             });
   }
@@ -221,7 +251,8 @@ public final class GameInstanceManager {
         return GameOperationResult.failure(GameOperationCode.NOT_FOUND, playerId.toString());
       instance.removePlayer(playerId, now());
     }
-    events.publish(new PlayerLeaveGameEvent(instance.id(), playerId, now()));
+    players.disconnect(playerId);
+    events.publish(new PlayerGameLeaveEvent(instance.id(), playerId, now()));
     return GameOperationResult.success(instance);
   }
 
@@ -246,6 +277,10 @@ public final class GameInstanceManager {
     if (instance == null)
       return completed(GameOperationResult.failure(GameOperationCode.NOT_FOUND, id.toString()));
     synchronized (this) {
+      if (!destroying.add(id))
+        return completed(
+            GameOperationResult.failure(
+                GameOperationCode.OPERATION_IN_PROGRESS, instance, id.toString()));
       try {
         if (instance.state() == GameState.CREATING) {
           instance.transition(GameState.RESETTING, now());
@@ -256,6 +291,7 @@ public final class GameInstanceManager {
         }
         if (instance.state() == GameState.ENDING) instance.transition(GameState.RESETTING, now());
       } catch (GameTransitionException exception) {
+        destroying.remove(id);
         return completed(
             GameOperationResult.failure(
                 GameOperationCode.INVALID_STATE, instance, exception.getMessage()));
@@ -264,7 +300,7 @@ public final class GameInstanceManager {
         byPlayer.remove(playerId);
         instance.removePlayer(playerId, now());
         players.leave(playerId);
-        events.publish(new PlayerLeaveGameEvent(id, playerId, now()));
+        events.publish(new PlayerGameLeaveEvent(id, playerId, now()));
       }
     }
     RuntimeWorldHandle world = instance.world().orElse(null);
@@ -272,14 +308,19 @@ public final class GameInstanceManager {
         world == null ? CompletableFuture.completedFuture(null) : worlds.destroy(world);
     return destruction.handle(
         (ignored, failure) -> {
-          if (failure != null)
+          if (failure != null) {
+            synchronized (this) {
+              destroying.remove(id);
+            }
             return GameOperationResult.failure(
                 GameOperationCode.WORLD_DESTRUCTION_FAILED, instance, rootMessage(failure));
+          }
           synchronized (this) {
             if (instance.state() == GameState.RESETTING)
               instance.transition(GameState.DESTROYED, now());
             instances.remove(id);
             byArena.remove(instance.arena().definition().id().value());
+            destroying.remove(id);
           }
           events.publish(new GameDestroyEvent(id, now()));
           return GameOperationResult.success(instance);
@@ -298,6 +339,25 @@ public final class GameInstanceManager {
     if (arenaId == null) return Optional.empty();
     return Optional.ofNullable(byArena.get(arenaId.toLowerCase(java.util.Locale.ROOT)))
         .map(instances::get);
+  }
+
+  /** Resolves a full UUID or a unique UUID prefix without guessing on ambiguity. */
+  public synchronized GameLookupResult lookup(String query) {
+    if (query == null || query.isBlank()) return GameLookupResult.missing();
+    String normalized = query.trim().toLowerCase(java.util.Locale.ROOT);
+    try {
+      GameInstance exact = instances.get(GameId.parse(normalized));
+      if (exact != null) return GameLookupResult.found(exact);
+    } catch (IllegalArgumentException ignored) {
+      // A short prefix is an expected input.
+    }
+    List<GameInstance> matches =
+        instances.values().stream()
+            .filter(game -> game.id().toString().startsWith(normalized))
+            .toList();
+    if (matches.isEmpty()) return GameLookupResult.missing();
+    if (matches.size() > 1) return GameLookupResult.ambiguous();
+    return GameLookupResult.found(matches.get(0));
   }
 
   public synchronized List<GameInstance> all() {
@@ -333,21 +393,6 @@ public final class GameInstanceManager {
       byArena.remove(instance.arena().definition().id().value());
     }
     events.publish(new GameDestroyEvent(instance.id(), now()));
-  }
-
-  private static RuntimeLocation waitingLocation(GameInstance instance) {
-    Optional<ArenaLocation> waiting = instance.arena().definition().waitingLocation();
-    if (waiting.isPresent()) {
-      ArenaLocation location = waiting.orElseThrow();
-      return new RuntimeLocation(
-          location.position().x(),
-          location.position().y(),
-          location.position().z(),
-          location.yaw(),
-          location.pitch());
-    }
-    var spawn = instance.arena().template().spawn();
-    return new RuntimeLocation(spawn.x(), spawn.y(), spawn.z(), spawn.yaw(), spawn.pitch());
   }
 
   private Instant now() {

@@ -1,10 +1,15 @@
 # État actuel
 
-- Dernier ticket terminé : Ticket 009.
+- Dernier ticket terminé : Ticket 010.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
 ## Disponible
+
+- Ticket 010 : lobby d'attente runtime `WAITING`/`STARTING`, compte a rebours automatique, annulation au-dessous du minimum, acceleration a partie pleine, passage controle vers `PLAYING`, nettoyage d'instance vide et arret administratif;
+- snapshots joueurs uniquement en memoire avec restauration de la position, inventaire, etat et scoreboard avant sortie; protections et rescue du vide limites aux membres d'un lobby runtime;
+- scoreboard, bossbar configurable, titres, actionbar, sons, items quitter/information et menu d'administration des parties;
+- `game.yml`, ids courts non ambigus, commandes `game start|stop` et permissions associees.
 
 - moteur `GameInstance` avec UUID, machine d'état complète, monde temporaire, joueurs, équipes, timers et statistiques en mémoire;
 - `GameInstanceManager` indexé par partie, joueur et arène, empêchant les doubles occupations et compensant les créations échouées;
@@ -56,4 +61,4 @@
 
 Aucune équipe BedWars configurable ou mécanique de couleur, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes restent des modèles administratifs persistants; leurs clones runtime ne fournissent encore aucun gameplay.
 
-Les 149 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 154 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

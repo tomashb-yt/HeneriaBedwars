@@ -17,6 +17,11 @@ public record GameId(UUID value) {
     return new GameId(UUID.fromString(value));
   }
 
+  /** Six-character display prefix; never used as the authoritative identity. */
+  public String shortId() {
+    return value.toString().substring(0, 6);
+  }
+
   @Override
   public String toString() {
     return value.toString();

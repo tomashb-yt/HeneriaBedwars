@@ -2,6 +2,8 @@
 
 ## Instances temporaires Ticket 009
 
+Le Ticket 010 utilise ce clone seulement comme monde de lobby pre-game. Une sortie normale restaure d'abord le snapshot joueur; la destruction d'une instance vide ou arretee evacue ensuite tout joueur restant, decharge sans sauvegarde et supprime le monde clone plus son manifeste runtime. Aucun reset de blocs de gameplay n'est necessaire tant que le Ticket 010 ne permet aucune construction dans le lobby d'attente.
+
 Une instance copie le dossier du monde modèle vers `<conteneur Bukkit>/hbw_game_<UUID compact>` hors du thread serveur, puis charge ce clone avec `WorldCreator` sur le thread serveur. Elle écrit parallèlement un manifeste sous `plugins/HeneriaBedWars/instances/game-<UUID>/world/active-world.txt`. Cette séparation est imposée par le chargement de mondes nommé de Spigot; les deux dossiers appartiennent au même runtime et sont supprimés ensemble.
 
 ```text

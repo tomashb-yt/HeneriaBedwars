@@ -1,0 +1,38 @@
+config-version: 1
+
+game:
+  waiting:
+    game-mode: ADVENTURE
+    protect-players: true
+    disable-hunger: true
+    disable-item-drop: true
+    disable-item-pickup: true
+    void-rescue-y: 0
+    destroy-empty-instance: true
+    empty-destroy-delay-seconds: 30
+
+  countdown:
+    enabled: true
+    normal-seconds: 30
+    full-game-seconds: 10
+    cancel-below-minimum: true
+    allow-join-during-countdown: true
+    announcements:
+      chat-seconds: [30, 20, 10]
+      title-seconds: [5, 4, 3, 2, 1]
+    bossbar:
+      enabled: true
+      color: BLUE
+      style: SOLID
+
+  scoreboard:
+    enabled: true
+    refresh-ticks: 20
+    footer: "play.heneria.fr"
+
+  inventory:
+    leave-slot: 8
+    info-slot: 4
+
+  forced-start:
+    enabled: true

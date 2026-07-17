@@ -3,6 +3,7 @@ package fr.heneria.bedwars.core.config;
 /** Stable identifiers for the built-in configuration files. */
 public enum ConfigurationId {
   GENERAL("config.yml"),
+  GAME("game.yml"),
   GAMEPLAY("gameplay.yml"),
   LOBBY("lobby.yml"),
   STORAGE("storage.yml"),

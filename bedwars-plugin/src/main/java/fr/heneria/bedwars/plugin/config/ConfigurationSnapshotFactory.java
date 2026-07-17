@@ -5,6 +5,7 @@ import fr.heneria.bedwars.core.config.ConfigurationDocument;
 import fr.heneria.bedwars.core.config.ConfigurationId;
 import fr.heneria.bedwars.core.config.ConfigurationProblem;
 import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
+import fr.heneria.bedwars.core.config.GameSettings;
 import fr.heneria.bedwars.core.config.GameplaySettings;
 import fr.heneria.bedwars.core.config.LobbySettings;
 import fr.heneria.bedwars.core.config.MapEditorSettings;
@@ -57,6 +58,63 @@ public final class ConfigurationSnapshotFactory {
             general.bool("security.prevent-reload-during-games", true),
             general.integer(
                 "performance.warn-main-thread-task-duration-ms", 50, 1, Integer.MAX_VALUE));
+
+    Reader game = new Reader(documents.get(ConfigurationId.GAME), problems);
+    String waitingGameMode =
+        allowedValue(
+            game,
+            "game.waiting.game-mode",
+            "ADVENTURE",
+            Set.of("ADVENTURE", "SURVIVAL", "CREATIVE", "SPECTATOR"));
+    String bossBarColor =
+        allowedValue(
+            game,
+            "game.countdown.bossbar.color",
+            "BLUE",
+            Set.of("PINK", "BLUE", "RED", "GREEN", "YELLOW", "PURPLE", "WHITE"));
+    String bossBarStyle =
+        allowedValue(
+            game,
+            "game.countdown.bossbar.style",
+            "SOLID",
+            Set.of("SOLID", "SEGMENTED_6", "SEGMENTED_10", "SEGMENTED_12", "SEGMENTED_20"));
+    int leaveItemSlot = game.integer("game.inventory.leave-slot", 8, 0, 8);
+    int infoItemSlot = game.integer("game.inventory.info-slot", 4, 0, 8);
+    boolean waitingInventorySlotsCollide = leaveItemSlot == infoItemSlot;
+    GameSettings gameSettings =
+        new GameSettings(
+            waitingGameMode,
+            game.bool("game.waiting.protect-players", true),
+            game.bool("game.waiting.disable-hunger", true),
+            game.bool("game.waiting.disable-item-drop", true),
+            game.bool("game.waiting.disable-item-pickup", true),
+            game.decimal("game.waiting.void-rescue-y", 0),
+            game.bool("game.waiting.destroy-empty-instance", true),
+            game.integer("game.waiting.empty-destroy-delay-seconds", 30, 0, 3600),
+            game.bool("game.countdown.enabled", true),
+            game.integer("game.countdown.normal-seconds", 30, 1, 3600),
+            game.integer("game.countdown.full-game-seconds", 10, 1, 3600),
+            game.bool("game.countdown.cancel-below-minimum", true),
+            game.bool("game.countdown.allow-join-during-countdown", true),
+            game.integerSet(
+                "game.countdown.announcements.chat-seconds", Set.of(30, 20, 10), 1, 3600),
+            game.integerSet(
+                "game.countdown.announcements.title-seconds", Set.of(5, 4, 3, 2, 1), 1, 3600),
+            game.bool("game.countdown.bossbar.enabled", true),
+            bossBarColor,
+            bossBarStyle,
+            game.bool("game.scoreboard.enabled", true),
+            game.integer("game.scoreboard.refresh-ticks", 20, 1, 1200),
+            game.string("game.scoreboard.footer", "play.heneria.fr"),
+            leaveItemSlot,
+            waitingInventorySlotsCollide ? (infoItemSlot + 1) % 9 : infoItemSlot,
+            game.bool("game.forced-start.enabled", true));
+    if (waitingInventorySlotsCollide)
+      game.error(
+          "game.inventory",
+          leaveItemSlot,
+          "two distinct hotbar slots",
+          "Waiting inventory slots collide");
 
     Reader gameplay = new Reader(documents.get(ConfigurationId.GAMEPLAY), problems);
     GameplaySettings gameplaySettings =
@@ -173,6 +231,7 @@ public final class ConfigurationSnapshotFactory {
     }
     return new ConfigurationSnapshot(
         plugin,
+        gameSettings,
         gameplaySettings,
         lobbySettings,
         storageSettings,
@@ -291,6 +350,14 @@ public final class ConfigurationSnapshotFactory {
       reader.problem(path, value, type.getSimpleName(), fallback, "Invalid enum value");
       return fallback;
     }
+  }
+
+  private static String allowedValue(
+      Reader reader, String path, String fallback, Set<String> allowed) {
+    String value = reader.string(path, fallback).toUpperCase(Locale.ROOT);
+    if (allowed.contains(value)) return value;
+    reader.problem(path, value, allowed, fallback, "Invalid enum value");
+    return fallback;
   }
 
   private static String safePrefix(Reader reader, String path, String value, String fallback) {
@@ -676,6 +743,23 @@ public final class ConfigurationSnapshotFactory {
         if (!result.isEmpty() && result.size() == list.size()) return result;
       }
       problem(key, value, "non-empty string list", fallback, "Invalid string list");
+      return fallback;
+    }
+
+    java.util.Set<Integer> integerSet(
+        String key, java.util.Set<Integer> fallback, int minimum, int maximum) {
+      Object value = document.value(key);
+      if (value instanceof List<?> list) {
+        java.util.Set<Integer> result =
+            list.stream()
+                .filter(Number.class::isInstance)
+                .map(Number.class::cast)
+                .map(Number::intValue)
+                .filter(number -> number >= minimum && number <= maximum)
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+        if (!result.isEmpty() && result.size() == list.size()) return result;
+      }
+      problem(key, value, "unique bounded integer list", fallback, "Invalid integer list");
       return fallback;
     }
 

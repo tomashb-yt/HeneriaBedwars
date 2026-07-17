@@ -1,0 +1,12 @@
+package fr.heneria.bedwars.core.game.countdown;
+
+public enum CountdownOperationCode {
+  SUCCESS,
+  GAME_NOT_FOUND,
+  INVALID_STATE,
+  MINIMUM_PLAYERS_NOT_REACHED,
+  COUNTDOWN_ALREADY_RUNNING,
+  COUNTDOWN_NOT_RUNNING,
+  FORCED_START_DISABLED,
+  INTERNAL_ERROR
+}

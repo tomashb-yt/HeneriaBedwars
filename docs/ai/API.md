@@ -38,10 +38,12 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 | `/bedwars map delete <id>` | `heneriabedwars.admin.map.delete` | ouvre la confirmation, sauvegarde puis supprime |
 | `/bedwars game create <arène>` | `heneriabedwars.admin.game.create` | clone la carte, crée l'instance en `WAITING` et fait rejoindre le joueur |
 | `/bedwars game list` | `heneriabedwars.admin.game.list` | liste les instances vivantes |
-| `/bedwars game info <UUID>` | `heneriabedwars.admin.game.info` | affiche arène, carte, état, monde et joueurs |
-| `/bedwars game join <arène ou UUID>` | `heneriabedwars.admin.game.join` | rejoint l'instance existante ou la crée automatiquement depuis une arène active |
-| `/bedwars game leave` | `heneriabedwars.admin.game.leave` | quitte l'instance et revient au monde de secours |
-| `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | évacue, décharge et supprime le clone |
+| `/bedwars game info <id-court ou UUID>` | `heneriabedwars.admin.game.info` | affiche arene, carte, etat, monde, joueurs, age et compteur |
+| `/bedwars game join <arene ou id>` | `heneriabedwars.admin.game.join` | rejoint le lobby existant ou cree l'instance depuis une arene active |
+| `/bedwars game leave` | `heneriabedwars.admin.game.leave` | restaure le snapshot joueur puis quitte l'instance |
+| `/bedwars game start <id> [--force]` | `heneriabedwars.admin.game.start` / `.force-start` | demarre le compteur ou force `PLAYING` pour un test |
+| `/bedwars game stop <id>` | `heneriabedwars.admin.game.stop` | arrete, restaure les joueurs et nettoie le clone |
+| `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | alias historique de `stop` |
 
 `heneriabedwars.admin` est accordée aux opérateurs et possède les permissions spécialisées comme enfants. La complétion ne propose que les sous-commandes autorisées.
 

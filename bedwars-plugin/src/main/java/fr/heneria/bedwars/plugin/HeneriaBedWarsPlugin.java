@@ -8,7 +8,9 @@ import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.arena.ArenaValidator;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
+import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.gui.TextInputManager;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapOperationLock;
@@ -27,9 +29,13 @@ import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.BukkitGameDisplayService;
+import fr.heneria.bedwars.plugin.game.BukkitPlayerSnapshotService;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimePlayerGateway;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimeWorldService;
+import fr.heneria.bedwars.plugin.game.GameAdminMenuFactory;
 import fr.heneria.bedwars.plugin.game.GameLifecycleComponent;
+import fr.heneria.bedwars.plugin.game.GameWaitingListener;
 import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
 import fr.heneria.bedwars.plugin.gui.BukkitTextInputService;
 import fr.heneria.bedwars.plugin.item.BukkitItemService;
@@ -61,6 +67,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private BukkitMapWorldService mapWorldService;
   private MapMenuFactory mapMenus;
   private GameInstanceManager gameService;
+  private GameCountdownService gameCountdowns;
+  private GameLobbyService gameLobby;
 
   @Override
   public void onEnable() {
@@ -154,15 +162,28 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               data.resolve(worldSettings.instancesDirectory()),
               getServer().getWorldContainer().toPath(),
               projectLogger);
+      itemService = new BukkitItemService(this, configurations, projectLogger);
+      BukkitPlayerSnapshotService playerSnapshots = new BukkitPlayerSnapshotService(worldSettings);
+      BukkitRuntimePlayerGateway runtimePlayers =
+          new BukkitRuntimePlayerGateway(
+              this, worldSettings, configurations, itemService, playerSnapshots);
       gameService =
           new GameInstanceManager(
-              arenaService,
-              mapService,
-              runtimeWorlds,
-              new BukkitRuntimePlayerGateway(this, worldSettings),
-              gameEvents,
-              clock);
-      itemService = new BukkitItemService(this, configurations, projectLogger);
+              arenaService, mapService, runtimeWorlds, runtimePlayers, gameEvents, clock);
+      gameCountdowns =
+          new GameCountdownService(
+              gameService, gameEvents, () -> configurations.snapshot().game(), clock);
+      gameLobby =
+          new GameLobbyService(
+              gameService, gameCountdowns, () -> configurations.snapshot().game(), clock);
+      BukkitGameDisplayService gameDisplays =
+          new BukkitGameDisplayService(
+              configurations, gameService, gameCountdowns, runtimePlayers, projectLogger);
+      GameWaitingListener waitingListener =
+          new GameWaitingListener(
+              this, configurations, gameService, gameLobby, runtimePlayers, gameDisplays);
+      GameAdminMenuFactory runtimeGameMenus =
+          new GameAdminMenuFactory(this, gameService, gameCountdowns, gameLobby, configurations);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       ArenaEditorStateStore editorStates = new ArenaEditorStateStore();
       MapEditorStateStore mapEditorStates = new MapEditorStateStore();
@@ -218,7 +239,9 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               projectLogger,
               mapService,
               mapMenus,
-              gameService);
+              gameService,
+              gameLobby,
+              runtimeGameMenus);
       arenaEditorReference.set(arenaEditor);
       bootstrap =
           new BedWarsBootstrap(
@@ -227,6 +250,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               arenaService,
               mapService,
               gameService,
+              gameCountdowns,
+              gameLobby,
               new MapLifecycleComponent(
                   this,
                   mapService,
@@ -237,7 +262,15 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   projectLogger),
               new ArenaLifecycleComponent(arenaService, projectLogger),
               new GameLifecycleComponent(
-                  this, gameService, runtimeWorlds, gameEvents, projectLogger),
+                  this,
+                  gameService,
+                  runtimeWorlds,
+                  gameEvents,
+                  gameLobby,
+                  gameDisplays,
+                  waitingListener,
+                  configurations,
+                  projectLogger),
               textInputService,
               textInputService,
               itemService,
@@ -284,6 +317,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
             arenaService,
             mapService,
             gameService,
+            gameCountdowns,
+            gameLobby,
             mapWorldService,
             itemService,
             guiService,

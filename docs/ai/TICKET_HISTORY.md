@@ -1,5 +1,15 @@
 # Historique des tickets
 
+## Ticket 010 - Lobby de partie, file d'attente et compte a rebours
+
+Termine le 2026-07-17 cote code et validation automatisee. `GameLobbyService` centralise l'entree, la sortie, la deconnexion, le lancement et l'arret pre-game; `GameCountdownService` porte le compte a rebours sans tache par partie. Le cycle `WAITING -> STARTING -> PLAYING` est automatique au minimum de joueurs, s'annule si ce minimum est perdu et peut etre force par un administrateur pour les tests.
+
+Le plugin capture l'etat initial d'un joueur en memoire avant le lobby runtime et le restaure lors de sa sortie. Pendant l'attente, les protections sont limitees aux membres de l'instance, un rescue du vide est applique et les items configures permettent de quitter ou consulter la partie. Scoreboard, bossbar, titres, actionbar et sons sont relies aux events Java internes, sans gameplay BedWars cache apres `PLAYING`.
+
+`game.yml` ajoute les reglages de protections, inventory, countdown, affichages et nettoyage. `/bedwars game start <id> [--force]` et `/bedwars game stop <id>` utilisent des identifiants courts non ambigus; le tableau de bord contient une liste runtime avec actions guidees et confirmation d'arret. Les permissions `game.start`, `game.force-start` et `game.stop` sont declarees.
+
+Validation intermediaire : 154 tests automatises reussis, aucun echec ni ignore; Spotless et compilation passent. Les interactions Bukkit reelles (teleportation, snapshot, protections, bossbar, inventaires et nettoyage de mondes) restent a verifier manuellement sur Paper. Commit prevu : `feat(game): add waiting lobby and countdown lifecycle`.
+
 ## Ticket 009 — Runtime des parties (Game Instance Engine)
 
 Terminé le 2026-07-16 côté code et validation automatisée. `bedwars-core/game` introduit `GameId`, `GameInstance`, `GameInstanceManager`, `RuntimeArena`, `RuntimePlayer`, `RuntimeTeam`, les ports monde/joueur et la machine `CREATING → WAITING → STARTING → PLAYING → ENDING → RESETTING → DESTROYED`. Les index empêchent une seconde instance sur une arène et l'appartenance d'un joueur à plusieurs parties. Une copie échouée détruit l'instance provisoire et libère la réservation.

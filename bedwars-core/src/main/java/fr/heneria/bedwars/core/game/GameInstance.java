@@ -152,7 +152,8 @@ public final class GameInstance {
     values.put(
         GameState.WAITING, Set.of(GameState.STARTING, GameState.ENDING, GameState.RESETTING));
     values.put(
-        GameState.STARTING, Set.of(GameState.PLAYING, GameState.ENDING, GameState.RESETTING));
+        GameState.STARTING,
+        Set.of(GameState.WAITING, GameState.PLAYING, GameState.ENDING, GameState.RESETTING));
     values.put(GameState.PLAYING, Set.of(GameState.ENDING));
     values.put(GameState.ENDING, Set.of(GameState.RESETTING));
     values.put(GameState.RESETTING, Set.of(GameState.DESTROYED));

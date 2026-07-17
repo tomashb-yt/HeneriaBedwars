@@ -1,5 +1,13 @@
 # Limitations connues
 
+## Ticket 010
+
+- Le passage en `PLAYING` est structurel : il ne demarre ni lit, generateur, boutique, mort BedWars, condition de victoire ni spectateur gameplay.
+- Les snapshots de joueur sont seulement en memoire. Une deconnexion abandonne le snapshot et un crash ne fournit ni restauration offline ni reconnexion.
+- Les listeners, teleports, inventaires, bossbars, scoreboards, titres, sons, protections et suppression de clone doivent encore etre testes avec plusieurs joueurs sur un serveur Paper reel.
+- La liste administrative affiche les 28 premieres instances; un filtre ou une pagination runtime sera ajoute si un usage depasse cette limite.
+- `start --force` est volontairement reserve a l'administration de test et ne doit pas etre expose a des joueurs ordinaires.
+
 ## Ticket 009
 
 - Il s'agit d'un moteur de cycle de vie, pas d'une partie BedWars jouable : les équipes runtime sont des emplacements génériques et aucun lit, générateur, achat, mort finale ou vainqueur n'est calculé.

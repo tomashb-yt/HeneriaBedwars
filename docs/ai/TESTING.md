@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 010
+
+La suite ajoute des tests purs du lobby et du compteur : entree du premier et du second joueur, demarrage automatique, annulation quand le minimum redescend, reprise du compteur, passage en `PLAYING`, lancement force, destruction d'une instance vide par le ticker central, id court non ambigu et validation de `game.yml`. Elle contient 154 tests automatises reussis, sans echec ni test ignore lors de la derniere verification.
+
+La matrice manuelle Paper doit verifier : creation de clone, entree de deux joueurs, inventaire et scoreboard d'attente, bloqueurs de lobby, rescue du vide, item et commande de sortie, restauration complete, compteur, annulation, bossbar, start force, nettoyage vide, stop et nettoyage apres redemarrage complet.
+
 ## Ticket 009
 
 Les tests purs couvrent la séquence complète des états, le refus d'une transition illégale, la réservation unique d'arène, le rollback d'un clone échoué, les index joueur, l'affectation d'équipe, les événements et la destruction libérant monde/mémoire. La suite complète contient 149 tests, 0 échec, 0 erreur et 0 test ignoré. Les opérations Bukkit réelles restent dans la matrice manuelle Paper : création, arrivée dans le clone, présence simultanée de plusieurs joueurs, refus d'une seconde instance, sortie, destruction et contrôle des deux dossiers.

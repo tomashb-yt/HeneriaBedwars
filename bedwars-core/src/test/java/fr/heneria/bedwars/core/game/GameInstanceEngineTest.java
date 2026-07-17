@@ -12,12 +12,15 @@ import fr.heneria.bedwars.core.arena.ArenaLocation;
 import fr.heneria.bedwars.core.arena.ArenaMetadata;
 import fr.heneria.bedwars.core.arena.ArenaStatus;
 import fr.heneria.bedwars.core.arena.ArenaVector;
+import fr.heneria.bedwars.core.config.GameSettings;
+import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.event.GameCreateEvent;
 import fr.heneria.bedwars.core.game.event.GameDestroyEvent;
 import fr.heneria.bedwars.core.game.event.GameEvent;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
-import fr.heneria.bedwars.core.game.event.PlayerJoinGameEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
+import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapTemplate;
 import fr.heneria.bedwars.core.map.MapType;
@@ -31,6 +34,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 class GameInstanceEngineTest {
@@ -92,7 +97,7 @@ class GameInstanceEngineTest {
     assertEquals(
         GameOperationCode.PLAYER_OCCUPIED,
         fixture.manager.join(game.id(), player).toCompletableFuture().join().code());
-    assertTrue(fixture.eventTypes().contains(PlayerJoinGameEvent.class));
+    assertTrue(fixture.eventTypes().contains(PlayerGameJoinEvent.class));
   }
 
   @Test
@@ -112,18 +117,147 @@ class GameInstanceEngineTest {
     assertTrue(fixture.eventTypes().contains(GameDestroyEvent.class));
   }
 
+  @Test
+  void lobbyStartsCancelsAndCompletesCountdownThroughStateMachine() {
+    Fixture fixture = new Fixture();
+    GameCountdownService countdowns = countdowns(fixture, settings(2, false, 30));
+    GameLobbyService lobby =
+        new GameLobbyService(
+            fixture.manager,
+            countdowns,
+            () -> settings(2, false, 30),
+            Clock.fixed(NOW, ZoneOffset.UTC));
+    GameInstance game =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+    UUID first = UUID.randomUUID();
+    UUID second = UUID.randomUUID();
+
+    assertTrue(lobby.join(game.id(), first).toCompletableFuture().join().successful());
+    assertEquals(GameState.WAITING, game.state());
+    assertTrue(lobby.join(game.id(), second).toCompletableFuture().join().successful());
+    assertEquals(GameState.STARTING, game.state());
+    assertTrue(countdowns.snapshot(game.id()).isPresent());
+
+    assertTrue(lobby.leave(second).toCompletableFuture().join().successful());
+    assertEquals(GameState.WAITING, game.state());
+    assertTrue(countdowns.snapshot(game.id()).isEmpty());
+
+    assertTrue(lobby.join(game.id(), second).toCompletableFuture().join().successful());
+    lobby.tick();
+    lobby.tick();
+    assertEquals(GameState.PLAYING, game.state());
+    assertTrue(countdowns.snapshot(game.id()).isEmpty());
+  }
+
+  @Test
+  void emptyWaitingInstanceIsDestroyedByCentralLobbyTicker() {
+    Fixture fixture = new Fixture();
+    GameSettings settings = settings(10, true, 0);
+    GameLobbyService lobby =
+        new GameLobbyService(
+            fixture.manager,
+            countdowns(fixture, settings),
+            () -> settings,
+            Clock.fixed(NOW, ZoneOffset.UTC));
+    GameInstance game =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+    UUID player = UUID.randomUUID();
+
+    assertTrue(lobby.join(game.id(), player).toCompletableFuture().join().successful());
+    assertTrue(lobby.leave(player).toCompletableFuture().join().successful());
+    lobby.tick();
+
+    assertEquals(0, fixture.manager.size());
+    assertTrue(fixture.worlds.destroyed);
+  }
+
+  @Test
+  void forceStartPassesThroughStartingToPlayingWithoutMinimumPlayers() {
+    Fixture fixture = new Fixture();
+    GameSettings settings = settings(10, true, 30);
+    GameCountdownService countdowns = countdowns(fixture, settings);
+    GameLobbyService lobby =
+        new GameLobbyService(
+            fixture.manager, countdowns, () -> settings, Clock.fixed(NOW, ZoneOffset.UTC));
+    GameInstance game =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+
+    assertTrue(lobby.start(game.id(), true).successful());
+    assertEquals(GameState.PLAYING, game.state());
+  }
+
+  @Test
+  void shortGameLookupRefusesAmbiguityButAcceptsTheFullUuid() {
+    UUID firstId = UUID.fromString("00000000-0000-0000-0000-000000000009");
+    UUID secondId = UUID.fromString("000000ff-0000-0000-0000-000000000010");
+    java.util.concurrent.atomic.AtomicInteger index =
+        new java.util.concurrent.atomic.AtomicInteger();
+    Fixture fixture =
+        new Fixture(
+            () -> index.getAndIncrement() == 0 ? firstId : secondId,
+            id ->
+                id.equals("arena1") || id.equals("arena2")
+                    ? Optional.of(arena(id))
+                    : Optional.empty());
+    GameInstance first =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+    fixture.manager.create("arena2").toCompletableFuture().join();
+
+    assertEquals(GameLookupStatus.AMBIGUOUS, fixture.manager.lookup("000000").status());
+    assertEquals(
+        first.id(), fixture.manager.lookup(first.id().toString()).instance().orElseThrow().id());
+  }
+
+  private static GameCountdownService countdowns(Fixture fixture, GameSettings settings) {
+    return new GameCountdownService(
+        fixture.manager, fixture.events, () -> settings, Clock.fixed(NOW, ZoneOffset.UTC));
+  }
+
+  private static GameSettings settings(
+      int normalCountdownSeconds, boolean destroyEmptyInstance, int emptyDestroyDelaySeconds) {
+    return new GameSettings(
+        "ADVENTURE",
+        true,
+        true,
+        true,
+        true,
+        -64,
+        destroyEmptyInstance,
+        emptyDestroyDelaySeconds,
+        true,
+        normalCountdownSeconds,
+        1,
+        true,
+        true,
+        java.util.Set.of(5),
+        java.util.Set.of(3),
+        true,
+        "BLUE",
+        "SOLID",
+        true,
+        20,
+        "test",
+        7,
+        1,
+        true);
+  }
+
   private static GameInstance instance() {
     GameId id = new GameId(GAME_ID);
     return new GameInstance(new RuntimeArena(id, arena(), template()), NOW);
   }
 
   private static ArenaDefinition arena() {
+    return arena("arena1");
+  }
+
+  private static ArenaDefinition arena(String id) {
     ArenaLocation waiting = new ArenaLocation("hbw_template_map1", new ArenaVector(1, 65, 1), 0, 0);
     return new ArenaDefinition(
         ArenaDefinition.CURRENT_CONFIG_VERSION,
         1,
-        ArenaId.parse("arena1"),
-        "Arena 1",
+        ArenaId.parse(id),
+        "Arena " + id,
         ArenaStatus.ENABLED,
         Optional.of("hbw_template_map1"),
         Optional.of("map1"),
@@ -158,17 +292,21 @@ class GameInstanceEngineTest {
     final GameInstanceManager manager;
 
     Fixture() {
+      this(() -> GAME_ID, id -> id.equals("arena1") ? Optional.of(arena()) : Optional.empty());
+    }
+
+    Fixture(Supplier<UUID> ids, Function<String, Optional<ArenaDefinition>> arenaFinder) {
       events.subscribe(published::add);
       manager =
           new GameInstanceManager(
-              id -> id.equals("arena1") ? Optional.of(arena()) : Optional.empty(),
+              arenaFinder,
               ignored -> true,
               id -> id.equals("map1") ? Optional.of(template()) : Optional.empty(),
               worlds,
               players,
               events,
               Clock.fixed(NOW, ZoneOffset.UTC),
-              () -> GAME_ID);
+              ids);
     }
 
     List<Class<?>> eventTypes() {
@@ -197,7 +335,10 @@ class GameInstanceEngineTest {
   private static final class FakePlayers implements RuntimePlayerGateway {
     @Override
     public CompletionStage<Boolean> enter(
-        UUID playerId, RuntimeWorldHandle world, RuntimeLocation destination) {
+        UUID playerId,
+        RuntimeWorldHandle world,
+        RuntimeLocation destination,
+        WaitingPlayerContext context) {
       return CompletableFuture.completedFuture(true);
     }
 

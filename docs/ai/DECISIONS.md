@@ -102,7 +102,7 @@ Compiler et exécuter avec Java 21.
 ### Raisons
 Version LTS, records et langage moderne, compatibilité Paper.
 
-### Conséquences
+### Consequences
 Les serveurs et outils de build doivent fournir un JDK 21.
 
 ## ADR-002 — Utilisation de Gradle Kotlin DSL
@@ -372,3 +372,21 @@ Les retours des menus métier ciblent explicitement leur parent logique au lieu 
 
 ### Conséquences
 Une vue ouverte directement par commande, devenue obsolète après reload ou issue d'une confirmation ne peut plus renvoyer vers un éditeur supprimé. Le bouton retour conserve le même sens visuel dans tout l'assistant : sous-menu vers éditeur, éditeur vers liste, liste vers configuration.
+
+## ADR-046 a ADR-050 - Runtime pre-game Ticket 010
+
+### Statut
+
+Accepte.
+
+### Decisions
+
+- **ADR-046** - Les snapshots de joueur avant partie restent uniquement en memoire. Ils sont restaures avant sortie, avec le monde de secours si le monde d'origine est absent; aucune reprise apres crash n'est simulee.
+- **ADR-047** - `GameLobbyService` est la facade unique pour rejoindre, quitter, deconnecter, demarrer ou arreter une partie avant gameplay. Commandes, menus et listener n'appellent pas directement les transitions de partie.
+- **ADR-048** - `GameCountdownService` ne planifie aucune tache. Une seule tache Bukkit centrale le fait avancer et nettoie les instances vides, ce qui borne le cout quand le nombre de parties augmente.
+- **ADR-049** - Les protections de lobby sont evaluees par appartenance joueur et etat `WAITING`/`STARTING`; elles ne bloquent jamais globalement un monde administratif ou le lobby principal.
+- **ADR-050** - Le passage `PLAYING` est autorise et observable mais ne demarre aucune mecanique BedWars. Les events de lobby sont internes Java et ne constituent pas une API Bukkit ou addon stable.
+
+### Consequences
+
+Le pre-game devient testable sans Paper pour les invariants de temps, d'index et de transitions. Les details Bukkit (inventaire, teleportation, affichage, protections) demandent toujours une matrice manuelle sur un serveur Paper. Le Ticket 011 peut ajouter les equipes detaillees sans casser le cycle de vie ou la restauration joueur.

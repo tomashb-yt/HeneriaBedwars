@@ -9,6 +9,8 @@ import fr.heneria.bedwars.core.config.ConfigurationSnapshot;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
+import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.plugin.arena.ArenaCommandHandler;
@@ -70,6 +72,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       ArenaService arenaService,
       MapTemplateService mapService,
       GameInstanceManager gameService,
+      GameCountdownService gameCountdowns,
+      GameLobbyService gameLobby,
       BukkitMapWorldService mapWorldService,
       ItemService itemService,
       GuiService guiService,
@@ -94,7 +98,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     this.mapCommands =
         new MapCommandHandler(
             plugin, mapService, mapWorldService, configurations, guiService, mapMenus, logger);
-    this.gameCommands = new GameCommandHandler(plugin, gameService, configurations);
+    this.gameCommands =
+        new GameCommandHandler(plugin, gameService, gameCountdowns, gameLobby, configurations);
   }
 
   @Override

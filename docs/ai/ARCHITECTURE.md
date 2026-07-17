@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 010 - lobby d'attente et compte a rebours
+
+`bedwars-core/game/lobby` porte les cas d'usage d'entree, sortie, deconnexion et nettoyage; `bedwars-core/game/countdown` porte un compteur pur pilote par une seule tache de plateforme. `GameLobbyService` reste l'unique facade de pre-game pour commandes et menus et delegue les transitions a `GameInstanceManager`.
+
+`bedwars-plugin/game` contient les frontieres Bukkit : `BukkitPlayerSnapshotService`, `BukkitRuntimePlayerGateway`, `GameWaitingListener`, `BukkitGameDisplayService`, `GameAdminMenuFactory` et `GameLifecycleComponent`. Les snapshots ne quittent jamais la memoire, les listeners sont limites aux membres `WAITING` ou `STARTING`, et le bus interne est replanifie sur le thread serveur avant tout affichage Bukkit.
+
 ## Ticket 009 — moteur d'instances
 
 `bedwars-api/game` expose seulement des snapshots immuables via `GameApi`, `PlayerGameApi` et `ArenaGameApi`. `bedwars-core/game` contient `GameInstance`, `GameInstanceManager`, `RuntimeArena`, `RuntimePlayer`, `RuntimeTeam`, la machine d'état, les index et le bus d'événements interne. `bedwars-plugin/game` adapte la copie de fichiers, `WorldCreator`, les téléportations, commandes et événements de déconnexion.

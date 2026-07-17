@@ -1,5 +1,22 @@
 # Cycle des parties
 
+## Lobby et compte a rebours Ticket 010
+
+```mermaid
+stateDiagram-v2
+  [*] --> WAITING: clone prete
+  WAITING --> STARTING: minimum atteint
+  STARTING --> WAITING: minimum perdu
+  STARTING --> PLAYING: compteur termine ou force admin
+  WAITING --> ENDING: stop ou instance vide
+  STARTING --> ENDING: stop
+  PLAYING --> ENDING: futur cycle BedWars
+  ENDING --> RESETTING
+  RESETTING --> DESTROYED
+```
+
+Le joueur rejoint au point d'attente, recoit son inventaire temporaire et un affichage de statut. Quitter restaure son snapshot. A la fin du compteur, l'inventaire d'attente et les affichages sont retires mais aucune logique BedWars n'est encore lancee.
+
 ## Socle runtime Ticket 009
 
 ```mermaid

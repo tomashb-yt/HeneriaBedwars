@@ -213,6 +213,64 @@ game:
     not-found: "<red>Arène ou instance runtime introuvable."
     player-only: "<red>Cette opération doit être effectuée par un joueur."
     teleport-failed: "<red>L'instance existe, mais votre téléportation a échoué."
+    ambiguous: "<red>Plusieurs parties correspondent à cet identifiant. Ajoutez des caractères."
+    started: "<green>Compte à rebours démarré pour <white>{game_id}<green>."
+    stopped: "<green>Partie <white>{game_id}<green> arrêtée et nettoyée."
+  join:
+    success: "<green>Vous avez rejoint <white>{arena_name}<green> (<white>{players}/{maximum_players}<green>)."
+    already-in-game: "<red>Vous êtes déjà dans une partie."
+    full: "<red>Cette partie est complète."
+    not-joinable: "<red>Cette partie ne peut plus être rejointe."
+    world-not-ready: "<red>Le monde temporaire n'est pas prêt."
+    broadcast: "<yellow>{player}<gray> a rejoint la partie (<white>{players}/{maximum_players}<gray>)."
+  leave:
+    success: "<green>Votre état précédent a été restauré."
+    not-in-game: "<red>Vous n'êtes dans aucune partie."
+    broadcast: "<yellow>{player}<gray> a quitté la partie (<white>{players}/{maximum_players}<gray>)."
+  waiting:
+    title: "<aqua><bold>{arena_name}"
+    subtitle: "<gray>En attente de joueurs"
+    actionbar: "<yellow>{players}/{minimum_players} joueurs requis"
+    players: "<gray>Joueurs : <white>{players}/{maximum_players}"
+    minimum: "<gray>Minimum : <white>{minimum_players}"
+    waiting-for-players: "<yellow>En attente de joueurs supplémentaires..."
+    enough-players: "<green>Assez de joueurs : préparation du lancement."
+  countdown:
+    started: "<green>La partie démarre dans <white>{countdown}<green> secondes."
+    cancelled: "<red>Compte à rebours annulé : il manque des joueurs."
+    accelerated: "<aqua>La partie est complète : démarrage accéléré à <white>{countdown}<aqua> secondes."
+    seconds: "<yellow>Début dans <white>{countdown}<yellow> secondes."
+    final: "<green><bold>{countdown}"
+    forced: "<red>Démarrage forcé par un administrateur."
+  start:
+    title: "<green><bold>La partie commence !"
+    subtitle: "<gray>Le gameplay BedWars arrive au Ticket 011."
+    message: "<yellow>État PLAYING atteint. Aucun faux gameplay BedWars n'est lancé."
+  stop:
+    success: "<green>Partie arrêtée et monde temporaire nettoyé."
+    failed: "<red>Impossible d'arrêter cette partie : <white>{code}<red>."
+  scoreboard:
+    title: "<aqua><bold>HeneriaBedWars"
+    map: "<gray>Carte : <white>{arena_name}"
+    players: "<gray>Joueurs : <white>{players}/{maximum_players}"
+    minimum: "<gray>Minimum : <white>{minimum_players}"
+    state: "<gray>État : <white>{state}"
+    countdown: "<yellow>Début : <white>{countdown} s"
+    waiting: "<yellow>Joueurs insuffisants"
+    footer: "<aqua>{footer}"
+  error:
+    teleport: "<red>La téléportation vers la partie a échoué."
+    internal: "<red>Une erreur interne du lobby est survenue."
+    instance-missing: "<red>Cette instance n'existe plus."
+  gui:
+    list:
+      title: "<gold><bold>Parties runtime <gray>({count})"
+    info:
+      title: "<aqua><bold>Instance {game_id}"
+    missing:
+      title: "<red>Instance introuvable"
+    stop:
+      title: "<red><bold>Arreter {game_id} ?"
 gui:
   general:
     back: "<yellow>Retour"

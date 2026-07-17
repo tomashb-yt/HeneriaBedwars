@@ -213,6 +213,64 @@ game:
     not-found: "<red>Arena or runtime instance not found."
     player-only: "<red>This operation must be performed by a player."
     teleport-failed: "<red>The instance exists, but your teleport failed."
+    ambiguous: "<red>Several games match this identifier. Enter more characters."
+    started: "<green>Countdown started for <white>{game_id}<green>."
+    stopped: "<green>Game <white>{game_id}<green> stopped and cleaned."
+  join:
+    success: "<green>You joined <white>{arena_name}<green> (<white>{players}/{maximum_players}<green>)."
+    already-in-game: "<red>You are already in a game."
+    full: "<red>This game is full."
+    not-joinable: "<red>This game can no longer be joined."
+    world-not-ready: "<red>The temporary world is not ready."
+    broadcast: "<yellow>{player}<gray> joined the game (<white>{players}/{maximum_players}<gray>)."
+  leave:
+    success: "<green>Your previous state was restored."
+    not-in-game: "<red>You are not in a game."
+    broadcast: "<yellow>{player}<gray> left the game (<white>{players}/{maximum_players}<gray>)."
+  waiting:
+    title: "<aqua><bold>{arena_name}"
+    subtitle: "<gray>Waiting for players"
+    actionbar: "<yellow>{players}/{minimum_players} players required"
+    players: "<gray>Players: <white>{players}/{maximum_players}"
+    minimum: "<gray>Minimum: <white>{minimum_players}"
+    waiting-for-players: "<yellow>Waiting for more players..."
+    enough-players: "<green>Enough players: preparing to start."
+  countdown:
+    started: "<green>The game starts in <white>{countdown}<green> seconds."
+    cancelled: "<red>Countdown cancelled: not enough players."
+    accelerated: "<aqua>The game is full: accelerated start in <white>{countdown}<aqua> seconds."
+    seconds: "<yellow>Starting in <white>{countdown}<yellow> seconds."
+    final: "<green><bold>{countdown}"
+    forced: "<red>Game force-started by an administrator."
+  start:
+    title: "<green><bold>The game begins!"
+    subtitle: "<gray>BedWars gameplay arrives in Ticket 011."
+    message: "<yellow>PLAYING state reached. No fake BedWars gameplay is started."
+  stop:
+    success: "<green>Game stopped and temporary world cleaned."
+    failed: "<red>Unable to stop this game: <white>{code}<red>."
+  scoreboard:
+    title: "<aqua><bold>HeneriaBedWars"
+    map: "<gray>Map: <white>{arena_name}"
+    players: "<gray>Players: <white>{players}/{maximum_players}"
+    minimum: "<gray>Minimum: <white>{minimum_players}"
+    state: "<gray>State: <white>{state}"
+    countdown: "<yellow>Start: <white>{countdown} s"
+    waiting: "<yellow>Not enough players"
+    footer: "<aqua>{footer}"
+  error:
+    teleport: "<red>Teleporting to the game failed."
+    internal: "<red>An internal lobby error occurred."
+    instance-missing: "<red>This instance no longer exists."
+  gui:
+    list:
+      title: "<gold><bold>Runtime games <gray>({count})"
+    info:
+      title: "<aqua><bold>Game {game_id}"
+    missing:
+      title: "<red>Game not found"
+    stop:
+      title: "<red><bold>Stop {game_id}?"
 gui:
   general:
     back: "<yellow>Back"

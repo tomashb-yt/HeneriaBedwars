@@ -44,6 +44,9 @@ public final class AdministrativeCommandPolicy {
   public static final String GAME_INFO = "heneriabedwars.admin.game.info";
   public static final String GAME_JOIN = "heneriabedwars.admin.game.join";
   public static final String GAME_LEAVE = "heneriabedwars.admin.game.leave";
+  public static final String GAME_START = "heneriabedwars.admin.game.start";
+  public static final String GAME_FORCE_START = "heneriabedwars.admin.game.force-start";
+  public static final String GAME_STOP = "heneriabedwars.admin.game.stop";
   public static final String GAME_DESTROY = "heneriabedwars.admin.game.destroy";
 
   public List<String> complete(

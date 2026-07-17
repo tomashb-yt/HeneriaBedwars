@@ -9,6 +9,7 @@ import java.util.Set;
 /** Complete immutable runtime configuration activated as one unit. */
 public record ConfigurationSnapshot(
     PluginSettings plugin,
+    GameSettings game,
     GameplaySettings gameplay,
     LobbySettings lobby,
     StorageSettings storage,

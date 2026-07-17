@@ -7,6 +7,8 @@ import fr.heneria.bedwars.api.game.GameApi;
 import fr.heneria.bedwars.api.game.PlayerGameApi;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
+import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.gui.TextInputService;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.lifecycle.LifecycleManager;
@@ -38,6 +40,8 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
       ArenaService arenaService,
       MapTemplateService mapService,
       GameInstanceManager games,
+      GameCountdownService countdowns,
+      GameLobbyService lobby,
       LifecycleComponent mapLifecycle,
       LifecycleComponent arenaLifecycle,
       LifecycleComponent gameLifecycle,
@@ -56,6 +60,8 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
     services.register(ArenaService.class, arenaService);
     services.register(MapTemplateService.class, mapService);
     services.register(GameInstanceManager.class, games);
+    services.register(GameCountdownService.class, countdowns);
+    services.register(GameLobbyService.class, lobby);
     services.register(TextInputService.class, textInputService);
     services.register(ItemService.class, itemService);
     services.register(GuiService.class, guiService);

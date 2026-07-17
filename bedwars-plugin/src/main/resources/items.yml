@@ -158,6 +158,10 @@ items:
         material: RED_BED
         name: "<aqua><bold>Mes arènes"
         lore: ["<gray>Créer et configurer les parties", "", "<white>{arena_count} <gray>arène(s)", "<green>{enabled_count} <gray>prête(s)", "<red>{invalid_count} <gray>à terminer", "", "<yellow>▸ Cliquez pour ouvrir"]
+      games-v5:
+        material: CLOCK
+        name: "<gold><bold>Parties en cours"
+        lore: ["<gray>Surveiller les lobbys temporaires", "", "<white>{game_count} <gray>instance(s)", "<yellow>{waiting_count} <gray>en attente", "<aqua>{starting_count} <gray>en lancement", "<green>{playing_count} <gray>en jeu", "", "<yellow>Cliquez pour ouvrir"]
       maps:
         material: GRASS_BLOCK
         name: "<green><bold>Mes cartes"
@@ -487,3 +491,48 @@ items:
       failed-v4: {material: RED_CONCRETE, name: "<red><bold>Operation echouee", lore: ["<gray>{operation_detail}"]}
     duplicate:
       summary-v4: {material: STRUCTURE_BLOCK, name: "<gold><bold>Confirmer la copie", lore: ["<gray>Source : <white>{map_id}", "<gray>Destination : <white>{destination_id}"]}
+  game:
+    admin:
+      summary:
+        material: CLOCK
+        name: "<gold><bold>Instances runtime"
+        lore: ["<gray>Total : <white>{game_count}", "<yellow>Attente : <white>{waiting_count}", "<aqua>Lancement : <white>{starting_count}", "<green>En jeu : <white>{playing_count}"]
+      empty:
+        material: MINECART
+        name: "<yellow>Aucune instance active"
+        lore: ["<gray>Creez ou lancez une arene prete."]
+      entry:
+        material: MAP
+        name: "<aqua><bold>{game_id} <gray>- {arena_id}"
+        lore: ["<gray>Etat : <white>{state}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Countdown : <white>{countdown} s", "<gray>Monde : <white>{world_name}", "", "<yellow>Cliquez pour gerer"]
+        required-placeholders: [game_id, arena_id, state, players, maximum_players, countdown, world_name]
+      info:
+        material: BOOK
+        name: "<aqua><bold>Instance {game_id}"
+        lore: ["<gray>Arene : <white>{arena_id}", "<gray>Carte : <white>{map_id}", "<gray>Etat : <white>{state}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Minimum : <white>{minimum_players}", "<gray>Countdown : <white>{countdown} s", "<gray>Monde : <white>{world_name}", "<gray>Age : <white>{age_seconds} s"]
+        required-placeholders: [game_id, arena_id, map_id, state, players, maximum_players, minimum_players, countdown, world_name, age_seconds]
+      join: {material: ENDER_PEARL, name: "<green>Rejoindre pour tester", lore: ["<gray>Rejoint le lobby de cette instance."]}
+      start: {material: CLOCK, name: "<yellow>Demarrer le compte a rebours", lore: ["<gray>Necessite le minimum de joueurs."]}
+      force-start: {material: LIGHTNING_ROD, name: "<red>Forcer le passage en jeu", lore: ["<gray>Test administrateur uniquement."]}
+      stop: {material: TNT, name: "<red>Arreter et nettoyer", lore: ["<gray>Detruit le monde temporaire apres confirmation."]}
+      stop-confirmation:
+        material: REDSTONE_BLOCK
+        name: "<red><bold>Confirmer l'arret de {game_id}"
+        lore: ["<gray>Arene : <white>{arena_id}", "<gray>Les joueurs seront restaures."]
+        required-placeholders: [game_id, arena_id]
+      missing: {material: BARRIER, name: "<red>Instance introuvable", lore: ["<gray>Elle a peut-etre deja ete nettoyee."]}
+    waiting:
+      leave:
+        material: RED_BED
+        name: "<red><bold>Quitter la partie"
+        lore: ["<gray>Retourne à votre position précédente.", "", "<yellow>▸ Cliquez pour quitter"]
+        tags: {category: game-waiting, action: leave-game}
+      info:
+        material: BOOK
+        name: "<aqua><bold>Informations de la partie"
+        lore: ["<gray>Arène : <white>{arena_name}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Minimum : <white>{minimum_players}", "<gray>État : <white>{state}", "<gray>Compte à rebours : <white>{countdown}", "", "<yellow>▸ Cliquez pour actualiser"]
+        tags: {category: game-waiting, action: game-info}
+      countdown: {material: CLOCK, name: "<yellow>Début dans <white>{countdown} s", lore: ["<gray>{players}/{maximum_players} joueurs"]}
+      state: {material: COMPARATOR, name: "<aqua>État : <white>{state}"}
+      not-ready: {material: REDSTONE, name: "<red>En attente de joueurs", lore: ["<gray>{players}/{minimum_players} requis"]}
+      ready: {material: LIME_DYE, glow: true, name: "<green>Partie prête", lore: ["<gray>Le compte à rebours peut commencer."]}
