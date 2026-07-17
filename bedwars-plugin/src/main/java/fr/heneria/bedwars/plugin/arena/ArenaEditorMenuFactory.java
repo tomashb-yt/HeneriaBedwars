@@ -637,21 +637,58 @@ public final class ArenaEditorMenuFactory {
   public Gui teams(UUID playerId, String id, long expected) {
     ArenaDefinition arena = arenas.find(id).orElse(null);
     if (arena == null) return missing(playerId);
-    return Gui.builder()
-        .id("arena.teams." + id)
-        .title(message("arena.teams.assistant-title", placeholders(arena, arenas.validate(arena))))
-        .rows(3)
-        .fillEmptySlots(true)
-        .button(11, teamNumberButton(playerId, arena, expected, true))
-        .button(15, teamNumberButton(playerId, arena, expected, false))
-        .button(
-            13,
-            GuiButton.builder()
-                .itemKey("arena.teams.assistant-summary")
-                .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
-                .build())
-        .button(22, editorBackButton(playerId, id))
-        .build();
+    Gui.Builder builder =
+        Gui.builder()
+            .id("arena.teams." + id)
+            .title(
+                message("arena.teams.assistant-title", placeholders(arena, arenas.validate(arena))))
+            .rows(4)
+            .fillEmptySlots(true)
+            .button(11, teamNumberButton(playerId, arena, expected, true))
+            .button(15, teamNumberButton(playerId, arena, expected, false))
+            .button(
+                13,
+                GuiButton.builder()
+                    .itemKey("arena.teams.assistant-summary")
+                    .itemPlaceholders(context -> placeholders(arena, arenas.validate(arena)))
+                    .build())
+            .button(31, editorBackButton(playerId, id));
+    List<Integer> slots = List.of(10, 12, 14, 16, 19, 21, 23, 25);
+    for (int index = 0; index < Math.min(slots.size(), arena.teams().size()); index++) {
+      var team = arena.teams().get(index);
+      Map<String, Object> values = new LinkedHashMap<>(placeholders(arena, arenas.validate(arena)));
+      values.put("team_id", team.id().value());
+      values.put("team_name", team.displayName());
+      values.put("team_color", team.color().name());
+      values.put("team_capacity", team.capacity());
+      values.put(
+          "team_spawn_status", team.spawn().isPresent() ? "✓ Spawn configuré" : "Spawn manquant");
+      builder.button(
+          slots.get(index),
+          GuiButton.builder()
+              .itemKey("arena.teams.assistant-summary")
+              .itemPlaceholders(context -> values)
+              .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+              .onLeftClick(
+                  context ->
+                      withPlayer(
+                          playerId,
+                          player ->
+                              mutate(
+                                  context,
+                                  playerId,
+                                  id,
+                                  arenas.setTeamSpawn(
+                                      id,
+                                      team.id(),
+                                      BukkitArenaLocations.from(player.getLocation()),
+                                      expected),
+                                  "team-spawn")))
+              .onRightClick(
+                  context -> team.spawn().ifPresent(value -> teleport(context, playerId, value)))
+              .build());
+    }
+    return builder.build();
   }
 
   public Gui boundary(UUID playerId, String id, long expected) {
