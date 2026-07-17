@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Correctif UX cartes et arènes — 2026-07-17
+
+`ArenaEditorMenuFactory.editor` est une vue compacte de cinq lignes pilotée par `arena-editor.assistant-v5`. Elle affiche directement jusqu'à huit `ArenaTeamDefinition` colorées; un clic ouvre la fiche spawn/lit de l'équipe. La fiche revient à l'assistant principal. Les écrans joueurs et limites restent disponibles pour le diagnostic avancé, mais ne font plus partie du parcours essentiel.
+
+`MapFileService` expose un dépôt d'import par identifiant validé, sans chemin arbitraire. `SecureMapFileService` confine ce dépôt sous `maps/templates/<id>/import`, refuse les liens symboliques et exige `level.dat`. `MapTemplateService.prepareImport` ferme le monde sur le thread Bukkit et conserve le verrou; `completeImportFiles` sauvegarde puis échange les dossiers hors thread; `finishImport` charge le nouveau monde, force le type `BEDWARS`, publie les métadonnées et libère le verrou. En cas d'échec de copie, le dossier précédent est restauré.
+
 ## Correctif de préparation Ticket 012 — configuration des équipes
 
 `ArenaEditorMenuFactory` possède une vue liste et une fiche par `TeamId`; toutes les mutations continuent de passer par `ArenaService` avec la révision observée. Une sauvegarde réussie reconstruit la même fiche avec la nouvelle révision. `BukkitArenaBeds` reste à la frontière plugin : il transforme le bloc regardé en position normalisée du pied après vérification des deux moitiés. Le cœur refuse les doublons par coordonnées de bloc sans dépendre de Bukkit.

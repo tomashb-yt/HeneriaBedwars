@@ -26,6 +26,7 @@ public record MapEditorSettings(
     int settingsSlot,
     int workflowSlot,
     int associationsSlot,
+    int importSlot,
     int validationSlot,
     int backupSlot,
     int duplicateSlot,

@@ -419,95 +419,86 @@ public final class ArenaEditorMenuFactory {
     long expected = arena.revision();
     ArenaValidationResult validation = arenas.validate(arena);
     ArenaEditorSettings settings = settings();
-    return Gui.builder()
-        .id("arena.editor." + id)
-        .title(message("arena.gui.editor.assistant-title", placeholders(arena, validation)))
-        .rows(settings.editorRows())
-        .fillEmptySlots(true)
-        .data("arena_id", id)
-        .data("arena_revision", expected)
-        .button(settings.informationSlot(), infoButton(arena, validation))
-        .button(
-            settings.displayNameSlot(),
-            action(
-                "arena.editor.assistant-name",
-                AdministrativeCommandPolicy.ARENA_EDIT,
-                placeholders(arena, validation),
-                context -> requestDisplayName(playerId, id, expected)))
-        .button(
-            settings.worldSlot(),
-            GuiButton.builder()
-                .itemKey("arena.editor.assistant-map")
-                .itemPlaceholders(context -> placeholders(arena, validation))
-                .permission(AdministrativeCommandPolicy.ARENA_EDIT)
-                .onLeftClick(context -> context.open(mapTemplates(playerId, id, expected)))
-                .onRightClick(
-                    context ->
-                        withPlayer(
-                            playerId,
-                            player ->
-                                mutate(
-                                    context,
-                                    playerId,
-                                    id,
-                                    arenas.setWorld(id, player.getWorld().getName(), expected),
-                                    "world")))
-                .build())
-        .button(settings.waitingSlot(), positionButton(playerId, arena, expected, true, validation))
-        .button(
-            settings.spectatorSlot(),
-            action(
-                "arena.editor.assistant-teams",
-                AdministrativeCommandPolicy.ARENA_EDIT,
-                placeholders(arena, validation),
-                context -> context.open(teams(playerId, id, expected))))
-        .button(
-            settings.playersSlot(),
-            action(
-                "arena.editor.assistant-players",
-                AdministrativeCommandPolicy.ARENA_EDIT,
-                placeholders(arena, validation),
-                context -> context.open(players(playerId, id, expected))))
-        .button(settings.teamsSlot(), positionButton(playerId, arena, expected, false, validation))
-        .button(
-            settings.boundarySlot(),
-            action(
-                "arena.editor.assistant-boundary",
-                AdministrativeCommandPolicy.ARENA_EDIT,
-                placeholders(arena, validation),
-                context -> context.open(boundary(playerId, id, expected))))
-        .button(
-            settings.validationSlot(),
-            GuiButton.builder()
-                .itemKey(
-                    validation.valid()
-                        ? "arena.editor.assistant-review-ready"
-                        : "arena.editor.assistant-review")
-                .itemPlaceholders(context -> placeholders(arena, validation))
-                .onLeftClick(context -> context.open(validation(playerId, id)))
-                .build())
-        .button(settings.enableSlot(), activationButton(playerId, arena, expected, validation))
-        .button(
-            settings.deleteSlot(),
-            action(
-                "arena.editor.assistant-delete",
-                AdministrativeCommandPolicy.ARENA_DELETE,
-                placeholders(arena, validation),
-                context -> context.open(deleteConfirmation(playerId, id, false))))
-        .button(
-            settings.editorBackSlot(),
-            GuiButton.builder()
-                .itemKey("gui.back")
-                .onLeftClick(context -> context.replace(list(playerId)))
-                .build())
-        .button(
-            settings.editorRefreshSlot(),
-            GuiButton.builder()
-                .itemKey("gui.refresh")
-                .onLeftClick(context -> context.replace(editor(playerId, id)))
-                .build())
-        .button(settings.editorCloseSlot(), standard.close())
-        .build();
+    Gui.Builder builder =
+        Gui.builder()
+            .id("arena.editor." + id)
+            .title(message("arena.gui.editor.assistant-title", placeholders(arena, validation)))
+            .rows(settings.editorRows())
+            .fillEmptySlots(true)
+            .data("arena_id", id)
+            .data("arena_revision", expected)
+            .button(settings.informationSlot(), infoButton(arena, validation))
+            .button(
+                settings.worldSlot(),
+                GuiButton.builder()
+                    .itemKey("arena.editor.assistant-map-v5")
+                    .itemPlaceholders(context -> placeholders(arena, validation))
+                    .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+                    .onLeftClick(context -> context.open(mapTemplates(playerId, id, expected)))
+                    .onRightClick(
+                        context ->
+                            withPlayer(
+                                playerId,
+                                player ->
+                                    mutate(
+                                        context,
+                                        playerId,
+                                        id,
+                                        arenas.setWorld(id, player.getWorld().getName(), expected),
+                                        "world")))
+                    .build())
+            .button(
+                settings.waitingSlot(), positionButton(playerId, arena, expected, true, validation))
+            .button(
+                settings.spectatorSlot(),
+                positionButton(playerId, arena, expected, false, validation))
+            .button(
+                settings.teamsSlot(),
+                action(
+                    "arena.editor.assistant-teams-v5",
+                    AdministrativeCommandPolicy.ARENA_EDIT,
+                    placeholders(arena, validation),
+                    context -> context.open(teams(playerId, id, expected))))
+            .button(
+                settings.validationSlot(),
+                GuiButton.builder()
+                    .itemKey(
+                        validation.valid()
+                            ? "arena.editor.assistant-review-ready-v5"
+                            : "arena.editor.assistant-review-v5")
+                    .itemPlaceholders(context -> placeholders(arena, validation))
+                    .onLeftClick(context -> context.open(validation(playerId, id)))
+                    .build())
+            .button(settings.enableSlot(), activationButton(playerId, arena, expected, validation))
+            .button(
+                settings.deleteSlot(),
+                action(
+                    "arena.editor.assistant-delete-v5",
+                    AdministrativeCommandPolicy.ARENA_DELETE,
+                    placeholders(arena, validation),
+                    context -> context.open(deleteConfirmation(playerId, id, false))))
+            .button(
+                settings.editorBackSlot(),
+                GuiButton.builder()
+                    .itemKey("gui.back")
+                    .onLeftClick(context -> context.replace(list(playerId)))
+                    .build())
+            .button(settings.editorCloseSlot(), standard.close());
+    for (int index = 0;
+        index < Math.min(settings.teamSlots().size(), arena.teams().size());
+        index++) {
+      ArenaTeamDefinition team = arena.teams().get(index);
+      Map<String, Object> values = teamPlaceholders(arena, validation, team);
+      builder.button(
+          settings.teamSlots().get(index),
+          GuiButton.builder()
+              .itemKey(teamEntryKey(team.color()))
+              .itemPlaceholders(context -> values)
+              .permission(AdministrativeCommandPolicy.ARENA_EDIT)
+              .onLeftClick(context -> context.open(teamEditor(playerId, id, team.id(), expected)))
+              .build());
+    }
+    return builder.build();
   }
 
   public Gui worlds(UUID playerId, String id, long expected) {
@@ -685,7 +676,7 @@ public final class ArenaEditorMenuFactory {
         Gui.builder()
             .id("arena.team." + id + '.' + team.id().value())
             .title(message("arena.teams.team-title", values))
-            .rows(5)
+            .rows(4)
             .fillEmptySlots(true)
             .button(
                 4,
@@ -712,12 +703,6 @@ public final class ArenaEditorMenuFactory {
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
-                13,
-                GuiButton.builder()
-                    .itemKey("arena.teams.future-features")
-                    .itemPlaceholders(context -> values)
-                    .build())
-            .button(
                 19,
                 action(
                     "arena.teams.set-spawn",
@@ -732,19 +717,19 @@ public final class ArenaEditorMenuFactory {
                     values,
                     context -> selectTeamBed(context, playerId, arena, team, expected)))
             .button(
-                36,
+                27,
                 GuiButton.builder()
                     .itemKey("gui.back")
-                    .onLeftClick(context -> context.replace(teams(playerId, id, arena.revision())))
+                    .onLeftClick(context -> context.replace(editor(playerId, id)))
                     .build())
             .button(
-                40,
+                31,
                 GuiButton.builder()
                     .itemKey("arena.teams.review")
                     .itemPlaceholders(context -> values)
                     .onLeftClick(context -> context.open(validation(playerId, id)))
                     .build())
-            .button(44, standard.close());
+            .button(35, standard.close());
     if (team.spawn().isPresent()) {
       builder
           .button(
@@ -962,7 +947,8 @@ public final class ArenaEditorMenuFactory {
       ArenaValidationResult validation) {
     Optional<ArenaLocation> location =
         waiting ? arena.waitingLocation() : arena.spectatorLocation();
-    String key = waiting ? "arena.editor.assistant-waiting" : "arena.editor.assistant-spectator";
+    String key =
+        waiting ? "arena.editor.assistant-waiting-v5" : "arena.editor.assistant-spectator-v5";
     return GuiButton.builder()
         .itemKey(key)
         .itemPlaceholders(context -> positionPlaceholders(arena, validation, location))
@@ -1054,13 +1040,13 @@ public final class ArenaEditorMenuFactory {
       UUID playerId, ArenaDefinition arena, long expected, ArenaValidationResult validation) {
     if (!arena.enabled() && !validation.valid())
       return GuiButton.builder()
-          .itemKey("arena.editor.assistant-activation-blocked")
+          .itemKey("arena.editor.assistant-activation-blocked-v5")
           .itemPlaceholders(context -> placeholders(arena, validation))
           .onLeftClick(context -> context.open(validation(playerId, arena.id().value())))
           .build();
     if (arena.enabled())
       return GuiButton.builder()
-          .itemKey("arena.editor.assistant-runtime-ready")
+          .itemKey("arena.editor.assistant-runtime-ready-v5")
           .itemPlaceholders(context -> placeholders(arena, validation))
           .onLeftClick(context -> launchOrJoin(context, playerId, arena.id().value()))
           .onRightClick(
@@ -1068,7 +1054,7 @@ public final class ArenaEditorMenuFactory {
                   context.open(activationConfirmation(playerId, arena.id().value(), expected)))
           .build();
     return action(
-        "arena.editor.assistant-activation-ready",
+        "arena.editor.assistant-activation-ready-v5",
         AdministrativeCommandPolicy.ARENA_ENABLE,
         placeholders(arena, validation),
         context -> context.open(activationConfirmation(playerId, arena.id().value(), expected)));
@@ -1154,7 +1140,7 @@ public final class ArenaEditorMenuFactory {
 
   private GuiButton infoButton(ArenaDefinition arena, ArenaValidationResult validation) {
     return GuiButton.builder()
-        .itemKey("arena.editor.assistant-progress")
+        .itemKey("arena.editor.assistant-progress-v5")
         .itemPlaceholders(context -> placeholders(arena, validation))
         .build();
   }

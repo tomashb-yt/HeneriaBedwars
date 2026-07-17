@@ -1,5 +1,11 @@
 # Système de menus interne
 
+## Assistant d'arène compact v5
+
+La vue principale tient sur cinq lignes. La première zone contient la progression; la seconde la carte, le spawn d'attente, le spawn spectateur et le format. La zone centrale affiche directement jusqu'à huit laines d'équipe avec état du spawn et du lit. La barre inférieure conserve uniquement retour, activation/test, validation, suppression et fermeture. Le nom, la plage de joueurs, les limites et l'actualisation explicite ont été retirés de cette vue car les mutations reconstruisent déjà le menu et les écrans avancés restent disponibles ailleurs.
+
+La fiche d'une carte possède aussi l'action **Importer une carte BedWars**. Si le dépôt `maps/templates/<id>/import/` n'est pas prêt, le joueur reçoit le chemin exact et la structure attendue. Sinon une confirmation explique fermeture, sauvegarde et remplacement avant de lancer l'opération suivie.
+
 ## Fiche guidée d'une équipe
 
 Le menu « Équipes » n'enregistre plus une position par effet secondaire du clic. Il affiche jusqu'à huit laines colorées avec capacité, état du spawn, état du lit et préparation. Un clic ouvre une fiche dédiée qui sépare les actions `définir`, `téléporter` et `retirer` pour chaque position.

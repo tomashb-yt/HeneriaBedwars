@@ -13,20 +13,18 @@ public record ArenaEditorSettings(
     int nextPageSlot,
     int editorRows,
     int informationSlot,
-    int displayNameSlot,
     int worldSlot,
     int waitingSlot,
     int spectatorSlot,
-    int playersSlot,
     int teamsSlot,
-    int boundarySlot,
+    List<Integer> teamSlots,
     int validationSlot,
     int enableSlot,
     int deleteSlot,
     int editorBackSlot,
-    int editorRefreshSlot,
     int editorCloseSlot) {
   public ArenaEditorSettings {
     contentSlots = List.copyOf(contentSlots);
+    teamSlots = List.copyOf(teamSlots);
   }
 }

@@ -1,5 +1,11 @@
 # Configuration
 
+## Assistant d'arène v5 et import de carte
+
+`menus.yml` utilise `arena-editor.assistant-v5` pour la vue essentielle sur cinq lignes. Les clés règlent les slots `information`, `world`, `waiting`, `spectator`, `teams`, la liste `team-slots`, puis `validation`, `enable`, `delete`, `back` et `close`. Le nouveau namespace est fusionné dans les anciennes installations sans écraser leur ancien bloc `arena-editor.editor`.
+
+Une création ou un reload assure l'existence de `maps/templates/<id>/import/LISEZ-MOI.txt`. Le contenu du monde externe doit être copié dans `import/` avec `level.dat` à sa racine. Aucun réglage n'autorise un chemin externe; les dossiers du monde actif restent sous le conteneur Bukkit et les archives sous `backups/maps/`.
+
 ## Cycle de vie
 
 Les ressources par défaut sont embarquées dans `bedwars-plugin/src/main/resources`. Au premier démarrage, seules les ressources absentes sont copiées en UTF-8; aucun fichier existant n'est écrasé. Les dossiers `arenas`, `languages`, `backups`, `maps/templates`, `maps/metadata` et `instances` sont créés. Chaque YAML doit contenir `config-version: 1`.

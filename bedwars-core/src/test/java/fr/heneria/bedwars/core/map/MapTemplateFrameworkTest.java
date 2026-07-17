@@ -129,6 +129,24 @@ class MapTemplateFrameworkTest {
   }
 
   @Test
+  void importLifecycleUnloadsBacksUpReplacesAndReloadsAsBedWars() {
+    Fixture fixture = new Fixture();
+    fixture.service.create("desert", MapType.GENERIC, "Admin");
+    fixture.files.importReady = true;
+
+    assertTrue(fixture.service.prepareImport("desert").successful());
+    assertFalse(fixture.worlds.loaded);
+    assertTrue(fixture.service.completeImportFiles("desert").successful());
+    MapOperationResult finished = fixture.service.finishImport("desert");
+
+    assertTrue(finished.successful());
+    assertTrue(fixture.files.replaced);
+    assertEquals(1, fixture.files.backups);
+    assertEquals(MapType.BEDWARS, finished.template().orElseThrow().type());
+    assertTrue(finished.template().orElseThrow().loaded());
+  }
+
+  @Test
   void deletionRequiresBackupAndRefusesLinkedTemplate() throws Exception {
     Fixture fixture = new Fixture();
     MapTemplate created =
@@ -330,9 +348,27 @@ class MapTemplateFrameworkTest {
     final java.util.Set<MapId> existing = new java.util.HashSet<>();
     boolean failCopy;
     boolean failBackup;
+    boolean importReady;
+    boolean replaced;
+    int backups;
 
     @Override
     public void createTemplateDirectory(MapTemplate template) {
+      existing.add(template.id());
+    }
+
+    @Override
+    public void ensureImportDirectory(MapTemplate template) {}
+
+    @Override
+    public boolean importReady(MapTemplate template) {
+      return importReady;
+    }
+
+    @Override
+    public void replaceFromImport(MapTemplate template) throws IOException {
+      if (!importReady) throw new IOException("import");
+      replaced = true;
       existing.add(template.id());
     }
 
@@ -346,6 +382,7 @@ class MapTemplateFrameworkTest {
     public void backup(MapTemplate template, String reason, String pluginVersion)
         throws IOException {
       if (failBackup) throw new IOException("backup");
+      backups++;
     }
 
     @Override

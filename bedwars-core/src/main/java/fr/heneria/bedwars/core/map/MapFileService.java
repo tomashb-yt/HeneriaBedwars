@@ -11,6 +11,15 @@ import java.io.IOException;
 public interface MapFileService {
   void createTemplateDirectory(MapTemplate template) throws IOException;
 
+  /** Ensures the administrator-facing, per-map import folder exists. */
+  void ensureImportDirectory(MapTemplate template) throws IOException;
+
+  /** Returns whether the confined import folder contains a complete Minecraft world. */
+  boolean importReady(MapTemplate template);
+
+  /** Replaces the unloaded working world from its confined import folder. */
+  void replaceFromImport(MapTemplate template) throws IOException;
+
   void duplicate(MapTemplate source, MapTemplate destination) throws IOException;
 
   void backup(MapTemplate template, String reason, String pluginVersion) throws IOException;

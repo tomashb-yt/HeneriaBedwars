@@ -288,6 +288,17 @@ items:
       assistant-runtime-ready: {material: ENDER_EYE, glow: true, name: "<aqua><bold>Tester l'arène", lore: ["<gray>L'arène est active et prête.", "<gray>Une instance sera créée automatiquement", "<gray>si aucune n'existe encore.", "", "<green>▸ Gauche : lancer ou rejoindre", "<yellow>▸ Droit : désactiver"]}
       assistant-disable: {material: GRAY_DYE, name: "<yellow>Désactiver l'arène", lore: ["<gray>La configuration sera conservée.", "", "<yellow>▸ Cliquez pour confirmer"]}
       assistant-delete: {material: TNT, name: "<red>Supprimer définitivement", lore: ["<gray>Une sauvegarde sera créée avant", "<gray>la suppression de l'arène.", "", "<red>▸ Cliquez pour continuer"]}
+      assistant-progress-v5: {material: NETHER_STAR, glow: true, name: "<aqua><bold>Configuration de {arena_name}", lore: ["<gray>Progression : <white>{setup_percent}%", "<gray>Équipes prêtes : <white>{team_spawns_configured}/{team_count}", "<gray>Lits placés : <white>{team_beds_configured}/{team_count}", "", "<yellow>À faire : <white>{next_step}", "<dark_gray>Sauvegarde automatique"]}
+      assistant-map-v5: {material: GRASS_BLOCK, name: "<green><bold>Carte BedWars", lore: ["<gray>Carte : <white>{map_template}", "<gray>Monde : <white>{world}", "", "<yellow>▸ Choisir, créer ou remplacer la carte"]}
+      assistant-waiting-v5: {material: CLOCK, name: "<gold><bold>Spawn d'attente", lore: ["<gray>Les joueurs attendent ici avant", "<gray>le démarrage de la partie.", "", "<yellow>Gauche : placer ici", "<aqua>Droit : téléporter", "<red>Shift+droit : retirer"]}
+      assistant-spectator-v5: {material: ENDER_EYE, name: "<aqua><bold>Spawn spectateur", lore: ["<gray>Point d'arrivée après élimination.", "", "<yellow>Gauche : placer ici", "<aqua>Droit : téléporter", "<red>Shift+droit : retirer"]}
+      assistant-teams-v5: {material: WHITE_BANNER, name: "<light_purple><bold>Format des équipes", lore: ["<gray>Format : <white>{team_count} × {players_per_team}", "<gray>Capacité : <white>{capacity} joueurs", "", "<yellow>▸ Modifier le nombre et la taille", "<gray>Les équipes colorées sont juste dessous."]}
+      assistant-review-v5: {material: ORANGE_CONCRETE, name: "<gold><bold>Configuration à terminer", lore: ["<red>{validation_errors} erreur(s)", "<yellow>{validation_warnings} conseil(s)", "", "<white>{next_step}", "<yellow>▸ Voir les actions requises"]}
+      assistant-review-ready-v5: {material: LIME_CONCRETE, glow: true, name: "<green><bold>Configuration complète", lore: ["<gray>La carte, les spawns et les équipes", "<gray>sont correctement configurés.", "", "<yellow>▸ Voir le récapitulatif"]}
+      assistant-activation-ready-v5: {material: LIME_DYE, name: "<green><bold>Activer l'arène", lore: ["<gray>Rend cette arène disponible", "<gray>dans la sélection des parties.", "", "<yellow>▸ Cliquez pour confirmer"]}
+      assistant-activation-blocked-v5: {material: IRON_BARS, name: "<red><bold>Activation verrouillée", lore: ["<gray>Il reste <white>{validation_errors}<gray> action(s)", "<gray>obligatoire(s) à terminer.", "", "<yellow>▸ Voir les actions requises"]}
+      assistant-runtime-ready-v5: {material: ENDER_PEARL, glow: true, name: "<aqua><bold>Tester l'arène", lore: ["<gray>L'arène est active.", "", "<green>Gauche : lancer ou rejoindre", "<yellow>Droit : désactiver"]}
+      assistant-delete-v5: {material: TNT, name: "<red>Supprimer l'arène", lore: ["<gray>Une sauvegarde de la configuration", "<gray>sera créée avant suppression.", "", "<red>▸ Cliquez pour continuer"]}
     world:
       entry: {material: GRASS_BLOCK, name: "<green>{world}", lore: ["<gray>Environnement: <white>{environment}", "<gray>Joueurs: <white>{world_players}", "<gray>Monde actuel: <white>{world_current}", "<gray>Selectionne: <white>{world_selected}", "<white>Gauche: selectionner", "<white>Droit: teleporter"]}
     players:
@@ -451,6 +462,7 @@ items:
       associations-v4: {material: CHAIN, name: "<yellow>Arenes associees", lore: ["<gray>Total : <white>{arena_count}", "<gray>{linked_arenas}", "<yellow>Cliquez pour gerer"]}
       validation-v4: {material: SPYGLASS, name: "<gold>Verifier la carte", lore: ["<red>{validation_errors} erreur(s)", "<yellow>{validation_warnings} avertissement(s)", "<yellow>Cliquez pour les details"]}
       backup-v4: {material: ENDER_CHEST, name: "<aqua>Sauvegarde complete", lore: ["<gray>Cree une archive sans bloquer le serveur."]}
+      import-v5: {material: FILLED_MAP, glow: true, name: "<green><bold>Importer une carte BedWars", lore: ["<gray>Dossier : <white>{import_path}", "<gray>Prête : <white>{import_ready}", "", "<yellow>1. Déposez le monde dans ce dossier", "<yellow>2. Cliquez ici pour remplacer", "", "<red>L'ancienne carte sera sauvegardée."]}
       duplicate-v4: {material: STRUCTURE_BLOCK, name: "<gold>Dupliquer", lore: ["<gray>Copie le dossier et les metadonnees."]}
       delete-v4: {material: TNT, name: "<red><bold>Supprimer", lore: ["<gray>Sauvegarde obligatoire avant suppression.", "<red>Les cartes protegees restent bloquees."]}
       save-v4: {material: CHEST, name: "<aqua>Sauvegarder", lore: ["<gray>Enregistre blocs et metadonnees."]}
@@ -517,6 +529,8 @@ items:
       failed-v4: {material: RED_CONCRETE, name: "<red><bold>Operation echouee", lore: ["<gray>{operation_detail}"]}
     duplicate:
       summary-v4: {material: STRUCTURE_BLOCK, name: "<gold><bold>Confirmer la copie", lore: ["<gray>Source : <white>{map_id}", "<gray>Destination : <white>{destination_id}"]}
+    import:
+      summary-v5: {material: FILLED_MAP, glow: true, name: "<gold><bold>Remplacer {map_name} ?", lore: ["<gray>Source : <white>{import_path}", "", "<yellow>Le monde ouvert sera fermé.", "<yellow>L'ancienne version sera sauvegardée.", "<yellow>Le nouveau monde sera chargé.", "", "<red>Vérifiez que level.dat est présent."]}
   game:
     public:
       general:

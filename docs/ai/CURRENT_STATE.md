@@ -1,5 +1,13 @@
 # État actuel
 
+## Correctif UX et import de cartes — 2026-07-17
+
+- assistant principal d'arène réduit à cinq lignes et centré sur carte, attente, spectateur et équipes;
+- huit équipes colorées configurables directement depuis la vue principale;
+- dossier `maps/templates/<id>/import/` créé pour chaque carte avec instructions locales;
+- remplacement de monde BedWars depuis le menu, sauvegarde préalable, copie asynchrone, rollback et rechargement;
+- tests automatisés dédiés au stockage et au cycle d'import; validation Paper réelle encore requise.
+
 - Dernier ticket terminé : Ticket 011. Le Ticket 012 reste en cours et ne doit pas être considéré comme livré.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.

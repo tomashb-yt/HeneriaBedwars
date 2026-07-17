@@ -85,6 +85,44 @@ class MapStorageTest {
   }
 
   @Test
+  void everyCreatedMapGetsAnAdministratorImportFolder() throws Exception {
+    SecureMapFileService files = fileService(root.resolve("worlds"));
+
+    files.createTemplateDirectory(template("desert"));
+
+    Path imports = root.resolve("markers/desert/import");
+    assertTrue(Files.isDirectory(imports));
+    assertTrue(Files.isRegularFile(imports.resolve("LISEZ-MOI.txt")));
+    assertFalse(files.importReady(template("desert")));
+  }
+
+  @Test
+  void stagedBedWarsWorldAtomicallyReplacesWorkingWorldAndKeepsSource() throws Exception {
+    Path worlds = root.resolve("worlds");
+    SecureMapFileService files = fileService(worlds);
+    MapTemplate template = template("desert");
+    files.createTemplateDirectory(template);
+    Path imports = root.resolve("markers/desert/import");
+    Files.createDirectories(imports.resolve("region"));
+    Files.writeString(imports.resolve("level.dat"), "new-level");
+    Files.writeString(imports.resolve("region/r.0.0.mca"), "new-blocks");
+    Files.writeString(imports.resolve("uid.dat"), "external-id");
+    Path current = worlds.resolve("hbw_template_desert");
+    Files.createDirectories(current);
+    Files.writeString(current.resolve("level.dat"), "old-level");
+
+    assertTrue(files.importReady(template));
+    files.replaceFromImport(template);
+
+    assertEquals("new-level", Files.readString(current.resolve("level.dat")));
+    assertEquals("new-blocks", Files.readString(current.resolve("region/r.0.0.mca")));
+    assertFalse(Files.exists(current.resolve("uid.dat")));
+    assertTrue(Files.exists(imports.resolve("level.dat")));
+    assertFalse(Files.exists(worlds.resolve(".hbw_template_desert.import.tmp")));
+    assertFalse(Files.exists(worlds.resolve(".hbw_template_desert.previous.tmp")));
+  }
+
+  @Test
   void backupContainsWorldMetadataAndManifestBeforeDeletion() throws Exception {
     Path worlds = root.resolve("worlds");
     Files.createDirectories(worlds.resolve("hbw_template_desert"));

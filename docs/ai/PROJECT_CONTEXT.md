@@ -1,5 +1,9 @@
 # Contexte du projet
 
+État correctif UX du 2026-07-17 : l'assistant d'arène principal tient sur cinq lignes et expose directement les équipes colorées. Les opérations essentielles sont carte, attente, spectateur, format, spawn/lit de chaque équipe, validation et activation. Les réglages avancés ne saturent plus cette vue.
+
+Chaque `MapTemplate` possède un dépôt administrateur confiné `maps/templates/<id>/import/`. La présence de `level.dat` autorise un remplacement guidé : déchargement Bukkit sur le thread serveur, sauvegarde et copie hors thread, échange avec restauration de secours, puis rechargement sur le thread serveur. Aucun chemin fourni par l'utilisateur n'est accepté.
+
 Etat correctif 010.1 : la surface `/bedwars` est administrative, tandis que `game join|leave` forme la petite surface publique temporaire. Les items du lobby sont authentifiés par PDC et délèguent au service métier; l'information joueur est séparée des menus administratifs. Le scoreboard d'attente est localisé, configurable et incrémental.
 
 Le Ticket 011 ajoutera deux axes indépendants : équipes BedWars détaillées et navigateur public `/bw`. Le livre d'un joueur déjà présent reste informatif; seul le navigateur avant join pourra proposer l'action rejoindre.

@@ -1,5 +1,11 @@
 # Historique des tickets
 
+## Correctif UX et remplacement de cartes — 2026-07-17
+
+L'assistant d'arène a été recentré sur les opérations réellement nécessaires : carte, spawn d'attente, spawn spectateur, format, équipes colorées, validation et activation. Les fiches d'équipe sont accessibles directement et leur retour ramène à l'assistant. Les réglages secondaires ne surchargent plus la vue principale.
+
+Chaque carte dispose maintenant d'un dossier d'import documenté. Le menu vérifie `level.dat`, ferme le monde, sauvegarde la version actuelle, remplace le dossier de façon confinée et asynchrone, restaure l'ancienne cible si l'échange échoue puis recharge le monde comme carte `BEDWARS`. Les liens d'arène et métadonnées restent conservés. Validation : 165 tests réussis, aucun échec ni test ignoré, build propre, Spotless et Shadow JAR validés; essai Paper réel restant.
+
 ## Correctif de préparation Ticket 012 — configuration des équipes
 
 Ajouté le 2026-07-17 après constat en jeu que les sous-commandes d'équipe étaient invisibles et que le clic du menu modifiait directement le spawn. Le menu général affiche maintenant un résumé spawn/lit et ouvre une fiche colorée par équipe. Cette fiche sépare définir, téléporter et retirer; chaque mutation sauvegarde puis reste sur la fiche avec la nouvelle révision.

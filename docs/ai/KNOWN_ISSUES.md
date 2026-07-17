@@ -1,5 +1,11 @@
 # Limitations connues
 
+## Import de cartes externes
+
+- Le monde importé doit correspondre à la version Minecraft du serveur; le plugin ne convertit pas les formats de chunks.
+- L'opération est couverte par tests de fichiers, mais l'évacuation, le déchargement et le rechargement doivent encore être validés sur un serveur Paper réel.
+- Après remplacement, les coordonnées administratives conservées peuvent ne plus correspondre au nouveau build : revérifier attente, spectateur, spawns et lits depuis l'assistant avant activation.
+
 ## Préparation Ticket 012 — configuration des équipes
 
 - La sélection GUI doit encore être validée sur Paper : l'administrateur doit être dans le monde modèle, regarder un lit complet à moins de huit blocs avant de cliquer sur « Sélectionner le lit regardé ».

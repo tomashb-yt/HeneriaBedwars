@@ -37,22 +37,19 @@ arena-editor:
     sort-slot: 51
     previous-page-slot: 45
     next-page-slot: 53
-  editor:
-    rows: 6
+  assistant-v5:
+    rows: 5
     information-slot: 4
-    display-name-slot: 10
-    world-slot: 12
-    waiting-slot: 14
-    spectator-slot: 16
-    players-slot: 20
-    teams-slot: 22
-    boundary-slot: 24
-    validation-slot: 31
-    enable-slot: 39
-    delete-slot: 41
-    back-slot: 45
-    refresh-slot: 49
-    close-slot: 53
+    world-slot: 10
+    waiting-slot: 12
+    spectator-slot: 14
+    teams-slot: 16
+    team-slots: [19, 20, 21, 22, 23, 24, 25, 31]
+    validation-slot: 40
+    enable-slot: 38
+    delete-slot: 42
+    back-slot: 36
+    close-slot: 44
 map-editor:
   list:
     rows: 6
@@ -78,6 +75,7 @@ map-editor:
     settings-slot: 21
     workflow-slot: 22
     associations-slot: 23
+    import-slot: 24
     validation-slot: 25
     backup-slot: 29
     duplicate-slot: 31

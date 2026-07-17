@@ -442,6 +442,7 @@ map:
       create-input: "<yellow>Enter the new arena id."
     validation: {title: "<gold>Validation of {map_name}"}
     operation: {title: "<yellow>Operation on {map_name}"}
+    import: {confirm-title: "<gold>Replace map {map_name}?"}
     display-name-input: "<yellow>Enter the new display name for {map_name}."
     duplicate:
       input: "<yellow>Enter the id for the copy of {map_name}."
@@ -461,7 +462,7 @@ map:
   workflow:
     next: {spawn: "Set the arrival point", save: "Save the map", link-arena: "Link or create an arena", select-lobby: "Select this map as the main lobby", complete: "Setup complete"}
   operation:
-    type: {duplicate: "Duplication", backup: "Full backup", delete: "Deletion"}
+    type: {duplicate: "Duplication", backup: "Full backup", import: "BedWars map import", delete: "Deletion"}
     status: {pending: "pending", running: "running", success: "complete", failed: "failed", cancelled: "cancelled"}
   validation:
     problem:
@@ -496,6 +497,9 @@ map:
     association-success: "<green>Association updated."
     entered: "<green>You are now inside <white>{map_name}<green>."
     teleported: "<green>Teleported to the arrival point."
+  import:
+    missing: "<yellow>First place the world contents in <white>{import_path}<yellow>. The <white>level.dat<yellow> file must be directly inside this folder."
+    success: "<green>Map <white>{map_name}<green> was replaced and opened. The previous version was backed up. You can now configure spawns and beds from the arena."
   error:
     not-found: "<red>Map not found."
     already-exists: "<red>This id already exists."
@@ -512,6 +516,8 @@ map:
     world-unload: "<red>Could not close the world."
     world-settings: "<red>Could not apply the world settings."
     copy: "<red>Copy failed."
+    import-not-ready: "<red>The import folder does not contain a valid world. Make sure level.dat is directly inside it."
+    import: "<red>Map replacement failed. The previous map was preserved or restored."
     backup: "<red>Full backup failed."
     conflict: "<red>The map changed. Refresh the menu."
     invalid-type: "<red>This map type is incompatible with its links."

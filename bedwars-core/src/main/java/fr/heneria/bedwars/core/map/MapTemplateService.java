@@ -109,6 +109,12 @@ public final class MapTemplateService {
         loaded.templates().stream()
             .map(
                 template -> {
+                  try {
+                    files.ensureImportDirectory(template);
+                  } catch (IOException exception) {
+                    return template.failed(
+                        "Import folder unavailable: " + exception.getMessage(), now());
+                  }
                   List<String> problems = validator.validate(template);
                   if (!problems.isEmpty())
                     return template.failed(String.join(", ", problems), now());
@@ -441,6 +447,87 @@ public final class MapTemplateService {
     } finally {
       locks.release(template.id());
     }
+  }
+
+  /** Main-thread phase: validates the staged world, evacuates players and unloads the template. */
+  public MapOperationResult prepareImport(String rawId) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (!files.importReady(template))
+      return MapOperationResult.failure(MapOperationCode.IMPORT_NOT_READY, template, rawId);
+    if (!locks.acquire(template.id()))
+      return MapOperationResult.failure(MapOperationCode.OPERATION_IN_PROGRESS, template, rawId);
+    try {
+      if (worlds.isLoaded(template)) {
+        MapWorldResult unloaded = worlds.unload(template, true);
+        if (!unloaded.successful()) {
+          locks.release(template.id());
+          return MapOperationResult.failure(
+              MapOperationCode.WORLD_UNLOAD_FAILED, template, unloaded.detail());
+        }
+      }
+      MapTemplate unloaded =
+          template.loaded() || template.state() != MapState.UNLOADED
+              ? template.unloadedAt(now())
+              : template;
+      if (unloaded != template) {
+        registry.put(unloaded);
+        repository.save(unloaded);
+      }
+      return MapOperationResult.success(unloaded);
+    } catch (IOException exception) {
+      locks.release(template.id());
+      return MapOperationResult.failure(
+          MapOperationCode.STORAGE_ERROR, template, exception.getMessage());
+    }
+  }
+
+  /** Asynchronous phase: archives the old world then swaps in the staged BedWars world. */
+  public MapOperationResult completeImportFiles(String rawId) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (!locks.active(template.id()))
+      return MapOperationResult.failure(MapOperationCode.INVALID_ARGUMENT, template, rawId);
+    try {
+      if (files.templateExists(template)) files.backup(template, "IMPORT_REPLACE", pluginVersion);
+      files.replaceFromImport(template);
+      return MapOperationResult.success(template);
+    } catch (IOException exception) {
+      locks.release(template.id());
+      return MapOperationResult.failure(
+          MapOperationCode.IMPORT_FAILED, template, exception.getMessage());
+    }
+  }
+
+  /** Main-thread phase: publishes BedWars metadata and loads the newly imported world. */
+  public MapOperationResult finishImport(String rawId) {
+    MapTemplate template = find(rawId).orElse(null);
+    if (template == null) return MapOperationResult.failure(MapOperationCode.NOT_FOUND, rawId);
+    if (!locks.active(template.id()))
+      return MapOperationResult.failure(MapOperationCode.INVALID_ARGUMENT, template, rawId);
+    try {
+      MapTemplate bedWars =
+          template.type() == MapType.BEDWARS ? template : template.withType(MapType.BEDWARS, now());
+      MapWorldResult loaded = worlds.load(bedWars);
+      if (!loaded.successful())
+        return MapOperationResult.failure(
+            MapOperationCode.WORLD_LOAD_FAILED, bedWars, loaded.detail());
+      MapTemplate updated = bedWars.loadedAt(now());
+      repository.save(updated);
+      registry.put(updated);
+      return MapOperationResult.success(updated);
+    } catch (IOException exception) {
+      if (worlds.isLoaded(template)) worlds.unload(template, false);
+      registry.put(template.normalized(MapState.UNLOADED));
+      return MapOperationResult.failure(
+          MapOperationCode.STORAGE_ERROR, template, exception.getMessage());
+    } finally {
+      locks.release(template.id());
+    }
+  }
+
+  public boolean importReady(String rawId) {
+    return find(rawId).filter(files::importReady).isPresent();
   }
 
   public boolean protectedTemplate(String rawId) {

@@ -435,9 +435,10 @@ public final class ConfigurationSnapshotFactory {
   }
 
   private static ArenaEditorSettings arenaEditor(Reader menus) {
+    String assistant = "arena-editor.assistant-v5.";
     int listRows = menus.integer("arena-editor.list.rows", 6, 1, 6);
     int listSize = listRows * 9;
-    int editorRows = menus.integer("arena-editor.editor.rows", 6, 1, 6);
+    int editorRows = menus.integer(assistant + "rows", 5, 1, 6);
     int editorSize = editorRows * 9;
     List<Integer> contentSlots =
         menus.integerList(
@@ -451,23 +452,19 @@ public final class ConfigurationSnapshotFactory {
     int previousSlot = menus.integer("arena-editor.list.previous-page-slot", 45, 0, listSize - 1);
     int nextSlot = menus.integer("arena-editor.list.next-page-slot", 53, 0, listSize - 1);
 
-    int informationSlot =
-        menus.integer("arena-editor.editor.information-slot", 4, 0, editorSize - 1);
-    int displayNameSlot =
-        menus.integer("arena-editor.editor.display-name-slot", 10, 0, editorSize - 1);
-    int worldSlot = menus.integer("arena-editor.editor.world-slot", 12, 0, editorSize - 1);
-    int waitingSlot = menus.integer("arena-editor.editor.waiting-slot", 14, 0, editorSize - 1);
-    int spectatorSlot = menus.integer("arena-editor.editor.spectator-slot", 16, 0, editorSize - 1);
-    int playersSlot = menus.integer("arena-editor.editor.players-slot", 20, 0, editorSize - 1);
-    int teamsSlot = menus.integer("arena-editor.editor.teams-slot", 22, 0, editorSize - 1);
-    int boundarySlot = menus.integer("arena-editor.editor.boundary-slot", 24, 0, editorSize - 1);
-    int validationSlot =
-        menus.integer("arena-editor.editor.validation-slot", 31, 0, editorSize - 1);
-    int enableSlot = menus.integer("arena-editor.editor.enable-slot", 39, 0, editorSize - 1);
-    int deleteSlot = menus.integer("arena-editor.editor.delete-slot", 41, 0, editorSize - 1);
-    int backSlot = menus.integer("arena-editor.editor.back-slot", 45, 0, editorSize - 1);
-    int refreshSlot = menus.integer("arena-editor.editor.refresh-slot", 49, 0, editorSize - 1);
-    int closeSlot = menus.integer("arena-editor.editor.close-slot", 53, 0, editorSize - 1);
+    int informationSlot = menus.integer(assistant + "information-slot", 4, 0, editorSize - 1);
+    int worldSlot = menus.integer(assistant + "world-slot", 10, 0, editorSize - 1);
+    int waitingSlot = menus.integer(assistant + "waiting-slot", 12, 0, editorSize - 1);
+    int spectatorSlot = menus.integer(assistant + "spectator-slot", 14, 0, editorSize - 1);
+    int teamsSlot = menus.integer(assistant + "teams-slot", 16, 0, editorSize - 1);
+    List<Integer> teamSlots =
+        menus.integerList(
+            assistant + "team-slots", List.of(19, 20, 21, 22, 23, 24, 25, 31), editorSize);
+    int validationSlot = menus.integer(assistant + "validation-slot", 40, 0, editorSize - 1);
+    int enableSlot = menus.integer(assistant + "enable-slot", 38, 0, editorSize - 1);
+    int deleteSlot = menus.integer(assistant + "delete-slot", 42, 0, editorSize - 1);
+    int backSlot = menus.integer(assistant + "back-slot", 36, 0, editorSize - 1);
+    int closeSlot = menus.integer(assistant + "close-slot", 44, 0, editorSize - 1);
 
     List<Integer> listSlots =
         combine(
@@ -481,25 +478,22 @@ public final class ConfigurationSnapshotFactory {
             listSize - 6,
             listSize - 4);
     List<Integer> editorSlots =
-        List.of(
+        combine(
+            teamSlots,
             informationSlot,
-            displayNameSlot,
             worldSlot,
             waitingSlot,
             spectatorSlot,
-            playersSlot,
             teamsSlot,
-            boundarySlot,
             validationSlot,
             enableSlot,
             deleteSlot,
             backSlot,
-            refreshSlot,
             closeSlot);
     validateSlotRange(menus, "arena-editor.list", listSlots, listSize);
-    validateSlotRange(menus, "arena-editor.editor", editorSlots, editorSize);
+    validateSlotRange(menus, "arena-editor.assistant-v5", editorSlots, editorSize);
     validateDistinctSlots(menus, "arena-editor.list", listSlots);
-    validateDistinctSlots(menus, "arena-editor.editor", editorSlots);
+    validateDistinctSlots(menus, "arena-editor.assistant-v5", editorSlots);
     return new ArenaEditorSettings(
         listRows,
         contentSlots,
@@ -510,18 +504,15 @@ public final class ConfigurationSnapshotFactory {
         nextSlot,
         editorRows,
         informationSlot,
-        displayNameSlot,
         worldSlot,
         waitingSlot,
         spectatorSlot,
-        playersSlot,
         teamsSlot,
-        boundarySlot,
+        teamSlots,
         validationSlot,
         enableSlot,
         deleteSlot,
         backSlot,
-        refreshSlot,
         closeSlot);
   }
 
@@ -567,6 +558,7 @@ public final class ConfigurationSnapshotFactory {
     int settings = menus.integer(root + "editor.settings-slot", 21, 0, editorSize - 1);
     int workflow = menus.integer(root + "editor.workflow-slot", 22, 0, editorSize - 1);
     int associations = menus.integer(root + "editor.associations-slot", 23, 0, editorSize - 1);
+    int importSlot = menus.integer(root + "editor.import-slot", 24, 0, editorSize - 1);
     int validation = menus.integer(root + "editor.validation-slot", 25, 0, editorSize - 1);
     int backup = menus.integer(root + "editor.backup-slot", 29, 0, editorSize - 1);
     int duplicate = menus.integer(root + "editor.duplicate-slot", 31, 0, editorSize - 1);
@@ -586,6 +578,7 @@ public final class ConfigurationSnapshotFactory {
             settings,
             workflow,
             associations,
+            importSlot,
             validation,
             backup,
             duplicate,
@@ -618,6 +611,7 @@ public final class ConfigurationSnapshotFactory {
         settings,
         workflow,
         associations,
+        importSlot,
         validation,
         backup,
         duplicate,

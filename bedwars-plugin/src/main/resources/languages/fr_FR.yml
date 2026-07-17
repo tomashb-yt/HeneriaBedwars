@@ -445,6 +445,8 @@ map:
       title: "<gold>Vérification de {map_name}"
     operation:
       title: "<yellow>Opération sur {map_name}"
+    import:
+      confirm-title: "<gold>Remplacer la carte {map_name} ?"
     display-name-input: "<yellow>Écrivez le nouveau nom visible de {map_name}."
     duplicate:
       input: "<yellow>Écrivez l'identifiant de la copie de {map_name}."
@@ -501,6 +503,7 @@ map:
     type:
       duplicate: "Duplication"
       backup: "Sauvegarde complète"
+      import: "Import d'une carte BedWars"
       delete: "Suppression"
     status:
       pending: "préparation"
@@ -541,6 +544,9 @@ map:
     association-success: "<green>Association mise à jour."
     entered: "<green>Vous êtes maintenant dans <white>{map_name}<green>."
     teleported: "<green>Téléportation vers le point d'arrivée."
+  import:
+    missing: "<yellow>Déposez d'abord le contenu du monde dans <white>{import_path}<yellow>. Le fichier <white>level.dat<yellow> doit être directement dans ce dossier."
+    success: "<green>La carte <white>{map_name}<green> a été remplacée et ouverte. L'ancienne version est sauvegardée. Configurez maintenant les spawns et les lits depuis l'arène."
   error:
     not-found: "<red>Carte introuvable."
     already-exists: "<red>Cet identifiant existe déjà."
@@ -557,6 +563,8 @@ map:
     world-unload: "<red>Impossible de fermer le monde."
     world-settings: "<red>Impossible d'appliquer les réglages du monde."
     copy: "<red>La copie a échoué."
+    import-not-ready: "<red>Le dossier d'import ne contient pas de monde valide. Vérifiez que level.dat est placé directement dedans."
+    import: "<red>Le remplacement de la carte a échoué. L'ancienne carte a été conservée ou restaurée."
     backup: "<red>La sauvegarde complète a échoué."
     conflict: "<red>La carte a changé. Actualisez le menu."
     invalid-type: "<red>Ce type de carte est incompatible avec ses associations."

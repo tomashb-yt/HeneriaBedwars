@@ -316,6 +316,13 @@ public final class MapMenuFactory {
                 values,
                 context -> context.open(associations(playerId, id))))
         .button(
+            layout.importSlot(),
+            action(
+                "map.editor.import-v5",
+                AdministrativeCommandPolicy.MAP_EDIT,
+                importPlaceholders(template),
+                context -> requestImport(playerId, template)))
+        .button(
             layout.validationSlot(),
             GuiButton.builder()
                 .itemKey("map.editor.validation-v4")
@@ -924,6 +931,94 @@ public final class MapMenuFactory {
             });
   }
 
+  private void requestImport(UUID playerId, MapTemplate template) {
+    if (!maps.importReady(template.id().value())) {
+      send(playerId, "map.import.missing", importPlaceholders(template));
+      return;
+    }
+    Player player = Bukkit.getPlayer(playerId);
+    if (player != null) gui.open(player, importConfirmation(playerId, template));
+  }
+
+  private Gui importConfirmation(UUID playerId, MapTemplate template) {
+    return ConfirmationGui.builder()
+        .id("map.import." + template.id())
+        .title(message("map.gui.import.confirm-title", importPlaceholders(template)))
+        .informationKey("map.import.summary-v5")
+        .informationPlaceholders(importPlaceholders(template))
+        .confirmItemKey("gui.confirm")
+        .cancelItemKey("gui.cancel")
+        .permission(AdministrativeCommandPolicy.MAP_EDIT)
+        .onCancel(context -> context.replace(info(playerId, template.id().value())))
+        .onConfirm(context -> beginImport(playerId, template.id().value()))
+        .build();
+  }
+
+  private void beginImport(UUID playerId, String id) {
+    MapTemplate template = maps.find(id).orElse(null);
+    if (template == null) {
+      openDashboard(playerId);
+      return;
+    }
+    if (operations.start(template.id(), MapOperationType.IMPORT, playerId, "preparing").isEmpty()) {
+      send(playerId, "map.error.operation-running", menuPlaceholders(template));
+      return;
+    }
+    MapOperationResult prepared = maps.prepareImport(id);
+    if (!prepared.successful()) {
+      operations.failed(template.id(), prepared.detail());
+      feedback(playerId, prepared);
+      return;
+    }
+    Player player = Bukkit.getPlayer(playerId);
+    if (player != null) gui.close(player);
+    states.state(playerId).followOperation(id);
+    operations.running(template.id(), "backup-and-copy");
+    Bukkit.getScheduler()
+        .runTaskAsynchronously(
+            plugin,
+            () -> {
+              MapOperationResult copied = maps.completeImportFiles(id);
+              if (!copied.successful()) {
+                operations.failed(template.id(), copied.detail());
+                Bukkit.getScheduler()
+                    .runTask(
+                        plugin,
+                        () -> {
+                          feedback(playerId, copied);
+                          Player online = Bukkit.getPlayer(playerId);
+                          if (online != null) gui.open(online, info(playerId, id));
+                        });
+                return;
+              }
+              Bukkit.getScheduler()
+                  .runTask(
+                      plugin,
+                      () -> {
+                        operations.running(template.id(), "loading-import");
+                        MapOperationResult result = maps.finishImport(id);
+                        if (result.successful()) {
+                          operations.success(template.id(), "complete");
+                          logger.info(
+                              "[Maps] "
+                                  + playerName(playerId)
+                                  + " replaced map '"
+                                  + id
+                                  + "' from its managed import folder.");
+                          send(
+                              playerId,
+                              "map.import.success",
+                              importPlaceholders(result.template().orElseThrow()));
+                        } else {
+                          operations.failed(template.id(), result.detail());
+                          feedback(playerId, result);
+                        }
+                        Player online = Bukkit.getPlayer(playerId);
+                        if (online != null) gui.open(online, info(playerId, id));
+                      });
+            });
+  }
+
   private void requestDisplayName(UUID playerId, MapTemplate template) {
     Player player = Bukkit.getPlayer(playerId);
     if (player == null) return;
@@ -1519,6 +1614,13 @@ public final class MapMenuFactory {
     return Map.copyOf(values);
   }
 
+  private Map<String, Object> importPlaceholders(MapTemplate template) {
+    Map<String, Object> values = new LinkedHashMap<>(menuPlaceholders(template));
+    values.put("import_path", "maps/templates/" + template.folderName() + "/import");
+    values.put("import_ready", maps.importReady(template.id().value()));
+    return Map.copyOf(values);
+  }
+
   private Map<String, Object> operationValues(MapOperationSnapshot operation) {
     long seconds =
         Math.max(0, Duration.between(operation.startedAt(), clock.instant()).toSeconds());
@@ -1607,6 +1709,8 @@ public final class MapMenuFactory {
       case WORLD_UNLOAD_FAILED -> "map.error.world-unload";
       case WORLD_SETTINGS_FAILED -> "map.error.world-settings";
       case COPY_FAILED -> "map.error.copy";
+      case IMPORT_NOT_READY -> "map.error.import-not-ready";
+      case IMPORT_FAILED -> "map.error.import";
       case BACKUP_FAILED -> "map.error.backup";
       case CONFLICT -> "map.error.conflict";
       case INVALID_TYPE -> "map.error.invalid-type";

@@ -23,6 +23,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
  * publishes by rename only after the complete copy succeeds.
  */
 public final class SecureMapFileService implements MapFileService {
+  private static final String IMPORT_DIRECTORY = "import";
+  private static final String IMPORT_INSTRUCTIONS = "LISEZ-MOI.txt";
   private static final DateTimeFormatter BACKUP_DATE =
       DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").withZone(ZoneOffset.UTC);
   private final Path templateMarkers;
@@ -56,6 +58,69 @@ public final class SecureMapFileService implements MapFileService {
     if (Files.exists(world(template)) || Files.exists(marker))
       throw new IOException("Managed map folder already exists");
     writeMarker(template, marker);
+  }
+
+  @Override
+  public void ensureImportDirectory(MapTemplate template) throws IOException {
+    Path marker = confined(templateMarkers, template.folderName());
+    if (Files.isSymbolicLink(marker)) throw new IOException("Unsafe map marker folder");
+    Files.createDirectories(marker);
+    Path imports = confined(marker, IMPORT_DIRECTORY);
+    if (Files.isSymbolicLink(imports)) throw new IOException("Unsafe map import folder");
+    Files.createDirectories(imports);
+    Path instructions = imports.resolve(IMPORT_INSTRUCTIONS);
+    if (!Files.exists(instructions))
+      Files.writeString(
+          instructions,
+          "REMPLACER CETTE CARTE PAR UN MONDE BEDWARS\n\n"
+              + "1. Fermez le monde depuis le menu HeneriaBedWars.\n"
+              + "2. Copiez ICI le contenu du dossier de votre monde.\n"
+              + "3. Le fichier level.dat doit se trouver directement dans ce dossier.\n"
+              + "4. Dans le menu de la carte, cliquez sur Importer / remplacer.\n\n"
+              + "Le plugin sauvegarde l'ancienne carte avant le remplacement.\n"
+              + "Ne placez aucun raccourci ou lien symbolique dans ce dossier.\n");
+  }
+
+  @Override
+  public boolean importReady(MapTemplate template) {
+    Path imports = importDirectory(template);
+    return Files.isDirectory(imports)
+        && !Files.isSymbolicLink(imports)
+        && Files.isRegularFile(imports.resolve("level.dat"));
+  }
+
+  @Override
+  public void replaceFromImport(MapTemplate template) throws IOException {
+    Path source = importDirectory(template);
+    if (!importReady(template))
+      throw new IOException("Import folder must contain level.dat at its root");
+    rejectSymbolicLinks(source);
+    Path target = world(template);
+    Path incoming = confined(worldRoot, "." + template.worldName() + ".import.tmp");
+    Path previous = confined(worldRoot, "." + template.worldName() + ".previous.tmp");
+    if (Files.exists(incoming) || Files.exists(previous))
+      throw new IOException("A previous map import requires manual inspection");
+    try {
+      copyTree(source, incoming);
+      if (Files.exists(target)) moveDirectory(target, previous);
+      moveDirectory(incoming, target);
+      deleteTreeIfExists(previous, worldRoot);
+    } catch (IOException exception) {
+      try {
+        deleteTreeIfExists(incoming, worldRoot);
+      } catch (IOException cleanup) {
+        exception.addSuppressed(cleanup);
+      }
+      try {
+        if (Files.exists(previous)) {
+          deleteTreeIfExists(target, worldRoot);
+          moveDirectory(previous, target);
+        }
+      } catch (IOException rollback) {
+        exception.addSuppressed(rollback);
+      }
+      throw exception;
+    }
   }
 
   @Override
@@ -130,7 +195,9 @@ public final class SecureMapFileService implements MapFileService {
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attributes)
               throws IOException {
-            if (Files.isSymbolicLink(file) || excludedFiles.contains(file.getFileName().toString()))
+            if (Files.isSymbolicLink(file)
+                || excludedFiles.contains(file.getFileName().toString())
+                || IMPORT_INSTRUCTIONS.equals(file.getFileName().toString()))
               return FileVisitResult.CONTINUE;
             Files.copy(
                 file,
@@ -181,6 +248,32 @@ public final class SecureMapFileService implements MapFileService {
     return confined(worldRoot, template.worldName());
   }
 
+  private Path importDirectory(MapTemplate template) {
+    return confined(confined(templateMarkers, template.folderName()), IMPORT_DIRECTORY);
+  }
+
+  private static void rejectSymbolicLinks(Path source) throws IOException {
+    Files.walkFileTree(
+        source,
+        new SimpleFileVisitor<>() {
+          @Override
+          public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes)
+              throws IOException {
+            if (Files.isSymbolicLink(directory))
+              throw new IOException("Unsafe symbolic link in map import");
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attributes)
+              throws IOException {
+            if (Files.isSymbolicLink(file))
+              throw new IOException("Unsafe symbolic link in map import");
+            return FileVisitResult.CONTINUE;
+          }
+        });
+  }
+
   private static Path root(Path value) {
     return value.toAbsolutePath().normalize();
   }
@@ -200,8 +293,9 @@ public final class SecureMapFileService implements MapFileService {
     }
   }
 
-  private static void writeMarker(MapTemplate template, Path marker) throws IOException {
+  private void writeMarker(MapTemplate template, Path marker) throws IOException {
     Files.createDirectories(marker);
     Files.writeString(marker.resolve("managed-world.txt"), template.worldName());
+    ensureImportDirectory(template);
   }
 }

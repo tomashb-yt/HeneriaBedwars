@@ -1,5 +1,9 @@
 # Roadmap
 
+## Correctif livré — assistant compact et import de monde
+
+La configuration essentielle d'une arène est regroupée dans une vue de cinq lignes avec accès direct aux équipes. Les cartes externes peuvent être déposées dans le dossier d'import propre à chaque modèle puis remplacées depuis le menu avec sauvegarde. Le prochain ticket gameplay reste inchangé; cette livraison améliore uniquement l'administration et le stockage des modèles.
+
 - [TERMINÉ] Ticket 001 — Initialisation et fondation
 - [TERMINÉ] Ticket 002 — Configuration, messages et traductions
 - [TERMINÉ] Ticket 003 — Framework interne de menus

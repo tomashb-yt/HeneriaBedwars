@@ -6,6 +6,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Dossier d'import dédié pour chaque carte et remplacement sécurisé d'un monde BedWars depuis le menu, avec sauvegarde automatique, échange atomique et rechargement.
+
 - Ticket 011 (livraison initiale) : définitions persistantes d'équipes, capacités runtime, sélection métier, `/bw`/`/bedwars play` par carte et déduplication des complétions publiques.
 
 - Correctif 010.1 : menu public d'informations, registre d'actions runtime par PDC et templates configurables du scoreboard d'attente.
@@ -47,6 +49,8 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Sauvegarde automatique des arènes et révisions optimistes empêchant une vue obsolète d'écraser une modification plus récente.
 
 ### Fixed
+
+- Assistant d'arène compact sur cinq lignes : carte, attente, spectateur, format et fiches des équipes colorées sont accessibles sans commandes ni icônes secondaires.
 
 - Correctif de configuration des équipes : chaque équipe possède désormais une fiche GUI dédiée avec actions séparées pour définir, visiter et retirer son spawn ou son lit. La sélection du lit vérifie le monde modèle, un vrai lit complet et les doublons entre équipes.
 - Les sous-commandes `/bedwars arena team` sont documentées et complétées jusqu'aux identifiants d'équipe; `setbed` sélectionne le lit réellement regardé et `teleportbed` est disponible.

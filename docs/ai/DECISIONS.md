@@ -1,5 +1,9 @@
 # Décisions d'architecture
 
+## ADR — Import de carte par dépôt géré, sans sélection de chemin
+
+Décision : chaque modèle possède `maps/templates/<id>/import/`; l'administrateur y dépose le contenu du monde puis déclenche le remplacement dans le GUI. Le plugin n'accepte jamais un chemin saisi, refuse les liens symboliques, sauvegarde la cible et effectue l'échange sous verrou. Cette approche rend le remplacement compréhensible dans les fichiers tout en préservant le confinement du Ticket 007 et la séparation thread Bukkit / accès disque.
+
 ## ADR-059 à ADR-061 — Configuration guidée des équipes
 
 Accepté.
