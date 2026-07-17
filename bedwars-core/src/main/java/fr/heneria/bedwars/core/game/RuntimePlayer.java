@@ -17,6 +17,11 @@ public final class RuntimePlayer {
   private int finalKills;
   private int bedsDestroyed;
   private boolean spectator;
+  private boolean respawning;
+  private boolean finalDeath;
+  private Instant lastDeathAt;
+  private Instant respawnAt;
+  private Instant protectedUntil;
 
   public RuntimePlayer(UUID playerId, Instant joinedAt) {
     this.playerId = Objects.requireNonNull(playerId, "playerId");
@@ -50,6 +55,52 @@ public final class RuntimePlayer {
 
   public synchronized void spectator(boolean value) {
     spectator = value;
+  }
+
+  public synchronized boolean spectator() {
+    return spectator;
+  }
+
+  public synchronized boolean respawning() {
+    return respawning;
+  }
+
+  public synchronized boolean finalDeath() {
+    return finalDeath;
+  }
+
+  public synchronized void scheduleRespawn(Instant deathAt, Instant dueAt) {
+    lastDeathAt = Objects.requireNonNull(deathAt, "deathAt");
+    respawnAt = Objects.requireNonNull(dueAt, "dueAt");
+    respawning = true;
+    spectator = true;
+  }
+
+  public synchronized void completeRespawn(Instant protectionEnd) {
+    respawning = false;
+    respawnAt = null;
+    spectator = false;
+    protectedUntil = protectionEnd;
+  }
+
+  public synchronized void eliminate(Instant at) {
+    lastDeathAt = Objects.requireNonNull(at, "at");
+    respawning = false;
+    respawnAt = null;
+    finalDeath = true;
+    spectator = true;
+  }
+
+  public synchronized Optional<Instant> respawnAt() {
+    return Optional.ofNullable(respawnAt);
+  }
+
+  public synchronized boolean protectedAt(Instant now) {
+    return protectedUntil != null && now.isBefore(protectedUntil);
+  }
+
+  public synchronized void clearProtection() {
+    protectedUntil = null;
   }
 
   public synchronized RuntimePlayerSnapshot snapshot(Instant now) {

@@ -23,6 +23,8 @@ public final class GameInstance {
   private final Map<String, RuntimeTeam> teams = new LinkedHashMap<>();
   private final Map<String, Long> timers = new LinkedHashMap<>();
   private final Map<String, Long> statistics = new LinkedHashMap<>();
+  private final Map<RuntimeBlockPosition, RuntimeBed> bedIndex = new LinkedHashMap<>();
+  private final Map<String, RuntimeBed> bedsByTeam = new LinkedHashMap<>();
   private GameState state = GameState.CREATING;
   private RuntimeWorldHandle world;
   private Instant updatedAt;
@@ -100,6 +102,63 @@ public final class GameInstance {
 
   public synchronized Optional<RuntimeTeam> team(String id) {
     return Optional.ofNullable(teams.get(id));
+  }
+
+  public synchronized java.util.List<RuntimePlayer> runtimePlayers() {
+    return java.util.List.copyOf(players.values());
+  }
+
+  public synchronized java.util.List<RuntimeTeam> teams() {
+    return java.util.List.copyOf(teams.values());
+  }
+
+  /** Registers both physical halves after the clone is loaded. */
+  public synchronized void registerBed(
+      String teamId, RuntimeBlockPosition foot, RuntimeBlockPosition head) {
+    if (!teams.containsKey(teamId)) throw new IllegalArgumentException("Unknown team " + teamId);
+    if (bedsByTeam.containsKey(teamId)) throw new IllegalStateException("Bed already registered");
+    if (bedIndex.containsKey(foot) || bedIndex.containsKey(head))
+      throw new IllegalStateException("Runtime bed block already indexed");
+    RuntimeBed bed = new RuntimeBed(teamId, foot, head);
+    bedsByTeam.put(teamId, bed);
+    bedIndex.put(foot, bed);
+    bedIndex.put(head, bed);
+    teams.get(teamId).bedAlive(true);
+  }
+
+  public synchronized Optional<RuntimeBed> bedAt(RuntimeBlockPosition position) {
+    return Optional.ofNullable(bedIndex.get(position));
+  }
+
+  public synchronized Optional<RuntimeBed> bed(String teamId) {
+    return Optional.ofNullable(bedsByTeam.get(teamId));
+  }
+
+  public synchronized int indexedBedBlocks() {
+    return bedIndex.size();
+  }
+
+  public synchronized boolean bedsReady() {
+    boolean configured =
+        arena.definition().teams().stream().allMatch(team -> team.bedDefinition().isPresent());
+    return !configured || bedIndex.size() == teams.size() * 2;
+  }
+
+  synchronized BedDestroyResult destroyBed(
+      UUID playerId, RuntimeBlockPosition position, Instant now) {
+    if (state != GameState.PLAYING) return BedDestroyResult.of(BedDestroyCode.INVALID_STATE);
+    RuntimePlayer player = players.get(playerId);
+    if (player == null) return BedDestroyResult.of(BedDestroyCode.NOT_IN_GAME);
+    RuntimeBed bed = bedIndex.get(position);
+    if (bed == null) return BedDestroyResult.of(BedDestroyCode.BED_NOT_FOUND);
+    if (player.teamId().filter(bed.teamId()::equals).isPresent())
+      return new BedDestroyResult(BedDestroyCode.OWN_BED, Optional.of(bed));
+    if (!bed.destroy(playerId, now))
+      return new BedDestroyResult(BedDestroyCode.ALREADY_DESTROYED, Optional.of(bed));
+    teams.get(bed.teamId()).bedAlive(false);
+    player.recordBedDestroyed();
+    updatedAt = now;
+    return BedDestroyResult.destroyed(bed);
   }
 
   /** Resolves the selected team's configured spawn inside this instance's cloned world. */

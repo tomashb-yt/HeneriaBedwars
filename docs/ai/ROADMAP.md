@@ -19,9 +19,13 @@ La configuration essentielle d'une arène est regroupée dans une vue de cinq li
 - [TERMINÉ] Ticket 011 — Équipes BedWars et navigateur public
 - [TERMINÉ] Correctif de configuration — fiches d'équipes, spawns, sélection des lits et commandes de secours
 - [EN COURS] Ticket 012 — Destruction des lits, morts, réapparitions, éliminations et victoire
+- [À FAIRE] Ticket 013 — Générateurs de ressources
+- [À FAIRE] Ticket 014 — Boutiques et achats
+- [À FAIRE] Ticket 015 — Équipement, outils et améliorations
+- [À FAIRE] Ticket 016 — Combat 1.8 et dégâts BedWars
 
 ## Grandes phases futures
 
-La prochaine étape est la suite réelle du Ticket 012 : remappage runtime des lits, destruction protégée, mort, réapparition, élimination et victoire. Générateurs, boutiques, améliorations, combat complet, matchmaking automatique, stockage SQL et réseau proxy restent futurs.
+La logique automatisée du Ticket 012 est implémentée. La prochaine étape immédiate est sa validation Paper multijoueur et les correctifs issus du test réel; elle seule permettra de marquer le ticket terminé. Générateurs, boutiques, améliorations, combat complet, matchmaking, SQL et proxy restent futurs.
 
 Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.

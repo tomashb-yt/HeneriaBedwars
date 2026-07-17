@@ -17,7 +17,14 @@ public sealed interface GameEvent
         GameCountdownStartEvent,
         GameCountdownTickEvent,
         GameCountdownCancelEvent,
-        GameCountdownAccelerateEvent {
+        GameCountdownAccelerateEvent,
+        BedDestroyedEvent,
+        PlayerGameDeathEvent,
+        PlayerRespawnScheduledEvent,
+        PlayerGameRespawnEvent,
+        PlayerFinalDeathEvent,
+        TeamEliminatedEvent,
+        GameVictoryEvent {
   GameId gameId();
 
   Instant occurredAt();

@@ -2,7 +2,7 @@
 
 ## Présentation
 
-HeneriaBedWars est un futur plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Les Tickets 001 à 009 livrent la fondation administrative et le moteur d'instances temporaires ; aucun gameplay BedWars n'est encore actif.
+HeneriaBedWars est un plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Le Ticket 012 est en validation : lits runtime, morts, respawns, éliminations et victoire provisoire sont implémentés, mais le parcours complet doit encore être confirmé sur Paper.
 
 Le correctif de préparation du Ticket 012 rend les équipes, leurs spawns et leurs lits configurables depuis une fiche GUI. Le lit administratif est sélectionné en regardant un vrai lit complet dans le monde modèle; sa partie pied est persistée. Cela ne signifie pas que la destruction, la mort ou la réapparition runtime du Ticket 012 sont terminées.
 
@@ -48,6 +48,8 @@ Au démarrage, l'ancien `config.yml` officiel du Ticket 001 sans `config-version
 Le Ticket 008 centralise l'administration des cartes dans le menu v4. Les commandes restent disponibles pour le diagnostic avancé. Toute sauvegarde complète, duplication ou suppression de dossier doit rester asynchrone, visible dans `MapOperationTracker` et protégée par `MapOperationLock`. Les associations d'arènes restent la source de vérité et les états d'éditeur sont nettoyés à la déconnexion et à l'arrêt.
 
 Le Ticket 009 introduit `GameInstanceManager`. Une arène ne peut avoir qu'une instance vivante et un joueur ne peut appartenir qu'à une instance. Les clones `hbw_game_*` sont jetables, exclus des registres administratifs, déchargés sans sauvegarde puis supprimés. Les accès fichiers restent asynchrones; les appels Bukkit restent sur le thread serveur. Les événements `core.game.event` ne sont pas des événements Bukkit. Ne jamais persister `RuntimePlayer`, `RuntimeTeam` ou les statistiques runtime dans les YAML administratifs.
+
+Le Ticket 012 représente un lit par deux coordonnées de bloc et garde son état vivant/détruit dans `RuntimeBed`. Seul `GameBedService` attribue une destruction et seul `GameDeathService` décide respawn ou mort finale. Les respawns passent par le ticker central; aucune tâche par joueur. Les listeners gameplay doivent rester limités aux membres `PLAYING` et aux mondes `hbw_game_*`.
 
 ## Règles architecturales
 

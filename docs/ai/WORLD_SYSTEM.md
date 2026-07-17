@@ -1,5 +1,9 @@
 # Système de cartes modèles
 
+## Lits dans les clones Ticket 012
+
+Après chargement de `hbw_game_*`, `BukkitGameBedRegistry` vérifie chaque pied/tête aux coordonnées du modèle et construit un index runtime de deux blocs par équipe. Une destruction ne modifie que le clone, jamais `hbw_template_*`. Les explosions retirent les blocs indexés de leur liste de destruction et le reset existant supprime tout l'état avec le monde.
+
 ## Instances temporaires Ticket 009
 
 Le Ticket 010 utilise ce clone seulement comme monde de lobby pre-game. Une sortie normale restaure d'abord le snapshot joueur; la destruction d'une instance vide ou arretee evacue ensuite tout joueur restant, decharge sans sauvegarde et supprime le monde clone plus son manifeste runtime. Aucun reset de blocs de gameplay n'est necessaire tant que le Ticket 010 ne permet aucune construction dans le lobby d'attente.

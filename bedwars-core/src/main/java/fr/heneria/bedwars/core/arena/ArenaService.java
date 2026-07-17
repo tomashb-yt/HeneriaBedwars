@@ -281,10 +281,47 @@ public final class ArenaService {
         rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.of(location)));
   }
 
+  public synchronized ArenaOperationResult setTeamBed(
+      String rawId, TeamId teamId, ArenaBedDefinition bed, long expectedRevision) {
+    Objects.requireNonNull(bed, "bed");
+    ArenaDefinition current = find(rawId).orElse(null);
+    if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
+    if (conflict(current, expectedRevision)) return conflict(current);
+    if (current.teams().stream().noneMatch(team -> team.id().equals(teamId)))
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "Unknown team " + teamId.value());
+    Optional<ArenaTeamDefinition> duplicate =
+        current.teams().stream()
+            .filter(team -> !team.id().equals(teamId))
+            .filter(
+                team ->
+                    team.bedLocation()
+                            .map(ArenaBlockPosition::from)
+                            .filter(
+                                position ->
+                                    position.equals(bed.foot()) || position.equals(bed.head()))
+                            .isPresent()
+                        || team.bedDefinition()
+                            .filter(
+                                other ->
+                                    other.foot().equals(bed.foot())
+                                        || other.foot().equals(bed.head())
+                                        || other.head().equals(bed.foot())
+                                        || other.head().equals(bed.head()))
+                            .isPresent())
+            .findFirst();
+    if (duplicate.isPresent())
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT,
+          "Bed already belongs to team " + duplicate.orElseThrow().id().value());
+    return updateTeam(
+        rawId, teamId, expectedRevision, team -> team.withBedDefinition(Optional.of(bed)));
+  }
+
   public synchronized ArenaOperationResult clearTeamBed(
       String rawId, TeamId teamId, long expectedRevision) {
     return updateTeam(
-        rawId, teamId, expectedRevision, team -> team.withBedLocation(Optional.empty()));
+        rawId, teamId, expectedRevision, team -> team.withBedDefinition(Optional.empty()));
   }
 
   private ArenaOperationResult updateTeam(

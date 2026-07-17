@@ -323,6 +323,33 @@ game:
     countdown: "<yellow>Début : <white>{countdown} s"
     waiting: "<yellow>Joueurs insuffisants"
     footer: "<aqua>{footer}"
+  bed:
+    own: "<red>Vous ne pouvez pas détruire votre propre lit."
+    destroyed: "<red>Le lit de l'équipe <white>{team}<red> a été détruit par <white>{destroyer}<red> !"
+    destroyer: "<green>Vous avez détruit le lit de l'équipe <white>{team}<green> !"
+    victim-title: "<red><bold>LIT DÉTRUIT !"
+    victim-subtitle: "<gray>Vous ne réapparaîtrez plus après votre prochaine mort."
+  death:
+    respawn: "<yellow>Vous êtes mort. Votre lit est vivant : réapparition en cours."
+    final: "<red>Vous êtes définitivement éliminé."
+    final-title: "<red><bold>ÉLIMINATION FINALE"
+    final-subtitle: "<gray>Votre lit a été détruit."
+  respawn:
+    title: "<yellow><bold>VOUS ÊTES MORT"
+    subtitle: "<gray>Réapparition dans <white>{seconds}<gray> secondes."
+    success-title: "<green><bold>RÉAPPARITION"
+    success-subtitle: "<gray>Vous êtes temporairement protégé."
+    failed-title: "<red>Réapparition impossible"
+    failed-subtitle: "<gray>Le spawn de votre équipe est introuvable."
+  spectator:
+    no-targets: "<yellow>Aucun joueur actif à suivre."
+    teleported: "<green>Vous suivez maintenant <white>{player}<green>."
+  team:
+    eliminated: "<red>L'équipe <white>{team}<red> est éliminée !"
+  victory:
+    title: "<gold><bold>VICTOIRE !"
+    subtitle: "<yellow>L'équipe {team} remporte la partie."
+    broadcast: "<gold>Victoire de l'équipe <white>{team}<gold> !"
   error:
     teleport: "<red>La téléportation vers la partie a échoué."
     internal: "<red>Une erreur interne du lobby est survenue."

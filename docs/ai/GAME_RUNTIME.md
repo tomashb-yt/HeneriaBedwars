@@ -1,5 +1,11 @@
 # Runtime des parties et lobby d'attente
 
+## Ticket 012 — cycle jouable
+
+Pendant `PLAYING`, `GameBedService` protège le lit allié et attribue une seule destruction ennemie. Une mort consulte l'état du lit au moment exact de la décision : lit vivant, le joueur passe spectateur temporaire et réapparaît; lit détruit, il devient spectateur définitif. Les respawns sont des données de `RuntimePlayer` avancées chaque seconde, sans tâche individuelle.
+
+Une équipe sans membre actif ou en respawn est éliminée. Lorsqu'une seule équipe ayant réellement participé reste, la partie passe en `ENDING`; après `game.ending.duration-seconds`, le service de lobby restaure les joueurs et détruit l'instance. Déconnexion en jeu signifie élimination immédiate tant que la reconnexion n'existe pas.
+
 ## Positionnement au démarrage
 
 À la transition `STARTING → PLAYING`, le joueur quitte le point d'attente et rejoint le spawn de son `RuntimeTeam` dans `hbw_game_<UUID>`. Le chunk cible est chargé avant la téléportation et les objets d'attente sont retirés. Un spawn manquant est signalé sans déplacer arbitrairement le joueur. Cette étape ne constitue pas encore le gameplay des lits et éliminations.

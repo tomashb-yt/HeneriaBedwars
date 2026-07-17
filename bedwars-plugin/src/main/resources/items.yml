@@ -620,3 +620,14 @@ items:
       state: {material: COMPARATOR, name: "<aqua>État : <white>{state}"}
       not-ready: {material: REDSTONE, name: "<red>En attente de joueurs", lore: ["<gray>{players}/{minimum_players} requis"]}
       ready: {material: LIME_DYE, glow: true, name: "<green>Partie prête", lore: ["<gray>Le compte à rebours peut commencer."]}
+    spectator:
+      teleporter:
+        material: COMPASS
+        name: "<aqua><bold>Téléporteur de joueurs"
+        lore: ["<gray>Rejoint un joueur encore actif.", "", "<yellow>▸ Cliquez pour suivre"]
+        tags: {category: game-spectator, action: spectator_teleporter}
+      leave:
+        material: RED_BED
+        name: "<red><bold>Quitter la partie"
+        lore: ["<gray>Restaure votre état précédent.", "", "<yellow>▸ Cliquez pour quitter"]
+        tags: {category: game-spectator, action: spectator_leave}

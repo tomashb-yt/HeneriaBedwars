@@ -263,6 +263,7 @@ class ConfigurationSystemTest {
   @Test
   void startupAddsTicket003DefaultsToExistingMenusAndLanguagesWithBackups() throws Exception {
     installer(new TestLogger()).installMissing();
+    replace("game.yml", "\n  ending:\n    duration-seconds: 10\n", "\n");
     replace("menus.yml", "navigation:\n  history-enabled: true\n  max-history-size: 20\n", "");
     Files.writeString(
         temporary.resolve("items.yml"),
@@ -276,6 +277,7 @@ class ConfigurationSystemTest {
     service.initialize();
 
     assertTrue(Files.readString(temporary.resolve("menus.yml")).contains("history-enabled: true"));
+    assertTrue(Files.readString(temporary.resolve("game.yml")).contains("duration-seconds: 10"));
     String evolvedItems = Files.readString(temporary.resolve("items.yml"));
     assertTrue(evolvedItems.contains("demo:"));
     assertTrue(evolvedItems.contains("arenas-v2:"));
@@ -301,7 +303,7 @@ class ConfigurationSystemTest {
             .keys()
             .equals(service.snapshot().languages().get("en_US").keys()));
     try (var paths = Files.walk(temporary.resolve("backups"))) {
-      assertEquals(4, paths.filter(Files::isRegularFile).count());
+      assertEquals(5, paths.filter(Files::isRegularFile).count());
     }
   }
 

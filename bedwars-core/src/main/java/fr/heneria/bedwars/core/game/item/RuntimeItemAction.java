@@ -6,7 +6,9 @@ import java.util.Optional;
 /** Stable runtime actions stored in the item PDC, never inferred from appearance. */
 public enum RuntimeItemAction {
   WAITING_LEAVE("waiting_leave"),
-  WAITING_INFO("waiting_info");
+  WAITING_INFO("waiting_info"),
+  SPECTATOR_TELEPORTER("spectator_teleporter"),
+  SPECTATOR_LEAVE("spectator_leave");
 
   private final String key;
 

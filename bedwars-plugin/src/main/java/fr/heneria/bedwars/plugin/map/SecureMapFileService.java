@@ -3,7 +3,6 @@ package fr.heneria.bedwars.plugin.map;
 import fr.heneria.bedwars.core.map.MapFileService;
 import fr.heneria.bedwars.core.map.MapTemplate;
 import java.io.IOException;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -288,8 +287,14 @@ public final class SecureMapFileService implements MapFileService {
   private static void moveDirectory(Path source, Path destination) throws IOException {
     try {
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE);
-    } catch (AtomicMoveNotSupportedException exception) {
-      Files.move(source, destination);
+    } catch (IOException atomicFailure) {
+      if (!Files.exists(source) || Files.exists(destination)) throw atomicFailure;
+      try {
+        Files.move(source, destination);
+      } catch (IOException fallbackFailure) {
+        fallbackFailure.addSuppressed(atomicFailure);
+        throw fallbackFailure;
+      }
     }
   }
 

@@ -6,9 +6,9 @@ L'assistant d'arène tient sur cinq lignes et conserve l'essentiel : carte, spaw
 
 Chaque carte créée possède `plugins/HeneriaBedWars/maps/templates/<id>/import/`. Pour utiliser une carte BedWars téléchargée, copiez le contenu du monde dans ce dossier afin que `level.dat` soit directement sous `import/`, puis utilisez **Importer une carte BedWars** dans la fiche de la carte. Le plugin ferme le monde, sauvegarde l'ancienne version, remplace les fichiers hors thread serveur et recharge la nouvelle carte.
 
-HeneriaBedWars est un plugin BedWars expérimental pour Spigot/Paper 1.21.x, développé en Java 21. Le dépôt contient la fondation technique, la configuration, les menus administratifs, les arènes et un gestionnaire autonome de cartes modèles vides. Aucun gameplay BedWars n'est encore disponible.
+HeneriaBedWars est un plugin BedWars expérimental pour Spigot/Paper 1.21.x, développé en Java 21. Le dépôt contient la fondation technique, la configuration, les menus administratifs, les arènes et un gestionnaire autonome de cartes modèles.
 
-Le moteur d'instances peut désormais cloner une carte d'arène, charger un monde temporaire, accueillir des joueurs et le nettoyer. Cela reste une infrastructure : aucune partie BedWars jouable n'est encore lancée.
+Le moteur d'instances clone une carte, assigne les équipes et exécute maintenant le premier cycle BedWars : lits ennemis, mort avec respawn, mort finale, élimination et victoire provisoire. Cette livraison reste expérimentale tant que la matrice complète n'a pas été validée sur un serveur Paper réel.
 
 ## Prérequis et compilation
 

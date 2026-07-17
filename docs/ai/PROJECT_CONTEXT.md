@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État Ticket 012 du 2026-07-18 : le clone runtime indexe les deux blocs de chaque lit. Un ennemi peut le détruire une seule fois; le propriétaire est bloqué. `GameDeathService` décide respawn ou mort finale, `GameRespawnService` utilise le ticker central, puis la dernière équipe active déclenche `ENDING` et le nettoyage différé. Le code et les tests automatisés sont disponibles; la validation Paper multijoueur reste obligatoire avant de déclarer le ticket définitivement terminé.
+
 État correctif runtime/équipes du 2026-07-17 : les cartes et titres d'équipe respectent leur couleur, la fiche est organisée en deux colonnes fixes spawn/lit et tous les retours sont localisés. Quand le countdown atteint `PLAYING`, chaque joueur est déplacé au spawn de son équipe dans le clone runtime. Ce déplacement lance la phase de partie mais n'active encore aucune mécanique de lit, mort, victoire, générateur ou boutique.
 
 État correctif UX du 2026-07-17 : l'assistant d'arène principal tient sur cinq lignes et expose directement les équipes colorées. Les opérations essentielles sont carte, attente, spectateur, format, spawn/lit de chaque équipe, validation et activation. Les réglages avancés ne saturent plus cette vue.

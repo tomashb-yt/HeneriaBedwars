@@ -1,5 +1,19 @@
 # Décisions d'architecture
 
+## ADR-062 à ADR-070 — Gameplay des lits
+
+Accepté pour la phase de validation Ticket 012.
+
+- **ADR-062** — Un lit administratif complet possède un pied, une tête et une direction.
+- **ADR-063** — Le runtime, et non la présence du bloc seule, porte la transition irréversible vivant → détruit.
+- **ADR-064** — Les coordonnées du modèle sont remappées sans nom de monde vers le clone.
+- **ADR-065** — Seul un joueur ennemi en `PLAYING` obtient la destruction atomique.
+- **ADR-066** — La décision de mort appartient à `GameDeathService`, jamais au listener Bukkit.
+- **ADR-067** — La décision de respawn est capturée au moment de la mort et avancée par le ticker central.
+- **ADR-068** — Une équipe est éliminée quand aucun membre ne peut encore revenir.
+- **ADR-069** — Une seule équipe participante restante déclenche la victoire provisoire et `ENDING`.
+- **ADR-070** — Les blocs du modèle restent protégés; seuls les lits ennemis indexés sont destructibles.
+
 ## ADR — Le début de partie positionne les équipes sans démarrer le gameplay BedWars
 
 Décision : `GameStartEvent` déclenche la préparation Bukkit et la téléportation au spawn de l'équipe sélectionnée dans le clone runtime. La résolution de destination reste dans `GameInstance`; l'accès au monde et au joueur reste dans l'adaptateur plugin. Cette étape appartient au cycle de vie de la partie et ne change pas l'état des lits, n'écoute aucune mort et ne décide aucun vainqueur.

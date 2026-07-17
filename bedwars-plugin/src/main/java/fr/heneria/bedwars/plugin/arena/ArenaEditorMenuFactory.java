@@ -702,7 +702,7 @@ public final class ArenaEditorMenuFactory {
                 15,
                 GuiButton.builder()
                     .itemKey(
-                        team.bedLocation().isPresent()
+                        team.bedDefinition().isPresent()
                             ? "arena.teams.bed-configured-v6"
                             : "arena.teams.bed-missing-v6")
                     .itemPlaceholders(context -> values)
@@ -779,7 +779,7 @@ public final class ArenaEditorMenuFactory {
                   .itemKey("arena.teams.clear-spawn-disabled-v6")
                   .itemPlaceholders(context -> values)
                   .build());
-    if (team.bedLocation().isPresent()) {
+    if (team.bedDefinition().isPresent()) {
       builder
           .button(
               24,
@@ -1596,8 +1596,7 @@ public final class ArenaEditorMenuFactory {
       return;
     }
     ArenaOperationResult operation =
-        arenas.setTeamBed(
-            arena.id().value(), team.id(), selection.location().orElseThrow(), expected);
+        arenas.setTeamBed(arena.id().value(), team.id(), selection.bed().orElseThrow(), expected);
     if (operation.code() == ArenaOperationCode.INVALID_ARGUMENT
         && operation.detail().startsWith("Bed already belongs to team ")) {
       send(
@@ -1880,7 +1879,7 @@ public final class ArenaEditorMenuFactory {
         arena.teams().stream().filter(team -> team.spawn().isPresent()).count());
     values.put(
         "team_beds_configured",
-        arena.teams().stream().filter(team -> team.bedLocation().isPresent()).count());
+        arena.teams().stream().filter(team -> team.bedDefinition().isPresent()).count());
     values.put("validation_errors", errors(validation));
     values.put("validation_warnings", validation.warnings());
     boolean mapConfigured = arena.template().isPresent();
@@ -1951,14 +1950,14 @@ public final class ArenaEditorMenuFactory {
     values.put(
         "team_bed_status",
         message(
-            team.bedLocation().isPresent()
+            team.bedDefinition().isPresent()
                 ? "arena.teams.status.configured"
                 : "arena.teams.status.missing",
             Map.of()));
     values.put(
         "team_ready",
         message(
-            team.spawn().isPresent() && team.bedLocation().isPresent()
+            team.spawn().isPresent() && team.bedDefinition().isPresent()
                 ? "arena.teams.status.configured"
                 : "arena.teams.status.missing",
             Map.of()));

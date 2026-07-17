@@ -323,6 +323,33 @@ game:
     countdown: "<yellow>Start: <white>{countdown} s"
     waiting: "<yellow>Not enough players"
     footer: "<aqua>{footer}"
+  bed:
+    own: "<red>You cannot destroy your own bed."
+    destroyed: "<red>Team <white>{team}<red>'s bed was destroyed by <white>{destroyer}<red>!"
+    destroyer: "<green>You destroyed team <white>{team}<green>'s bed!"
+    victim-title: "<red><bold>BED DESTROYED!"
+    victim-subtitle: "<gray>You will no longer respawn after your next death."
+  death:
+    respawn: "<yellow>You died. Your bed is alive: respawn pending."
+    final: "<red>You have been permanently eliminated."
+    final-title: "<red><bold>FINAL DEATH"
+    final-subtitle: "<gray>Your bed has been destroyed."
+  respawn:
+    title: "<yellow><bold>YOU DIED"
+    subtitle: "<gray>Respawning in <white>{seconds}<gray> seconds."
+    success-title: "<green><bold>RESPAWNED"
+    success-subtitle: "<gray>You are temporarily protected."
+    failed-title: "<red>Respawn failed"
+    failed-subtitle: "<gray>Your team spawn could not be found."
+  spectator:
+    no-targets: "<yellow>There is no active player to follow."
+    teleported: "<green>You are now following <white>{player}<green>."
+  team:
+    eliminated: "<red>Team <white>{team}<red> has been eliminated!"
+  victory:
+    title: "<gold><bold>VICTORY!"
+    subtitle: "<yellow>Team {team} wins the game."
+    broadcast: "<gold>Team <white>{team}<gold> wins!"
   error:
     teleport: "<red>Teleporting to the game failed."
     internal: "<red>An internal lobby error occurred."

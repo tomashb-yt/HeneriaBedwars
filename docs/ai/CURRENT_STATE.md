@@ -1,5 +1,16 @@
 # État actuel
 
+## Ticket 012 — implémentation en validation
+
+- sélection administrative enregistrant pied, tête et direction du lit;
+- index runtime des deux blocs, destruction atomique et protection du lit allié;
+- blocs de carte protégés pendant `PLAYING`, explosions filtrées sur les lits;
+- mort avec lit vivant → spectateur temporaire → respawn centralisé → protection;
+- lit détruit → mort finale → spectateur permanent → élimination d'équipe;
+- dernière équipe active → `ENDING` → annonce → restauration et suppression du clone;
+- scoreboard de jeu et statistiques runtime kills/final kills/lits;
+- validation multijoueur Paper encore requise, donc Ticket 012 non déclaré définitivement terminé.
+
 ## Correctif équipes et lancement — 2026-07-17
 
 - couleurs des cartes et titres identiques à la couleur métier de chaque équipe;
@@ -85,9 +96,9 @@
 
 ## Non disponible
 
-Les équipes, leurs couleurs, spawns et positions administratives de lit sont configurables. En revanche, le cycle gameplay du Ticket 012 n'est pas encore livré : aucune destruction runtime de lit, mort BedWars, réapparition, élimination finale, victoire ou scoreboard `PLAYING`. Aucun générateur actif, boutique, PNJ, achat, amélioration, base de données, resource pack ou PlaceholderAPI n'est disponible.
+Le cycle automatisé du Ticket 012 est implémenté mais reste en validation Paper multijoueur. Les générateurs actifs, boutiques, PNJ, achats, améliorations, reconnexion, base de données, resource pack et PlaceholderAPI ne sont pas encore disponibles.
 
-Les 162 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 174 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
 ## Ticket 011 - livraison initiale
 
 Les arènes portent désormais des définitions d'équipes immuables et persistantes (identifiant, nom, couleur, ordre, capacité et spawn). Les anciens YAML à base de `teams.count` et `teams.players-per-team` sont relus avec des équipes générées déterministes, sans perdre la définition; les spawns restent à renseigner avant validation complète.

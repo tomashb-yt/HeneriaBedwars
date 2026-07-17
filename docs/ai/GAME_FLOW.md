@@ -1,5 +1,20 @@
 # Cycle des parties
 
+## Ticket 012
+
+```mermaid
+stateDiagram-v2
+  PLAYING --> RESPAWNING: mort et lit vivant
+  RESPAWNING --> PLAYING: délai écoulé
+  PLAYING --> FINAL_DEATH: mort et lit détruit
+  FINAL_DEATH --> TEAM_ELIMINATED: aucun membre ne peut revenir
+  TEAM_ELIMINATED --> ENDING: une seule équipe participante reste
+  ENDING --> RESETTING: délai de victoire écoulé
+  RESETTING --> DESTROYED: clone supprimé
+```
+
+La politique est `AT_DEATH` : un respawn déjà accordé reste valide si le lit est détruit pendant le délai.
+
 Le correctif 010.1 ne change aucune transition. Il sécurise les entrées utilisateur : commande publique ou item PDC -> `GameLobbyService` -> moteur existant. Le passage `WAITING -> STARTING` reconstruit les items et bascule le template de scoreboard sans recréer l'objectif.
 
 ## Lobby et compte a rebours Ticket 010

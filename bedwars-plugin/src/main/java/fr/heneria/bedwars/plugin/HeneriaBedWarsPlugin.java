@@ -7,7 +7,11 @@ import fr.heneria.bedwars.core.arena.ArenaRegistry;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.arena.ArenaValidator;
 import fr.heneria.bedwars.core.arena.editor.ArenaEditorStateStore;
+import fr.heneria.bedwars.core.game.CombatTracker;
+import fr.heneria.bedwars.core.game.GameBedService;
+import fr.heneria.bedwars.core.game.GameDeathService;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.GameRespawnService;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
@@ -29,7 +33,9 @@ import fr.heneria.bedwars.plugin.bootstrap.BedWarsBootstrap;
 import fr.heneria.bedwars.plugin.bootstrap.PluginBootstrap;
 import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.BukkitGameBedRegistry;
 import fr.heneria.bedwars.plugin.game.BukkitGameDisplayService;
+import fr.heneria.bedwars.plugin.game.BukkitGamePlayListener;
 import fr.heneria.bedwars.plugin.game.BukkitPlayerSnapshotService;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimePlayerGateway;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimeWorldService;
@@ -177,6 +183,21 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       gameLobby =
           new GameLobbyService(
               gameService, gameCountdowns, () -> configurations.snapshot().game(), clock);
+      GameBedService gameBeds = new GameBedService(gameService, gameEvents, clock);
+      GameDeathService gameDeaths =
+          new GameDeathService(
+              gameService,
+              gameEvents,
+              clock,
+              () -> configurations.snapshot().gameplay().respawnDelaySeconds());
+      GameRespawnService gameRespawns =
+          new GameRespawnService(
+              gameService,
+              gameEvents,
+              clock,
+              () -> configurations.snapshot().gameplay().respawnProtectionSeconds());
+      CombatTracker combatTracker = new CombatTracker();
+      BukkitGameBedRegistry runtimeBeds = new BukkitGameBedRegistry(projectLogger);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       BukkitGameDisplayService gameDisplays =
           new BukkitGameDisplayService(
@@ -198,6 +219,16 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               gameDisplays,
               guiService,
               publicGameMenus);
+      BukkitGamePlayListener playListener =
+          new BukkitGamePlayListener(
+              this,
+              configurations,
+              gameService,
+              gameBeds,
+              gameDeaths,
+              runtimePlayers,
+              gameLobby,
+              combatTracker);
       GameAdminMenuFactory runtimeGameMenus =
           new GameAdminMenuFactory(this, gameService, gameCountdowns, gameLobby, configurations);
       ArenaEditorStateStore editorStates = new ArenaEditorStateStore();
@@ -284,6 +315,10 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   gameLobby,
                   gameDisplays,
                   waitingListener,
+                  playListener,
+                  runtimeBeds,
+                  gameDeaths,
+                  gameRespawns,
                   runtimePlayers,
                   configurations,
                   projectLogger),

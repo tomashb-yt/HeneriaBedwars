@@ -100,6 +100,7 @@ public final class ArenaValidator {
     HashSet<TeamId> ids = new HashSet<>();
     HashSet<TeamColor> colors = new HashSet<>();
     HashSet<Integer> orders = new HashSet<>();
+    HashSet<ArenaBlockPosition> bedBlocks = new HashSet<>();
     int total = 0;
     for (ArenaTeamDefinition team : arena.teams()) {
       total += team.capacity();
@@ -124,12 +125,34 @@ public final class ArenaValidator {
             "team-bed-missing",
             "teams." + team.id().value() + ".bed",
             "Team bed is missing");
-      else
+      else if (team.bedDefinition().isEmpty())
+        error(
+            problems,
+            "team-bed-invalid",
+            "teams." + team.id().value() + ".bed",
+            "Team bed must be selected again to store both halves");
+      else {
         checkLocationWorld(
             problems,
             arena,
             team.bedLocation().orElseThrow(),
             "teams." + team.id().value() + ".bed");
+        ArenaBedDefinition bed = team.bedDefinition().orElseThrow();
+        if (!bedBlocks.add(bed.foot()) || !bedBlocks.add(bed.head()))
+          error(
+              problems,
+              "team-bed-duplicate",
+              "teams." + team.id().value() + ".bed",
+              "A bed block is already used by another team");
+        if (arena.worldName().isPresent()
+            && (!bed.foot().world().equals(arena.worldName().orElseThrow())
+                || !bed.head().world().equals(arena.worldName().orElseThrow())))
+          error(
+              problems,
+              "team-bed-world-mismatch",
+              "teams." + team.id().value() + ".bed",
+              "Team bed is in a different world");
+      }
     }
     if (total != arena.maximumPlayers())
       error(

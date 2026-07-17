@@ -59,6 +59,9 @@ public final class GameCountdownService {
               ? CountdownOperationCode.COUNTDOWN_ALREADY_RUNNING
               : CountdownOperationCode.INVALID_STATE,
           game.state().name());
+    if (!game.bedsReady())
+      return CountdownOperationResult.failure(
+          CountdownOperationCode.BEDS_NOT_READY, game.id().toString());
     int minimum = game.arena().definition().minimumPlayers();
     if (!forced && game.playerIds().size() < minimum)
       return CountdownOperationResult.failure(

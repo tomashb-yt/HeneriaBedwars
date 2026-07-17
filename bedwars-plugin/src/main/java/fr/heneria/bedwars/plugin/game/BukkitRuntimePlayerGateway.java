@@ -158,6 +158,73 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
             destination.pitch()));
   }
 
+  /** Places a dead player in a safe non-interactive spectator state. */
+  public boolean spectate(UUID playerId, RuntimeWorldHandle handle, RuntimeLocation destination) {
+    if (!Bukkit.isPrimaryThread())
+      throw new IllegalStateException("Spectator transition requires the server thread");
+    Player player = Bukkit.getPlayer(playerId);
+    World world = Bukkit.getWorld(handle.worldName());
+    if (player == null || world == null) return false;
+    Location target = location(world, destination);
+    world.getChunkAt(target).load();
+    preparePlayingPlayer(player);
+    player.setGameMode(org.bukkit.GameMode.SPECTATOR);
+    prepareSpectatorItems(player, handle.gameId().toString());
+    player.setFallDistance(0);
+    return player.teleport(target);
+  }
+
+  public void prepareSpectatorItems(Player player, String gameId) {
+    player.getInventory().clear();
+    ItemContext context = ItemContexts.forPlayer(player, configurations).build();
+    player
+        .getInventory()
+        .setItem(
+            0,
+            runtimeItems.tag(
+                items.buildOrFallback("game.spectator.teleporter", context),
+                RuntimeItemAction.SPECTATOR_TELEPORTER,
+                gameId));
+    player
+        .getInventory()
+        .setItem(
+            8,
+            runtimeItems.tag(
+                items.buildOrFallback("game.spectator.leave", context),
+                RuntimeItemAction.SPECTATOR_LEAVE,
+                gameId));
+    player.updateInventory();
+  }
+
+  /** Completes a BedWars respawn at the assigned runtime-team spawn. */
+  public boolean respawn(UUID playerId, RuntimeWorldHandle handle, RuntimeLocation destination) {
+    if (!Bukkit.isPrimaryThread())
+      throw new IllegalStateException("Respawn requires the server thread");
+    Player player = Bukkit.getPlayer(playerId);
+    World world = Bukkit.getWorld(handle.worldName());
+    if (player == null || world == null) return false;
+    Location target = location(world, destination);
+    world.getChunkAt(target).load();
+    preparePlayingPlayer(player);
+    player.setGameMode(org.bukkit.GameMode.SURVIVAL);
+    player.setHealth(player.getMaxHealth());
+    player.setFoodLevel(20);
+    player.setSaturation(20);
+    player.setFireTicks(0);
+    player.setFallDistance(0);
+    return player.teleport(target);
+  }
+
+  private static Location location(World world, RuntimeLocation destination) {
+    return new Location(
+        world,
+        destination.x(),
+        destination.y(),
+        destination.z(),
+        destination.yaw(),
+        destination.pitch());
+  }
+
   private void prepareWaitingPlayer(Player player, WaitingPlayerContext context) {
     player.getInventory().clear();
     player.getInventory().setArmorContents(new org.bukkit.inventory.ItemStack[4]);

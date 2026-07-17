@@ -79,11 +79,25 @@ public final class RuntimeTeam {
   }
 
   public synchronized void bedAlive(boolean value) {
+    if (bedAlive == false && value)
+      throw new IllegalStateException("A destroyed bed cannot revive");
     bedAlive = value;
+  }
+
+  public synchronized boolean bedAlive() {
+    return bedAlive;
   }
 
   public synchronized void eliminated(boolean value) {
     eliminated = value;
+  }
+
+  public synchronized boolean eliminated() {
+    return eliminated;
+  }
+
+  public synchronized Set<UUID> playerIds() {
+    return Set.copyOf(players);
   }
 
   public synchronized RuntimeTeamSnapshot snapshot() {

@@ -14,12 +14,15 @@ import fr.heneria.bedwars.core.arena.ArenaStatus;
 import fr.heneria.bedwars.core.arena.ArenaVector;
 import fr.heneria.bedwars.core.config.GameSettings;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
+import fr.heneria.bedwars.core.game.event.BedDestroyedEvent;
 import fr.heneria.bedwars.core.game.event.GameCreateEvent;
 import fr.heneria.bedwars.core.game.event.GameDestroyEvent;
 import fr.heneria.bedwars.core.game.event.GameEvent;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
+import fr.heneria.bedwars.core.game.event.GameVictoryEvent;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameRespawnEvent;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapTemplate;
@@ -221,6 +224,101 @@ class GameInstanceEngineTest {
         first.id(), fixture.manager.lookup(first.id().toString()).instance().orElseThrow().id());
   }
 
+  @Test
+  void bedIndexProtectsOwnBedAndCreditsOnlyOneEnemyDestroyer() {
+    Fixture fixture = new Fixture();
+    GameInstance game =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+    UUID red = UUID.randomUUID();
+    UUID blue = UUID.randomUUID();
+    fixture.manager.join(game.id(), red).toCompletableFuture().join();
+    fixture.manager.join(game.id(), blue).toCompletableFuture().join();
+    fixture.manager.selectTeam(red, "red");
+    fixture.manager.selectTeam(blue, "blue");
+    game.registerBed("red", new RuntimeBlockPosition(0, 64, 0), new RuntimeBlockPosition(1, 64, 0));
+    game.registerBed(
+        "blue", new RuntimeBlockPosition(10, 64, 0), new RuntimeBlockPosition(11, 64, 0));
+    fixture.manager.transition(game.id(), GameState.STARTING);
+    fixture.manager.transition(game.id(), GameState.PLAYING);
+    GameBedService beds =
+        new GameBedService(fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC));
+
+    assertEquals(
+        BedDestroyCode.OWN_BED, beds.destroy(red, new RuntimeBlockPosition(0, 64, 0)).code());
+    assertEquals(
+        BedDestroyCode.DESTROYED, beds.destroy(blue, new RuntimeBlockPosition(1, 64, 0)).code());
+    assertEquals(
+        BedDestroyCode.ALREADY_DESTROYED,
+        beds.destroy(blue, new RuntimeBlockPosition(0, 64, 0)).code());
+    assertFalse(game.team("red").orElseThrow().bedAlive());
+    assertEquals(1, game.player(blue).orElseThrow().snapshot(NOW).bedsDestroyed());
+    assertEquals(1, fixture.published.stream().filter(BedDestroyedEvent.class::isInstance).count());
+  }
+
+  @Test
+  void aliveBedSchedulesOneCentralRespawnWithProtection() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID red = game.team("red").orElseThrow().playerIds().iterator().next();
+    GameDeathService deaths =
+        new GameDeathService(
+            fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC), () -> 5);
+
+    assertEquals(DeathDecision.RESPAWN, deaths.handle(red, null).decision());
+    assertTrue(game.player(red).orElseThrow().respawning());
+    new GameRespawnService(
+            fixture.manager,
+            fixture.events,
+            Clock.fixed(NOW.plusSeconds(6), ZoneOffset.UTC),
+            () -> 3)
+        .tick();
+
+    RuntimePlayer player = game.player(red).orElseThrow();
+    assertFalse(player.respawning());
+    assertTrue(player.protectedAt(NOW.plusSeconds(7)));
+    assertTrue(fixture.eventTypes().contains(PlayerGameRespawnEvent.class));
+  }
+
+  @Test
+  void finalDeathEliminatesTeamAndTransitionsToEnding() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID red = game.team("red").orElseThrow().playerIds().iterator().next();
+    UUID blue = game.team("blue").orElseThrow().playerIds().iterator().next();
+    GameBedService beds =
+        new GameBedService(fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC));
+    assertTrue(beds.destroy(blue, new RuntimeBlockPosition(0, 64, 0)).successful());
+    GameDeathService deaths =
+        new GameDeathService(
+            fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC), () -> 5);
+
+    GameDeathResult result = deaths.handle(red, blue);
+
+    assertEquals(DeathDecision.FINAL_DEATH, result.decision());
+    assertEquals(Optional.of("red"), result.eliminatedTeam());
+    assertEquals(Optional.of("blue"), result.winnerTeam());
+    assertEquals(GameState.ENDING, game.state());
+    assertEquals(1, game.player(blue).orElseThrow().snapshot(NOW).finalKills());
+    assertTrue(fixture.eventTypes().contains(GameVictoryEvent.class));
+  }
+
+  private static GameInstance playingGame(Fixture fixture) {
+    GameInstance game =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+    UUID red = UUID.randomUUID();
+    UUID blue = UUID.randomUUID();
+    fixture.manager.join(game.id(), red).toCompletableFuture().join();
+    fixture.manager.join(game.id(), blue).toCompletableFuture().join();
+    fixture.manager.selectTeam(red, "red");
+    fixture.manager.selectTeam(blue, "blue");
+    game.registerBed("red", new RuntimeBlockPosition(0, 64, 0), new RuntimeBlockPosition(1, 64, 0));
+    game.registerBed(
+        "blue", new RuntimeBlockPosition(10, 64, 0), new RuntimeBlockPosition(11, 64, 0));
+    fixture.manager.transition(game.id(), GameState.STARTING);
+    fixture.manager.transition(game.id(), GameState.PLAYING);
+    return game;
+  }
+
   private static GameCountdownService countdowns(Fixture fixture, GameSettings settings) {
     return new GameCountdownService(
         fixture.manager, fixture.events, () -> settings, Clock.fixed(NOW, ZoneOffset.UTC));
@@ -253,12 +351,14 @@ class GameInstanceEngineTest {
         "title",
         java.util.List.of("waiting"),
         java.util.List.of("starting"),
+        java.util.List.of("playing"),
         "test",
         "test.local",
         7,
         1,
         500,
-        true);
+        true,
+        10);
   }
 
   private static GameInstance instance() {

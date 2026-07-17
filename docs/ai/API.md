@@ -1,5 +1,7 @@
 # API publique
 
+Le Ticket 012 ne modifie pas la surface publique : les snapshots existants reflètent maintenant kills, morts, final kills, lits détruits, état du lit et élimination. Les services de mutation des lits et morts restent internes afin de préserver leurs invariants atomiques.
+
 Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManager` Bukkit et expose des snapshots runtime immuables. Les sous-commandes historiques restent compatibles; aucune permission existante n'est supprimée.
 
 ## Commandes internes disponibles

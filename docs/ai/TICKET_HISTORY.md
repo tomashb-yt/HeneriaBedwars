@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 012 — première implémentation lits, respawns et éliminations — 2026-07-18
+
+Le modèle administratif enregistre désormais les deux blocs et la direction d'un lit tout en détectant les anciennes sélections incomplètes. Le clone vérifie physiquement ces blocs et construit un index O(1). La destruction ennemie est atomique, le lit allié et les autres blocs de carte restent protégés, et les explosions ne peuvent supprimer silencieusement un lit.
+
+`GameDeathService` décide respawn ou mort finale; `GameRespawnService` utilise le ticker central et applique une protection temporaire. Les final deaths alimentent les statistiques, éliminent une équipe sans membre capable de revenir et déclenchent `ENDING` pour la dernière équipe participante. Messages, scoreboard de jeu, spectateur et nettoyage différé sont branchés. Le ticket reste en validation jusqu'au parcours Paper multijoueur.
+
+Validation : 174 tests automatisés réussis, 0 échec, 0 erreur et 0 test ignoré; build propre, Spotless, `git diff --check` et Shadow JAR contrôlés. Un refus Windows du renommage atomique de dossiers de carte dispose désormais d'un repli standard sûr. Aucun serveur Paper n'étant disponible, le parcours multijoueur réel reste requis.
+
 ## Correctif équipes, traductions et début de partie — 2026-07-17
 
 Correction issue de trois captures en jeu : AQUA et les autres équipes héritaient toutes d'un nom violet, l'état prêt exposait une clé brute, la visite du lit annonçait seulement le nom technique du monde et la fiche compacte manquait de repères. Les entrées/titres v6 suivent maintenant `TeamColor`, la disponibilité est localisée, les messages nomment l'équipe et la fiche retrouve cinq lignes avec deux colonnes constantes et un guide central.

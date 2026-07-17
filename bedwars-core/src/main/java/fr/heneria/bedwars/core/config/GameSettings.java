@@ -30,12 +30,14 @@ public record GameSettings(
     String scoreboardTitle,
     List<String> scoreboardWaitingLines,
     List<String> scoreboardStartingLines,
+    List<String> scoreboardPlayingLines,
     String serverName,
     String serverAddress,
     int leaveItemSlot,
     int infoItemSlot,
     long itemInteractionCooldownMillis,
-    boolean forcedStartEnabled) {
+    boolean forcedStartEnabled,
+    int endingDurationSeconds) {
   public GameSettings {
     waitingGameMode = text(waitingGameMode, "waitingGameMode");
     if (!Double.isFinite(voidRescueY))
@@ -51,6 +53,7 @@ public record GameSettings(
     scoreboardTitle = text(scoreboardTitle, "scoreboardTitle");
     scoreboardWaitingLines = lines(scoreboardWaitingLines, "scoreboardWaitingLines");
     scoreboardStartingLines = lines(scoreboardStartingLines, "scoreboardStartingLines");
+    scoreboardPlayingLines = lines(scoreboardPlayingLines, "scoreboardPlayingLines");
     serverName = text(serverName, "serverName");
     serverAddress = text(serverAddress, "serverAddress");
     if (scoreboardRefreshTicks < 1)
@@ -61,6 +64,8 @@ public record GameSettings(
       throw new IllegalArgumentException("Waiting item slots must be distinct");
     if (itemInteractionCooldownMillis < 0 || itemInteractionCooldownMillis > 60_000)
       throw new IllegalArgumentException("Waiting item cooldown is out of range");
+    if (endingDurationSeconds < 1 || endingDurationSeconds > 300)
+      throw new IllegalArgumentException("Ending duration must be between 1 and 300 seconds");
   }
 
   private static String text(String value, String field) {

@@ -234,7 +234,7 @@ public final class ArenaCommandHandler {
                               + " [spawn="
                               + (team.spawn().isPresent() ? "ok" : "-")
                               + ", bed="
-                              + (team.bedLocation().isPresent() ? "ok" : "-")
+                              + (team.bedDefinition().isPresent() ? "ok" : "-")
                               + "]")
                   .toList());
       return send(
@@ -286,7 +286,7 @@ public final class ArenaCommandHandler {
         if (!selection.successful()) yield bedSelectionFailure(sender, selection.code(), arena);
         ArenaOperationResult operation =
             arenas.setTeamBed(
-                arena.id().value(), teamId, selection.location().orElseThrow(), arena.revision());
+                arena.id().value(), teamId, selection.bed().orElseThrow(), arena.revision());
         if (!operation.successful()) yield bedOperationFailure(sender, operation);
         yield send(
             sender,
@@ -307,7 +307,7 @@ public final class ArenaCommandHandler {
                 .filter(value -> value.id().equals(teamId))
                 .findFirst()
                 .orElse(null);
-        if (team == null || team.bedLocation().isEmpty())
+        if (team == null || team.bedDefinition().isEmpty())
           yield send(sender, "arena.team.bed.missing", Map.of("team", teamId.value()));
         yield teleport(sender, player, team.bedLocation().orElseThrow(), true);
       }

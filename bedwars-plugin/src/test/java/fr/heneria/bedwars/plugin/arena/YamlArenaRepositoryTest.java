@@ -4,11 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.heneria.bedwars.core.arena.ArenaBedDefinition;
+import fr.heneria.bedwars.core.arena.ArenaBlockPosition;
 import fr.heneria.bedwars.core.arena.ArenaBoundary;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
 import fr.heneria.bedwars.core.arena.ArenaId;
 import fr.heneria.bedwars.core.arena.ArenaLoadResult;
 import fr.heneria.bedwars.core.arena.ArenaVector;
+import fr.heneria.bedwars.core.arena.TeamId;
 import fr.heneria.bedwars.plugin.config.SafeYamlWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -110,5 +113,33 @@ class YamlArenaRepositoryTest {
     assertEquals(2, loaded.revision());
     assertTrue(loaded.boundary().orElseThrow().minimum().isPresent());
     assertTrue(loaded.boundary().orElseThrow().maximum().isEmpty());
+  }
+
+  @Test
+  void completeTwoBlockBedRoundTripsThroughYaml() throws Exception {
+    ArenaDefinition draft = ArenaDefinition.draft(new ArenaId("alpha"), CLOCK.instant());
+    ArenaBedDefinition bed =
+        new ArenaBedDefinition(
+            new ArenaBlockPosition("hbw_template_alpha", 1, 64, 2),
+            new ArenaBlockPosition("hbw_template_alpha", 2, 64, 2),
+            "EAST");
+    ArenaDefinition configured =
+        draft.withUpdatedTeam(
+            new TeamId("red"),
+            team -> team.withBedDefinition(Optional.of(bed)),
+            draft.status(),
+            CLOCK.instant());
+
+    repository.save(configured);
+
+    ArenaDefinition loaded = repository.loadAll().definitions().getFirst();
+    assertEquals(
+        bed,
+        loaded.teams().stream()
+            .filter(team -> team.id().value().equals("red"))
+            .findFirst()
+            .orElseThrow()
+            .bedDefinition()
+            .orElseThrow());
   }
 }

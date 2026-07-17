@@ -133,12 +133,26 @@ public final class ConfigurationSnapshotFactory {
                     "",
                     "<aqua>{server_address}"),
                 15),
+            game.stringList(
+                "game.scoreboard.playing.lines",
+                List.of(
+                    "",
+                    "<white>Carte <dark_gray>» <aqua>{arena_name}",
+                    "<white>Équipe <dark_gray>» <aqua>{team_name}",
+                    "<white>Équipes <dark_gray>» <green>{remaining_teams}",
+                    "",
+                    "<white>Kills <dark_gray>» <green>{kills}",
+                    "<white>Lits <dark_gray>» <aqua>{beds_destroyed}",
+                    "",
+                    "<aqua>{server_address}"),
+                15),
             game.string("game.scoreboard.server-name", "Heneria"),
             game.string("game.scoreboard.server-address", "play.heneria.fr"),
             leaveItemSlot,
             waitingInventorySlotsCollide ? (infoItemSlot + 1) % 9 : infoItemSlot,
             game.integer("game.waiting.items.interaction-cooldown-millis", 500, 0, 60_000),
-            game.bool("game.forced-start.enabled", true));
+            game.bool("game.forced-start.enabled", true),
+            game.integer("game.ending.duration-seconds", 10, 1, 300));
     if (waitingInventorySlotsCollide)
       game.error(
           "game.inventory",

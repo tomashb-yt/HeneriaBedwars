@@ -1,5 +1,9 @@
 # Système de menus interne
 
+## Lit complet Ticket 012
+
+L'action de sélection existante enregistre maintenant les deux blocs du lit. Une ancienne sélection à un seul bloc apparaît comme incomplète et doit être refaite. Le spectateur définitif reçoit un compas de suivi et un lit rouge de sortie, tous deux authentifiés par PDC et limités à son instance.
+
 ## Fiche équipe v6
 
 La fiche utilise cinq lignes et une géométrie constante. Le résumé coloré est centré en haut; le spawn occupe la colonne gauche et le lit la colonne droite. Chaque colonne contient état, définir/sélectionner, visiter et retirer. Les actions impossibles restent matérialisées par un bouton gris explicatif afin qu'aucun décalage n'apparaisse entre une équipe incomplète et une équipe prête. Un guide central décrit le parcours en trois étapes.

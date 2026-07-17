@@ -16,6 +16,12 @@ public record ArenaTeamDefinition(
     Optional<ArenaLocation> shopLocation,
     Optional<ArenaLocation> upgradeShopLocation,
     Map<String, String> metadata) {
+  private static final String BED_HEAD_WORLD = "bed-head-world";
+  private static final String BED_HEAD_X = "bed-head-x";
+  private static final String BED_HEAD_Y = "bed-head-y";
+  private static final String BED_HEAD_Z = "bed-head-z";
+  private static final String BED_FACING = "bed-facing";
+
   public ArenaTeamDefinition {
     id = Objects.requireNonNull(id, "id");
     displayName = Objects.requireNonNull(displayName, "displayName").trim();
@@ -58,6 +64,53 @@ public record ArenaTeamDefinition(
         shopLocation,
         upgradeShopLocation,
         metadata);
+  }
+
+  /** Stores both bed halves while preserving the historical foot location field. */
+  public ArenaTeamDefinition withBedDefinition(Optional<ArenaBedDefinition> value) {
+    Map<String, String> next = new java.util.LinkedHashMap<>(metadata);
+    next.keySet()
+        .removeAll(
+            java.util.Set.of(BED_HEAD_WORLD, BED_HEAD_X, BED_HEAD_Y, BED_HEAD_Z, BED_FACING));
+    Optional<ArenaLocation> foot = Optional.empty();
+    if (value.isPresent()) {
+      ArenaBedDefinition bed = value.orElseThrow();
+      foot = Optional.of(bed.foot().location());
+      next.put(BED_HEAD_WORLD, bed.head().world());
+      next.put(BED_HEAD_X, Integer.toString(bed.head().x()));
+      next.put(BED_HEAD_Y, Integer.toString(bed.head().y()));
+      next.put(BED_HEAD_Z, Integer.toString(bed.head().z()));
+      next.put(BED_FACING, bed.facing());
+    }
+    return new ArenaTeamDefinition(
+        id,
+        displayName,
+        color,
+        order,
+        capacity,
+        spawn,
+        foot,
+        shopLocation,
+        upgradeShopLocation,
+        next);
+  }
+
+  /** Returns a complete bed only for definitions selected by the two-block editor. */
+  public Optional<ArenaBedDefinition> bedDefinition() {
+    if (bedLocation.isEmpty()) return Optional.empty();
+    try {
+      ArenaBlockPosition head =
+          new ArenaBlockPosition(
+              metadata.get(BED_HEAD_WORLD),
+              Integer.parseInt(metadata.get(BED_HEAD_X)),
+              Integer.parseInt(metadata.get(BED_HEAD_Y)),
+              Integer.parseInt(metadata.get(BED_HEAD_Z)));
+      return Optional.of(
+          new ArenaBedDefinition(
+              ArenaBlockPosition.from(bedLocation.orElseThrow()), head, metadata.get(BED_FACING)));
+    } catch (RuntimeException ignored) {
+      return Optional.empty();
+    }
   }
 
   public ArenaTeamDefinition withDisplayName(String value) {

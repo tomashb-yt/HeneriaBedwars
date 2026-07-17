@@ -294,7 +294,16 @@ class ArenaFrameworkTest {
     return base.withTeams(
         base.teams().stream()
             .limit(2)
-            .map(team -> team.withSpawn(Optional.of(waiting)).withBedLocation(Optional.of(waiting)))
+            .map(
+                team -> {
+                  int x = 10 + team.order() * 3;
+                  ArenaBedDefinition bed =
+                      new ArenaBedDefinition(
+                          new ArenaBlockPosition("world", x, 64, 0),
+                          new ArenaBlockPosition("world", x + 1, 64, 0),
+                          "EAST");
+                  return team.withSpawn(Optional.of(waiting)).withBedDefinition(Optional.of(bed));
+                })
             .toList(),
         ArenaStatus.READY,
         NOW);

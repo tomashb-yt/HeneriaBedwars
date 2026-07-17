@@ -19,6 +19,16 @@ public final class GameLocationMapper {
             });
   }
 
+  /** Uses the configured spectator point, falling back to the waiting point. */
+  public RuntimeLocation spectator(GameInstance instance) {
+    return instance
+        .arena()
+        .definition()
+        .spectatorLocation()
+        .map(GameLocationMapper::coordinates)
+        .orElseGet(() -> waiting(instance));
+  }
+
   private static RuntimeLocation coordinates(ArenaLocation location) {
     return new RuntimeLocation(
         location.position().x(),

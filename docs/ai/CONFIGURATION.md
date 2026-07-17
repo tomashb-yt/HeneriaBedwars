@@ -1,5 +1,11 @@
 # Configuration
 
+## Gameplay Ticket 012
+
+`game.yml` ajoute les effets de lits, la politique `AT_DEATH`, le crédit de kill, la reconnexion désactivée et `game.ending.duration-seconds`. Le scoreboard possède désormais `game.scoreboard.playing.lines` avec `{team_name}`, `{remaining_teams}`, `{kills}` et `{beds_destroyed}`. Les délais de respawn et de protection continuent d'utiliser les valeurs typées historiques de `gameplay.yml`.
+
+Les nouvelles clés sont fusionnées au démarrage dans les installations existantes. Une ancienne équipe qui ne conserve que le pied du lit est considérée incomplète : ouvrir sa fiche et sélectionner de nouveau le lit enregistre les deux moitiés et la direction.
+
 ## Assistant d'arène v5 et import de carte
 
 `menus.yml` utilise `arena-editor.assistant-v5` pour la vue essentielle sur cinq lignes. Les clés règlent les slots `information`, `world`, `waiting`, `spectator`, `teams`, la liste `team-slots`, puis `validation`, `enable`, `delete`, `back` et `close`. Le nouveau namespace est fusionné dans les anciennes installations sans écraser leur ancien bloc `arena-editor.editor`.

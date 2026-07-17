@@ -56,6 +56,17 @@ game:
         - "<yellow>Préparez-vous !"
         - ""
         - "<aqua>{server_address}"
+    playing:
+      lines:
+        - ""
+        - "<white>Carte <dark_gray>» <aqua>{arena_name}"
+        - "<white>Équipe <dark_gray>» <aqua>{team_name}"
+        - "<white>Équipes <dark_gray>» <green>{remaining_teams}"
+        - ""
+        - "<white>Kills <dark_gray>» <green>{kills}"
+        - "<white>Lits <dark_gray>» <aqua>{beds_destroyed}"
+        - ""
+        - "<aqua>{server_address}"
 
   inventory:
     leave-slot: 8
@@ -63,3 +74,28 @@ game:
 
   forced-start:
     enabled: true
+
+  beds:
+    enabled: true
+    own-bed:
+      break-protected: true
+    destruction:
+      broadcast: true
+      title-to-victim-team: true
+      sound: ENTITY_WITHER_DEATH
+      particles: true
+      lightning-effect: false
+
+  respawn:
+    decision-policy: AT_DEATH
+    protection-cancel-on-attack: false
+
+  combat:
+    kill-credit-seconds: 10
+
+  reconnect:
+    enabled: false
+    disconnected-player-elimination-delay-seconds: 0
+
+  ending:
+    duration-seconds: 10

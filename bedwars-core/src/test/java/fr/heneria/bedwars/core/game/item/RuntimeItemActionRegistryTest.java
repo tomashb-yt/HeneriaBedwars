@@ -51,6 +51,19 @@ class RuntimeItemActionRegistryTest {
         decision("waiting_info", "game", GameState.STARTING, true, 1200));
   }
 
+  @Test
+  void spectatorActionsAreRestrictedToPlayingAndEnding() {
+    assertEquals(
+        RuntimeItemDecision.EXECUTE,
+        decision("spectator_teleporter", "game", GameState.PLAYING, true, 1000));
+    assertEquals(
+        RuntimeItemDecision.EXECUTE,
+        decision("spectator_leave", "game", GameState.ENDING, true, 1000));
+    assertEquals(
+        RuntimeItemDecision.INVALID_STATE,
+        decision("spectator_leave", "game", GameState.WAITING, true, 2000));
+  }
+
   private RuntimeItemDecision decision(
       String key, String itemGame, GameState state, boolean mainHand, long now) {
     return registry.evaluate(PLAYER, key, itemGame, "game", state, mainHand, now, 500);

@@ -1,5 +1,13 @@
 # Limitations connues
 
+## Ticket 012 en validation
+
+- Les anciennes sélections de lit à un seul bloc doivent être refaites depuis la fiche d'équipe.
+- Le téléporteur spectateur suit actuellement le premier joueur actif; une liste graphique complète reste une amélioration ultérieure.
+- La reconnexion en `PLAYING` n'est pas prise en charge : une déconnexion est une élimination définitive.
+- La validation automatisée ne remplace pas un test Paper à deux comptes des événements de mort, respawn, destruction et fin.
+- Générateurs, boutiques, économie, équipement final, récompenses et PvP 1.8 complet restent absents.
+
 - La téléportation d'équipe au passage `PLAYING` est couverte par la résolution métier et la compilation Bukkit, mais doit encore être confirmée avec plusieurs joueurs sur un serveur Paper réel.
 - Après le positionnement, aucune mécanique BedWars active n'est encore livrée : lits destructibles, réapparitions, éliminations, victoire, générateurs et boutiques restent absents.
 

@@ -69,6 +69,7 @@ permissions:
       heneriabedwars.admin.arena.delete: true
       heneriabedwars.admin.arena.menu: true
       heneriabedwars.admin.arena.teleport: true
+      heneriabedwars.admin.arena.team.bed: true
   heneriabedwars.admin.arena.create: {description: Creer une arene, default: op}
   heneriabedwars.admin.arena.list: {description: Lister les arenes, default: op}
   heneriabedwars.admin.arena.info: {description: Inspecter une arene, default: op}
@@ -78,6 +79,7 @@ permissions:
   heneriabedwars.admin.arena.delete: {description: Supprimer une arene avec confirmation, default: op}
   heneriabedwars.admin.arena.menu: {description: Ouvrir le menu des arenes, default: op}
   heneriabedwars.admin.arena.teleport: {description: Teleporter un administrateur depuis l'editeur, default: op}
+  heneriabedwars.admin.arena.team.bed: {description: Configurer les lits complets des equipes, default: op}
   heneriabedwars.admin.setup: {description: Ouvrir la configuration generale en jeu, default: op}
   heneriabedwars.admin.map:
     description: Administrer les cartes modeles.
@@ -116,6 +118,7 @@ permissions:
       heneriabedwars.admin.game.force-start: true
       heneriabedwars.admin.game.stop: true
       heneriabedwars.admin.game.destroy: true
+      heneriabedwars.admin.game.test: true
   heneriabedwars.admin.game.create: {description: Creer une instance depuis une arene, default: op}
   heneriabedwars.admin.game.list: {description: Lister les instances runtime, default: op}
   heneriabedwars.admin.game.info: {description: Inspecter une instance runtime, default: op}
@@ -125,3 +128,4 @@ permissions:
   heneriabedwars.admin.game.force-start: {description: Forcer le passage immediat d'une instance en jeu, default: op}
   heneriabedwars.admin.game.stop: {description: Arreter et nettoyer une instance runtime, default: op}
   heneriabedwars.admin.game.destroy: {description: Detruire et nettoyer une instance runtime, default: op}
+  heneriabedwars.admin.game.test: {description: Tester les mecaniques runtime BedWars, default: op}

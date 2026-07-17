@@ -1,5 +1,9 @@
 # Tests
 
+## Ticket 012 — phase automatisée
+
+La suite complète contient 174 tests automatisés réussis, sans échec, erreur ni test ignoré. Les nouveaux scénarios couvrent persistance pied/tête/direction, adjacency, index des deux blocs, protection du lit allié, double destruction, crédit unique, respawn centralisé, protection temporaire, mort finale, final kill, élimination, victoire et `ENDING`. La matrice Paper reste obligatoire pour les vrais événements de lit, mort immédiate, inventaires spectateur, titres, scoreboard et nettoyage multijoueur.
+
 ## Correctif Ticket 010.1
 
 La suite contient 161 tests automatisés réussis. Les nouveaux tests purs couvrent visibilité de la surface publique, résolution d'actions runtime, clé inconnue, ancien UUID, état interdit, off-hand, cooldown/oubli, rendu de placeholders, lignes vides et identiques, placeholder absent et limite de 15 lignes. Aucun serveur Minecraft n'est disponible : clics Bukkit, PDC réel, menu, restauration, affichage Paper et masquage des nombres restent dans la matrice manuelle.

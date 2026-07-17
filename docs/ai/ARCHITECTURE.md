@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 012 — lits et cycle d'élimination
+
+`ArenaBedDefinition` décrit pied, tête et direction sans Bukkit; la position historique du pied reste lisible pour migration. `BukkitGameBedRegistry` vérifie les blocs du clone et remplit l'index O(1) de `GameInstance`. `GameBedService`, `GameDeathService`, `GameRespawnService` et `CombatTracker` portent les décisions pures. `BukkitGamePlayListener` adapte uniquement les événements de blocs, dégâts, mort, respawn et spectateur.
+
+Le ticker unique du `GameLifecycleComponent` avance les respawns et la fin de partie. La victoire publie un événement interne, attend la durée configurée, restaure les snapshots et détruit le clone par le cycle existant.
+
 ## Correctif démarrage et présentation des équipes — 2026-07-17
 
 `GameInstance.startLocation(UUID)` résout la relation runtime joueur → équipe → spawn sans dépendance Bukkit. Sur `GameStartEvent`, `BukkitGameDisplayService` demande cette destination et `BukkitRuntimePlayerGateway` charge le chunk du clone, vide les objets d'attente, passe le joueur en survie et le téléporte. Un spawn absent produit un message explicite et ne simule aucune mécanique BedWars.

@@ -1,14 +1,15 @@
 package fr.heneria.bedwars.plugin.arena;
 
+import fr.heneria.bedwars.core.arena.ArenaBedDefinition;
+import fr.heneria.bedwars.core.arena.ArenaBlockPosition;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
-import fr.heneria.bedwars.core.arena.ArenaLocation;
 import java.util.Objects;
 import java.util.Optional;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Player;
 
-/** Validates and normalizes an administrator's targeted Bukkit bed to its foot block. */
+/** Validates and normalizes an administrator's targeted Bukkit bed to both block halves. */
 public final class BukkitArenaBeds {
   private static final int SELECTION_DISTANCE = 8;
 
@@ -39,7 +40,14 @@ public final class BukkitArenaBeds {
       return Selection.failure(SelectionCode.INCOMPLETE_BED);
 
     return new Selection(
-        SelectionCode.SUCCESS, Optional.of(BukkitArenaLocations.from(foot.getLocation())));
+        SelectionCode.SUCCESS,
+        Optional.of(
+            new ArenaBedDefinition(position(foot), position(head), footBed.getFacing().name())));
+  }
+
+  private static ArenaBlockPosition position(Block block) {
+    return new ArenaBlockPosition(
+        block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
   }
 
   public enum SelectionCode {
@@ -49,11 +57,11 @@ public final class BukkitArenaBeds {
     INCOMPLETE_BED
   }
 
-  public record Selection(SelectionCode code, Optional<ArenaLocation> location) {
+  public record Selection(SelectionCode code, Optional<ArenaBedDefinition> bed) {
     public Selection {
       code = Objects.requireNonNull(code, "code");
-      location = Objects.requireNonNull(location, "location");
-      if ((code == SelectionCode.SUCCESS) != location.isPresent())
+      bed = Objects.requireNonNull(bed, "bed");
+      if ((code == SelectionCode.SUCCESS) != bed.isPresent())
         throw new IllegalArgumentException("A successful bed selection requires a location");
     }
 

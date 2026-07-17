@@ -6,6 +6,9 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Ticket 012, première livraison jouable : lits persistants à deux blocs, index runtime, destruction ennemie atomique, protection du lit allié, morts, respawns centralisés, protection temporaire, morts finales, éliminations et victoire provisoire.
+- Scoreboard `PLAYING`, messages FR/EN, spectateur définitif avec téléporteur simple et item de sortie, puis nettoyage automatique de l'instance après la victoire.
+
 - Dossier d'import dédié pour chaque carte et remplacement sécurisé d'un monde BedWars depuis le menu, avec sauvegarde automatique, échange atomique et rechargement.
 
 - Ticket 011 (livraison initiale) : définitions persistantes d'équipes, capacités runtime, sélection métier, `/bw`/`/bedwars play` par carte et déduplication des complétions publiques.

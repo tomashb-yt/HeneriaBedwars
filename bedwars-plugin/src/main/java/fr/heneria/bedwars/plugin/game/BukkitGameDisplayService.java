@@ -9,6 +9,7 @@ import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.display.RuntimeScoreboardRenderer;
 import fr.heneria.bedwars.core.game.display.RuntimeScoreboardView;
+import fr.heneria.bedwars.core.game.event.BedDestroyedEvent;
 import fr.heneria.bedwars.core.game.event.GameCountdownAccelerateEvent;
 import fr.heneria.bedwars.core.game.event.GameCountdownCancelEvent;
 import fr.heneria.bedwars.core.game.event.GameCountdownStartEvent;
@@ -16,8 +17,14 @@ import fr.heneria.bedwars.core.game.event.GameCountdownTickEvent;
 import fr.heneria.bedwars.core.game.event.GameDestroyEvent;
 import fr.heneria.bedwars.core.game.event.GameEvent;
 import fr.heneria.bedwars.core.game.event.GameStartEvent;
+import fr.heneria.bedwars.core.game.event.GameVictoryEvent;
+import fr.heneria.bedwars.core.game.event.PlayerFinalDeathEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameDeathEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameLeaveEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameRespawnEvent;
+import fr.heneria.bedwars.core.game.event.PlayerRespawnScheduledEvent;
+import fr.heneria.bedwars.core.game.event.TeamEliminatedEvent;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
@@ -73,6 +80,14 @@ public final class BukkitGameDisplayService {
       else if (event instanceof GameCountdownAccelerateEvent accelerated)
         onCountdownAccelerate(accelerated);
       else if (event instanceof GameStartEvent started) onStart(started);
+      else if (event instanceof BedDestroyedEvent destroyed) onBedDestroyed(destroyed);
+      else if (event instanceof PlayerGameDeathEvent death) onDeath(death);
+      else if (event instanceof PlayerRespawnScheduledEvent scheduled)
+        onRespawnScheduled(scheduled);
+      else if (event instanceof PlayerGameRespawnEvent respawned) onRespawn(respawned);
+      else if (event instanceof PlayerFinalDeathEvent finalDeath) onFinalDeath(finalDeath);
+      else if (event instanceof TeamEliminatedEvent eliminated) onTeamEliminated(eliminated);
+      else if (event instanceof GameVictoryEvent victory) onVictory(victory);
       else if (event instanceof GameDestroyEvent destroyed) removeBossBar(destroyed.gameId());
     } catch (RuntimeException exception) {
       logger.error("[Games] Unable to update waiting-lobby displays", exception);
@@ -98,7 +113,9 @@ public final class BukkitGameDisplayService {
     for (UUID playerId : game.playerIds()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player != null) {
-        players.refreshWaitingItems(player, lobby.waitingContext(game));
+        if (game.state() == fr.heneria.bedwars.api.game.GameState.WAITING
+            || game.state() == fr.heneria.bedwars.api.game.GameState.STARTING)
+          players.refreshWaitingItems(player, lobby.waitingContext(game));
         updateScoreboard(player, game);
       }
     }
@@ -224,9 +241,129 @@ public final class BukkitGameDisplayService {
           10);
       player.sendMessage(
           message(moved ? "game.start.message-v6" : "game.start.teleport-failed-v6", values(game)));
-      BukkitScoreboardSession waiting = scoreboards.remove(playerId);
-      if (waiting != null && player.getScoreboard() == waiting.scoreboard())
-        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+      updateScoreboard(player, game);
+    }
+  }
+
+  private void onBedDestroyed(BedDestroyedEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    if (game == null) return;
+    var team = game.team(event.teamId()).orElse(null);
+    Player destroyer = Bukkit.getPlayer(event.destroyerId());
+    if (team == null) return;
+    Map<String, Object> additions =
+        Map.of(
+            "team",
+            team.snapshot().displayName(),
+            "destroyer",
+            destroyer == null ? "?" : destroyer.getName());
+    broadcast(game, "game.bed.destroyed", additions);
+    if (destroyer != null)
+      destroyer.sendMessage(message("game.bed.destroyer", merge(values(game), additions)));
+    for (UUID playerId : team.playerIds()) {
+      Player player = Bukkit.getPlayer(playerId);
+      if (player == null) continue;
+      player.sendTitle(
+          message("game.bed.victim-title", merge(values(game), additions)),
+          message("game.bed.victim-subtitle", merge(values(game), additions)),
+          5,
+          60,
+          10);
+      player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
+    }
+  }
+
+  private void onDeath(PlayerGameDeathEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    if (game == null) return;
+    Player victim = Bukkit.getPlayer(event.playerId());
+    if (victim != null)
+      victim.sendMessage(
+          message(
+              event.finalDeath() ? "game.death.final" : "game.death.respawn",
+              merge(values(game), Map.of("player", victim.getName()))));
+  }
+
+  private void onRespawnScheduled(PlayerRespawnScheduledEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    Player player = Bukkit.getPlayer(event.playerId());
+    if (game == null || player == null) return;
+    long seconds =
+        Math.max(0, java.time.Duration.between(event.occurredAt(), event.respawnAt()).toSeconds());
+    player.sendTitle(
+        message("game.respawn.title", values(game)),
+        message("game.respawn.subtitle", merge(values(game), Map.of("seconds", seconds))),
+        5,
+        40,
+        5);
+  }
+
+  private void onRespawn(PlayerGameRespawnEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    Player player = Bukkit.getPlayer(event.playerId());
+    if (game == null || player == null) return;
+    boolean moved =
+        game.world()
+            .flatMap(
+                world ->
+                    game.startLocation(event.playerId())
+                        .map(destination -> players.respawn(event.playerId(), world, destination)))
+            .orElse(false);
+    player.sendTitle(
+        message(moved ? "game.respawn.success-title" : "game.respawn.failed-title", values(game)),
+        message(
+            moved ? "game.respawn.success-subtitle" : "game.respawn.failed-subtitle", values(game)),
+        5,
+        40,
+        10);
+  }
+
+  private void onFinalDeath(PlayerFinalDeathEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    Player player = Bukkit.getPlayer(event.playerId());
+    if (game == null || player == null) return;
+    game.world()
+        .ifPresent(
+            world ->
+                players.spectate(
+                    event.playerId(),
+                    world,
+                    new fr.heneria.bedwars.core.game.GameLocationMapper().spectator(game)));
+    player.sendTitle(
+        message("game.death.final-title", values(game)),
+        message("game.death.final-subtitle", values(game)),
+        5,
+        60,
+        10);
+  }
+
+  private void onTeamEliminated(TeamEliminatedEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    if (game == null) return;
+    String team =
+        game.team(event.teamId())
+            .map(value -> value.snapshot().displayName())
+            .orElse(event.teamId());
+    broadcast(game, "game.team.eliminated", Map.of("team", team));
+  }
+
+  private void onVictory(GameVictoryEvent event) {
+    GameInstance game = games.find(event.gameId()).orElse(null);
+    if (game == null) return;
+    String team =
+        game.team(event.teamId())
+            .map(value -> value.snapshot().displayName())
+            .orElse(event.teamId());
+    broadcast(game, "game.victory.broadcast", Map.of("team", team));
+    for (UUID playerId : game.playerIds()) {
+      Player player = Bukkit.getPlayer(playerId);
+      if (player != null)
+        player.sendTitle(
+            message("game.victory.title", merge(values(game), Map.of("team", team))),
+            message("game.victory.subtitle", merge(values(game), Map.of("team", team))),
+            10,
+            100,
+            20);
     }
   }
 
@@ -243,11 +380,13 @@ public final class BukkitGameDisplayService {
                         .language()
                         .render(settings.scoreboardTitle(), PlaceholderContext.EMPTY),
                     settings.scoreboardHideNumbers()));
-    Map<String, Object> values = values(game);
+    Map<String, Object> values = values(game, player.getUniqueId());
     List<String> templates =
-        game.state() == fr.heneria.bedwars.api.game.GameState.STARTING
-            ? settings.scoreboardStartingLines()
-            : settings.scoreboardWaitingLines();
+        switch (game.state()) {
+          case STARTING -> settings.scoreboardStartingLines();
+          case PLAYING, ENDING -> settings.scoreboardPlayingLines();
+          default -> settings.scoreboardWaitingLines();
+        };
     RuntimeScoreboardView view =
         scoreboardRenderer.render(settings.scoreboardTitle(), templates, values);
     session.update(view);
@@ -279,6 +418,29 @@ public final class BukkitGameDisplayService {
     values.put("server_address", configurations.snapshot().game().serverAddress());
     String statusKey = missing > 0 ? "game.status.insufficient" : "game.status.ready";
     values.put("status_message", message(statusKey, Map.of()));
+    return Map.copyOf(values);
+  }
+
+  private Map<String, Object> values(GameInstance game, UUID playerId) {
+    Map<String, Object> values = new LinkedHashMap<>(values(game));
+    var runtime = game.player(playerId).orElse(null);
+    var snapshot = runtime == null ? null : runtime.snapshot(java.time.Instant.now());
+    String teamName =
+        runtime == null
+            ? "-"
+            : runtime
+                .teamId()
+                .flatMap(game::team)
+                .map(team -> team.snapshot().displayName())
+                .orElse("-");
+    values.put("team_name", teamName);
+    values.put("kills", snapshot == null ? 0 : snapshot.kills());
+    values.put("beds_destroyed", snapshot == null ? 0 : snapshot.bedsDestroyed());
+    values.put(
+        "remaining_teams",
+        game.teams().stream()
+            .filter(team -> !team.playerIds().isEmpty() && !team.eliminated())
+            .count());
     return Map.copyOf(values);
   }
 
