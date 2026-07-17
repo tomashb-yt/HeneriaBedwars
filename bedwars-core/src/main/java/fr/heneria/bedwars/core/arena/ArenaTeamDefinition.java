@@ -44,4 +44,60 @@ public record ArenaTeamDefinition(
         upgradeShopLocation,
         metadata);
   }
+
+  public ArenaTeamDefinition withDisplayName(String value) {
+    return new ArenaTeamDefinition(
+        id,
+        value,
+        color,
+        order,
+        capacity,
+        spawn,
+        bedLocation,
+        shopLocation,
+        upgradeShopLocation,
+        metadata);
+  }
+
+  public ArenaTeamDefinition withColor(TeamColor value) {
+    return new ArenaTeamDefinition(
+        id,
+        displayName,
+        value,
+        order,
+        capacity,
+        spawn,
+        bedLocation,
+        shopLocation,
+        upgradeShopLocation,
+        metadata);
+  }
+
+  public ArenaTeamDefinition withCapacity(int value) {
+    return new ArenaTeamDefinition(
+        id,
+        displayName,
+        color,
+        order,
+        value,
+        spawn,
+        bedLocation,
+        shopLocation,
+        upgradeShopLocation,
+        metadata);
+  }
+
+  public ArenaTeamDefinition withOrder(int value) {
+    return new ArenaTeamDefinition(
+        id,
+        displayName,
+        color,
+        value,
+        capacity,
+        spawn,
+        bedLocation,
+        shopLocation,
+        upgradeShopLocation,
+        metadata);
+  }
 }

@@ -189,6 +189,12 @@ arena:
       location-world-mismatch: {message: "A position belongs to another map.", solution: "Set this position again inside the associated map."}
       incomplete-boundary: {message: "Boundaries are enabled but incomplete.", solution: "Set both points or disable boundaries."}
       invalid-boundary: {message: "The two boundary points are inconsistent.", solution: "Set the minimum and maximum points again."}
+      missing-teams: {message: "No complete team is configured.", solution: "Configure at least two teams."}
+      missing-team-spawn: {message: "The spawn for team {team_name} is not configured.", solution: "Stand at this team's spawn and save the position."}
+      duplicate-team-id: {message: "Several teams use the same identifier.", solution: "Give every team a unique identifier."}
+      duplicate-team-color: {message: "Several teams use the same color.", solution: "Choose a different color for each team."}
+      duplicate-team-order: {message: "Several teams use the same order.", solution: "Reorder the teams."}
+      team-capacity-mismatch: {message: "Team capacity does not match the maximum player count.", solution: "Adjust team capacities."}
   map:
     title: "<aqua>Map template - {arena_name}"
     assistant-title: "<aqua><bold>Step 1 <gray>• <white>BedWars map"

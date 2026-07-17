@@ -189,6 +189,12 @@ arena:
       location-world-mismatch: {message: "Une position appartient à une autre carte.", solution: "Replacez cette position dans la carte associée."}
       incomplete-boundary: {message: "Les limites sont activées mais incomplètes.", solution: "Placez les deux points ou désactivez les limites."}
       invalid-boundary: {message: "Les deux points des limites sont incohérents.", solution: "Replacez les points minimum et maximum."}
+      missing-teams: {message: "Aucune équipe complète n'est configurée.", solution: "Configurez au moins deux équipes."}
+      missing-team-spawn: {message: "Le spawn de l'équipe {team_name} n'est pas configuré.", solution: "Placez-vous au spawn de cette équipe puis enregistrez sa position."}
+      duplicate-team-id: {message: "Plusieurs équipes utilisent le même identifiant.", solution: "Attribuez un identifiant unique à chaque équipe."}
+      duplicate-team-color: {message: "Plusieurs équipes utilisent la même couleur.", solution: "Choisissez une couleur différente pour chaque équipe."}
+      duplicate-team-order: {message: "Plusieurs équipes utilisent le même ordre.", solution: "Réorganisez les équipes."}
+      team-capacity-mismatch: {message: "La capacité des équipes ne correspond pas au maximum de joueurs.", solution: "Ajustez les capacités des équipes."}
   map:
     title: "<aqua>Carte modele - {arena_name}"
     assistant-title: "<aqua><bold>Étape 1 <gray>• <white>Carte BedWars"

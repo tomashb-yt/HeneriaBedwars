@@ -248,6 +248,33 @@ public final class ArenaService {
     return edit(rawId, expectedRevision, arena -> arena.withTeams(teams, editStatus(arena), now()));
   }
 
+  public synchronized ArenaOperationResult setTeamSpawn(
+      String rawId, TeamId teamId, ArenaLocation location, long expectedRevision) {
+    return updateTeam(
+        rawId, teamId, expectedRevision, team -> team.withSpawn(Optional.of(location)));
+  }
+
+  public synchronized ArenaOperationResult clearTeamSpawn(
+      String rawId, TeamId teamId, long expectedRevision) {
+    return updateTeam(rawId, teamId, expectedRevision, team -> team.withSpawn(Optional.empty()));
+  }
+
+  private ArenaOperationResult updateTeam(
+      String rawId,
+      TeamId teamId,
+      long expectedRevision,
+      java.util.function.UnaryOperator<ArenaTeamDefinition> operation) {
+    ArenaDefinition current = find(rawId).orElse(null);
+    if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
+    if (current.teams().stream().noneMatch(team -> team.id().equals(teamId)))
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "Unknown team " + teamId.value());
+    return edit(
+        rawId,
+        expectedRevision,
+        arena -> arena.withUpdatedTeam(teamId, operation, editStatus(arena), now()));
+  }
+
   public synchronized ArenaOperationResult setDisplayName(
       String rawId, String displayName, long expectedRevision) {
     String value = displayName == null ? "" : displayName.trim();

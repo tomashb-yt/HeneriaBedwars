@@ -1,10 +1,12 @@
 package fr.heneria.bedwars.plugin.arena;
 
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
+import fr.heneria.bedwars.core.arena.ArenaLocation;
 import fr.heneria.bedwars.core.arena.ArenaOperationCode;
 import fr.heneria.bedwars.core.arena.ArenaOperationResult;
 import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.arena.ArenaValidationResult;
+import fr.heneria.bedwars.core.arena.TeamId;
 import fr.heneria.bedwars.core.command.AdministrativeCommandPolicy;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.config.TranslationKey;
@@ -50,6 +52,7 @@ public final class ArenaCommandHandler {
       case "setspectator" -> setLocation(sender, args, false);
       case "setplayers" -> setPlayers(sender, args);
       case "setteams" -> setTeams(sender, args);
+      case "team" -> team(sender, args);
       case "validate" -> validate(sender, args);
       case "enable" -> status(sender, args, true);
       case "disable" -> status(sender, args, false);
@@ -152,6 +155,66 @@ public final class ArenaCommandHandler {
     } catch (NumberFormatException exception) {
       return send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
     }
+  }
+
+  private boolean team(CommandSender sender, String[] args) {
+    if (!allowed(sender, AdministrativeCommandPolicy.ARENA_EDIT)) return true;
+    if (args.length < 4) return send(sender, TranslationKey.ARENA_HELP);
+    ArenaDefinition arena = arenas.find(args[3]).orElse(null);
+    if (arena == null) return notFound(sender, new String[] {"arena", "info", args[3]});
+    if (args[2].equalsIgnoreCase("list")) {
+      sender.sendMessage(
+          "§bÉquipes : §f"
+              + String.join(", ", arena.teams().stream().map(team -> team.id().value()).toList()));
+      return true;
+    }
+    if (!(sender instanceof Player player) || args.length != 5)
+      return send(
+          sender, args.length == 5 ? TranslationKey.PLAYER_ONLY : TranslationKey.ARENA_HELP);
+    TeamId teamId;
+    try {
+      teamId = new TeamId(args[4]);
+    } catch (IllegalArgumentException exception) {
+      return send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
+    }
+    return switch (args[2].toLowerCase(Locale.ROOT)) {
+      case "setspawn" ->
+          result(
+              sender,
+              arenas.setTeamSpawn(
+                  arena.id().value(),
+                  teamId,
+                  BukkitArenaLocations.from(player.getLocation()),
+                  arena.revision()),
+              TranslationKey.ARENA_UPDATED);
+      case "clearspawn" ->
+          result(
+              sender,
+              arenas.clearTeamSpawn(arena.id().value(), teamId, arena.revision()),
+              TranslationKey.ARENA_UPDATED);
+      case "teleport" -> {
+        var team =
+            arena.teams().stream()
+                .filter(value -> value.id().equals(teamId))
+                .findFirst()
+                .orElse(null);
+        if (team == null || team.spawn().isEmpty())
+          yield send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
+        ArenaLocation spawn = team.spawn().orElseThrow();
+        org.bukkit.World world = org.bukkit.Bukkit.getWorld(spawn.world());
+        if (world == null) yield send(sender, TranslationKey.ARENA_INVALID_ARGUMENT);
+        player.teleport(
+            new org.bukkit.Location(
+                world,
+                spawn.position().x(),
+                spawn.position().y(),
+                spawn.position().z(),
+                spawn.yaw(),
+                spawn.pitch()));
+        yield true;
+      }
+      default -> send(sender, TranslationKey.ARENA_HELP);
+    };
   }
 
   private boolean validate(CommandSender sender, String[] args) {

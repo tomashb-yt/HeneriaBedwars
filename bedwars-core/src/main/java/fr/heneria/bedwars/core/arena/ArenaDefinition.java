@@ -321,6 +321,30 @@ public record ArenaDefinition(
         next);
   }
 
+  /** Changes one stable team without regenerating the remaining definitions. */
+  public ArenaDefinition withUpdatedTeam(
+      TeamId teamId,
+      java.util.function.UnaryOperator<ArenaTeamDefinition> operation,
+      ArenaStatus newStatus,
+      Instant now) {
+    Objects.requireNonNull(teamId, "teamId");
+    Objects.requireNonNull(operation, "operation");
+    java.util.ArrayList<ArenaTeamDefinition> next = new java.util.ArrayList<>(teams.size());
+    boolean found = false;
+    for (ArenaTeamDefinition team : teams) {
+      if (!team.id().equals(teamId)) {
+        next.add(team);
+        continue;
+      }
+      ArenaTeamDefinition updated = Objects.requireNonNull(operation.apply(team), "updated team");
+      if (!updated.id().equals(teamId)) throw new IllegalArgumentException("Team id cannot change");
+      next.add(updated);
+      found = true;
+    }
+    if (!found) throw new IllegalArgumentException("Unknown team " + teamId.value());
+    return withTeams(next, newStatus, now);
+  }
+
   /** Deterministic migration defaults for legacy count/capacity-only arena definitions. */
   public static List<ArenaTeamDefinition> defaultTeams(int count, int capacity) {
     TeamColor[] colors = TeamColor.values();
