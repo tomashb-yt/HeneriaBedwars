@@ -493,15 +493,21 @@ items:
       summary-v4: {material: STRUCTURE_BLOCK, name: "<gold><bold>Confirmer la copie", lore: ["<gray>Source : <white>{map_id}", "<gray>Destination : <white>{destination_id}"]}
   game:
     public:
-      info:
+      general:
         material: BOOK
-        name: "<aqua><bold>Informations"
-        lore: ["<gray>Carte : <white>{arena_name}", "<gray>Partie : <white>{game_id}", "<gray>État : <white>{state}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Minimum : <white>{minimum_players}", "<gray>Compte à rebours : <white>{countdown}s"]
-        required-placeholders: [arena_name, game_id, state, players, maximum_players, minimum_players, countdown]
-      leave:
-        material: RED_BED
-        name: "<red><bold>Quitter la partie"
-        lore: ["<gray>Restaure votre inventaire et votre position.", "", "<yellow>▸ Cliquez pour quitter"]
+        name: "<aqua><bold>Informations générales"
+        lore: ["<gray>Carte : <white>{arena_name}", "<gray>Arène : <white>{arena_id}", "<gray>Partie : <white>{game_id}", "<gray>Capacité : <white>{minimum_players} à {maximum_players} joueurs"]
+        required-placeholders: [arena_name, arena_id, game_id, minimum_players, maximum_players]
+      state:
+        material: CLOCK
+        name: "<yellow><bold>État de la partie"
+        lore: ["<gray>État : <white>{state}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Compte à rebours : <white>{countdown}s", "", "<yellow>{status_message}"]
+        required-placeholders: [state, players, maximum_players, countdown, status_message]
+      players:
+        material: PLAYER_HEAD
+        name: "<green><bold>Liste des joueurs"
+        lore: ["<gray>Présents : <white>{players}/{maximum_players}", "", "<white>{player_names}"]
+        required-placeholders: [players, maximum_players, player_names]
     admin:
       summary:
         material: CLOCK

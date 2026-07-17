@@ -8,7 +8,7 @@
 
 - Correctif 010.1 : `/bedwars` strictement réservé au dashboard administrateur, aide publique adaptée et complétion joueur limitée à `game join|leave`;
 - items d'attente interactifs identifiés par PDC avec UUID d'instance, filtrage off-hand, cooldown et protection contre les anciens items;
-- menu public d'informations sans action administrative et départ délégué à `GameLobbyService`;
+- menu public d'informations uniquement composé du résumé, de l'état, de la liste des joueurs et de la fermeture; le départ reste sur l'item rouge et `GameLobbyService`;
 - scoreboard configurable/localisé, lignes stables sans recréation, labels runtime lisibles et masquage des nombres quand Paper le permet;
 
 - Ticket 010 : lobby d'attente runtime `WAITING`/`STARTING`, compte a rebours automatique, annulation au-dessous du minimum, acceleration a partie pleine, passage controle vers `PLAYING`, nettoyage d'instance vide et arret administratif;

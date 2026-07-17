@@ -2,7 +2,7 @@
 
 ## Correctif 010.1
 
-Chaque item d'attente contient une action stable et l'UUID complet de la partie. Le listener accepte les clics gauche/droit dans l'air ou sur bloc même si l'interaction vanilla est déjà annulée, ignore l'off-hand, applique un cooldown et refuse un ancien UUID. Quitter appelle exclusivement `GameLobbyService.leave`; informations ouvre un GUI public.
+Chaque item d'attente contient une action stable et l'UUID complet de la partie. Le listener accepte les clics gauche/droit dans l'air ou sur bloc même si l'interaction vanilla est déjà annulée, ignore l'off-hand, applique un cooldown et refuse un ancien UUID. Quitter appelle exclusivement `GameLobbyService.leave`; informations ouvre un GUI public purement informatif, sans bouton de départ redondant.
 
 Le scoreboard utilise les templates `waiting` ou `starting`, rend les états localisés et conserve une session par joueur. Les équipes/entrées restent stables afin d'éviter le clignotement. Paper peut masquer les nombres via sa capacité `NumberFormat.blank`; Spigot conserve les scores avec un fallback compatible.
 
@@ -73,4 +73,4 @@ Le tableau de bord `/bedwars setup` contient une carte **Parties en cours** qui 
 
 ## Limites volontaires
 
-Le runtime ne persiste aucune donnee de match ni snapshot de joueur. Il ne gere ni equipes BedWars detaillees, ni lits, generateurs, boutiques, spectateurs, reconnexion, proxy, matchmaking, SQL, Redis ou replay. Le prochain chantier recommande est le Ticket 011 : equipes, couleurs et assignation detaillee.
+Le runtime ne persiste aucune donnee de match ni snapshot de joueur. Il ne gere ni equipes BedWars detaillees, ni lits, generateurs, boutiques, spectateurs, reconnexion, proxy, matchmaking, SQL, Redis ou replay. Le prochain chantier recommande est le Ticket 011 : équipes détaillées et navigateur public `/bw`, selon `TICKET_011_SCOPE.md`.

@@ -15,6 +15,6 @@
 
 ## Grandes phases futures
 
-Le prochain ticket recommande est le Ticket 011 : equipes BedWars detaillees, couleurs, spawns et assignation. Lits actifs, generateurs, boutiques, ameliorations, combat, victoire, matchmaking, stockage SQL et reseau proxy restent futurs.
+Le prochain ticket recommandé est le Ticket 011 : équipes BedWars détaillées, couleurs, spawns et assignation, ainsi que le premier navigateur public `/bw` avec quick play simple et sélection des parties. Le périmètre détaillé est dans `TICKET_011_SCOPE.md`. Lits actifs, générateurs, boutiques, améliorations, combat, victoire, matchmaking automatique, stockage SQL et réseau proxy restent futurs.
 
 Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.

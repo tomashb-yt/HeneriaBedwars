@@ -187,8 +187,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               gameLobby,
               projectLogger);
       GamePublicInfoMenuFactory publicGameMenus =
-          new GamePublicInfoMenuFactory(
-              this, gameService, gameCountdowns, gameLobby, configurations);
+          new GamePublicInfoMenuFactory(gameService, gameCountdowns, configurations);
       GameWaitingListener waitingListener =
           new GameWaitingListener(
               this,

@@ -2,6 +2,8 @@
 
 Etat correctif 010.1 : la surface `/bedwars` est administrative, tandis que `game join|leave` forme la petite surface publique temporaire. Les items du lobby sont authentifiés par PDC et délèguent au service métier; l'information joueur est séparée des menus administratifs. Le scoreboard d'attente est localisé, configurable et incrémental.
 
+Le Ticket 011 ajoutera deux axes indépendants : équipes BedWars détaillées et navigateur public `/bw`. Le livre d'un joueur déjà présent reste informatif; seul le navigateur avant join pourra proposer l'action rejoindre.
+
 Etat Ticket 010 : le plugin transforme une arene valide et sa carte modele en instance isolee, accueille plusieurs joueurs dans un lobby temporaire, protege cet espace, gere un compte a rebours et atteint `PLAYING` sans lancer de gameplay BedWars. Aucun lit actif, generateur, boutique, combat specifique, victoire ou matchmaking n'est fourni.
 
 État Ticket 009 : le plugin sait transformer une arène valide et sa carte modèle en instance vivante isolée, avec clone temporaire, machine d'état, joueurs, équipes, événements et nettoyage. Il ne contient encore aucune mécanique BedWars : aucun lit actif, générateur, boutique, combat spécifique, victoire ou matchmaking.

@@ -2,7 +2,7 @@
 
 ## Menu public Ticket 010.1
 
-Le livre du lobby ouvre un menu de trois lignes distinct de l'administration. Il affiche carte, id court, état localisé, joueurs, capacités et countdown, puis propose seulement quitter ou fermer. Aucune route ne mène au dashboard, à l'arrêt forcé ou à la suppression du monde.
+Le livre du lobby ouvre un menu de trois lignes distinct de l'administration. Il contient quatre éléments seulement : informations générales, état/countdown, liste des joueurs et fermer. Le départ reste réservé au lit rouge ou à `/bedwars game leave`; aucune route ne mène au dashboard, à l'arrêt forcé ou à la suppression du monde.
 
 ## Intégration Ticket 007
 

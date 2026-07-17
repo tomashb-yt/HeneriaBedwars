@@ -2,6 +2,8 @@
 
 ## Correctif Ticket 010.1 - Accès, items du lobby et scoreboard
 
+Ajustement d'interface : le menu ouvert par le livre ne duplique plus le départ. Il présente informations générales, état/countdown, joueurs et fermeture. Le navigateur public `/bw`, quick play, filtres et sélection par clic sont explicitement reportés au Ticket 011 et documentés dans `TICKET_011_SCOPE.md`.
+
 Terminé le 2026-07-17 côté code et validation automatisée. Le dashboard `/bedwars` exige désormais `heneriabedwars.admin.dashboard`; les permissions publiques `heneriabedwars.game.join|leave` et la complétion ne révèlent aucune commande de configuration. Le message joueur explique le parcours public temporaire.
 
 La cause des items inactifs était un listener `ignoreCancelled=true` sans filtrage off-hand : une interaction protégée pouvait être annulée avant l'action. Les nouveaux PDC `runtime_item`/`runtime_game_id`, le registre d'actions, le cooldown et la garde d'opération assurent un seul leave via `GameLobbyService`. Le livre ouvre un menu public séparé.
