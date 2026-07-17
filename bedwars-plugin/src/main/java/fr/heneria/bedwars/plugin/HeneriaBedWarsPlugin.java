@@ -35,6 +35,7 @@ import fr.heneria.bedwars.plugin.game.BukkitRuntimePlayerGateway;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimeWorldService;
 import fr.heneria.bedwars.plugin.game.GameAdminMenuFactory;
 import fr.heneria.bedwars.plugin.game.GameLifecycleComponent;
+import fr.heneria.bedwars.plugin.game.GamePublicInfoMenuFactory;
 import fr.heneria.bedwars.plugin.game.GameWaitingListener;
 import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
 import fr.heneria.bedwars.plugin.gui.BukkitTextInputService;
@@ -176,15 +177,30 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       gameLobby =
           new GameLobbyService(
               gameService, gameCountdowns, () -> configurations.snapshot().game(), clock);
+      guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       BukkitGameDisplayService gameDisplays =
           new BukkitGameDisplayService(
-              configurations, gameService, gameCountdowns, runtimePlayers, projectLogger);
+              configurations,
+              gameService,
+              gameCountdowns,
+              runtimePlayers,
+              gameLobby,
+              projectLogger);
+      GamePublicInfoMenuFactory publicGameMenus =
+          new GamePublicInfoMenuFactory(
+              this, gameService, gameCountdowns, gameLobby, configurations);
       GameWaitingListener waitingListener =
           new GameWaitingListener(
-              this, configurations, gameService, gameLobby, runtimePlayers, gameDisplays);
+              this,
+              configurations,
+              gameService,
+              gameLobby,
+              runtimePlayers,
+              gameDisplays,
+              guiService,
+              publicGameMenus);
       GameAdminMenuFactory runtimeGameMenus =
           new GameAdminMenuFactory(this, gameService, gameCountdowns, gameLobby, configurations);
-      guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       ArenaEditorStateStore editorStates = new ArenaEditorStateStore();
       MapEditorStateStore mapEditorStates = new MapEditorStateStore();
       MapOperationTracker mapOperations = new MapOperationTracker(clock);

@@ -1,6 +1,7 @@
 config-version: 1
 
 general:
+  public-help: "<aqua><bold>HeneriaBedWars</bold></aqua>\n<gray>You do not have access to administrative commands.\nUse lobby NPCs or <white>/bedwars game join <game></white> to play."
   prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
   no-permission: "<red>You do not have permission to use this command."
   player-only: "<red>This command is only available to players."
@@ -199,6 +200,21 @@ arena:
     success: "<green>Arena {arena_id} was backed up and deleted."
     failed: "<red>Deletion failed."
 game:
+  public-info:
+    title: "<aqua><bold>Game — {arena_name}"
+    missing-title: "<red>Game unavailable"
+  state:
+    creating: "Creating"
+    waiting: "Waiting"
+    starting: "Starting"
+    playing: "Playing"
+    ending: "Ending"
+    resetting: "Resetting"
+    destroyed: "Finished"
+  status:
+    insufficient: "<yellow>Not enough players"
+    waiting: "<yellow>Waiting for more players"
+    ready: "<green>Ready to start"
   command:
     help: "<yellow>Usage: /bedwars game join <arena> — other commands are for advanced administration."
     creating: "<yellow>Creating an instance for <white>{arena_id}<yellow>..."

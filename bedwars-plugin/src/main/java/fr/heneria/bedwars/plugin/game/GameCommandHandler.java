@@ -46,7 +46,6 @@ public final class GameCommandHandler {
   }
 
   public boolean execute(CommandSender sender, String[] args) {
-    if (!allowed(sender, AdministrativeCommandPolicy.GAME)) return true;
     if (args.length < 2) return send(sender, "game.command.help", Map.of());
     return switch (args[1].toLowerCase(Locale.ROOT)) {
       case "create" -> create(sender, args);
@@ -62,17 +61,26 @@ public final class GameCommandHandler {
   }
 
   public List<String> complete(CommandSender sender, String[] args, List<String> arenaIds) {
-    if (!sender.hasPermission(AdministrativeCommandPolicy.GAME)) return List.of();
+    boolean administrator = sender.hasPermission(AdministrativeCommandPolicy.GAME);
+    boolean canJoin = sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN);
+    boolean canLeave = sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE);
+    if (!administrator && !canJoin && !canLeave) return List.of();
     List<String> values = new ArrayList<>();
     if (args.length == 2) {
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_CREATE)) values.add("create");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_LIST)) values.add("list");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_INFO)) values.add("info");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN)) values.add("join");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE)) values.add("leave");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_START)) values.add("start");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_STOP)) values.add("stop");
-      if (sender.hasPermission(AdministrativeCommandPolicy.GAME_DESTROY)) values.add("destroy");
+      if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_CREATE))
+        values.add("create");
+      if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_LIST))
+        values.add("list");
+      if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_INFO))
+        values.add("info");
+      if (canJoin) values.add("join");
+      if (canLeave) values.add("leave");
+      if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_START))
+        values.add("start");
+      if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_STOP))
+        values.add("stop");
+      if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_DESTROY))
+        values.add("destroy");
     } else if (args.length == 3 && args[1].equalsIgnoreCase("create")) {
       values.addAll(arenaIds);
     } else if (args.length == 3 && args[1].equalsIgnoreCase("join")) {
@@ -92,7 +100,7 @@ public final class GameCommandHandler {
   }
 
   private boolean create(CommandSender sender, String[] args) {
-    if (!allowed(sender, AdministrativeCommandPolicy.GAME_CREATE)) return true;
+    if (!allowedAdmin(sender, AdministrativeCommandPolicy.GAME_CREATE)) return true;
     if (args.length != 3) return send(sender, "game.command.help", Map.of());
     send(sender, "game.command.creating", Map.of("arena_id", args[2]));
     games
@@ -113,7 +121,7 @@ public final class GameCommandHandler {
   }
 
   private boolean list(CommandSender sender) {
-    if (!allowed(sender, AdministrativeCommandPolicy.GAME_LIST)) return true;
+    if (!allowedAdmin(sender, AdministrativeCommandPolicy.GAME_LIST)) return true;
     String visible = String.join(" | ", games.all().stream().map(this::summary).limit(20).toList());
     return send(
         sender,
@@ -122,7 +130,7 @@ public final class GameCommandHandler {
   }
 
   private boolean info(CommandSender sender, String[] args) {
-    if (!allowed(sender, AdministrativeCommandPolicy.GAME_INFO)) return true;
+    if (!allowedAdmin(sender, AdministrativeCommandPolicy.GAME_INFO)) return true;
     GameInstance instance = resolve(sender, args, 3);
     if (instance == null) return true;
     return send(sender, "game.command.info", values(instance));
@@ -192,7 +200,7 @@ public final class GameCommandHandler {
   }
 
   private boolean start(CommandSender sender, String[] args) {
-    if (!allowed(sender, AdministrativeCommandPolicy.GAME_START)) return true;
+    if (!allowedAdmin(sender, AdministrativeCommandPolicy.GAME_START)) return true;
     if (args.length < 3 || args.length > 4) return send(sender, "game.command.help", Map.of());
     boolean force = args.length == 4 && args[3].equalsIgnoreCase("--force");
     if (args.length == 4 && !force) return send(sender, "game.command.help", Map.of());
@@ -206,7 +214,7 @@ public final class GameCommandHandler {
   }
 
   private boolean stop(CommandSender sender, String[] args, String permission) {
-    if (!allowed(sender, permission)) return true;
+    if (!allowedAdmin(sender, permission)) return true;
     GameInstance instance = resolve(sender, args, 3);
     if (instance == null) return true;
     send(sender, "game.command.destroying", values(instance));
@@ -299,6 +307,10 @@ public final class GameCommandHandler {
   private boolean allowed(CommandSender sender, String permission) {
     if (sender.hasPermission(permission)) return true;
     return send(sender, "general.no-permission", Map.of());
+  }
+
+  private boolean allowedAdmin(CommandSender sender, String permission) {
+    return allowed(sender, AdministrativeCommandPolicy.GAME) && allowed(sender, permission);
   }
 
   private boolean send(CommandSender sender, String key, Map<String, ?> values) {

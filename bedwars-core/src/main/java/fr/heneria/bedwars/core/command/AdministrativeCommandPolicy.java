@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 /** Pure permission-aware tab-completion policy for administrative commands. */
 public final class AdministrativeCommandPolicy {
   public static final String ADMIN = "heneriabedwars.admin";
+  public static final String ADMIN_DASHBOARD = "heneriabedwars.admin.dashboard";
   public static final String RELOAD = "heneriabedwars.admin.reload";
   public static final String CONFIG = "heneriabedwars.admin.config";
   public static final String LANGUAGE = "heneriabedwars.admin.language";
@@ -42,8 +43,8 @@ public final class AdministrativeCommandPolicy {
   public static final String GAME_CREATE = "heneriabedwars.admin.game.create";
   public static final String GAME_LIST = "heneriabedwars.admin.game.list";
   public static final String GAME_INFO = "heneriabedwars.admin.game.info";
-  public static final String GAME_JOIN = "heneriabedwars.admin.game.join";
-  public static final String GAME_LEAVE = "heneriabedwars.admin.game.leave";
+  public static final String GAME_JOIN = "heneriabedwars.game.join";
+  public static final String GAME_LEAVE = "heneriabedwars.game.leave";
   public static final String GAME_START = "heneriabedwars.admin.game.start";
   public static final String GAME_FORCE_START = "heneriabedwars.admin.game.force-start";
   public static final String GAME_STOP = "heneriabedwars.admin.game.stop";
@@ -98,7 +99,8 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(ARENA) || permitted.test(ARENA_MENU)) choices.add("arena");
       if (permitted.test(SETUP)) choices.add("setup");
       if (permitted.test(MAP) || permitted.test(MAP_MENU)) choices.add("map");
-      if (permitted.test(GAME)) choices.add("game");
+      if (permitted.test(GAME) || permitted.test(GAME_JOIN) || permitted.test(GAME_LEAVE))
+        choices.add("game");
     } else if (arguments.length == 2
         && arguments[0].equalsIgnoreCase("language")
         && permitted.test(LANGUAGE)) {

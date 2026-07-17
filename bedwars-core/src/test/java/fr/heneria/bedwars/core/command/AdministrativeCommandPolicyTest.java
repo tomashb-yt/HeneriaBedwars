@@ -20,6 +20,14 @@ class AdministrativeCommandPolicyTest {
   }
 
   @Test
+  void publicPlayerOnlySeesGameAndPublicActions() {
+    Set<String> permissions =
+        Set.of(AdministrativeCommandPolicy.GAME_JOIN, AdministrativeCommandPolicy.GAME_LEAVE);
+    assertEquals(
+        List.of("game"), policy.complete(permissions::contains, new String[] {""}, List.of()));
+  }
+
+  @Test
   void exposesGuiOnlyWithGuiPermission() {
     assertEquals(
         List.of("gui"),

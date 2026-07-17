@@ -6,7 +6,7 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 
 | Commande | Permission | Effet |
 |---|---|---|
-| `/bedwars`, `/hbw` | `heneriabedwars.admin.setup` pour un joueur | ouvre directement le tableau de bord; la console conserve l'aide |
+| `/bedwars`, `/hbw` | `heneriabedwars.admin.dashboard` | ouvre le tableau de bord administratif; sans permission affiche l'aide joueur |
 | `/bedwars version` | `heneriabedwars.admin` | versions, état et nombre de services |
 | `/bedwars reload` | `heneriabedwars.admin.reload` | reload transactionnel des YAML |
 | `/bedwars config` | `heneriabedwars.admin.config` | diagnostic sans secret |
@@ -39,8 +39,8 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 | `/bedwars game create <arène>` | `heneriabedwars.admin.game.create` | clone la carte, crée l'instance en `WAITING` et fait rejoindre le joueur |
 | `/bedwars game list` | `heneriabedwars.admin.game.list` | liste les instances vivantes |
 | `/bedwars game info <id-court ou UUID>` | `heneriabedwars.admin.game.info` | affiche arene, carte, etat, monde, joueurs, age et compteur |
-| `/bedwars game join <arene ou id>` | `heneriabedwars.admin.game.join` | rejoint le lobby existant ou cree l'instance depuis une arene active |
-| `/bedwars game leave` | `heneriabedwars.admin.game.leave` | restaure le snapshot joueur puis quitte l'instance |
+| `/bedwars game join <arene ou id>` | `heneriabedwars.game.join` | rejoint une instance existante; sa création reste administrative |
+| `/bedwars game leave` | `heneriabedwars.game.leave` | restaure le snapshot joueur puis quitte l'instance |
 | `/bedwars game start <id> [--force]` | `heneriabedwars.admin.game.start` / `.force-start` | demarre le compteur ou force `PLAYING` pour un test |
 | `/bedwars game stop <id>` | `heneriabedwars.admin.game.stop` | arrete, restaure les joueurs et nettoie le clone |
 | `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | alias historique de `stop` |

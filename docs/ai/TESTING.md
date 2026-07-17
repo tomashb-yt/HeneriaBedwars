@@ -1,5 +1,9 @@
 # Tests
 
+## Correctif Ticket 010.1
+
+La suite contient 161 tests automatisés réussis. Les nouveaux tests purs couvrent visibilité de la surface publique, résolution d'actions runtime, clé inconnue, ancien UUID, état interdit, off-hand, cooldown/oubli, rendu de placeholders, lignes vides et identiques, placeholder absent et limite de 15 lignes. Aucun serveur Minecraft n'est disponible : clics Bukkit, PDC réel, menu, restauration, affichage Paper et masquage des nombres restent dans la matrice manuelle.
+
 ## Ticket 010
 
 La suite ajoute des tests purs du lobby et du compteur : entree du premier et du second joueur, demarrage automatique, annulation quand le minimum redescend, reprise du compteur, passage en `PLAYING`, lancement force, destruction d'une instance vide par le ticker central, id court non ambigu et validation de `game.yml`. Elle contient 154 tests automatises reussis, sans echec ni test ignore lors de la derniere verification.

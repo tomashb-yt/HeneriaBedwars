@@ -6,6 +6,11 @@
 
 ## Disponible
 
+- Correctif 010.1 : `/bedwars` strictement réservé au dashboard administrateur, aide publique adaptée et complétion joueur limitée à `game join|leave`;
+- items d'attente interactifs identifiés par PDC avec UUID d'instance, filtrage off-hand, cooldown et protection contre les anciens items;
+- menu public d'informations sans action administrative et départ délégué à `GameLobbyService`;
+- scoreboard configurable/localisé, lignes stables sans recréation, labels runtime lisibles et masquage des nombres quand Paper le permet;
+
 - Ticket 010 : lobby d'attente runtime `WAITING`/`STARTING`, compte a rebours automatique, annulation au-dessous du minimum, acceleration a partie pleine, passage controle vers `PLAYING`, nettoyage d'instance vide et arret administratif;
 - snapshots joueurs uniquement en memoire avec restauration de la position, inventaire, etat et scoreboard avant sortie; protections et rescue du vide limites aux membres d'un lobby runtime;
 - scoreboard, bossbar configurable, titres, actionbar, sons, items quitter/information et menu d'administration des parties;
@@ -61,4 +66,4 @@
 
 Aucune équipe BedWars configurable ou mécanique de couleur, aucun lit, générateur actif, boutique, PNJ, achat, amélioration, lobby protégé, base de données, resource pack ou PlaceholderAPI. Les cartes restent des modèles administratifs persistants; leurs clones runtime ne fournissent encore aucun gameplay.
 
-Les 154 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 161 tests automatisés passent, sans échec ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.

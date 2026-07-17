@@ -1,5 +1,18 @@
 # Décisions d'architecture
 
+## ADR-051 à ADR-058 - Correctif lobby Ticket 010.1
+
+Accepté.
+
+- **ADR-051** — `/bedwars` sans argument et son dashboard sont strictement administratifs avec une permission dédiée.
+- **ADR-052** — Les commandes publiques `game join|leave` utilisent `heneriabedwars.game.*`, séparé de `heneriabedwars.admin.*`.
+- **ADR-053** — Un item runtime est identifié par les PDC `runtime_item` et `runtime_game_id`, jamais par son apparence.
+- **ADR-054** — Les actions d'items passent par `GameLobbyService`; le listener ne téléporte ni ne restaure directement.
+- **ADR-055** — Le scoreboard runtime est piloté par les templates validés de `game.yml`.
+- **ADR-056** — Les états et messages runtime affichés sont localisés avant rendu.
+- **ADR-057** — Une session personnelle conserve objectif, équipes et entrées stables et ne met à jour que les lignes modifiées.
+- **ADR-058** — Le masquage des scores est une capacité Paper optionnelle avec fallback Spigot sans erreur.
+
 ## ADR-040 — Instance runtime distincte des définitions persistantes
 
 Accepté. `ArenaDefinition` et `MapTemplate` restent administratifs; `GameInstance` ne les modifie jamais et possède un UUID ainsi qu'un clone jetable.

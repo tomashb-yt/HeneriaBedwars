@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Correctif Ticket 010.1 - Accès, items du lobby et scoreboard
+
+Terminé le 2026-07-17 côté code et validation automatisée. Le dashboard `/bedwars` exige désormais `heneriabedwars.admin.dashboard`; les permissions publiques `heneriabedwars.game.join|leave` et la complétion ne révèlent aucune commande de configuration. Le message joueur explique le parcours public temporaire.
+
+La cause des items inactifs était un listener `ignoreCancelled=true` sans filtrage off-hand : une interaction protégée pouvait être annulée avant l'action. Les nouveaux PDC `runtime_item`/`runtime_game_id`, le registre d'actions, le cooldown et la garde d'opération assurent un seul leave via `GameLobbyService`. Le livre ouvre un menu public séparé.
+
+Le scoreboard effaçait tous ses scores à chaque rafraîchissement et rendait `GameState.name()`. Il utilise désormais des templates `game.yml`, des labels localisés et une session personnelle à entrées stables. Le masquage Paper possède un fallback Spigot. Validation : 161 tests automatisés; aucun test en jeu faute de serveur.
+
 ## Ticket 010 - Lobby de partie, file d'attente et compte a rebours
 
 Termine le 2026-07-17 cote code et validation automatisee. `GameLobbyService` centralise l'entree, la sortie, la deconnexion, le lancement et l'arret pre-game; `GameCountdownService` porte le compte a rebours sans tache par partie. Le cycle `WAITING -> STARTING -> PLAYING` est automatique au minimum de joueurs, s'annule si ce minimum est perdu et peut etre force par un administrateur pour les tests.

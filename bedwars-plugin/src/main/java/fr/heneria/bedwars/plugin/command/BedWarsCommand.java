@@ -111,7 +111,9 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     try {
       if (args.length == 0
           && sender instanceof Player
-          && sender.hasPermission(AdministrativeCommandPolicy.SETUP)) return setup(sender);
+          && sender.hasPermission(AdministrativeCommandPolicy.ADMIN_DASHBOARD))
+        return setup(sender);
+      if (args.length == 0 && sender instanceof Player) return publicHelp(sender);
       if (args.length == 0) return help(sender);
       return switch (args[0].toLowerCase(Locale.ROOT)) {
         case "help" -> help(sender);
@@ -135,7 +137,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
   }
 
   private boolean help(CommandSender sender) {
-    if (!allowed(sender, ADMIN)) return true;
+    if (sender instanceof Player && !sender.hasPermission(ADMIN)) return publicHelp(sender);
     send(sender, TranslationKey.HELP_HEADER);
     if (sender instanceof Player) {
       if (sender.hasPermission(AdministrativeCommandPolicy.SETUP))
@@ -165,6 +167,17 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
                   "game.command.help",
                   configurations.snapshot().plugin().locale(),
                   PlaceholderContext.builder().build()));
+    return true;
+  }
+
+  private boolean publicHelp(CommandSender sender) {
+    sender.sendMessage(
+        configurations
+            .language()
+            .message(
+                "general.public-help",
+                configurations.snapshot().plugin().locale(),
+                PlaceholderContext.EMPTY));
     return true;
   }
 

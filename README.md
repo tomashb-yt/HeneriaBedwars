@@ -46,4 +46,6 @@ Le framework interne de menus est disponible via `/bedwars gui` ou `/hbw gui` av
 
 Pour tester le runtime : activez une arène valide liée à une carte `BEDWARS`, puis utilisez `/bedwars game create <arène>`. Le joueur est téléporté dans le clone en état `WAITING`. `/bedwars game list`, `info`, `join`, `leave` et `destroy` permettent de contrôler l'instance. La destruction supprime automatiquement le monde temporaire.
 
+`/bedwars` sans argument est strictement administratif et exige `heneriabedwars.admin.dashboard`. Un joueur ordinaire ne voit que `game join` et `game leave` dans la complétion. Dans le lobby d'attente, le livre ouvre un menu public d'informations et le lit quitte proprement la partie en restaurant l'état précédent. Le scoreboard est configurable dans `game.yml`, localisé et actualisé sans recréation complète.
+
 Les apparences viennent de `items.yml` : matériaux, quantités, textes directs ou traduits, lore, glow, enchantements sûrs, flags, cuir, têtes hors ligne, custom model data, tags contrôlés et héritage. `/bedwars item list`, `/bedwars item give <clé>` et `/bedwars item preview` permettent de vérifier le registre sans recompilation.

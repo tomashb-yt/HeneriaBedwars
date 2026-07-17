@@ -1,11 +1,14 @@
 package fr.heneria.bedwars.plugin.game;
 
 import fr.heneria.bedwars.core.config.GameSettings;
+import fr.heneria.bedwars.core.config.MessageRenderer;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.game.GameId;
 import fr.heneria.bedwars.core.game.GameInstance;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
+import fr.heneria.bedwars.core.game.display.RuntimeScoreboardRenderer;
+import fr.heneria.bedwars.core.game.display.RuntimeScoreboardView;
 import fr.heneria.bedwars.core.game.event.GameCountdownAccelerateEvent;
 import fr.heneria.bedwars.core.game.event.GameCountdownCancelEvent;
 import fr.heneria.bedwars.core.game.event.GameCountdownStartEvent;
@@ -15,6 +18,7 @@ import fr.heneria.bedwars.core.game.event.GameEvent;
 import fr.heneria.bedwars.core.game.event.GameStartEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameLeaveEvent;
+import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import java.util.LinkedHashMap;
@@ -24,15 +28,11 @@ import java.util.UUID;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
 
 /** Main-thread adapter for waiting scoreboards, boss bars, chat, action bars, titles and sounds. */
 public final class BukkitGameDisplayService {
@@ -40,8 +40,11 @@ public final class BukkitGameDisplayService {
   private final GameInstanceManager games;
   private final GameCountdownService countdowns;
   private final BukkitRuntimePlayerGateway players;
+  private final GameLobbyService lobby;
   private final ProjectLogger logger;
-  private final Map<UUID, Scoreboard> scoreboards = new LinkedHashMap<>();
+  private final RuntimeScoreboardRenderer scoreboardRenderer =
+      new RuntimeScoreboardRenderer(new MessageRenderer());
+  private final Map<UUID, BukkitScoreboardSession> scoreboards = new LinkedHashMap<>();
   private final Map<GameId, BossBar> bossBars = new LinkedHashMap<>();
 
   public BukkitGameDisplayService(
@@ -49,11 +52,13 @@ public final class BukkitGameDisplayService {
       GameInstanceManager games,
       GameCountdownService countdowns,
       BukkitRuntimePlayerGateway players,
+      GameLobbyService lobby,
       ProjectLogger logger) {
     this.configurations = configurations;
     this.games = games;
     this.countdowns = countdowns;
     this.players = players;
+    this.lobby = lobby;
     this.logger = logger;
   }
 
@@ -92,7 +97,10 @@ public final class BukkitGameDisplayService {
   public void refresh(GameInstance game) {
     for (UUID playerId : game.playerIds()) {
       Player player = Bukkit.getPlayer(playerId);
-      if (player != null) updateScoreboard(player, game);
+      if (player != null) {
+        players.refreshWaitingItems(player, lobby.waitingContext(game));
+        updateScoreboard(player, game);
+      }
     }
   }
 
@@ -120,7 +128,7 @@ public final class BukkitGameDisplayService {
   }
 
   private void onLeave(PlayerGameLeaveEvent event) {
-    Scoreboard removed = scoreboards.remove(event.playerId());
+    scoreboards.remove(event.playerId());
     Player player = Bukkit.getPlayer(event.playerId());
     if (player != null) bossBars.values().forEach(bar -> bar.removePlayer(player));
     GameInstance game = games.find(event.gameId()).orElse(null);
@@ -208,55 +216,61 @@ public final class BukkitGameDisplayService {
           50,
           10);
       player.sendMessage(message("game.start.message", values(game)));
-      Scoreboard waiting = scoreboards.remove(playerId);
-      if (waiting != null) player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+      BukkitScoreboardSession waiting = scoreboards.remove(playerId);
+      if (waiting != null && player.getScoreboard() == waiting.scoreboard())
+        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
     }
   }
 
   private void updateScoreboard(Player player, GameInstance game) {
     if (!configurations.snapshot().game().scoreboardEnabled()) return;
-    Scoreboard scoreboard =
+    GameSettings settings = configurations.snapshot().game();
+    BukkitScoreboardSession session =
         scoreboards.computeIfAbsent(
-            player.getUniqueId(), ignored -> Bukkit.getScoreboardManager().getNewScoreboard());
-    Objective objective = scoreboard.getObjective("hbw");
-    if (objective == null) {
-      objective =
-          scoreboard.registerNewObjective(
-              "hbw", "dummy", message("game.scoreboard.title", values(game)));
-      objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-    }
-    for (String entry : scoreboard.getEntries()) scoreboard.resetScores(entry);
+            player.getUniqueId(),
+            ignored ->
+                new BukkitScoreboardSession(
+                    Bukkit.getScoreboardManager().getNewScoreboard(),
+                    configurations
+                        .language()
+                        .render(settings.scoreboardTitle(), PlaceholderContext.EMPTY),
+                    settings.scoreboardHideNumbers()));
     Map<String, Object> values = values(game);
-    List<String> lines =
-        List.of(
-            " ",
-            message("game.scoreboard.map", values),
-            message("game.scoreboard.players", values),
-            message("game.scoreboard.minimum", values),
-            message("game.scoreboard.state", values),
-            countdowns.snapshot(game.id()).isPresent()
-                ? message("game.scoreboard.countdown", values)
-                : message("game.scoreboard.waiting", values),
-            "  ",
-            message("game.scoreboard.footer", values));
-    int score = lines.size();
-    for (int index = 0; index < lines.size(); index++)
-      objective.getScore(lines.get(index) + ChatColor.values()[index]).setScore(score--);
-    if (player.getScoreboard() != scoreboard) player.setScoreboard(scoreboard);
+    List<String> templates =
+        game.state() == fr.heneria.bedwars.api.game.GameState.STARTING
+            ? settings.scoreboardStartingLines()
+            : settings.scoreboardWaitingLines();
+    RuntimeScoreboardView view =
+        scoreboardRenderer.render(settings.scoreboardTitle(), templates, values);
+    session.update(view);
+    if (player.getScoreboard() != session.scoreboard()) player.setScoreboard(session.scoreboard());
   }
 
   private Map<String, Object> values(GameInstance game) {
     Map<String, Object> values = new LinkedHashMap<>();
-    values.put("game_id", game.id().shortId());
+    values.put("game_id", game.id().toString());
+    values.put("game_short_id", game.id().shortId());
     values.put("arena_id", game.arena().definition().id().value());
     values.put("arena_name", game.arena().definition().displayName());
     values.put("players", game.playerIds().size());
     values.put("minimum_players", game.arena().definition().minimumPlayers());
     values.put("maximum_players", game.arena().definition().maximumPlayers());
-    values.put("state", game.state().name());
+    String state =
+        message("game.state." + game.state().name().toLowerCase(java.util.Locale.ROOT), Map.of());
+    values.put("state", state);
+    values.put(
+        "state_color",
+        game.state() == fr.heneria.bedwars.api.game.GameState.STARTING ? "§a" : "§e");
     values.put(
         "countdown", countdowns.snapshot(game.id()).map(c -> c.remainingSeconds()).orElse(0));
-    values.put("footer", configurations.snapshot().game().scoreboardFooter());
+    int minimum = game.arena().definition().minimumPlayers();
+    int missing = Math.max(0, minimum - game.playerIds().size());
+    values.put("missing_players", missing);
+    values.put("map_id", game.arena().template().id().value());
+    values.put("server_name", configurations.snapshot().game().serverName());
+    values.put("server_address", configurations.snapshot().game().serverAddress());
+    String statusKey = missing > 0 ? "game.status.insufficient" : "game.status.ready";
+    values.put("status_message", message(statusKey, Map.of()));
     return Map.copyOf(values);
   }
 

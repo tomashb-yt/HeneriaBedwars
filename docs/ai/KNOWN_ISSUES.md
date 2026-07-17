@@ -1,5 +1,12 @@
 # Limitations connues
 
+## Correctif Ticket 010.1
+
+- Le matchmaking public, les PNJ et la commande courte `/bw` restent futurs; `game join|leave` est la surface publique temporaire.
+- Les équipes BedWars détaillées et le scoreboard `PLAYING` restent futurs.
+- Paper 1.21 peut masquer les nombres via `NumberFormat.blank`; le JAR conserve sa compatibilité Spigot et laisse les scores visibles lorsque cette capacité n'existe pas.
+- Les clics, menus, restaurations et affichages doivent encore être validés sur un serveur Paper réel.
+
 ## Ticket 010
 
 - Le passage en `PLAYING` est structurel : il ne demarre ni lit, generateur, boutique, mort BedWars, condition de victoire ni spectateur gameplay.

@@ -236,9 +236,15 @@ class GameInstanceEngineTest {
         "SOLID",
         true,
         20,
+        true,
+        "title",
+        java.util.List.of("waiting"),
+        java.util.List.of("starting"),
         "test",
+        "test.local",
         7,
         1,
+        500,
         true);
   }
 

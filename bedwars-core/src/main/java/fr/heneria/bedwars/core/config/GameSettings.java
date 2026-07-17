@@ -1,5 +1,6 @@
 package fr.heneria.bedwars.core.config;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -25,9 +26,15 @@ public record GameSettings(
     String bossBarStyle,
     boolean scoreboardEnabled,
     int scoreboardRefreshTicks,
-    String scoreboardFooter,
+    boolean scoreboardHideNumbers,
+    String scoreboardTitle,
+    List<String> scoreboardWaitingLines,
+    List<String> scoreboardStartingLines,
+    String serverName,
+    String serverAddress,
     int leaveItemSlot,
     int infoItemSlot,
+    long itemInteractionCooldownMillis,
     boolean forcedStartEnabled) {
   public GameSettings {
     waitingGameMode = text(waitingGameMode, "waitingGameMode");
@@ -41,18 +48,31 @@ public record GameSettings(
     titleAnnouncementSeconds = Set.copyOf(titleAnnouncementSeconds);
     bossBarColor = text(bossBarColor, "bossBarColor");
     bossBarStyle = text(bossBarStyle, "bossBarStyle");
-    scoreboardFooter = Objects.requireNonNull(scoreboardFooter, "scoreboardFooter").trim();
+    scoreboardTitle = text(scoreboardTitle, "scoreboardTitle");
+    scoreboardWaitingLines = lines(scoreboardWaitingLines, "scoreboardWaitingLines");
+    scoreboardStartingLines = lines(scoreboardStartingLines, "scoreboardStartingLines");
+    serverName = text(serverName, "serverName");
+    serverAddress = text(serverAddress, "serverAddress");
     if (scoreboardRefreshTicks < 1)
       throw new IllegalArgumentException("scoreboardRefreshTicks must be positive");
     if (leaveItemSlot < 0 || leaveItemSlot > 8 || infoItemSlot < 0 || infoItemSlot > 8)
       throw new IllegalArgumentException("Waiting item slots must be inside the hotbar");
     if (leaveItemSlot == infoItemSlot)
       throw new IllegalArgumentException("Waiting item slots must be distinct");
+    if (itemInteractionCooldownMillis < 0 || itemInteractionCooldownMillis > 60_000)
+      throw new IllegalArgumentException("Waiting item cooldown is out of range");
   }
 
   private static String text(String value, String field) {
     String result = Objects.requireNonNull(value, field).trim();
     if (result.isEmpty()) throw new IllegalArgumentException(field + " is blank");
+    return result;
+  }
+
+  private static List<String> lines(List<String> value, String field) {
+    List<String> result = List.copyOf(Objects.requireNonNull(value, field));
+    if (result.isEmpty() || result.size() > 15)
+      throw new IllegalArgumentException(field + " must contain between 1 and 15 lines");
     return result;
   }
 }

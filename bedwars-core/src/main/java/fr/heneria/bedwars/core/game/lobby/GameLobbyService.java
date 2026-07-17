@@ -183,10 +183,11 @@ public final class GameLobbyService {
     }
   }
 
-  private WaitingPlayerContext waitingContext(GameInstance game) {
+  public WaitingPlayerContext waitingContext(GameInstance game) {
     GameSettings current = settings.get();
     Map<String, Object> values = new LinkedHashMap<>();
     values.put("game_id", game.id().shortId());
+    values.put("full_game_id", game.id().toString());
     values.put("arena_id", game.arena().definition().id().value());
     values.put("arena_name", game.arena().definition().displayName());
     values.put("players", game.playerIds().size() + 1);

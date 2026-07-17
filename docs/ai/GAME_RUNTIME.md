@@ -1,5 +1,11 @@
 # Runtime des parties et lobby d'attente
 
+## Correctif 010.1
+
+Chaque item d'attente contient une action stable et l'UUID complet de la partie. Le listener accepte les clics gauche/droit dans l'air ou sur bloc même si l'interaction vanilla est déjà annulée, ignore l'off-hand, applique un cooldown et refuse un ancien UUID. Quitter appelle exclusivement `GameLobbyService.leave`; informations ouvre un GUI public.
+
+Le scoreboard utilise les templates `waiting` ou `starting`, rend les états localisés et conserve une session par joueur. Les équipes/entrées restent stables afin d'éviter le clignotement. Paper peut masquer les nombres via sa capacité `NumberFormat.blank`; Spigot conserve les scores avec un fallback compatible.
+
 ## Ticket 010
 
 Une arene active est transformee par `GameInstanceManager` en monde clone jetable puis en `GameInstance`. Le Ticket 010 ajoute la couche d'attente au-dessus de ce moteur, sans introduire de lit, generateur, boutique, combat ou condition de victoire.

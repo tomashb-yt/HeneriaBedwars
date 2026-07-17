@@ -104,10 +104,40 @@ public final class ConfigurationSnapshotFactory {
             bossBarColor,
             bossBarStyle,
             game.bool("game.scoreboard.enabled", true),
-            game.integer("game.scoreboard.refresh-ticks", 20, 1, 1200),
-            game.string("game.scoreboard.footer", "play.heneria.fr"),
+            game.integer("game.scoreboard.update-interval-ticks", 20, 1, 1200),
+            game.bool("game.scoreboard.hide-red-numbers", true),
+            game.string("game.scoreboard.title", "<aqua><bold>HENERIA BEDWARS</bold></aqua>"),
+            game.stringList(
+                "game.scoreboard.waiting.lines",
+                List.of(
+                    "",
+                    "<white>Carte <dark_gray>» <aqua>{arena_name}",
+                    "<white>Joueurs <dark_gray>» <green>{players}<gray>/{maximum_players}",
+                    "<white>Minimum <dark_gray>» <yellow>{minimum_players}",
+                    "<white>État <dark_gray>» {state_color}{state}",
+                    "",
+                    "{status_message}",
+                    "",
+                    "<aqua>{server_address}"),
+                15),
+            game.stringList(
+                "game.scoreboard.starting.lines",
+                List.of(
+                    "",
+                    "<white>Carte <dark_gray>» <aqua>{arena_name}",
+                    "<white>Joueurs <dark_gray>» <green>{players}<gray>/{maximum_players}",
+                    "",
+                    "<white>Début dans <dark_gray>» <green>{countdown}s",
+                    "",
+                    "<yellow>Préparez-vous !",
+                    "",
+                    "<aqua>{server_address}"),
+                15),
+            game.string("game.scoreboard.server-name", "Heneria"),
+            game.string("game.scoreboard.server-address", "play.heneria.fr"),
             leaveItemSlot,
             waitingInventorySlotsCollide ? (infoItemSlot + 1) % 9 : infoItemSlot,
+            game.integer("game.waiting.items.interaction-cooldown-millis", 500, 0, 60_000),
             game.bool("game.forced-start.enabled", true));
     if (waitingInventorySlotsCollide)
       game.error(
@@ -727,6 +757,23 @@ public final class ConfigurationSnapshotFactory {
         if (!result.isEmpty() && result.size() == list.size()) return result;
       }
       problem(key, value, "unique valid slot list", fallback, "Invalid slot list");
+      return fallback;
+    }
+
+    List<String> stringList(String key, List<String> fallback, int maximumSize) {
+      Object value = document.value(key);
+      if (value instanceof List<?> list
+          && !list.isEmpty()
+          && list.size() <= maximumSize
+          && list.stream().allMatch(String.class::isInstance)) {
+        return list.stream().map(String.class::cast).toList();
+      }
+      problem(
+          key,
+          value,
+          "string list with 1 to " + maximumSize + " lines",
+          fallback,
+          "Invalid text lines");
       return fallback;
     }
 

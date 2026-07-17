@@ -1,5 +1,7 @@
 # Cycle des parties
 
+Le correctif 010.1 ne change aucune transition. Il sécurise les entrées utilisateur : commande publique ou item PDC -> `GameLobbyService` -> moteur existant. Le passage `WAITING -> STARTING` reconstruit les items et bascule le template de scoreboard sans recréer l'objectif.
+
 ## Lobby et compte a rebours Ticket 010
 
 ```mermaid

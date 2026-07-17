@@ -492,6 +492,16 @@ items:
     duplicate:
       summary-v4: {material: STRUCTURE_BLOCK, name: "<gold><bold>Confirmer la copie", lore: ["<gray>Source : <white>{map_id}", "<gray>Destination : <white>{destination_id}"]}
   game:
+    public:
+      info:
+        material: BOOK
+        name: "<aqua><bold>Informations"
+        lore: ["<gray>Carte : <white>{arena_name}", "<gray>Partie : <white>{game_id}", "<gray>État : <white>{state}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Minimum : <white>{minimum_players}", "<gray>Compte à rebours : <white>{countdown}s"]
+        required-placeholders: [arena_name, game_id, state, players, maximum_players, minimum_players, countdown]
+      leave:
+        material: RED_BED
+        name: "<red><bold>Quitter la partie"
+        lore: ["<gray>Restaure votre inventaire et votre position.", "", "<yellow>▸ Cliquez pour quitter"]
     admin:
       summary:
         material: CLOCK
@@ -526,12 +536,12 @@ items:
         material: RED_BED
         name: "<red><bold>Quitter la partie"
         lore: ["<gray>Retourne à votre position précédente.", "", "<yellow>▸ Cliquez pour quitter"]
-        tags: {category: game-waiting, action: leave-game}
+        tags: {category: game-waiting, action: waiting_leave}
       info:
         material: BOOK
         name: "<aqua><bold>Informations de la partie"
         lore: ["<gray>Arène : <white>{arena_name}", "<gray>Joueurs : <white>{players}/{maximum_players}", "<gray>Minimum : <white>{minimum_players}", "<gray>État : <white>{state}", "<gray>Compte à rebours : <white>{countdown}", "", "<yellow>▸ Cliquez pour actualiser"]
-        tags: {category: game-waiting, action: game-info}
+        tags: {category: game-waiting, action: waiting_info}
       countdown: {material: CLOCK, name: "<yellow>Début dans <white>{countdown} s", lore: ["<gray>{players}/{maximum_players} joueurs"]}
       state: {material: COMPARATOR, name: "<aqua>État : <white>{state}"}
       not-ready: {material: REDSTONE, name: "<red>En attente de joueurs", lore: ["<gray>{players}/{minimum_players} requis"]}

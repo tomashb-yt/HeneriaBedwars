@@ -71,6 +71,24 @@ public final class MessageRenderer {
     tags.put("</bold>", "§r");
     tags.put("</italic>", "§r");
     tags.put("</underlined>", "§r");
+    for (String color :
+        java.util.List.of(
+            "black",
+            "dark_blue",
+            "dark_green",
+            "dark_aqua",
+            "dark_red",
+            "dark_purple",
+            "gold",
+            "gray",
+            "dark_gray",
+            "blue",
+            "green",
+            "aqua",
+            "red",
+            "light_purple",
+            "yellow",
+            "white")) tags.put("</" + color + ">", "§r");
     return Map.copyOf(tags);
   }
 }

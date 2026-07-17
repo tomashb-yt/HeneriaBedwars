@@ -10,6 +10,8 @@ game:
     void-rescue-y: 0
     destroy-empty-instance: true
     empty-destroy-delay-seconds: 30
+    items:
+      interaction-cooldown-millis: 500
 
   countdown:
     enabled: true
@@ -27,8 +29,33 @@ game:
 
   scoreboard:
     enabled: true
-    refresh-ticks: 20
-    footer: "play.heneria.fr"
+    hide-red-numbers: true
+    update-interval-ticks: 20
+    title: "<aqua><bold>HENERIA BEDWARS</bold></aqua>"
+    server-name: "Heneria"
+    server-address: "play.heneria.fr"
+    waiting:
+      lines:
+        - ""
+        - "<white>Carte <dark_gray>» <aqua>{arena_name}"
+        - "<white>Joueurs <dark_gray>» <green>{players}<gray>/{maximum_players}"
+        - "<white>Minimum <dark_gray>» <yellow>{minimum_players}"
+        - "<white>État <dark_gray>» {state_color}{state}"
+        - ""
+        - "{status_message}"
+        - ""
+        - "<aqua>{server_address}"
+    starting:
+      lines:
+        - ""
+        - "<white>Carte <dark_gray>» <aqua>{arena_name}"
+        - "<white>Joueurs <dark_gray>» <green>{players}<gray>/{maximum_players}"
+        - ""
+        - "<white>Début dans <dark_gray>» <green>{countdown}s"
+        - ""
+        - "<yellow>Préparez-vous !"
+        - ""
+        - "<aqua>{server_address}"
 
   inventory:
     leave-slot: 8

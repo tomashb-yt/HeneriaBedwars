@@ -1,6 +1,7 @@
 config-version: 1
 
 general:
+  public-help: "<aqua><bold>HeneriaBedWars</bold></aqua>\n<gray>Vous n'avez accès à aucune commande administrative.\nUtilisez les PNJ du lobby ou <white>/bedwars game join <partie></white> pour jouer."
   prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
   no-permission: "<red>Vous n'avez pas la permission d'utiliser cette commande."
   player-only: "<red>Cette commande est réservée aux joueurs."
@@ -199,6 +200,21 @@ arena:
     success: "<green>L'arene {arena_id} a ete sauvegardee puis supprimee."
     failed: "<red>Suppression impossible."
 game:
+  public-info:
+    title: "<aqua><bold>Partie — {arena_name}"
+    missing-title: "<red>Partie indisponible"
+  state:
+    creating: "Création"
+    waiting: "En attente"
+    starting: "Démarrage"
+    playing: "En jeu"
+    ending: "Fin de partie"
+    resetting: "Réinitialisation"
+    destroyed: "Terminée"
+  status:
+    insufficient: "<yellow>Joueurs insuffisants"
+    waiting: "<yellow>En attente d'autres joueurs"
+    ready: "<green>Prêt à démarrer"
   command:
     help: "<yellow>Utilisation : /bedwars game join <arène> — les autres commandes sont réservées à l'administration avancée."
     creating: "<yellow>Création d'une instance pour <white>{arena_id}<yellow>..."

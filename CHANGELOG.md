@@ -6,6 +6,9 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Correctif 010.1 : menu public d'informations, registre d'actions runtime par PDC et templates configurables du scoreboard d'attente.
+- Sessions de sidebar personnelles et stables, placeholders localisés et masquage optionnel des nombres sur Paper avec fallback Spigot.
+
 - Ticket 009 : moteur de `GameInstance`, machine d'état, index par arène/joueur, runtime players/teams, timers/statistiques et événements Java internes.
 - Clonage asynchrone des cartes modèles en mondes `hbw_game_*`, téléportation, évacuation, déchargement sans sauvegarde, suppression et récupération des dossiers orphelins.
 - Commandes `/bedwars game`, permissions dédiées et API publique immuable `GameApi`/`PlayerGameApi`/`ArenaGameApi` publiée via Bukkit.
@@ -42,6 +45,10 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 - Sauvegarde automatique des arènes et révisions optimistes empêchant une vue obsolète d'écraser une modification plus récente.
 
 ### Fixed
+
+- `/bedwars` et sa complétion ne révèlent plus le tableau de bord ni les commandes de configuration aux joueurs ordinaires.
+- Les items quitter/informations répondent aux clics air/bloc, gauche/droit, ignorent l'off-hand et refusent les anciens identifiants d'instance.
+- Le scoreboard n'affiche plus les enums runtime bruts et n'efface plus toutes ses lignes à chaque rafraîchissement.
 
 - Validation des arènes sans doublon carte/monde, compatibilité des cartes modèles déchargées et diagnostics entièrement reformulés dans la langue active sans codes techniques visibles.
 

@@ -11,6 +11,7 @@
 - [TERMINÉ] Ticket 009 — Runtime des parties (Game Instance Engine)
 
 - [TERMINE] Ticket 010 - Lobby de partie, file d'attente et compte a rebours
+- [TERMINE] Correctif 010.1 - accès administrateur, items du lobby et scoreboard
 
 ## Grandes phases futures
 

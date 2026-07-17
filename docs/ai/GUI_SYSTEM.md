@@ -1,5 +1,9 @@
 # Système de menus interne
 
+## Menu public Ticket 010.1
+
+Le livre du lobby ouvre un menu de trois lignes distinct de l'administration. Il affiche carte, id court, état localisé, joueurs, capacités et countdown, puis propose seulement quitter ou fermer. Aucune route ne mène au dashboard, à l'arrêt forcé ou à la suppression du monde.
+
 ## Intégration Ticket 007
 
 `MapMenuFactory` réutilise le framework pour la liste paginée, les informations, la création par chat, les actions de monde et la confirmation de suppression. Les apparences `map.*` viennent de `items.yml`; le menu ne lit jamais les YAML. La copie et la phase fichier de suppression quittent le thread serveur, puis le résultat revient sur le thread Bukkit avant tout message ou changement de vue. L'éditeur d'arènes ouvre aussi un sélecteur des cartes `BEDWARS` valides.

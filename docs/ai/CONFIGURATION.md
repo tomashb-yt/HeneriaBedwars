@@ -81,6 +81,8 @@ Toutes les valeurs sont rechargeables dans `GameSettings`. Elles agissent unique
 | `game.inventory.leave-slot/info-slot` | `8` / `4` | positions hotbar, distinctes et de 0 a 8 |
 | `game.forced-start.enabled` | `true` | autorise le test `start --force` |
 
+Le correctif 010.1 remplace les anciennes lignes fixes par `game.scoreboard.title`, `waiting.lines` et `starting.lines` (1 à 15 lignes, lignes vides autorisées), et ajoute `hide-red-numbers`, `update-interval-ticks`, `server-name`, `server-address` et `game.waiting.items.interaction-cooldown-millis`. Les placeholders couvrent ids partie/arène/carte, joueurs, minimum/maximum/manquants, état localisé, couleur, statut, countdown et serveur. L'évolution ajoute uniquement les clés absentes à un ancien `game.yml` après sauvegarde.
+
 ## `storage.yml`
 
 Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQL ou Redis n'est ouverte.

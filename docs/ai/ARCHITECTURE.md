@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Correctif 010.1 - accès, items runtime et affichage
+
+`AdministrativeCommandPolicy` sépare `heneriabedwars.admin.*` de `heneriabedwars.game.join|leave`. Le dashboard possède sa permission dédiée. `RuntimeItemActionRegistry` valide action, main, état, UUID d'instance et cooldown avant que `GameWaitingListener` délègue à `GameLobbyService`. `GamePublicInfoMenuFactory` ne contient aucune navigation administrative.
+
+`RuntimeScoreboardRenderer` rend les templates purs; `BukkitScoreboardSession` crée une fois objectif, équipes et entrées stables puis ne change que les préfixes modifiés. `ScoreboardNumberHider` adapte la capacité Paper par détection bornée et reste sans effet sur Spigot.
+
 ## Ticket 010 - lobby d'attente et compte a rebours
 
 `bedwars-core/game/lobby` porte les cas d'usage d'entree, sortie, deconnexion et nettoyage; `bedwars-core/game/countdown` porte un compteur pur pilote par une seule tache de plateforme. `GameLobbyService` reste l'unique facade de pre-game pour commandes et menus et delegue les transitions a `GameInstanceManager`.

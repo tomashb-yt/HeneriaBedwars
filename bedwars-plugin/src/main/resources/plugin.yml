@@ -16,6 +16,7 @@ permissions:
     description: Permet d'utiliser les commandes administratives de HeneriaBedWars.
     default: op
     children:
+      heneriabedwars.admin.dashboard: true
       heneriabedwars.admin.reload: true
       heneriabedwars.admin.config: true
       heneriabedwars.admin.language: true
@@ -25,6 +26,11 @@ permissions:
       heneriabedwars.admin.setup: true
       heneriabedwars.admin.map: true
       heneriabedwars.admin.game: true
+      heneriabedwars.game.join: true
+      heneriabedwars.game.leave: true
+  heneriabedwars.admin.dashboard:
+    description: Ouvrir le tableau de bord administratif.
+    default: op
   heneriabedwars.admin.reload:
     description: Permet de recharger les configurations.
     default: op
@@ -103,8 +109,8 @@ permissions:
       heneriabedwars.admin.game.create: true
       heneriabedwars.admin.game.list: true
       heneriabedwars.admin.game.info: true
-      heneriabedwars.admin.game.join: true
-      heneriabedwars.admin.game.leave: true
+      heneriabedwars.game.join: true
+      heneriabedwars.game.leave: true
       heneriabedwars.admin.game.start: true
       heneriabedwars.admin.game.force-start: true
       heneriabedwars.admin.game.stop: true
@@ -112,8 +118,8 @@ permissions:
   heneriabedwars.admin.game.create: {description: Creer une instance depuis une arene, default: op}
   heneriabedwars.admin.game.list: {description: Lister les instances runtime, default: op}
   heneriabedwars.admin.game.info: {description: Inspecter une instance runtime, default: op}
-  heneriabedwars.admin.game.join: {description: Rejoindre une instance runtime, default: op}
-  heneriabedwars.admin.game.leave: {description: Quitter son instance runtime, default: op}
+  heneriabedwars.game.join: {description: Rejoindre une instance runtime publique, default: true}
+  heneriabedwars.game.leave: {description: Quitter son instance runtime, default: true}
   heneriabedwars.admin.game.start: {description: Demarrer le compte a rebours d'une instance, default: op}
   heneriabedwars.admin.game.force-start: {description: Forcer le passage immediat d'une instance en jeu, default: op}
   heneriabedwars.admin.game.stop: {description: Arreter et nettoyer une instance runtime, default: op}
