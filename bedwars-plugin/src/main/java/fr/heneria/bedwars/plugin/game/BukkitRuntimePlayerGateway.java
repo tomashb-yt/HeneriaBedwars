@@ -106,13 +106,33 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
         () -> {
           Player player = Bukkit.getPlayer(playerId);
           if (player == null) return;
-          player.getInventory().clear();
-          player.getInventory().setArmorContents(new org.bukkit.inventory.ItemStack[4]);
-          player.getInventory().setItemInOffHand(null);
-          player.updateInventory();
+          preparePlayingPlayer(player);
         };
     if (Bukkit.isPrimaryThread()) action.run();
     else plugin.getServer().getScheduler().runTask(plugin, action);
+  }
+
+  /** Moves one player from the waiting point to the spawn of the assigned runtime team. */
+  public boolean beginPlaying(
+      UUID playerId, RuntimeWorldHandle handle, RuntimeLocation destination) {
+    if (!Bukkit.isPrimaryThread())
+      throw new IllegalStateException("Game start teleport must run on the server thread");
+    Player player = Bukkit.getPlayer(playerId);
+    World world = Bukkit.getWorld(handle.worldName());
+    if (player == null || world == null) return false;
+    Location target =
+        new Location(
+            world,
+            destination.x(),
+            destination.y(),
+            destination.z(),
+            destination.yaw(),
+            destination.pitch());
+    world.getChunkAt(target).load();
+    preparePlayingPlayer(player);
+    player.setGameMode(org.bukkit.GameMode.SURVIVAL);
+    player.setFallDistance(0);
+    return player.teleport(target);
   }
 
   /** Rebuilds the two current runtime items after a valid reload or refresh. */
@@ -163,6 +183,13 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
     }
     org.bukkit.inventory.ItemStack offHand = player.getInventory().getItemInOffHand();
     if (runtimeItems.clearIfRuntime(offHand)) player.getInventory().setItemInOffHand(null);
+  }
+
+  private static void preparePlayingPlayer(Player player) {
+    player.getInventory().clear();
+    player.getInventory().setArmorContents(new org.bukkit.inventory.ItemStack[4]);
+    player.getInventory().setItemInOffHand(null);
+    player.updateInventory();
   }
 
   private void prepareWaitingItems(Player player, WaitingPlayerContext context) {

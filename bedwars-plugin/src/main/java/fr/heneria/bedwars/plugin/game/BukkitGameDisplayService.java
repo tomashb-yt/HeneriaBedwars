@@ -206,16 +206,24 @@ public final class BukkitGameDisplayService {
     removeBossBar(event.gameId());
     if (game == null) return;
     for (UUID playerId : game.playerIds()) {
-      players.beginPlaying(playerId);
       Player player = Bukkit.getPlayer(playerId);
       if (player == null) continue;
+      boolean moved =
+          game.world()
+              .flatMap(
+                  world ->
+                      game.startLocation(playerId)
+                          .map(destination -> players.beginPlaying(playerId, world, destination)))
+              .orElse(false);
+      if (!moved) players.beginPlaying(playerId);
       player.sendTitle(
           message("game.start.title", values(game)),
-          message("game.start.subtitle", values(game)),
+          message("game.start.subtitle-v6", values(game)),
           5,
           50,
           10);
-      player.sendMessage(message("game.start.message", values(game)));
+      player.sendMessage(
+          message(moved ? "game.start.message-v6" : "game.start.teleport-failed-v6", values(game)));
       BukkitScoreboardSession waiting = scoreboards.remove(playerId);
       if (waiting != null && player.getScoreboard() == waiting.scoreboard())
         player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());

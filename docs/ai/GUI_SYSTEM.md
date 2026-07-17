@@ -1,5 +1,11 @@
 # Système de menus interne
 
+## Fiche équipe v6
+
+La fiche utilise cinq lignes et une géométrie constante. Le résumé coloré est centré en haut; le spawn occupe la colonne gauche et le lit la colonne droite. Chaque colonne contient état, définir/sélectionner, visiter et retirer. Les actions impossibles restent matérialisées par un bouton gris explicatif afin qu'aucun décalage n'apparaisse entre une équipe incomplète et une équipe prête. Un guide central décrit le parcours en trois étapes.
+
+Chaque clé d'entrée `arena.teams.entry-<couleur>-v6` fixe à la fois la laine et la couleur du nom. Les titres suivent la même couleur. La ligne « Prête » réutilise les libellés localisés configuré/manquant, ce qui évite d'exposer une clé de traduction brute sur une ancienne installation.
+
 ## Assistant d'arène compact v5
 
 La vue principale tient sur cinq lignes. La première zone contient la progression; la seconde la carte, le spawn d'attente, le spawn spectateur et le format. La zone centrale affiche directement jusqu'à huit laines d'équipe avec état du spawn et du lit. La barre inférieure conserve uniquement retour, activation/test, validation, suppression et fermeture. Le nom, la plage de joueurs, les limites et l'actualisation explicite ont été retirés de cette vue car les mutations reconstruisent déjà le menu et les écrans avancés restent disponibles ailleurs.

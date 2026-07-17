@@ -50,6 +50,9 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Fixed
 
+- Couleurs des équipes et titres alignés sur `TeamColor`, état « Prête » toujours localisé, messages dédiés pour visiter spawn/lit et fiche équipe réorganisée en deux colonnes constantes.
+- Le passage en `PLAYING` téléporte chaque joueur au spawn de son équipe dans le monde runtime cloné; l'ancien message annonçant un futur Ticket 011 a été supprimé.
+
 - Assistant d'arène compact sur cinq lignes : carte, attente, spectateur, format et fiches des équipes colorées sont accessibles sans commandes ni icônes secondaires.
 
 - Correctif de configuration des équipes : chaque équipe possède désormais une fiche GUI dédiée avec actions séparées pour définir, visiter et retirer son spawn ou son lit. La sélection du lit vérifie le monde modèle, un vrai lit complet et les doublons entre équipes.

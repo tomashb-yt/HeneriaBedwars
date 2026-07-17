@@ -1,5 +1,9 @@
 # Runtime des parties et lobby d'attente
 
+## Positionnement au démarrage
+
+À la transition `STARTING → PLAYING`, le joueur quitte le point d'attente et rejoint le spawn de son `RuntimeTeam` dans `hbw_game_<UUID>`. Le chunk cible est chargé avant la téléportation et les objets d'attente sont retirés. Un spawn manquant est signalé sans déplacer arbitrairement le joueur. Cette étape ne constitue pas encore le gameplay des lits et éliminations.
+
 ## Correctif 010.1
 
 Chaque item d'attente contient une action stable et l'UUID complet de la partie. Le listener accepte les clics gauche/droit dans l'air ou sur bloc même si l'interaction vanilla est déjà annulée, ignore l'off-hand, applique un cooldown et refuse un ancien UUID. Quitter appelle exclusivement `GameLobbyService.leave`; informations ouvre un GUI public purement informatif, sans bouton de départ redondant.

@@ -1,5 +1,9 @@
 # Décisions d'architecture
 
+## ADR — Le début de partie positionne les équipes sans démarrer le gameplay BedWars
+
+Décision : `GameStartEvent` déclenche la préparation Bukkit et la téléportation au spawn de l'équipe sélectionnée dans le clone runtime. La résolution de destination reste dans `GameInstance`; l'accès au monde et au joueur reste dans l'adaptateur plugin. Cette étape appartient au cycle de vie de la partie et ne change pas l'état des lits, n'écoute aucune mort et ne décide aucun vainqueur.
+
 ## ADR — Import de carte par dépôt géré, sans sélection de chemin
 
 Décision : chaque modèle possède `maps/templates/<id>/import/`; l'administrateur y dépose le contenu du monde puis déclenche le remplacement dans le GUI. Le plugin n'accepte jamais un chemin saisi, refuse les liens symboliques, sauvegarde la cible et effectue l'échange sous verrou. Cette approche rend le remplacement compréhensible dans les fichiers tout en préservant le confinement du Ticket 007 et la séparation thread Bukkit / accès disque.

@@ -101,6 +101,19 @@ class GameInstanceEngineTest {
   }
 
   @Test
+  void startLocationUsesTheAssignedRuntimeTeamSpawn() {
+    GameInstance game = instance();
+    game.transition(GameState.WAITING, NOW.plusSeconds(1));
+    UUID playerId = UUID.randomUUID();
+    RuntimePlayer player = game.addPlayer(playerId, NOW.plusSeconds(2));
+    RuntimeLocation spawn = new RuntimeLocation(12.5, 70, -4.5, 90, 0);
+    game.team(player.teamId().orElseThrow()).orElseThrow().spawn(spawn);
+
+    assertEquals(spawn, game.startLocation(playerId).orElseThrow());
+    assertTrue(game.startLocation(UUID.randomUUID()).isEmpty());
+  }
+
+  @Test
   void destructionEvacuatesPlayersDeletesWorldAndReleasesArena() {
     Fixture fixture = new Fixture();
     GameInstance game =

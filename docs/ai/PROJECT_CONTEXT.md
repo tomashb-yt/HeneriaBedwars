@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État correctif runtime/équipes du 2026-07-17 : les cartes et titres d'équipe respectent leur couleur, la fiche est organisée en deux colonnes fixes spawn/lit et tous les retours sont localisés. Quand le countdown atteint `PLAYING`, chaque joueur est déplacé au spawn de son équipe dans le clone runtime. Ce déplacement lance la phase de partie mais n'active encore aucune mécanique de lit, mort, victoire, générateur ou boutique.
+
 État correctif UX du 2026-07-17 : l'assistant d'arène principal tient sur cinq lignes et expose directement les équipes colorées. Les opérations essentielles sont carte, attente, spectateur, format, spawn/lit de chaque équipe, validation et activation. Les réglages avancés ne saturent plus cette vue.
 
 Chaque `MapTemplate` possède un dépôt administrateur confiné `maps/templates/<id>/import/`. La présence de `level.dat` autorise un remplacement guidé : déchargement Bukkit sur le thread serveur, sauvegarde et copie hors thread, échange avec restauration de secours, puis rechargement sur le thread serveur. Aucun chemin fourni par l'utilisateur n'est accepté.

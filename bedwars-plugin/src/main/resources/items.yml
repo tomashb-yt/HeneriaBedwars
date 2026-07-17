@@ -317,18 +317,31 @@ items:
       confirm-assisted: {material: PAPER, name: "<gold><bold>Confirmer le nouveau format", lore: ["<gray>Avant: <white>{team_count} × {players_per_team}", "<gray>Après: <white>{new_team_count} × {new_players_per_team}", "<gray>Nouvelle capacité: <white>{new_capacity}"]}
       assistant-overview-v2: {material: NETHER_STAR, glow: true, name: "<light_purple><bold>Configuration des équipes", lore: ["<gray>Ouvrez une équipe pour régler", "<gray>son spawn et son lit séparément.", "", "<white>Spawns : <aqua>{team_spawns_configured}<gray>/{team_count}", "<white>Lits : <red>{team_beds_configured}<gray>/{team_count}"]}
       entry-base: {material: WHITE_WOOL, name: "<light_purple><bold>{team_name}", lore: ["<gray>Identifiant : <white>{team_id}", "<gray>Couleur : <white>{team_color}", "<gray>Capacité : <white>{team_capacity}", "", "<gray>Spawn : <white>{team_spawn_status}", "<gray>Lit : <white>{team_bed_status}", "<gray>Prête : <white>{team_ready}", "", "<yellow>▸ Cliquez pour configurer"]}
-      entry-red: {inherit: "arena.teams.entry-base", material: RED_WOOL}
-      entry-blue: {inherit: "arena.teams.entry-base", material: BLUE_WOOL}
-      entry-green: {inherit: "arena.teams.entry-base", material: GREEN_WOOL}
-      entry-yellow: {inherit: "arena.teams.entry-base", material: YELLOW_WOOL}
-      entry-aqua: {inherit: "arena.teams.entry-base", material: LIGHT_BLUE_WOOL}
-      entry-white: {inherit: "arena.teams.entry-base", material: WHITE_WOOL}
-      entry-pink: {inherit: "arena.teams.entry-base", material: PINK_WOOL}
-      entry-gray: {inherit: "arena.teams.entry-base", material: GRAY_WOOL}
-      entry-lime: {inherit: "arena.teams.entry-base", material: LIME_WOOL}
-      entry-orange: {inherit: "arena.teams.entry-base", material: ORANGE_WOOL}
-      entry-purple: {inherit: "arena.teams.entry-base", material: PURPLE_WOOL}
-      entry-black: {inherit: "arena.teams.entry-base", material: BLACK_WOOL}
+      entry-red: {inherit: "arena.teams.entry-base", material: RED_WOOL, name: "<red><bold>{team_name}"}
+      entry-blue: {inherit: "arena.teams.entry-base", material: BLUE_WOOL, name: "<blue><bold>{team_name}"}
+      entry-green: {inherit: "arena.teams.entry-base", material: GREEN_WOOL, name: "<dark_green><bold>{team_name}"}
+      entry-yellow: {inherit: "arena.teams.entry-base", material: YELLOW_WOOL, name: "<yellow><bold>{team_name}"}
+      entry-aqua: {inherit: "arena.teams.entry-base", material: LIGHT_BLUE_WOOL, name: "<aqua><bold>{team_name}"}
+      entry-white: {inherit: "arena.teams.entry-base", material: WHITE_WOOL, name: "<white><bold>{team_name}"}
+      entry-pink: {inherit: "arena.teams.entry-base", material: PINK_WOOL, name: "<light_purple><bold>{team_name}"}
+      entry-gray: {inherit: "arena.teams.entry-base", material: GRAY_WOOL, name: "<gray><bold>{team_name}"}
+      entry-lime: {inherit: "arena.teams.entry-base", material: LIME_WOOL, name: "<green><bold>{team_name}"}
+      entry-orange: {inherit: "arena.teams.entry-base", material: ORANGE_WOOL, name: "<gold><bold>{team_name}"}
+      entry-purple: {inherit: "arena.teams.entry-base", material: PURPLE_WOOL, name: "<dark_purple><bold>{team_name}"}
+      entry-black: {inherit: "arena.teams.entry-base", material: BLACK_WOOL, name: "<dark_gray><bold>{team_name}"}
+      entry-base-v6: {material: WHITE_WOOL, name: "<white><bold>{team_name}", lore: ["<gray>Identifiant : <white>{team_id}", "<gray>Couleur : {team_color_display}", "<gray>Capacité : <white>{team_capacity}", "", "<gray>Spawn : <white>{team_spawn_status}", "<gray>Lit : <white>{team_bed_status}", "<gray>Prête : <white>{team_ready}", "", "<yellow>▸ Cliquez pour configurer"]}
+      entry-red-v6: {inherit: "arena.teams.entry-base-v6", material: RED_WOOL, name: "<red><bold>{team_name}"}
+      entry-blue-v6: {inherit: "arena.teams.entry-base-v6", material: BLUE_WOOL, name: "<blue><bold>{team_name}"}
+      entry-green-v6: {inherit: "arena.teams.entry-base-v6", material: GREEN_WOOL, name: "<dark_green><bold>{team_name}"}
+      entry-yellow-v6: {inherit: "arena.teams.entry-base-v6", material: YELLOW_WOOL, name: "<yellow><bold>{team_name}"}
+      entry-aqua-v6: {inherit: "arena.teams.entry-base-v6", material: LIGHT_BLUE_WOOL, name: "<aqua><bold>{team_name}"}
+      entry-white-v6: {inherit: "arena.teams.entry-base-v6", material: WHITE_WOOL, name: "<white><bold>{team_name}"}
+      entry-pink-v6: {inherit: "arena.teams.entry-base-v6", material: PINK_WOOL, name: "<light_purple><bold>{team_name}"}
+      entry-gray-v6: {inherit: "arena.teams.entry-base-v6", material: GRAY_WOOL, name: "<gray><bold>{team_name}"}
+      entry-lime-v6: {inherit: "arena.teams.entry-base-v6", material: LIME_WOOL, name: "<green><bold>{team_name}"}
+      entry-orange-v6: {inherit: "arena.teams.entry-base-v6", material: ORANGE_WOOL, name: "<gold><bold>{team_name}"}
+      entry-purple-v6: {inherit: "arena.teams.entry-base-v6", material: PURPLE_WOOL, name: "<dark_purple><bold>{team_name}"}
+      entry-black-v6: {inherit: "arena.teams.entry-base-v6", material: BLACK_WOOL, name: "<dark_gray><bold>{team_name}"}
       spawn-configured: {material: LIME_CONCRETE, name: "<green><bold>Spawn configuré", lore: ["<gray>{spawn_world}", "<white>X {spawn_x}  Y {spawn_y}  Z {spawn_z}"]}
       spawn-missing: {material: RED_CONCRETE, name: "<red><bold>Spawn manquant", lore: ["<gray>Placez-vous au point où les", "<gray>joueurs de cette équipe apparaîtront."]}
       set-spawn: {material: COMPASS, name: "<aqua>Définir le spawn ici", lore: ["<gray>Enregistre votre position actuelle", "<gray>dans le monde modèle.", "", "<yellow>▸ Cliquez pour enregistrer"]}
@@ -340,6 +353,21 @@ items:
       teleport-bed: {material: ENDER_EYE, name: "<aqua>Voir le lit", lore: ["<gray>Vous téléporte juste au-dessus", "<gray>du lit enregistré.", "", "<yellow>▸ Cliquez pour vous téléporter"]}
       clear-bed: {material: BARRIER, name: "<red>Retirer le lit", lore: ["<gray>Le bloc n'est pas cassé.", "<gray>Seule l'association est retirée.", "", "<red>▸ Cliquez pour retirer"]}
       future-features: {material: HOPPER, name: "<gray>Boutiques et améliorations", lore: ["<dark_gray>Fonctionnalités futures", "", "<gray>Elles ne sont pas nécessaires", "<gray>pour configurer le spawn et le lit."]}
+      guide-v6: {material: WRITABLE_BOOK, name: "<aqua><bold>Comment configurer {team_name}", lore: ["<gray>Colonne gauche : <aqua>spawn d'équipe", "<gray>Colonne droite : <red>lit d'équipe", "", "<yellow>1. Définissez ou sélectionnez", "<yellow>2. Visitez pour vérifier", "<yellow>3. Retirez seulement pour recommencer"]}
+      spawn-configured-v6: {material: LIME_CONCRETE, glow: true, name: "<green><bold>SPAWN • Configuré", lore: ["<gray>{spawn_world}", "<white>X {spawn_x}  Y {spawn_y}  Z {spawn_z}", "", "<gray>Utilisez les 3 boutons en dessous."]}
+      spawn-missing-v6: {material: RED_CONCRETE, name: "<red><bold>SPAWN • À placer", lore: ["<gray>Placez-vous au point d'apparition", "<gray>de cette équipe, puis utilisez", "<aqua>Définir ici<gray> juste en dessous."]}
+      bed-configured-v6: {material: LIME_BED, glow: true, name: "<green><bold>LIT • Configuré", lore: ["<gray>{bed_world}", "<white>X {bed_x}  Y {bed_y}  Z {bed_z}", "", "<gray>Utilisez les 3 boutons en dessous."]}
+      bed-missing-v6: {material: RED_BED, name: "<red><bold>LIT • À sélectionner", lore: ["<gray>Regardez un vrai lit complet", "<gray>à moins de 8 blocs, puis utilisez", "<red>Sélectionner le lit<gray> en dessous."]}
+      set-spawn-v6: {material: COMPASS, name: "<aqua><bold>SPAWN • Définir ici", lore: ["<gray>Enregistre votre position actuelle.", "", "<yellow>▸ Cliquez pour enregistrer"]}
+      teleport-spawn-v6: {material: ENDER_PEARL, name: "<aqua>SPAWN • Visiter", lore: ["<gray>Vérifie visuellement la position.", "", "<yellow>▸ Cliquez pour vous téléporter"]}
+      clear-spawn-v6: {material: GRAY_DYE, name: "<red>SPAWN • Retirer", lore: ["<gray>À utiliser seulement pour recommencer.", "", "<red>▸ Cliquez pour retirer"]}
+      teleport-spawn-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>SPAWN • Visite indisponible", lore: ["<gray>Définissez d'abord le spawn."]}
+      clear-spawn-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>SPAWN • Rien à retirer", lore: ["<gray>Définissez d'abord le spawn."]}
+      set-bed-v6: {material: BLAZE_ROD, name: "<red><bold>LIT • Sélectionner", lore: ["<gray>Regardez le lit de cette équipe", "<gray>à moins de 8 blocs.", "", "<yellow>▸ Cliquez pour l'enregistrer"]}
+      teleport-bed-v6: {material: ENDER_EYE, name: "<aqua>LIT • Visiter", lore: ["<gray>Vous place juste au-dessus du lit.", "", "<yellow>▸ Cliquez pour vous téléporter"]}
+      clear-bed-v6: {material: BARRIER, name: "<red>LIT • Retirer", lore: ["<gray>Le bloc reste en place; seule", "<gray>l'association est supprimée.", "", "<red>▸ Cliquez pour retirer"]}
+      teleport-bed-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>LIT • Visite indisponible", lore: ["<gray>Sélectionnez d'abord le lit."]}
+      clear-bed-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>LIT • Rien à retirer", lore: ["<gray>Sélectionnez d'abord le lit."]}
       review: {material: WRITABLE_BOOK, name: "<gold>Vérifier l'arène", lore: ["<gray>Problèmes restants : <white>{validation_errors}", "", "<yellow>▸ Cliquez pour ouvrir le diagnostic"]}
     boundary:
       minimum: {material: BLUE_CONCRETE, name: "<blue>Definir le minimum", lore: ["<gray>Configure: <white>{minimum_configured}"]}

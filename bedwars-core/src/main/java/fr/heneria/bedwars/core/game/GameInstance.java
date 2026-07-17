@@ -102,6 +102,13 @@ public final class GameInstance {
     return Optional.ofNullable(teams.get(id));
   }
 
+  /** Resolves the selected team's configured spawn inside this instance's cloned world. */
+  public synchronized Optional<RuntimeLocation> startLocation(UUID playerId) {
+    RuntimePlayer player = players.get(playerId);
+    if (player == null) return Optional.empty();
+    return player.teamId().map(teams::get).flatMap(RuntimeTeam::spawn);
+  }
+
   /** Reassigns a waiting player only when the destination has capacity. */
   synchronized boolean selectTeam(UUID playerId, String teamId, Instant now) {
     if (state != GameState.WAITING) return false;

@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Correctif équipes, traductions et début de partie — 2026-07-17
+
+Correction issue de trois captures en jeu : AQUA et les autres équipes héritaient toutes d'un nom violet, l'état prêt exposait une clé brute, la visite du lit annonçait seulement le nom technique du monde et la fiche compacte manquait de repères. Les entrées/titres v6 suivent maintenant `TeamColor`, la disponibilité est localisée, les messages nomment l'équipe et la fiche retrouve cinq lignes avec deux colonnes constantes et un guide central.
+
+Le passage en `PLAYING` ne se limite plus à l'ancien message de développement. Le runtime résout le spawn de l'équipe attribuée et l'adaptateur Bukkit téléporte le joueur dans le clone chargé en mode survie. Les mécaniques BedWars postérieures au placement restent volontairement hors de ce correctif.
+
+Validation : 166 tests automatisés réussis, aucun échec ni test ignoré, build propre, Spotless et Shadow JAR validés. Le parcours complet reste à confirmer sur un serveur Paper réel.
+
 ## Correctif UX et remplacement de cartes — 2026-07-17
 
 L'assistant d'arène a été recentré sur les opérations réellement nécessaires : carte, spawn d'attente, spawn spectateur, format, équipes colorées, validation et activation. Les fiches d'équipe sont accessibles directement et leur retour ramène à l'assistant. Les réglages secondaires ne surchargent plus la vue principale.

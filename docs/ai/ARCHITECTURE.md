@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Correctif démarrage et présentation des équipes — 2026-07-17
+
+`GameInstance.startLocation(UUID)` résout la relation runtime joueur → équipe → spawn sans dépendance Bukkit. Sur `GameStartEvent`, `BukkitGameDisplayService` demande cette destination et `BukkitRuntimePlayerGateway` charge le chunk du clone, vide les objets d'attente, passe le joueur en survie et le téléporte. Un spawn absent produit un message explicite et ne simule aucune mécanique BedWars.
+
+La fiche GUI d'équipe conserve deux colonnes stables : spawn à gauche, lit à droite. Les six emplacements d'action restent visibles même lorsqu'une position manque; les boutons indisponibles expliquent la dépendance. Les clés visuelles et titres `v6` garantissent leur ajout aux installations existantes sans écraser les personnalisations antérieures.
+
 ## Correctif UX cartes et arènes — 2026-07-17
 
 `ArenaEditorMenuFactory.editor` est une vue compacte de cinq lignes pilotée par `arena-editor.assistant-v5`. Elle affiche directement jusqu'à huit `ArenaTeamDefinition` colorées; un clic ouvre la fiche spawn/lit de l'équipe. La fiche revient à l'assistant principal. Les écrans joueurs et limites restent disponibles pour le diagnostic avancé, mais ne font plus partie du parcours essentiel.

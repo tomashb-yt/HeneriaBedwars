@@ -1,5 +1,14 @@
 # État actuel
 
+## Correctif équipes et lancement — 2026-07-17
+
+- couleurs des cartes et titres identiques à la couleur métier de chaque équipe;
+- état prêt rendu avec des traductions déjà garanties dans les catalogues existants;
+- messages distincts pour visiter le spawn ou le lit d'une équipe;
+- fiche équipe sur cinq lignes, guide central et deux colonnes d'actions toujours alignées;
+- téléportation de chaque joueur au spawn de son équipe lors de `STARTING → PLAYING`;
+- aucune destruction de lit, réapparition, élimination ou victoire n'est ajoutée par ce correctif.
+
 ## Correctif UX et import de cartes — 2026-07-17
 
 - assistant principal d'arène réduit à cinq lignes et centré sur carte, attente, spectateur et équipes;

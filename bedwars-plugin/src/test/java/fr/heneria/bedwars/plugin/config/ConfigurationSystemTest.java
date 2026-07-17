@@ -284,11 +284,15 @@ class ConfigurationSystemTest {
     assertTrue(evolvedItems.contains("assistant-progress:"));
     assertTrue(evolvedItems.contains("minimum-assisted:"));
     assertTrue(evolvedItems.contains("assistant-choice-loaded:"));
+    assertTrue(evolvedItems.contains("entry-aqua-v6:"));
+    assertTrue(evolvedItems.contains("guide-v6:"));
     assertTrue(Files.readString(french).contains("gui:"));
     assertTrue(Files.readString(english).contains("gui:"));
     assertTrue(Files.readString(french).contains("title-v2:"));
     assertTrue(Files.readString(french).contains("map-template-missing:"));
     assertTrue(Files.readString(french).contains("assistant-title:"));
+    assertTrue(Files.readString(french).contains("subtitle-v6:"));
+    assertTrue(Files.readString(french).contains("team-title-aqua-v6:"));
     assertTrue(
         service
             .snapshot()

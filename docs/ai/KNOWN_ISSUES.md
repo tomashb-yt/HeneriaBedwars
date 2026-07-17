@@ -1,5 +1,8 @@
 # Limitations connues
 
+- La téléportation d'équipe au passage `PLAYING` est couverte par la résolution métier et la compilation Bukkit, mais doit encore être confirmée avec plusieurs joueurs sur un serveur Paper réel.
+- Après le positionnement, aucune mécanique BedWars active n'est encore livrée : lits destructibles, réapparitions, éliminations, victoire, générateurs et boutiques restent absents.
+
 ## Import de cartes externes
 
 - Le monde importé doit correspondre à la version Minecraft du serveur; le plugin ne convertit pas les formats de chunks.

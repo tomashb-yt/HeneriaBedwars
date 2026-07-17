@@ -675,8 +675,13 @@ public final class ArenaEditorMenuFactory {
     Gui.Builder builder =
         Gui.builder()
             .id("arena.team." + id + '.' + team.id().value())
-            .title(message("arena.teams.team-title", values))
-            .rows(4)
+            .title(
+                message(
+                    "arena.teams.team-title-"
+                        + team.color().name().toLowerCase(Locale.ROOT)
+                        + "-v6",
+                    values))
+            .rows(5)
             .fillEmptySlots(true)
             .button(
                 4,
@@ -689,8 +694,8 @@ public final class ArenaEditorMenuFactory {
                 GuiButton.builder()
                     .itemKey(
                         team.spawn().isPresent()
-                            ? "arena.teams.spawn-configured"
-                            : "arena.teams.spawn-missing")
+                            ? "arena.teams.spawn-configured-v6"
+                            : "arena.teams.spawn-missing-v6")
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
@@ -698,51 +703,58 @@ public final class ArenaEditorMenuFactory {
                 GuiButton.builder()
                     .itemKey(
                         team.bedLocation().isPresent()
-                            ? "arena.teams.bed-configured"
-                            : "arena.teams.bed-missing")
+                            ? "arena.teams.bed-configured-v6"
+                            : "arena.teams.bed-missing-v6")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                13,
+                GuiButton.builder()
+                    .itemKey("arena.teams.guide-v6")
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
                 19,
                 action(
-                    "arena.teams.set-spawn",
+                    "arena.teams.set-spawn-v6",
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     values,
                     context -> setTeamSpawn(context, playerId, arena, team, expected)))
             .button(
                 23,
                 action(
-                    "arena.teams.set-bed",
+                    "arena.teams.set-bed-v6",
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     values,
                     context -> selectTeamBed(context, playerId, arena, team, expected)))
             .button(
-                27,
+                36,
                 GuiButton.builder()
                     .itemKey("gui.back")
                     .onLeftClick(context -> context.replace(editor(playerId, id)))
                     .build())
             .button(
-                31,
+                40,
                 GuiButton.builder()
                     .itemKey("arena.teams.review")
                     .itemPlaceholders(context -> values)
                     .onLeftClick(context -> context.open(validation(playerId, id)))
                     .build())
-            .button(35, standard.close());
+            .button(44, standard.close());
     if (team.spawn().isPresent()) {
       builder
           .button(
               20,
               action(
-                  "arena.teams.teleport-spawn",
+                  "arena.teams.teleport-spawn-v6",
                   AdministrativeCommandPolicy.ARENA_TELEPORT,
                   values,
-                  context -> teleport(context, playerId, team.spawn().orElseThrow())))
+                  context ->
+                      teleportTeamSpawn(context, playerId, team, team.spawn().orElseThrow())))
           .button(
               21,
               action(
-                  "arena.teams.clear-spawn",
+                  "arena.teams.clear-spawn-v6",
                   AdministrativeCommandPolicy.ARENA_EDIT,
                   values,
                   context ->
@@ -753,20 +765,34 @@ public final class ArenaEditorMenuFactory {
                           team.id(),
                           arenas.clearTeamSpawn(id, team.id(), expected),
                           "team-spawn-clear")));
-    }
+    } else
+      builder
+          .button(
+              20,
+              GuiButton.builder()
+                  .itemKey("arena.teams.teleport-spawn-disabled-v6")
+                  .itemPlaceholders(context -> values)
+                  .build())
+          .button(
+              21,
+              GuiButton.builder()
+                  .itemKey("arena.teams.clear-spawn-disabled-v6")
+                  .itemPlaceholders(context -> values)
+                  .build());
     if (team.bedLocation().isPresent()) {
       builder
           .button(
               24,
               action(
-                  "arena.teams.teleport-bed",
+                  "arena.teams.teleport-bed-v6",
                   AdministrativeCommandPolicy.ARENA_TELEPORT,
                   values,
-                  context -> teleportBed(context, playerId, team.bedLocation().orElseThrow())))
+                  context ->
+                      teleportBed(context, playerId, team, team.bedLocation().orElseThrow())))
           .button(
               25,
               action(
-                  "arena.teams.clear-bed",
+                  "arena.teams.clear-bed-v6",
                   AdministrativeCommandPolicy.ARENA_EDIT,
                   values,
                   context ->
@@ -777,7 +803,20 @@ public final class ArenaEditorMenuFactory {
                           team.id(),
                           arenas.clearTeamBed(id, team.id(), expected),
                           "team-bed-clear")));
-    }
+    } else
+      builder
+          .button(
+              24,
+              GuiButton.builder()
+                  .itemKey("arena.teams.teleport-bed-disabled-v6")
+                  .itemPlaceholders(context -> values)
+                  .build())
+          .button(
+              25,
+              GuiButton.builder()
+                  .itemKey("arena.teams.clear-bed-disabled-v6")
+                  .itemPlaceholders(context -> values)
+                  .build());
     return builder.build();
   }
 
@@ -1665,7 +1704,22 @@ public final class ArenaEditorMenuFactory {
     send(playerId, "arena.world.teleport-success", Map.of("world", world.getName()));
   }
 
-  private void teleportBed(GuiClickContext context, UUID playerId, ArenaLocation value) {
+  private void teleportTeamSpawn(
+      GuiClickContext context, UUID playerId, ArenaTeamDefinition team, ArenaLocation value) {
+    teleportTeamPosition(context, playerId, team, value, false);
+  }
+
+  private void teleportBed(
+      GuiClickContext context, UUID playerId, ArenaTeamDefinition team, ArenaLocation value) {
+    teleportTeamPosition(context, playerId, team, value, true);
+  }
+
+  private void teleportTeamPosition(
+      GuiClickContext context,
+      UUID playerId,
+      ArenaTeamDefinition team,
+      ArenaLocation value,
+      boolean bed) {
     Player player = player(playerId);
     if (!player.hasPermission(AdministrativeCommandPolicy.ARENA_TELEPORT)) {
       send(playerId, "general.no-permission", Map.of());
@@ -1679,12 +1733,15 @@ public final class ArenaEditorMenuFactory {
     player.teleport(
         new Location(
             world,
-            value.position().x() + 0.5,
-            value.position().y() + 1.0,
-            value.position().z() + 0.5,
+            value.position().x() + (bed ? 0.5 : 0.0),
+            value.position().y() + (bed ? 1.0 : 0.0),
+            value.position().z() + (bed ? 0.5 : 0.0),
             value.yaw(),
             value.pitch()));
-    send(playerId, "arena.world.teleport-success", Map.of("world", world.getName()));
+    send(
+        playerId,
+        bed ? "arena.team.bed.teleported" : "arena.team.spawn.teleported",
+        Map.of("team", team.displayName()));
   }
 
   private void teleportBoundary(UUID playerId, ArenaDefinition arena, ArenaVector point) {
@@ -1882,6 +1939,7 @@ public final class ArenaEditorMenuFactory {
     values.put("team_id", team.id().value());
     values.put("team_name", team.displayName());
     values.put("team_color", team.color().name());
+    values.put("team_color_display", teamColorDisplay(team.color()));
     values.put("team_capacity", team.capacity());
     values.put(
         "team_spawn_status",
@@ -1901,8 +1959,8 @@ public final class ArenaEditorMenuFactory {
         "team_ready",
         message(
             team.spawn().isPresent() && team.bedLocation().isPresent()
-                ? "arena.teams.status.yes"
-                : "arena.teams.status.no",
+                ? "arena.teams.status.configured"
+                : "arena.teams.status.missing",
             Map.of()));
     putLocation(values, "spawn", team.spawn());
     putLocation(values, "bed", team.bedLocation());
@@ -1918,7 +1976,26 @@ public final class ArenaEditorMenuFactory {
   }
 
   private static String teamEntryKey(TeamColor color) {
-    return "arena.teams.entry-" + color.name().toLowerCase(Locale.ROOT);
+    return "arena.teams.entry-" + color.name().toLowerCase(Locale.ROOT) + "-v6";
+  }
+
+  private static String teamColorDisplay(TeamColor color) {
+    String code =
+        switch (color) {
+          case RED -> "§c";
+          case BLUE -> "§9";
+          case GREEN -> "§2";
+          case YELLOW -> "§e";
+          case AQUA -> "§b";
+          case WHITE -> "§f";
+          case PINK -> "§d";
+          case GRAY -> "§7";
+          case LIME -> "§a";
+          case ORANGE -> "§6";
+          case PURPLE -> "§5";
+          case BLACK -> "§8";
+        };
+    return code + color.name() + "§f";
   }
 
   private static Map<String, Object> positionPlaceholders(
