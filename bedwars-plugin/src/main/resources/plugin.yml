@@ -8,7 +8,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   bedwars:
     description: Commande principale de HeneriaBedWars.
-    usage: /bedwars [version|reload|config|language|gui|item|arena|map|game|stats|setup]
+    usage: /bedwars [version|reload|config|language|gui|item|arena|map|game|stats|top|setup]
     aliases:
       - hbw
       - bw
@@ -30,6 +30,8 @@ permissions:
       heneriabedwars.game.join: true
       heneriabedwars.game.leave: true
       heneriabedwars.statistics.view: true
+      heneriabedwars.statistics.view.others: true
+      heneriabedwars.statistics.leaderboard: true
   heneriabedwars.admin.dashboard:
     description: Ouvrir le tableau de bord administratif.
     default: op
@@ -126,6 +128,8 @@ permissions:
   heneriabedwars.game.join: {description: Rejoindre une instance runtime publique, default: true}
   heneriabedwars.game.leave: {description: Quitter son instance runtime, default: true}
   heneriabedwars.statistics.view: {description: Consulter ses statistiques BedWars, default: true}
+  heneriabedwars.statistics.view.others: {description: Consulter le profil d'un autre joueur, default: true}
+  heneriabedwars.statistics.leaderboard: {description: Consulter les classements BedWars, default: true}
   heneriabedwars.admin.game.start: {description: Demarrer le compte a rebours d'une instance, default: op}
   heneriabedwars.admin.game.force-start: {description: Forcer le passage immediat d'une instance en jeu, default: op}
   heneriabedwars.admin.game.stop: {description: Arreter et nettoyer une instance runtime, default: op}

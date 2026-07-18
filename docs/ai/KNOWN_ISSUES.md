@@ -1,5 +1,12 @@
 # Limitations connues
 
+## Ticket 018 — profils et classements
+
+- Un profil créé par le Ticket 017 n'a aucun pseudo persistant historique : il apparaît par UUID court dans le top et devient recherchable après la prochaine connexion du joueur.
+- Les classements sont globaux et permanents. Saisons, reset administratif, pagination au-delà du top 10 et cache distribué restent futurs.
+- Le niveau est une progression informative calculée; il ne débloque encore ni cosmétique, ni récompense, ni monnaie.
+- Les commandes, caractères de barre XP et changements de pseudo doivent encore être contrôlés visuellement sur Paper 1.21.x.
+
 ## Ticket 017 — statistiques et stockage
 
 - MySQL/MariaDB n'a pas encore d'adaptateur actif : choisir `storage.type: mysql` conserve seulement les statistiques de la session et journalise un avertissement.

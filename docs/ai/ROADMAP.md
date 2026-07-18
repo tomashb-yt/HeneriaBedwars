@@ -1,5 +1,9 @@
 # Roadmap
 
+## Ticket 018 en validation
+
+Les profils nommés, six classements publics et la première progression BedWars sont implémentés. Le système reste volontairement sans récompense, saison ou mutation publique. Après validation Paper, le Ticket 019 pourra introduire quêtes/récompenses ou stockage MySQL/MariaDB selon la priorité produit.
+
 ## Ticket 017 en validation
 
 Les profils joueurs et les statistiques de match sont maintenant durables dans SQLite. L'enregistrement est asynchrone, transactionnel et protégé contre le double comptage; `/bw stats` expose une première vue personnelle. La prochaine étape logique est le Ticket 018 : classements, consultation d'autres profils et fondations de progression, après validation Paper de la persistance.
@@ -40,9 +44,10 @@ La configuration essentielle d'une arène est regroupée dans une vue de cinq li
 - [EN COURS — VALIDATION PAPER] Ticket 015 — Équipement, outils et améliorations
 - [EN COURS — VALIDATION PAPER] Ticket 016 — Combat 1.8 et dégâts BedWars
 - [EN COURS — VALIDATION PAPER] Ticket 017 — Profils joueurs, statistiques et stockage SQLite
+- [EN COURS — VALIDATION PAPER] Ticket 018 — Profils nommés, classements et progression
 
 ## Grandes phases futures
 
-La logique automatisée des Tickets 012 à 017 est implémentée et doit encore être confirmée sur Paper multijoueur. La priorité suivante est la stabilisation en jeu, puis les classements et la progression avant le stockage réseau.
+La logique automatisée des Tickets 012 à 018 est implémentée et doit encore être confirmée sur Paper multijoueur. La priorité suivante est la stabilisation en jeu, puis les récompenses ou MySQL/MariaDB avant le stockage réseau.
 
-Fondation, configurations, interfaces, items, arènes, cartes, instances, lobby, équipes, lits, générateurs, boutiques, améliorations, combat et statistiques SQLite sont implémentés. Les classements, la progression, MySQL/MariaDB, le réseau et l'API de mutation restent futurs.
+Fondation, configurations, interfaces, items, arènes, cartes, instances, lobby, équipes, lits, générateurs, boutiques, améliorations, combat, statistiques SQLite, profils, classements et niveaux sont implémentés. Les récompenses, saisons, MySQL/MariaDB, réseau et API de mutation restent futurs.

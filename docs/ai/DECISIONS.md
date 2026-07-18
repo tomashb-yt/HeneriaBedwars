@@ -1,5 +1,14 @@
 # Décisions d'architecture
 
+## ADR-113 à ADR-118 — profils, classements et progression
+
+- **ADR-113** — L'UUID reste l'identité durable; le pseudo courant est un index révisable enregistré uniquement après une vraie connexion Bukkit.
+- **ADR-114** — La recherche normalise avec `Locale.ROOT`; un renommage retire l'ancien index et un pseudo réutilisé appartient au dernier UUID connecté.
+- **ADR-115** — Les anciennes statistiques sans pseudo restent classables avec un UUID court, mais ne deviennent recherchables par nom qu'après reconnexion.
+- **ADR-116** — Les catégories de classement sont une enum fermée traduite vers des colonnes SQL constantes; limite maximale 100, top joueur fixé à 10.
+- **ADR-117** — L'expérience et le niveau sont dérivés des agrégats, donc reproductibles et sans migration de compteur. Le palier du niveau `n` commence à `100 × (n-1)²` XP.
+- **ADR-118** — Le Ticket 018 n'accorde aucune récompense et ne modifie pas l'API Java publique; permissions de profils tiers et classements restent distinctes.
+
 ## ADR-107 à ADR-112 — statistiques persistantes
 
 - **ADR-107** — Les agrégats, résultats de match et ports de persistance appartiennent au cœur pur; JDBC reste exclusivement dans le module plugin.

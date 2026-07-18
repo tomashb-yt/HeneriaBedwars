@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 018 — profils, classements et progression
+
+Les scénarios purs couvrent normalisation et validation des identités, renommage, résolution insensible à la casse, tri par métrique, rangs stables, limites et formule de progression jusqu'aux agrégats saturés. L'intégration SQLite part d'une base Ticket 017 sans table d'identités, applique l'évolution additive, persiste un renommage, redémarre puis vérifie recherche et classement. La parité des langues et la permission racine `top` sont également contrôlées.
+
+La suite complète contient 217 tests automatisés réussis, sans échec, erreur ni test ignoré. Spotless, le build propre et le Shadow JAR sont confirmés. La matrice Paper doit vérifier profil personnel, profil tiers, pseudo inconnu, six tops, niveau/XP, redémarrage et renommage après reconnexion.
+
 ## Ticket 017 — statistiques persistantes
 
 Les tests purs vérifient agrégation, ratios, victoires/défaites, séries, valeurs impossibles et double enregistrement. Le test SQLite crée une vraie base, écrit deux participants, refuse le doublon, ferme le dépôt puis confirme les mêmes agrégats après réouverture. La configuration refuse aussi un chemin SQLite sortant du dossier du plugin, et la permission publique `stats` est couverte.

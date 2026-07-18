@@ -38,6 +38,16 @@ class AdministrativeCommandPolicyTest {
   }
 
   @Test
+  void exposesLeaderboardWithoutAdministrativePermission() {
+    assertEquals(
+        List.of("top"),
+        policy.complete(
+            permission -> permission.equals(AdministrativeCommandPolicy.STATISTICS_LEADERBOARD),
+            new String[] {""},
+            List.of()));
+  }
+
+  @Test
   void exposesGuiOnlyWithGuiPermission() {
     assertEquals(
         List.of("gui"),

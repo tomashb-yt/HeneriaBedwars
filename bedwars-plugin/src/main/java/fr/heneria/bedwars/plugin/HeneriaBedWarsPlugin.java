@@ -221,7 +221,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       statisticsService = new StatisticsService(statisticsRepository);
       StatisticsLifecycleComponent statisticsLifecycle =
           new StatisticsLifecycleComponent(
-              statisticsService, gameService, gameEvents, projectLogger);
+              this, statisticsService, gameService, gameEvents, projectLogger);
       GameBedService gameBeds = new GameBedService(gameService, gameEvents, clock);
       GameDeathService gameDeaths =
           new GameDeathService(

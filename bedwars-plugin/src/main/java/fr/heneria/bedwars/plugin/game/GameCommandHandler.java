@@ -13,7 +13,10 @@ import fr.heneria.bedwars.core.game.countdown.CountdownOperationResult;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.lobby.GameJoinResult;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
+import fr.heneria.bedwars.core.statistics.LeaderboardMetric;
 import fr.heneria.bedwars.core.statistics.PlayerStatistics;
+import fr.heneria.bedwars.core.statistics.PlayerStatisticsProfile;
+import fr.heneria.bedwars.core.statistics.StatisticsLeaderboardEntry;
 import fr.heneria.bedwars.core.statistics.StatisticsService;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import java.time.Duration;
@@ -63,7 +66,8 @@ public final class GameCommandHandler {
       case "info" -> info(sender, args);
       case "join" -> join(sender, args);
       case "leave" -> leave(sender);
-      case "stats" -> statistics(sender);
+      case "stats" -> statistics(sender, args.length >= 3 ? args[2] : null);
+      case "top" -> leaderboard(sender, args.length >= 3 ? args[2] : null);
       case "start" -> start(sender, args);
       case "stop" -> stop(sender, args, AdministrativeCommandPolicy.GAME_STOP);
       case "destroy" -> stop(sender, args, AdministrativeCommandPolicy.GAME_DESTROY);
@@ -75,7 +79,18 @@ public final class GameCommandHandler {
   public boolean executePublic(CommandSender sender, String[] args) {
     if (!(sender instanceof Player player))
       return send(sender, "game.command.player-only", Map.of());
-    if (args.length > 0 && args[0].equalsIgnoreCase("stats")) return statistics(player);
+    if (args.length > 0 && args[0].equalsIgnoreCase("stats")) {
+      if (args.length > 2) return send(player, "statistics.usage", Map.of());
+      return statistics(player, args.length == 2 ? args[1] : null);
+    }
+    if (args.length > 0 && args[0].equalsIgnoreCase("top")) {
+      if (args.length > 2)
+        return send(
+            player,
+            "statistics.leaderboard.usage",
+            Map.of("metrics", String.join(", ", leaderboardMetricKeys())));
+      return leaderboard(player, args.length == 2 ? args[1] : null);
+    }
     if (args.length > 0 && args[0].equalsIgnoreCase("leave")) return leave(sender);
     if (!allowed(sender, AdministrativeCommandPolicy.GAME_JOIN)) return true;
     if (args.length == 0 || args[0].equalsIgnoreCase("play")) return publicHelp(sender);
@@ -89,13 +104,28 @@ public final class GameCommandHandler {
   public List<String> completePublic(CommandSender sender, String[] args) {
     if (!sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN)
         && !sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE)
-        && !sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW)) return List.of();
+        && !sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW)
+        && !sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_LEADERBOARD))
+      return List.of();
     List<String> values =
         args.length <= 1
             ? publicChoices(sender)
-            : args.length == 2 && args[0].equalsIgnoreCase("join") ? publicMapIds() : List.of();
+            : args.length == 2 && args[0].equalsIgnoreCase("join")
+                ? publicMapIds()
+                : args.length == 2
+                        && args[0].equalsIgnoreCase("stats")
+                        && sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW_OTHERS)
+                    ? onlinePlayerNames()
+                    : args.length == 2
+                            && args[0].equalsIgnoreCase("top")
+                            && sender.hasPermission(
+                                AdministrativeCommandPolicy.STATISTICS_LEADERBOARD)
+                        ? leaderboardMetricKeys()
+                        : List.of();
     String input = args.length == 0 ? "" : args[args.length - 1].toLowerCase(Locale.ROOT);
-    return values.stream().filter(value -> value.startsWith(input)).toList();
+    return values.stream()
+        .filter(value -> value.toLowerCase(Locale.ROOT).startsWith(input))
+        .toList();
   }
 
   public List<String> complete(CommandSender sender, String[] args, List<String> arenaIds) {
@@ -103,7 +133,10 @@ public final class GameCommandHandler {
     boolean canJoin = sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN);
     boolean canLeave = sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE);
     boolean canViewStatistics = sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW);
-    if (!administrator && !canJoin && !canLeave && !canViewStatistics) return List.of();
+    boolean canViewLeaderboard =
+        sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_LEADERBOARD);
+    if (!administrator && !canJoin && !canLeave && !canViewStatistics && !canViewLeaderboard)
+      return List.of();
     List<String> values = new ArrayList<>();
     if (args.length == 2) {
       if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_CREATE))
@@ -115,6 +148,7 @@ public final class GameCommandHandler {
       if (canJoin) values.add("join");
       if (canLeave) values.add("leave");
       if (canViewStatistics) values.add("stats");
+      if (canViewLeaderboard) values.add("top");
       if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_START))
         values.add("start");
       if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_STOP))
@@ -125,6 +159,12 @@ public final class GameCommandHandler {
       values.addAll(arenaIds);
     } else if (args.length == 3 && args[1].equalsIgnoreCase("join")) {
       values.addAll(publicMapIds());
+    } else if (args.length == 3
+        && args[1].equalsIgnoreCase("stats")
+        && sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW_OTHERS)) {
+      values.addAll(onlinePlayerNames());
+    } else if (args.length == 3 && args[1].equalsIgnoreCase("top") && canViewLeaderboard) {
+      values.addAll(leaderboardMetricKeys());
     } else if (args.length == 3
         && List.of("info", "start", "stop", "destroy").contains(args[1].toLowerCase(Locale.ROOT))) {
       values.addAll(shortIds());
@@ -247,28 +287,41 @@ public final class GameCommandHandler {
     return send(sender, "game.help.public", Map.of("maps", String.join(", ", publicMapIds())));
   }
 
-  private boolean statistics(CommandSender sender) {
+  private boolean statistics(CommandSender sender, String targetName) {
     if (!(sender instanceof Player player))
       return send(sender, "game.command.player-only", Map.of());
     if (!allowed(sender, AdministrativeCommandPolicy.STATISTICS_VIEW)) return true;
-    send(player, "statistics.loading", Map.of());
-    statistics
-        .statistics(player.getUniqueId())
-        .whenComplete(
-            (snapshot, failure) ->
-                main(
-                    () -> {
-                      if (failure != null || snapshot == null) {
-                        send(player, "statistics.error", Map.of());
-                        return;
-                      }
-                      showStatistics(player, snapshot);
-                    }));
+    boolean self = targetName == null || targetName.equalsIgnoreCase(player.getName());
+    if (!self && !allowed(sender, AdministrativeCommandPolicy.STATISTICS_VIEW_OTHERS)) return true;
+    String requested = self ? player.getName() : targetName;
+    send(player, "statistics.loading", Map.of("player", requested));
+    java.util.concurrent.CompletionStage<java.util.Optional<PlayerStatisticsProfile>> request =
+        self
+            ? statistics
+                .profile(player.getUniqueId(), player.getName())
+                .thenApply(java.util.Optional::of)
+            : statistics.profile(requested);
+    request.whenComplete(
+        (profile, failure) ->
+            main(
+                () -> {
+                  if (failure != null || profile == null) {
+                    send(player, "statistics.error", Map.of());
+                    return;
+                  }
+                  if (profile.isEmpty()) {
+                    send(player, "statistics.not-found", Map.of("player", requested));
+                    return;
+                  }
+                  showStatistics(player, profile.orElseThrow());
+                }));
     return true;
   }
 
-  private void showStatistics(Player player, PlayerStatistics snapshot) {
+  private void showStatistics(Player player, PlayerStatisticsProfile profile) {
+    PlayerStatistics snapshot = profile.statistics();
     Map<String, Object> values = new LinkedHashMap<>();
+    values.put("profile_player", profile.identity().currentName());
     values.put("games", snapshot.gamesPlayed());
     values.put("wins", snapshot.wins());
     values.put("losses", snapshot.losses());
@@ -281,11 +334,69 @@ public final class GameCommandHandler {
     values.put("streak", snapshot.currentWinStreak());
     values.put("best_streak", snapshot.bestWinStreak());
     values.put("play_time", duration(snapshot.playTimeSeconds()));
+    values.put("level", profile.progression().level());
+    values.put("experience", profile.progression().totalExperience());
+    values.put("level_experience", profile.progression().currentLevelExperience());
+    values.put("level_required", profile.progression().requiredLevelExperience());
+    values.put("progress_bar", progressBar(profile.progression().progressPercent()));
+    values.put(
+        "progress_percent",
+        String.format(Locale.ROOT, "%.0f", profile.progression().progressPercent()));
     send(player, "statistics.header", values);
+    send(player, "statistics.progression", values);
     send(player, "statistics.games", values);
     send(player, "statistics.combat", values);
     send(player, "statistics.objectives", values);
     send(player, "statistics.footer", values);
+  }
+
+  private boolean leaderboard(CommandSender sender, String metricKey) {
+    if (!(sender instanceof Player player))
+      return send(sender, "game.command.player-only", Map.of());
+    if (!allowed(sender, AdministrativeCommandPolicy.STATISTICS_LEADERBOARD)) return true;
+    LeaderboardMetric metric =
+        metricKey == null ? LeaderboardMetric.WINS : LeaderboardMetric.find(metricKey).orElse(null);
+    if (metric == null)
+      return send(
+          player,
+          "statistics.leaderboard.usage",
+          Map.of("metrics", String.join(", ", leaderboardMetricKeys())));
+    String metricName = metricName(metric);
+    send(player, "statistics.leaderboard.loading", Map.of("metric", metricName));
+    statistics
+        .leaderboard(metric, 10)
+        .whenComplete(
+            (entries, failure) ->
+                main(
+                    () -> {
+                      if (failure != null || entries == null) {
+                        send(player, "statistics.leaderboard.error", Map.of());
+                        return;
+                      }
+                      showLeaderboard(player, metricName, entries);
+                    }));
+    return true;
+  }
+
+  private void showLeaderboard(
+      Player player, String metricName, List<StatisticsLeaderboardEntry> entries) {
+    send(player, "statistics.leaderboard.header", Map.of("metric", metricName));
+    if (entries.isEmpty()) {
+      send(player, "statistics.leaderboard.empty", Map.of());
+    } else {
+      for (StatisticsLeaderboardEntry entry : entries) {
+        var progression = statistics.progression(entry.statistics());
+        send(
+            player,
+            "statistics.leaderboard.entry",
+            Map.of(
+                "rank", entry.rank(),
+                "profile_player", entry.identity().currentName(),
+                "score", entry.score(),
+                "level", progression.level()));
+      }
+    }
+    send(player, "statistics.leaderboard.footer", Map.of());
   }
 
   private List<String> publicChoices(CommandSender sender) {
@@ -294,7 +405,31 @@ public final class GameCommandHandler {
       choices.addAll(List.of("play", "join"));
     if (sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE)) choices.add("leave");
     if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW)) choices.add("stats");
+    if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_LEADERBOARD))
+      choices.add("top");
     return List.copyOf(choices);
+  }
+
+  private List<String> onlinePlayerNames() {
+    return Bukkit.getOnlinePlayers().stream().map(Player::getName).sorted().toList();
+  }
+
+  private static List<String> leaderboardMetricKeys() {
+    return java.util.Arrays.stream(LeaderboardMetric.values()).map(LeaderboardMetric::key).toList();
+  }
+
+  private String metricName(LeaderboardMetric metric) {
+    return configurations
+        .language()
+        .message(
+            "statistics.leaderboard.metric." + metric.key(),
+            configurations.snapshot().plugin().locale(),
+            PlaceholderContext.EMPTY);
+  }
+
+  private static String progressBar(double percentage) {
+    int completed = Math.max(0, Math.min(10, (int) Math.floor(percentage / 10.0)));
+    return "■".repeat(completed) + "□".repeat(10 - completed);
   }
 
   private static String duration(long seconds) {

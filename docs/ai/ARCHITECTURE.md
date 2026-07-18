@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 018 — profils nommés, progression et classements
+
+`PlayerIdentity` sépare le pseudo courant de l'UUID durable. `StatisticsLifecycleComponent` observe uniquement la connexion Bukkit puis délègue l'écriture asynchrone à `StatisticsService`. Le dépôt résout les pseudos normalisés, gère les renommages et réattribue un nom réutilisé au dernier UUID effectivement connecté.
+
+`LeaderboardMetric` forme la liste fermée des tris autorisés. L'adaptateur SQLite traduit cette enum vers une colonne connue avant de produire un top borné; aucun texte de commande n'entre dans la requête. `ProgressionPolicy` calcule une vue de niveau pure depuis les agrégats. Les profils, classements et niveaux restent internes au plugin tant que leur contrat d'addon n'est pas stabilisé.
+
 ## Ticket 017 — profils et statistiques persistantes
 
 `bedwars-core.statistics` contient les agrégats immuables, le résultat de match, le port asynchrone `StatisticsRepository` et `StatisticsService`. Aucun de ces contrats ne dépend de Bukkit ou de JDBC. Le composant plugin capture `GameVictoryEvent` synchronement tant que `GameInstance` existe encore, puis transmet le snapshot à la persistance.

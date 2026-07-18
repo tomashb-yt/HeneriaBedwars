@@ -1,7 +1,7 @@
 config-version: 1
 
 general:
-  public-help: "<aqua><bold>HeneriaBedWars</bold></aqua>\n<gray>Use lobby NPCs or <white>/bw join <map></white> to play.\n<gray>Your profile: <white>/bw stats"
+  public-help: "<aqua><bold>HeneriaBedWars</bold></aqua>\n<gray>Play: <white>/bw join <map>\n<gray>Profiles: <white>/bw stats [player]\n<gray>Leaderboards: <white>/bw top [type]"
   prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
   no-permission: "<red>You do not have permission to use this command."
   player-only: "<red>This command is only available to players."
@@ -20,6 +20,7 @@ command:
     setup: "<gray>/bedwars setup <dark_gray>- <white>Opens in-game configuration."
     map: "<gray>/bedwars map <dark_gray>- <white>Manages map templates."
     stats: "<gray>/bedwars stats <dark_gray>- <white>Shows your BedWars profile."
+    top: "<gray>/bedwars top [ranking] <dark_gray>- <white>Shows the BedWars leaderboard."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Plugin version: <white>{plugin_version}"
@@ -249,16 +250,34 @@ arena:
     success: "<green>Arena {arena_id} was backed up and deleted."
     failed: "<red>Deletion failed."
 statistics:
-  loading: "<gray>Loading your BedWars profile..."
+  loading: "<gray>Loading <white>{player}<gray>'s profile..."
+  usage: "<red>Usage: <white>/bw stats [player]"
+  not-found: "<red>No known BedWars profile for <white>{player}<red>. The player must have joined at least once since Ticket 018."
   error: "<red>Your profile could not be loaded. Please try again in a moment."
-  header: "<dark_aqua><bold>━━ BedWars profile ━━"
+  header: "<dark_aqua><bold>━━ {profile_player}'s profile <gray>• <aqua>Level {level} <dark_aqua>━━"
+  progression: "<gray>Progress <dark_gray>• <aqua>{progress_bar} <white>{level_experience}<gray>/<white>{level_required} XP <dark_gray>({progress_percent}%)"
   games: "<gray>Games <dark_gray>• <white>{games} <gray>| Wins <dark_gray>• <green>{wins} <gray>| Losses <dark_gray>• <red>{losses} <gray>| Rate <dark_gray>• <aqua>{win_rate}%"
   combat: "<gray>Kills <dark_gray>• <green>{kills} <gray>| Deaths <dark_gray>• <red>{deaths} <gray>| Final kills <dark_gray>• <gold>{final_kills} <gray>| K/D <dark_gray>• <yellow>{kdr}"
   objectives: "<gray>Beds broken <dark_gray>• <light_purple>{beds} <gray>| Streak <dark_gray>• <aqua>{streak} <gray>| Best <dark_gray>• <yellow>{best_streak}"
-  footer: "<gray>Play time <dark_gray>• <white>{play_time}"
+  footer: "<gray>Play time <dark_gray>• <white>{play_time} <gray>| Total XP <dark_gray>• <aqua>{experience}"
+  leaderboard:
+    loading: "<gray>Loading the <white>{metric}<gray> leaderboard..."
+    usage: "<red>Usage: <white>/bw top [ranking]<gray>. Choices: <white>{metrics}"
+    error: "<red>The leaderboard could not be loaded. Please try again in a moment."
+    header: "<dark_aqua><bold>━━ BedWars top 10 <gray>• <aqua>{metric} <dark_aqua>━━"
+    entry: "<gold>#{rank} <white>{profile_player} <dark_gray>• <aqua>{score} <gray>• Level <white>{level}"
+    empty: "<gray>No completed game has been recorded yet."
+    footer: "<dark_gray>Change ranking with <white>/bw top <type>"
+    metric:
+      wins: "Wins"
+      finals: "Final kills"
+      kills: "Kills"
+      beds: "Beds broken"
+      games: "Games played"
+      streak: "Best streak"
 game:
   help:
-    public: "<aqua><bold>HeneriaBedWars</bold> <gray>— Play\n<white>/bw join <map> <gray>Joins the best available game.\n<white>/bw leave <gray>Leaves your game.\n<white>/bw stats <gray>Shows your BedWars profile.\n<gray>Available maps: <white>{maps}"
+    public: "<aqua><bold>HeneriaBedWars</bold> <gray>— Play\n<white>/bw join <map> <gray>Joins the best available game.\n<white>/bw leave <gray>Leaves your game.\n<white>/bw stats [player] <gray>Shows a profile.\n<white>/bw top [type] <gray>Shows the leaderboard.\n<gray>Available maps: <white>{maps}"
     usage:
       join: "<red>Map missing. <gray>Usage: <white>/bw join <map><gray>. Maps: <white>{maps}"
   error:

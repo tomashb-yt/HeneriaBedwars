@@ -1,5 +1,7 @@
 # API publique
 
+Le Ticket 018 conserve l'API Java publique inchangée. Il ajoute `/bw stats [joueur]` et `/bw top [wins|finals|kills|beds|games|streak]`. Les permissions sont respectivement `heneriabedwars.statistics.view`, `.view.others` et `.leaderboard`. Les contrats `PlayerIdentity`, `LeaderboardMetric` et `ProgressionPolicy` restent internes.
+
 Le Ticket 017 ne modifie pas l'API Java publique. `StatisticsService` et `StatisticsRepository` restent internes pendant la stabilisation du schéma. La surface joueur ajoute `/bw stats` et `/bedwars stats`, protégées par `heneriabedwars.statistics.view`; elles consultent uniquement le profil du joueur connecté.
 
 Le Ticket 015 ne modifie pas l'API publique. `PlayerEquipment`, `TeamUpgradePurchaseService` et leurs événements sont internes : les addons ne doivent pas muter directement l'équipement, les prix ou les niveaux d'une équipe.
@@ -55,6 +57,8 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 | `/bedwars game join <arene ou id>` | `heneriabedwars.game.join` | rejoint une instance existante; sa création reste administrative |
 | `/bedwars game leave` | `heneriabedwars.game.leave` | restaure le snapshot joueur puis quitte l'instance |
 | `/bw stats`, `/bedwars stats` | `heneriabedwars.statistics.view` | affiche le profil BedWars persistant du joueur connecté |
+| `/bw stats <joueur>`, `/bedwars stats <joueur>` | `heneriabedwars.statistics.view.others` | recherche un profil connu par pseudo, sans distinction de casse |
+| `/bw top [type]`, `/bedwars top [type]` | `heneriabedwars.statistics.leaderboard` | affiche le top 10; `wins` est le classement par défaut |
 | `/bedwars game start <id> [--force]` | `heneriabedwars.admin.game.start` / `.force-start` | demarre le compteur ou force `PLAYING` pour un test |
 | `/bedwars game stop <id>` | `heneriabedwars.admin.game.stop` | arrete, restaure les joueurs et nettoie le clone |
 | `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | alias historique de `stop` |

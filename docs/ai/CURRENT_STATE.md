@@ -1,5 +1,16 @@
 # État actuel
 
+## Ticket 018 — implémentation en validation Paper
+
+- table additive `player_identities` avec UUID, dernier pseudo, forme normalisée et date de mise à jour;
+- mémorisation asynchrone à la connexion et prise en charge des renommages/réattributions;
+- `/bw stats [joueur]` avec niveau, barre XP et statistiques complètes;
+- `/bw top [wins|finals|kills|beds|games|streak]`, top 10 stable et localisé;
+- anciennes lignes Ticket 017 sans identité affichées par UUID court dans les tops jusqu'à la prochaine connexion;
+- permissions publiques séparées pour profil personnel, profils tiers et classements;
+- migration SQLite réelle, recherche, tri, limites et progression couverts par les tests;
+- 217 tests automatisés réussis, sans échec, erreur ni test ignoré; Spotless, build propre et Shadow JAR confirmés. Le rendu et les commandes restent à valider sur Paper.
+
 ## Ticket 017 — implémentation en validation Paper
 
 - profil persistant par UUID : parties, victoires/défaites, ratio, kills, morts, final kills, lits, temps et séries;

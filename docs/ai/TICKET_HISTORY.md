@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 018 — Profils nommés, classements et progression — 2026-07-18
+
+Le stockage SQLite évolue sans supprimer les données Ticket 017 : `player_identities` mémorise UUID, dernier pseudo et forme normalisée lors de chaque connexion. La recherche ignore la casse, les renommages retirent l'ancien index et un pseudo réutilisé est rattaché au dernier compte observé. Les profils historiques sans identité restent présents dans les tops sous un UUID court.
+
+`/bw stats [joueur]` affiche désormais niveau, progression, parties, victoires, combats, objectifs, séries et temps. `/bw top` propose victoires, final kills, kills, lits, parties et meilleure série. Les tris sont bornés, déterministes et entièrement asynchrones. Le niveau est dérivé par une politique pure; aucune récompense n'est encore accordée.
+
+Validation finale réussie : 217 tests, aucun échec, aucune erreur, aucun test ignoré, Spotless conforme, build propre et Shadow JAR généré avec le pilote SQLite. La validation Paper doit confirmer les commandes, le rendu, la persistance et les renommages. Commit prévu : `feat(statistics): add player leaderboards and progression`.
+
 ## Ticket 017 — Profils joueurs et statistiques SQLite — 2026-07-18
 
 Le cœur ajoute un modèle de résultat terminé et un profil agrégé sans dépendance Bukkit. Une victoire capture les participants avant le recyclage du clone, puis `SqliteStatisticsRepository` enregistre la partie et tous les profils dans une transaction exécutée hors du thread serveur. `processed_matches` rend l'opération idempotente même après répétition d'un événement ou redémarrage.

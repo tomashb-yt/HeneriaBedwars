@@ -46,6 +46,8 @@ public final class AdministrativeCommandPolicy {
   public static final String GAME_JOIN = "heneriabedwars.game.join";
   public static final String GAME_LEAVE = "heneriabedwars.game.leave";
   public static final String STATISTICS_VIEW = "heneriabedwars.statistics.view";
+  public static final String STATISTICS_VIEW_OTHERS = "heneriabedwars.statistics.view.others";
+  public static final String STATISTICS_LEADERBOARD = "heneriabedwars.statistics.leaderboard";
   public static final String GAME_START = "heneriabedwars.admin.game.start";
   public static final String GAME_FORCE_START = "heneriabedwars.admin.game.force-start";
   public static final String GAME_STOP = "heneriabedwars.admin.game.stop";
@@ -103,6 +105,7 @@ public final class AdministrativeCommandPolicy {
       if (permitted.test(GAME) || permitted.test(GAME_JOIN) || permitted.test(GAME_LEAVE))
         choices.add("game");
       if (permitted.test(STATISTICS_VIEW)) choices.add("stats");
+      if (permitted.test(STATISTICS_LEADERBOARD)) choices.add("top");
     } else if (arguments.length == 2
         && arguments[0].equalsIgnoreCase("language")
         && permitted.test(LANGUAGE)) {

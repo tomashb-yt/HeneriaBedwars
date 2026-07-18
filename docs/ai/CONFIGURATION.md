@@ -1,5 +1,9 @@
 # Configuration
 
+## Ticket 018
+
+Aucune nouvelle clé n'est ajoutée. Les poids XP et catégories de classement sont des règles métier internes pour cette première version; ils ne doivent pas être présentés comme rechargeables. Le stockage continue d'utiliser `storage.yml` et fait évoluer automatiquement le schéma SQLite.
+
 ## Ticket 017 — `storage.yml`
 
 `storage.type: sqlite` active la persistance des profils. `sqlite.file` est un chemin relatif confiné au dossier du plugin; les chemins absolus et remontées `..` sont refusés. Le fichier et son schéma sont créés automatiquement. `mysql` reste accepté pour compatibilité de configuration mais utilise temporairement un dépôt mémoire avec avertissement tant que son adaptateur n'est pas livré.

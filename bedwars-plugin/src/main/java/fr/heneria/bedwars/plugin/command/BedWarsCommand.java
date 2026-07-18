@@ -137,7 +137,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         case "map" -> mapCommands.execute(sender, args);
         case "game" -> gameCommands.execute(sender, args);
         case "play" -> gameCommands.executePublic(sender, new String[] {"play"});
-        case "stats" -> gameCommands.executePublic(sender, new String[] {"stats"});
+        case "stats" -> gameCommands.executePublic(sender, args);
+        case "top" -> gameCommands.executePublic(sender, args);
         case "setup" -> setup(sender);
         default -> send(sender, TranslationKey.UNKNOWN_COMMAND);
       };
@@ -157,6 +158,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       send(sender, TranslationKey.HELP_VERSION);
       if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW))
         send(sender, TranslationKey.HELP_STATS);
+      if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_LEADERBOARD))
+        send(sender, TranslationKey.HELP_TOP);
       if (sender.hasPermission(RELOAD)) send(sender, TranslationKey.HELP_RELOAD);
       return true;
     }
@@ -175,6 +178,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
       send(sender, TranslationKey.HELP_MAP);
     if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW))
       send(sender, TranslationKey.HELP_STATS);
+    if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_LEADERBOARD))
+      send(sender, TranslationKey.HELP_TOP);
     if (sender.hasPermission(AdministrativeCommandPolicy.GAME))
       sender.sendMessage(
           configurations
@@ -414,7 +419,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
     if (alias.equalsIgnoreCase("bw")) return gameCommands.completePublic(sender, args);
     if (args.length >= 1 && args[0].equalsIgnoreCase("play"))
       return gameCommands.completePublic(sender, new String[] {"play"});
-    if (args.length >= 1 && args[0].equalsIgnoreCase("stats")) return List.of();
+    if (args.length >= 1 && (args[0].equalsIgnoreCase("stats") || args[0].equalsIgnoreCase("top")))
+      return gameCommands.completePublic(sender, args);
     if (args.length >= 1 && args[0].equalsIgnoreCase("game"))
       return gameCommands.complete(
           sender, args, arenaService.list().stream().map(arena -> arena.id().value()).toList());
@@ -440,6 +446,7 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
                       || value.equals("version")
                       || value.equals("reload")
                       || value.equals("stats")
+                      || value.equals("top")
                       || value.equals("game"))
           .toList();
     return completions;

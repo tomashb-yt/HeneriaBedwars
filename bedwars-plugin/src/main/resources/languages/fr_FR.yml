@@ -1,7 +1,7 @@
 config-version: 1
 
 general:
-  public-help: "<aqua><bold>HeneriaBedWars</bold></aqua>\n<gray>Utilisez les PNJ du lobby ou <white>/bw join <carte></white> pour jouer.\n<gray>Votre profil : <white>/bw stats"
+  public-help: "<aqua><bold>HeneriaBedWars</bold></aqua>\n<gray>Jouer : <white>/bw join <carte>\n<gray>Profils : <white>/bw stats [joueur]\n<gray>Classements : <white>/bw top [type]"
   prefix: "<gray>[<aqua>HeneriaBedWars<gray>] "
   no-permission: "<red>Vous n'avez pas la permission d'utiliser cette commande."
   player-only: "<red>Cette commande est réservée aux joueurs."
@@ -20,6 +20,7 @@ command:
     setup: "<gray>/bedwars setup <dark_gray>- <white>Ouvre la configuration en jeu."
     map: "<gray>/bedwars map <dark_gray>- <white>Administre les cartes modeles."
     stats: "<gray>/bedwars stats <dark_gray>- <white>Affiche votre profil BedWars."
+    top: "<gray>/bedwars top [classement] <dark_gray>- <white>Affiche le top BedWars."
   version:
     header: "<aqua><bold>HeneriaBedWars"
     plugin-version: "<gray>Version du plugin : <white>{plugin_version}"
@@ -249,16 +250,34 @@ arena:
     success: "<green>L'arene {arena_id} a ete sauvegardee puis supprimee."
     failed: "<red>Suppression impossible."
 statistics:
-  loading: "<gray>Chargement de votre profil BedWars..."
+  loading: "<gray>Chargement du profil de <white>{player}<gray>..."
+  usage: "<red>Utilisation : <white>/bw stats [joueur]"
+  not-found: "<red>Aucun profil BedWars connu pour <white>{player}<red>. Le joueur doit s'être connecté au moins une fois depuis le Ticket 018."
   error: "<red>Votre profil n'a pas pu être chargé. Réessayez dans un instant."
-  header: "<dark_aqua><bold>━━ Profil BedWars ━━"
+  header: "<dark_aqua><bold>━━ Profil de {profile_player} <gray>• <aqua>Niveau {level} <dark_aqua>━━"
+  progression: "<gray>Progression <dark_gray>• <aqua>{progress_bar} <white>{level_experience}<gray>/<white>{level_required} XP <dark_gray>({progress_percent}%)"
   games: "<gray>Parties <dark_gray>• <white>{games} <gray>| Victoires <dark_gray>• <green>{wins} <gray>| Défaites <dark_gray>• <red>{losses} <gray>| Ratio <dark_gray>• <aqua>{win_rate}%"
   combat: "<gray>Éliminations <dark_gray>• <green>{kills} <gray>| Morts <dark_gray>• <red>{deaths} <gray>| Finales <dark_gray>• <gold>{final_kills} <gray>| K/D <dark_gray>• <yellow>{kdr}"
   objectives: "<gray>Lits détruits <dark_gray>• <light_purple>{beds} <gray>| Série <dark_gray>• <aqua>{streak} <gray>| Record <dark_gray>• <yellow>{best_streak}"
-  footer: "<gray>Temps de jeu <dark_gray>• <white>{play_time}"
+  footer: "<gray>Temps de jeu <dark_gray>• <white>{play_time} <gray>| XP total <dark_gray>• <aqua>{experience}"
+  leaderboard:
+    loading: "<gray>Chargement du classement <white>{metric}<gray>..."
+    usage: "<red>Utilisation : <white>/bw top [classement]<gray>. Choix : <white>{metrics}"
+    error: "<red>Le classement n'a pas pu être chargé. Réessayez dans un instant."
+    header: "<dark_aqua><bold>━━ Top 10 BedWars <gray>• <aqua>{metric} <dark_aqua>━━"
+    entry: "<gold>#{rank} <white>{profile_player} <dark_gray>• <aqua>{score} <gray>• Niveau <white>{level}"
+    empty: "<gray>Aucune partie terminée n'est encore enregistrée."
+    footer: "<dark_gray>Changez de classement avec <white>/bw top <type>"
+    metric:
+      wins: "Victoires"
+      finals: "Éliminations finales"
+      kills: "Éliminations"
+      beds: "Lits détruits"
+      games: "Parties jouées"
+      streak: "Meilleure série"
 game:
   help:
-    public: "<aqua><bold>HeneriaBedWars</bold> <gray>— Jouer\n<white>/bw join <carte> <gray>Rejoint la meilleure partie disponible.\n<white>/bw leave <gray>Quitte votre partie.\n<white>/bw stats <gray>Affiche votre profil BedWars.\n<gray>Cartes disponibles : <white>{maps}"
+    public: "<aqua><bold>HeneriaBedWars</bold> <gray>— Jouer\n<white>/bw join <carte> <gray>Rejoint la meilleure partie disponible.\n<white>/bw leave <gray>Quitte votre partie.\n<white>/bw stats [joueur] <gray>Affiche un profil.\n<white>/bw top [type] <gray>Affiche le classement.\n<gray>Cartes disponibles : <white>{maps}"
     usage:
       join: "<red>Carte manquante. <gray>Utilisation : <white>/bw join <carte><gray>. Cartes : <white>{maps}"
   error:

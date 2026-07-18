@@ -10,6 +10,14 @@
 
 `processed_matches` conserve l'UUID de partie, l'arène, la carte, l'équipe gagnante et la date. Cet UUID est la barrière contre les doubles écritures.
 
+Depuis le Ticket 018, `player_identities` associe un UUID au dernier pseudo réellement observé à la connexion. `normalized_name` est unique et insensible à la casse côté service. Cette table est additive : une base Ticket 017 existante la reçoit au prochain démarrage sans réécriture des agrégats.
+
+## Progression
+
+L'XP total est dérivé : 10 par partie, 100 par victoire, 5 par kill, 15 par final kill et 25 par lit. Le niveau `n` commence à `100 × (n-1)²` XP. Ce calcul pur permet de modifier l'affichage et de reconstruire tous les niveaux sans compteur supplémentaire; aucune récompense n'est encore liée au niveau.
+
+Les tops autorisés sont `wins`, `finals`, `kills`, `beds`, `games` et `streak`. `LeaderboardMetric` choisit la colonne SQL parmi cette liste fermée. Le pseudo demandé par le joueur n'est jamais concaténé dans une requête.
+
 ## Atomicité et concurrence
 
 SQLite fonctionne en mode WAL avec un délai d'attente configurable. Chaque résultat ouvre une transaction : l'insertion `INSERT OR IGNORE` du match doit réussir avant les UPSERT des joueurs. Si l'UUID existe déjà, la transaction est annulée et aucun compteur ne change. En cas d'erreur, tous les participants restent inchangés.
@@ -18,4 +26,4 @@ Un exécuteur daemon mono-thread sérialise initialisation, écritures et lectur
 
 ## Commandes et limites
 
-`/bw stats` et `/bedwars stats` affichent seulement le profil personnel et requièrent `heneriabedwars.statistics.view`. Les parties sans victoire ne sont pas comptées. Les classements, profils tiers, saisons, migrations MySQL/MariaDB et exposition dans l'API publique restent futurs.
+`/bw stats` affiche le profil personnel; l'argument optionnel requiert `heneriabedwars.statistics.view.others`. `/bw top [type]` requiert `heneriabedwars.statistics.leaderboard`. Les parties sans victoire ne sont pas comptées. Saisons, reset, récompenses, migrations MySQL/MariaDB et exposition dans l'API publique restent futurs.
