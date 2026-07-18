@@ -29,6 +29,9 @@ import fr.heneria.bedwars.core.map.MapType;
 import fr.heneria.bedwars.core.map.MapWorldSettings;
 import fr.heneria.bedwars.core.map.editor.MapEditorStateStore;
 import fr.heneria.bedwars.core.map.operation.MapOperationTracker;
+import fr.heneria.bedwars.core.statistics.InMemoryStatisticsRepository;
+import fr.heneria.bedwars.core.statistics.StatisticsRepository;
+import fr.heneria.bedwars.core.statistics.StatisticsService;
 import fr.heneria.bedwars.plugin.arena.ArenaEditorMenuFactory;
 import fr.heneria.bedwars.plugin.arena.ArenaLifecycleComponent;
 import fr.heneria.bedwars.plugin.arena.YamlArenaRepository;
@@ -67,6 +70,8 @@ import fr.heneria.bedwars.plugin.map.MapMenuFactory;
 import fr.heneria.bedwars.plugin.map.MapMenuNavigation;
 import fr.heneria.bedwars.plugin.map.SecureMapFileService;
 import fr.heneria.bedwars.plugin.map.YamlMapTemplateRepository;
+import fr.heneria.bedwars.plugin.statistics.SqliteStatisticsRepository;
+import fr.heneria.bedwars.plugin.statistics.StatisticsLifecycleComponent;
 import java.time.Clock;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -90,6 +95,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
   private GameInstanceManager gameService;
   private GameCountdownService gameCountdowns;
   private GameLobbyService gameLobby;
+  private StatisticsService statisticsService;
 
   @Override
   public void onEnable() {
@@ -198,6 +204,24 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       gameLobby =
           new GameLobbyService(
               gameService, gameCountdowns, () -> configurations.snapshot().game(), clock);
+      StatisticsRepository statisticsRepository;
+      if (configurations.snapshot().storage().type().equals("sqlite")) {
+        java.nio.file.Path database =
+            data.resolve(configurations.snapshot().storage().sqliteFile()).normalize();
+        if (!database.startsWith(data.normalize()))
+          throw new IllegalStateException("SQLite database escapes the plugin directory");
+        statisticsRepository =
+            new SqliteStatisticsRepository(
+                database, configurations.snapshot().storage().connectionTimeoutMillis());
+      } else {
+        projectLogger.warning(
+            "[Statistics] MySQL is not active yet; statistics will be memory-only for this run.");
+        statisticsRepository = new InMemoryStatisticsRepository();
+      }
+      statisticsService = new StatisticsService(statisticsRepository);
+      StatisticsLifecycleComponent statisticsLifecycle =
+          new StatisticsLifecycleComponent(
+              statisticsService, gameService, gameEvents, projectLogger);
       GameBedService gameBeds = new GameBedService(gameService, gameEvents, clock);
       GameDeathService gameDeaths =
           new GameDeathService(
@@ -340,6 +364,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               gameService,
               gameCountdowns,
               gameLobby,
+              statisticsService,
               new MapLifecycleComponent(
                   this,
                   mapService,
@@ -349,6 +374,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   mapOperations,
                   projectLogger),
               new ArenaLifecycleComponent(arenaService, projectLogger),
+              statisticsLifecycle,
               new GameLifecycleComponent(
                   this,
                   gameService,
@@ -419,6 +445,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
             gameService,
             gameCountdowns,
             gameLobby,
+            statisticsService,
             mapWorldService,
             itemService,
             guiService,

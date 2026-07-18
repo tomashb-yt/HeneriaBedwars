@@ -1,5 +1,7 @@
 # API publique
 
+Le Ticket 017 ne modifie pas l'API Java publique. `StatisticsService` et `StatisticsRepository` restent internes pendant la stabilisation du schéma. La surface joueur ajoute `/bw stats` et `/bedwars stats`, protégées par `heneriabedwars.statistics.view`; elles consultent uniquement le profil du joueur connecté.
+
 Le Ticket 015 ne modifie pas l'API publique. `PlayerEquipment`, `TeamUpgradePurchaseService` et leurs événements sont internes : les addons ne doivent pas muter directement l'équipement, les prix ou les niveaux d'une équipe.
 
 `/bw join <carte>` liste désormais les modèles associés aux arènes actives même lorsqu'aucune instance n'existe. Si nécessaire, la commande clone la carte puis rejoint la nouvelle instance; la création runtime n'accorde aucune permission administrative au joueur.
@@ -52,6 +54,7 @@ Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManag
 | `/bedwars game info <id-court ou UUID>` | `heneriabedwars.admin.game.info` | affiche arene, carte, etat, monde, joueurs, age et compteur |
 | `/bedwars game join <arene ou id>` | `heneriabedwars.game.join` | rejoint une instance existante; sa création reste administrative |
 | `/bedwars game leave` | `heneriabedwars.game.leave` | restaure le snapshot joueur puis quitte l'instance |
+| `/bw stats`, `/bedwars stats` | `heneriabedwars.statistics.view` | affiche le profil BedWars persistant du joueur connecté |
 | `/bedwars game start <id> [--force]` | `heneriabedwars.admin.game.start` / `.force-start` | demarre le compteur ou force `PLAYING` pour un test |
 | `/bedwars game stop <id>` | `heneriabedwars.admin.game.stop` | arrete, restaure les joueurs et nettoie le clone |
 | `/bedwars game destroy <UUID>` | `heneriabedwars.admin.game.destroy` | alias historique de `stop` |

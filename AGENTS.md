@@ -2,7 +2,9 @@
 
 ## Présentation
 
-HeneriaBedWars est un plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Le Ticket 012 est en validation : lits runtime, morts, respawns, éliminations et victoire provisoire sont implémentés, mais le parcours complet doit encore être confirmé sur Paper.
+HeneriaBedWars est un plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Le Ticket 017 est en validation : les résultats de partie et profils joueurs sont persistés dans SQLite hors du thread serveur, mais le parcours complet doit encore être confirmé sur Paper.
+
+Le Ticket 017 ajoute `StatisticsService` et un dépôt idempotent. Une victoire est capturée sur `GameVictoryEvent` avant le recyclage du clone; `processed_matches` empêche tout double comptage. `/bw stats` reste une lecture personnelle asynchrone. Ne jamais appeler JDBC depuis un listener, un menu ou le thread Bukkit.
 
 Le Ticket 016 est en validation : le profil `legacy_1_8` neutralise le cooldown moderne, supprime balayage et bouclier, applique dégâts d'épée et knockback configurables, puis conserve les règles BedWars de protection, friendly-fire, vide et kill-credit. Les réglages Bukkit temporaires du joueur sont restaurés par son snapshot à la sortie.
 
@@ -39,7 +41,7 @@ Inspecter ensuite Git, tous les Markdown pertinents et les fichiers touchés. Ne
 
 Sous Windows, remplacer `./gradlew` par `.\gradlew.bat`. Le JAR déployable est produit par `:bedwars-plugin:shadowJar`.
 
-Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui`, `item`, `arena`, `setup` et `map`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge les configurations, items, métadonnées de cartes et arènes sans charger automatiquement les mondes.
+Commandes disponibles : `/bedwars` ou `/hbw`, puis `version`, `reload`, `config`, `language`, `gui`, `item`, `arena`, `setup`, `map`, `game` et `stats`. Les permissions sont documentées dans `docs/ai/API.md`. Après modification du manifeste, remplacer le JAR et redémarrer complètement le serveur ; `/bedwars reload` recharge les configurations, items, métadonnées de cartes et arènes sans charger automatiquement les mondes.
 
 Le Ticket 007 sépare les métadonnées `maps/metadata/`, les marqueurs de propriété `maps/templates/`, les mondes de travail Bukkit préfixés dans le conteneur de mondes du serveur et les sauvegardes `backups/maps/`. Ne jamais accepter un chemin arbitraire ou suivre un lien symbolique. Toute suppression passe par `MapTemplateService.prepareDelete` sur le thread serveur puis `completeDelete` hors thread ; les relations d'arènes actives sont la source de vérité.
 

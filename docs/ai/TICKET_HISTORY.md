@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 017 — Profils joueurs et statistiques SQLite — 2026-07-18
+
+Le cœur ajoute un modèle de résultat terminé et un profil agrégé sans dépendance Bukkit. Une victoire capture les participants avant le recyclage du clone, puis `SqliteStatisticsRepository` enregistre la partie et tous les profils dans une transaction exécutée hors du thread serveur. `processed_matches` rend l'opération idempotente même après répétition d'un événement ou redémarrage.
+
+Le profil contient parties, victoires, défaites, taux de victoire, kills, morts, final kills, ratio K/D, lits détruits, temps de jeu et séries actuelle/record. `/bw stats` et `/bedwars stats` donnent une vue personnelle localisée avec la permission publique `heneriabedwars.statistics.view`. MySQL reste préparatoire et utilise un repli mémoire explicite.
+
+Validation complète : 210 tests réussis sans échec, erreur ni test ignoré; build propre, Spotless et Shadow JAR validés. La validation Paper doit confirmer la création du fichier, une victoire réelle, le redémarrage et l'absence de double comptage. Commit prévu : `feat(statistics): add persistent player profiles`.
+
 ## Ticket 016 — Combat 1.8 et dégâts BedWars — 2026-07-18
 
 Le profil `legacy_1_8` agit maintenant réellement dans les clones runtime : vitesse d'attaque immédiate, balayage et boucliers neutralisés, point de dégâts historique pour les épées et knockback configurable avec variations sprint/projectile. `CombatPolicy` centralise les refus hors `PLAYING`, spectateur, respawn, protection, autre instance et friendly-fire.

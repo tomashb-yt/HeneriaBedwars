@@ -13,6 +13,8 @@ import fr.heneria.bedwars.core.game.countdown.CountdownOperationResult;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.lobby.GameJoinResult;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
+import fr.heneria.bedwars.core.statistics.PlayerStatistics;
+import fr.heneria.bedwars.core.statistics.StatisticsService;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import java.time.Duration;
 import java.time.Instant;
@@ -34,6 +36,7 @@ public final class GameCommandHandler {
   private final GameLobbyService lobby;
   private final ArenaService arenas;
   private final ConfigurationService configurations;
+  private final StatisticsService statistics;
 
   public GameCommandHandler(
       JavaPlugin plugin,
@@ -41,13 +44,15 @@ public final class GameCommandHandler {
       GameCountdownService countdowns,
       GameLobbyService lobby,
       ArenaService arenas,
-      ConfigurationService configurations) {
+      ConfigurationService configurations,
+      StatisticsService statistics) {
     this.plugin = plugin;
     this.games = games;
     this.countdowns = countdowns;
     this.lobby = lobby;
     this.arenas = arenas;
     this.configurations = configurations;
+    this.statistics = statistics;
   }
 
   public boolean execute(CommandSender sender, String[] args) {
@@ -58,6 +63,7 @@ public final class GameCommandHandler {
       case "info" -> info(sender, args);
       case "join" -> join(sender, args);
       case "leave" -> leave(sender);
+      case "stats" -> statistics(sender);
       case "start" -> start(sender, args);
       case "stop" -> stop(sender, args, AdministrativeCommandPolicy.GAME_STOP);
       case "destroy" -> stop(sender, args, AdministrativeCommandPolicy.GAME_DESTROY);
@@ -69,6 +75,8 @@ public final class GameCommandHandler {
   public boolean executePublic(CommandSender sender, String[] args) {
     if (!(sender instanceof Player player))
       return send(sender, "game.command.player-only", Map.of());
+    if (args.length > 0 && args[0].equalsIgnoreCase("stats")) return statistics(player);
+    if (args.length > 0 && args[0].equalsIgnoreCase("leave")) return leave(sender);
     if (!allowed(sender, AdministrativeCommandPolicy.GAME_JOIN)) return true;
     if (args.length == 0 || args[0].equalsIgnoreCase("play")) return publicHelp(sender);
     return switch (args[0].toLowerCase(Locale.ROOT)) {
@@ -79,10 +87,12 @@ public final class GameCommandHandler {
   }
 
   public List<String> completePublic(CommandSender sender, String[] args) {
-    if (!sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN)) return List.of();
+    if (!sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN)
+        && !sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE)
+        && !sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW)) return List.of();
     List<String> values =
         args.length <= 1
-            ? List.of("play", "join", "leave")
+            ? publicChoices(sender)
             : args.length == 2 && args[0].equalsIgnoreCase("join") ? publicMapIds() : List.of();
     String input = args.length == 0 ? "" : args[args.length - 1].toLowerCase(Locale.ROOT);
     return values.stream().filter(value -> value.startsWith(input)).toList();
@@ -92,7 +102,8 @@ public final class GameCommandHandler {
     boolean administrator = sender.hasPermission(AdministrativeCommandPolicy.GAME);
     boolean canJoin = sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN);
     boolean canLeave = sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE);
-    if (!administrator && !canJoin && !canLeave) return List.of();
+    boolean canViewStatistics = sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW);
+    if (!administrator && !canJoin && !canLeave && !canViewStatistics) return List.of();
     List<String> values = new ArrayList<>();
     if (args.length == 2) {
       if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_CREATE))
@@ -103,6 +114,7 @@ public final class GameCommandHandler {
         values.add("info");
       if (canJoin) values.add("join");
       if (canLeave) values.add("leave");
+      if (canViewStatistics) values.add("stats");
       if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_START))
         values.add("start");
       if (administrator && sender.hasPermission(AdministrativeCommandPolicy.GAME_STOP))
@@ -233,6 +245,62 @@ public final class GameCommandHandler {
 
   private boolean publicHelp(CommandSender sender) {
     return send(sender, "game.help.public", Map.of("maps", String.join(", ", publicMapIds())));
+  }
+
+  private boolean statistics(CommandSender sender) {
+    if (!(sender instanceof Player player))
+      return send(sender, "game.command.player-only", Map.of());
+    if (!allowed(sender, AdministrativeCommandPolicy.STATISTICS_VIEW)) return true;
+    send(player, "statistics.loading", Map.of());
+    statistics
+        .statistics(player.getUniqueId())
+        .whenComplete(
+            (snapshot, failure) ->
+                main(
+                    () -> {
+                      if (failure != null || snapshot == null) {
+                        send(player, "statistics.error", Map.of());
+                        return;
+                      }
+                      showStatistics(player, snapshot);
+                    }));
+    return true;
+  }
+
+  private void showStatistics(Player player, PlayerStatistics snapshot) {
+    Map<String, Object> values = new LinkedHashMap<>();
+    values.put("games", snapshot.gamesPlayed());
+    values.put("wins", snapshot.wins());
+    values.put("losses", snapshot.losses());
+    values.put("win_rate", String.format(Locale.ROOT, "%.1f", snapshot.winRate()));
+    values.put("kills", snapshot.kills());
+    values.put("deaths", snapshot.deaths());
+    values.put("final_kills", snapshot.finalKills());
+    values.put("kdr", String.format(Locale.ROOT, "%.2f", snapshot.killDeathRatio()));
+    values.put("beds", snapshot.bedsDestroyed());
+    values.put("streak", snapshot.currentWinStreak());
+    values.put("best_streak", snapshot.bestWinStreak());
+    values.put("play_time", duration(snapshot.playTimeSeconds()));
+    send(player, "statistics.header", values);
+    send(player, "statistics.games", values);
+    send(player, "statistics.combat", values);
+    send(player, "statistics.objectives", values);
+    send(player, "statistics.footer", values);
+  }
+
+  private List<String> publicChoices(CommandSender sender) {
+    List<String> choices = new ArrayList<>();
+    if (sender.hasPermission(AdministrativeCommandPolicy.GAME_JOIN))
+      choices.addAll(List.of("play", "join"));
+    if (sender.hasPermission(AdministrativeCommandPolicy.GAME_LEAVE)) choices.add("leave");
+    if (sender.hasPermission(AdministrativeCommandPolicy.STATISTICS_VIEW)) choices.add("stats");
+    return List.copyOf(choices);
+  }
+
+  private static String duration(long seconds) {
+    long hours = seconds / 3600;
+    long minutes = seconds % 3600 / 60;
+    return hours + "h " + minutes + "m";
   }
 
   private void join(CommandSender sender, Player player, GameInstance instance) {

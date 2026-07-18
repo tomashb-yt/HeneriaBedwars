@@ -1,5 +1,9 @@
 # Roadmap
 
+## Ticket 017 en validation
+
+Les profils joueurs et les statistiques de match sont maintenant durables dans SQLite. L'enregistrement est asynchrone, transactionnel et protégé contre le double comptage; `/bw stats` expose une première vue personnelle. La prochaine étape logique est le Ticket 018 : classements, consultation d'autres profils et fondations de progression, après validation Paper de la persistance.
+
 ## Ticket 016 en validation
 
 Le profil de combat inspiré de la 1.8, les règles de dégâts BedWars, le knockback configurable et le kill-credit sont raccordés au runtime sans réimplémenter les loadouts. Le prochain ticket devra être défini après validation Paper multijoueur de cette boucle jouable.
@@ -35,9 +39,10 @@ La configuration essentielle d'une arène est regroupée dans une vue de cinq li
 - [EN COURS — VALIDATION PAPER] Ticket 014 — Boutiques, PNJ et achats atomiques
 - [EN COURS — VALIDATION PAPER] Ticket 015 — Équipement, outils et améliorations
 - [EN COURS — VALIDATION PAPER] Ticket 016 — Combat 1.8 et dégâts BedWars
+- [EN COURS — VALIDATION PAPER] Ticket 017 — Profils joueurs, statistiques et stockage SQLite
 
 ## Grandes phases futures
 
-La logique automatisée des Tickets 012 à 016 est implémentée et doit encore être confirmée sur Paper multijoueur. La priorité suivante est la stabilisation en jeu avant statistiques, stockage durable et réseau.
+La logique automatisée des Tickets 012 à 017 est implémentée et doit encore être confirmée sur Paper multijoueur. La priorité suivante est la stabilisation en jeu, puis les classements et la progression avant le stockage réseau.
 
-Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.
+Fondation, configurations, interfaces, items, arènes, cartes, instances, lobby, équipes, lits, générateurs, boutiques, améliorations, combat et statistiques SQLite sont implémentés. Les classements, la progression, MySQL/MariaDB, le réseau et l'API de mutation restent futurs.

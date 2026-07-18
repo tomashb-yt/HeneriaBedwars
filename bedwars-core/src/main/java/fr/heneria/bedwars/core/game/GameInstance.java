@@ -2,6 +2,7 @@ package fr.heneria.bedwars.core.game;
 
 import fr.heneria.bedwars.api.game.GameSnapshot;
 import fr.heneria.bedwars.api.game.GameState;
+import fr.heneria.bedwars.api.game.RuntimePlayerSnapshot;
 import fr.heneria.bedwars.core.game.generator.GeneratorDefinition;
 import fr.heneria.bedwars.core.game.generator.GeneratorId;
 import fr.heneria.bedwars.core.game.generator.GeneratorPacingPolicy;
@@ -24,6 +25,7 @@ public final class GameInstance {
   private final RuntimeArena arena;
   private final Instant createdAt;
   private final Map<UUID, RuntimePlayer> players = new LinkedHashMap<>();
+  private final Map<UUID, RuntimePlayerSnapshot> departedParticipants = new LinkedHashMap<>();
   private final Map<String, RuntimeTeam> teams = new LinkedHashMap<>();
   private final Map<String, Long> timers = new LinkedHashMap<>();
   private final Map<String, Long> statistics = new LinkedHashMap<>();
@@ -93,6 +95,8 @@ public final class GameInstance {
   synchronized Optional<RuntimePlayer> removePlayer(UUID playerId, Instant now) {
     RuntimePlayer removed = players.remove(playerId);
     if (removed == null) return Optional.empty();
+    if ((state == GameState.PLAYING || state == GameState.ENDING) && removed.teamId().isPresent())
+      departedParticipants.put(playerId, removed.snapshot(now));
     removed.teamId().map(teams::get).ifPresent(team -> team.remove(playerId));
     updatedAt = now;
     return Optional.of(removed);
@@ -112,6 +116,13 @@ public final class GameInstance {
 
   public synchronized java.util.List<RuntimePlayer> runtimePlayers() {
     return java.util.List.copyOf(players.values());
+  }
+
+  /** Includes players who left after gameplay started without exposing them as active members. */
+  public synchronized java.util.List<RuntimePlayerSnapshot> participantSnapshots(Instant now) {
+    Map<UUID, RuntimePlayerSnapshot> participants = new LinkedHashMap<>(departedParticipants);
+    players.values().forEach(player -> participants.put(player.playerId(), player.snapshot(now)));
+    return java.util.List.copyOf(participants.values());
   }
 
   public synchronized java.util.List<RuntimeTeam> teams() {

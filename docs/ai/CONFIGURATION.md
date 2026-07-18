@@ -1,5 +1,9 @@
 # Configuration
 
+## Ticket 017 — `storage.yml`
+
+`storage.type: sqlite` active la persistance des profils. `sqlite.file` est un chemin relatif confiné au dossier du plugin; les chemins absolus et remontées `..` sont refusés. Le fichier et son schéma sont créés automatiquement. `mysql` reste accepté pour compatibilité de configuration mais utilise temporairement un dépôt mémoire avec avertissement tant que son adaptateur n'est pas livré.
+
 ## Ticket 016 — `gameplay.yml`
 
 Le profil `legacy_1_8` active les adaptations de combat uniquement pour les membres d'une instance `PLAYING`. Les nouvelles clés de combat sont ajoutées non destructivement aux anciens fichiers avec sauvegarde. Les valeurs sont lues à chaque événement; vitesse d'attaque et fenêtre d'invulnérabilité sont appliquées au début/respawn puis restaurées à la sortie.
@@ -141,13 +145,13 @@ Le correctif 010.1 remplace les anciennes lignes fixes par `game.scoreboard.titl
 
 ## `storage.yml`
 
-Ces valeurs sont chargées dans `StorageSettings`; aucune connexion SQLite, MySQL ou Redis n'est ouverte.
+Ces valeurs sont chargées dans `StorageSettings`. SQLite est ouvert de façon asynchrone au démarrage; MySQL et Redis ne créent encore aucune connexion.
 
 | Clé | Type | Défaut / contrainte | Sensible |
 |---|---|---|---|
 | `config-version` | entier | `1` | non |
 | `storage.type` | chaîne | `sqlite`; `sqlite` ou `mysql` | non |
-| `sqlite.file` | chaîne | `data.db` | non |
+| `sqlite.file` | chemin relatif sûr | `data.db`; ni absolu, ni `..` | non |
 | `mysql.host` | chaîne | `localhost` | non |
 | `mysql.port` | entier | `3306`, 1 à 65535 | non |
 | `mysql.database` | chaîne | `heneriabedwars` | non |

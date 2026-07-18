@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État Ticket 017 du 2026-07-18 : chaque victoire produit un résultat immuable avant la destruction de l'instance. `StatisticsService` agrège parties, victoires, défaites, kills, morts, final kills, lits, temps de jeu et séries. SQLite est le stockage actif par défaut, toutes les opérations JDBC utilisent un exécuteur dédié et l'UUID de partie rend l'écriture idempotente. Les joueurs consultent leur profil avec `/bw stats` ou `/bedwars stats`.
+
 État Ticket 016 du 2026-07-18 : le combat `legacy_1_8` est actif dans les clones en `PLAYING`. Les attaques n'attendent plus le cooldown 1.9+, les boucliers et dégâts de balayage sont neutralisés, les épées récupèrent le point de dégât historique et le knockback horizontal/vertical est configurable. `CombatPolicy` protège spectateurs, joueurs en respawn, protection de réapparition, équipes alliées et instances différentes; le vide conserve le dernier attaquant récent. Les réglages originaux du joueur sont restaurés à sa sortie.
 
 État Ticket 015 du 2026-07-18 : la boutique d'objets propose désormais armures permanentes, pioches et haches à quatre niveaux ainsi que cisailles permanentes. Les outils exigent le niveau précédent et régressent d'un niveau à chaque mort. Un second PNJ, placé depuis la fiche d'équipe, vend Tranchant, Protection et Hâte; l'effet est partagé immédiatement avec les membres vivants et réappliqué au respawn.

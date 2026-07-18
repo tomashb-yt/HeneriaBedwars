@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 017 — statistiques persistantes
+
+Les tests purs vérifient agrégation, ratios, victoires/défaites, séries, valeurs impossibles et double enregistrement. Le test SQLite crée une vraie base, écrit deux participants, refuse le doublon, ferme le dépôt puis confirme les mêmes agrégats après réouverture. La configuration refuse aussi un chemin SQLite sortant du dossier du plugin, et la permission publique `stats` est couverte.
+
+Validation complète : 210 tests réussis, aucun échec, aucune erreur et aucun test ignoré; build propre, Spotless et Shadow JAR validés. La matrice Paper doit vérifier création de `data.db`, profil vide, victoire à deux joueurs, compteurs des deux camps, `/bw stats`, redémarrage serveur et absence de double comptage.
+
 ## Ticket 016 — combat et dégâts
 
 Les tests purs couvrent les états non jouables, spectateurs, protection de respawn, friendly-fire, instances différentes et ennemis autorisés. Un scénario supplémentaire confirme que `respawn.enabled: false` force une mort finale. La configuration vérifie les nouvelles valeurs et leur évolution non destructive avec sauvegarde.

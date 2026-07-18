@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 017 — profils et statistiques persistantes
+
+`bedwars-core.statistics` contient les agrégats immuables, le résultat de match, le port asynchrone `StatisticsRepository` et `StatisticsService`. Aucun de ces contrats ne dépend de Bukkit ou de JDBC. Le composant plugin capture `GameVictoryEvent` synchronement tant que `GameInstance` existe encore, puis transmet le snapshot à la persistance.
+
+`SqliteStatisticsRepository` est un adaptateur mono-écrivain exécuté sur un thread dédié. Une transaction insère d'abord `processed_matches.game_uuid`, puis met à jour tous les participants; une partie déjà présente ne modifie aucun compteur. Les commandes lisent également le dépôt de façon asynchrone et ne reviennent au thread serveur que pour afficher les messages. Voir `STATISTICS_SYSTEM.md`.
+
 ## Ticket 016 — combat et dégâts
 
 `CombatPolicy` appartient au cœur et retourne une raison stable sans dépendre de Bukkit. `BukkitGamePlayListener` traduit les événements de dégâts, projectiles, knockback, bouclier, mort et vide vers cette politique; il ne décide ni respawn ni victoire. `CombatTracker` reste la mémoire bornée du dernier attaquant et `GameDeathService` reste l'unique décideur de mort finale.

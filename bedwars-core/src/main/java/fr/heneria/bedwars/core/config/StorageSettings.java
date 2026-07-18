@@ -1,6 +1,6 @@
 package fr.heneria.bedwars.core.config;
 
-/** Immutable preparatory storage settings. */
+/** Immutable storage settings; SQLite is active while network backends remain preparatory. */
 public record StorageSettings(
     String type,
     String sqliteFile,

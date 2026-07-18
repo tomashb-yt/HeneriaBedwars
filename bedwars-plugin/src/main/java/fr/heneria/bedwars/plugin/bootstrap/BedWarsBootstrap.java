@@ -15,6 +15,7 @@ import fr.heneria.bedwars.core.lifecycle.LifecycleManager;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.core.map.MapTemplateService;
 import fr.heneria.bedwars.core.service.ServiceRegistry;
+import fr.heneria.bedwars.core.statistics.StatisticsService;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
 import fr.heneria.bedwars.plugin.gui.GuiService;
@@ -42,8 +43,10 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
       GameInstanceManager games,
       GameCountdownService countdowns,
       GameLobbyService lobby,
+      StatisticsService statistics,
       LifecycleComponent mapLifecycle,
       LifecycleComponent arenaLifecycle,
+      LifecycleComponent statisticsLifecycle,
       LifecycleComponent gameLifecycle,
       TextInputService textInputService,
       LifecycleComponent textInputLifecycle,
@@ -62,6 +65,7 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
     services.register(GameInstanceManager.class, games);
     services.register(GameCountdownService.class, countdowns);
     services.register(GameLobbyService.class, lobby);
+    services.register(StatisticsService.class, statistics);
     services.register(TextInputService.class, textInputService);
     services.register(ItemService.class, itemService);
     services.register(GuiService.class, guiService);
@@ -72,6 +76,7 @@ public final class BedWarsBootstrap implements PluginBootstrap, HeneriaBedWarsAp
                 new FoundationComponent(),
                 mapLifecycle,
                 arenaLifecycle,
+                statisticsLifecycle,
                 gameLifecycle,
                 textInputLifecycle,
                 guiService),

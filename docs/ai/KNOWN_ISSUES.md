@@ -1,5 +1,12 @@
 # Limitations connues
 
+## Ticket 017 — statistiques et stockage
+
+- MySQL/MariaDB n'a pas encore d'adaptateur actif : choisir `storage.type: mysql` conserve seulement les statistiques de la session et journalise un avertissement.
+- Une partie arrêtée administrativement sans victoire n'est volontairement pas comptée. Les égalités et abandons statistiques nécessiteront un modèle de résultat futur.
+- `/bw stats` affiche uniquement le profil du joueur connecté; les classements et la recherche d'un autre profil sont prévus pour le ticket suivant.
+- Le démarrage SQLite, une victoire réelle et la conservation après redémarrage doivent encore être confirmés sur Paper 1.21.x.
+
 ## Ticket 016 — combat
 
 - Le ressenti du knockback, les coups sprintés, les flèches et la fenêtre de dix ticks doivent être ajustés après une vraie session Paper à deux joueurs; la compilation seule ne certifie pas le ressenti réseau.

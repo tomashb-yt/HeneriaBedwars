@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(project(":bedwars-api"))
     implementation(project(":bedwars-core"))
+    implementation("org.xerial:sqlite-jdbc:3.53.2.0")
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:26.0.2")
 

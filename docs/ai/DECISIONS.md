@@ -1,12 +1,21 @@
 # Décisions d'architecture
 
+## ADR-107 à ADR-112 — statistiques persistantes
+
+- **ADR-107** — Les agrégats, résultats de match et ports de persistance appartiennent au cœur pur; JDBC reste exclusivement dans le module plugin.
+- **ADR-108** — SQLite via Xerial `sqlite-jdbc` est le premier backend actif et le seul ajout de dépendance du ticket; il fournit un stockage embarqué portable sans service externe.
+- **ADR-109** — Toutes les opérations JDBC passent par un exécuteur mono-thread dédié; le thread Bukkit ne bloque jamais sur un accès disque ou SQL.
+- **ADR-110** — L'UUID runtime de partie est une clé idempotente persistée dans `processed_matches`; insertion du match et agrégation des joueurs partagent une transaction.
+- **ADR-111** — `GameVictoryEvent` est le point de capture final, avant destruction de l'instance. Les abandons administratifs et parties inachevées ne modifient pas les profils.
+- **ADR-112** — Le Ticket 017 expose seulement le profil personnel par commande. Classements, recherche d'autres joueurs et mutation publique restent hors périmètre.
+
 ## ADR-101 à ADR-106 — Combat 1.8 et dégâts BedWars
 
 - **ADR-101** — Toute autorisation de dégâts runtime passe par `CombatPolicy`, pur et indépendant de Bukkit.
 - **ADR-102** — Le profil `legacy_1_8` est réalisé par vitesse d'attaque élevée, suppression du balayage/bouclier et correction de dégâts d'épée; il ne remplace jamais les items du Ticket 015.
 - **ADR-103** — Le knockback utilise `EntityKnockbackByEntityEvent` et son vecteur final, sans annulation du dégât ni tâche différée par coup.
 - **ADR-104** — La protection de respawn, le friendly-fire et l'appartenance à la même instance sont vérifiés avant attribution d'un coup.
-- **ADR-105** — Le crédit d'une chute lit `CombatTracker` dans une fenêtre configurable; aucune statistique de combat n'est persistée.
+- **ADR-105** — Le crédit d'une chute lit `CombatTracker` dans une fenêtre configurable; le runtime reste la source du kill avant agrégation finale par le Ticket 017.
 - **ADR-106** — Vitesse d'attaque et fenêtre d'invulnérabilité d'origine font partie du snapshot pré-partie et sont restaurées à la sortie.
 
 ## ADR-096 à ADR-100 — Équipement et améliorations

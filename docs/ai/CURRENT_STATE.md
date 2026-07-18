@@ -1,5 +1,15 @@
 # État actuel
 
+## Ticket 017 — implémentation en validation Paper
+
+- profil persistant par UUID : parties, victoires/défaites, ratio, kills, morts, final kills, lits, temps et séries;
+- capture exacte de `GameVictoryEvent` avant le nettoyage de la partie;
+- SQLite actif par défaut, schéma créé automatiquement dans `plugins/HeneriaBedWars/data.db`;
+- écriture transactionnelle et idempotente par UUID de partie;
+- aucune opération JDBC sur le thread Bukkit;
+- `/bw stats` et `/bedwars stats`, localisés FR/EN et accessibles avec `heneriabedwars.statistics.view`;
+- 210 tests automatisés réussis, build propre, Spotless et Shadow JAR validés; démarrage et persistance après vraie victoire à valider sur Paper.
+
 ## Ticket 016 — implémentation en validation Paper
 
 - profil `legacy_1_8` réellement appliqué : vitesse d'attaque immédiate, aucun balayage et aucun usage de bouclier;

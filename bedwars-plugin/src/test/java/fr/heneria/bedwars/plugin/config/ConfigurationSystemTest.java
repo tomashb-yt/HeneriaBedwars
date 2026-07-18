@@ -89,6 +89,19 @@ class ConfigurationSystemTest {
   }
 
   @Test
+  void unsafeSqliteFileRejectsReloadAndPreservesSnapshot() throws Exception {
+    ConfigurationService service = service();
+    service.initialize();
+    var previous = service.snapshot();
+    replace("storage.yml", "file: data.db", "file: ../outside.db");
+
+    ConfigurationReloadResult result = service.reloadAll();
+
+    assertFalse(result.successful());
+    assertSame(previous, service.snapshot());
+  }
+
+  @Test
   void appliesDefaultsAndReportsInvalidPortDelayMenuAndMaterial() throws Exception {
     ConfigurationService service = service();
     service.initialize();

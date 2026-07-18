@@ -118,6 +118,27 @@ class GameInstanceEngineTest {
   }
 
   @Test
+  void preservesOnlyParticipantsWhoLeaveAfterGameplayStarts() {
+    GameInstance game = instance();
+    game.transition(GameState.WAITING, NOW.plusSeconds(1));
+    UUID waitingPlayer = UUID.randomUUID();
+    game.addPlayer(waitingPlayer, NOW.plusSeconds(2));
+    game.removePlayer(waitingPlayer, NOW.plusSeconds(3));
+    assertTrue(game.participantSnapshots(NOW.plusSeconds(3)).isEmpty());
+
+    UUID participant = UUID.randomUUID();
+    RuntimePlayer runtime = game.addPlayer(participant, NOW.plusSeconds(4));
+    game.transition(GameState.STARTING, NOW.plusSeconds(5));
+    game.transition(GameState.PLAYING, NOW.plusSeconds(6));
+    runtime.recordKill(true);
+    game.removePlayer(participant, NOW.plusSeconds(10));
+
+    assertTrue(game.playerIds().isEmpty());
+    assertEquals(1, game.participantSnapshots(NOW.plusSeconds(20)).size());
+    assertEquals(1, game.participantSnapshots(NOW.plusSeconds(20)).getFirst().kills());
+  }
+
+  @Test
   void startLocationUsesTheAssignedRuntimeTeamSpawn() {
     GameInstance game = instance();
     game.transition(GameState.WAITING, NOW.plusSeconds(1));

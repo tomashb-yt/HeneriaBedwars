@@ -210,7 +210,8 @@ public final class ConfigurationSnapshotFactory {
     StorageSettings storageSettings =
         new StorageSettings(
             storageType,
-            storage.string("sqlite.file", "data.db"),
+            relativePath(
+                storage, "sqlite.file", storage.string("sqlite.file", "data.db"), "data.db"),
             storage.string("mysql.host", "localhost"),
             storage.integer("mysql.port", 3306, 1, 65535),
             storage.string("mysql.database", "heneriabedwars"),
