@@ -386,6 +386,9 @@ game:
     spectator-teleported: "<dark_gray>[<aqua>➜<dark_gray>] <gray>You are now spectating <white>{player}<gray>."
     team-eliminated: "<dark_gray>[<red>✘<dark_gray>] <gray>Team {team} <gray>has been eliminated."
     victory: "<dark_gray>[<gold>★<dark_gray>] <gold><bold>VICTORY</bold> <dark_gray>• <gray>Team {team} <gray>wins the game!"
+  design-v16:
+    combat-killed: "<dark_gray>[<red>⚔<dark_gray>] {victim} <gray>was eliminated by {killer}{final}"
+    combat-fallen: "<dark_gray>[<gray>☠<dark_gray>] {victim} <gray>was eliminated{final}"
   error:
     teleport: "<red>Teleporting to the game failed."
     internal: "<red>An internal lobby error occurred."

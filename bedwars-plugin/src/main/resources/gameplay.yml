@@ -5,6 +5,13 @@ combat:
   attack-cooldown-enabled: false
   shields-enabled: false
   friendly-fire: false
+  hit-invulnerability-ticks: 10
+  kill-credit-seconds: 10
+  knockback:
+    horizontal: 0.40
+    vertical: 0.40
+    sprint-multiplier: 1.15
+    projectile-multiplier: 1.00
 respawn:
   enabled: true
   delay-seconds: 5

@@ -53,6 +53,8 @@ class ConfigurationSystemTest {
     service.initialize();
     assertEquals("fr_FR", service.snapshot().plugin().locale());
     assertEquals(5, service.snapshot().gameplay().respawnDelaySeconds());
+    assertEquals(10, service.snapshot().gameplay().hitInvulnerabilityTicks());
+    assertEquals(0.4, service.snapshot().gameplay().knockbackHorizontal());
     assertEquals(54, service.snapshot().menus().defaultSize());
     assertEquals("hbw_template_", service.snapshot().worlds().templateWorldPrefix());
     assertEquals("maps/templates", service.snapshot().worlds().templatesDirectory());
@@ -271,6 +273,16 @@ class ConfigurationSystemTest {
   void startupEvolvesGameplayCatalogsMenusItemsAndLanguagesWithBackups() throws Exception {
     installer(new TestLogger()).installMissing();
     replace("game.yml", "\n  ending:\n    duration-seconds: 10\n", "\n");
+    replace(
+        "gameplay.yml",
+        "  hit-invulnerability-ticks: 10\n"
+            + "  kill-credit-seconds: 10\n"
+            + "  knockback:\n"
+            + "    horizontal: 0.40\n"
+            + "    vertical: 0.40\n"
+            + "    sprint-multiplier: 1.15\n"
+            + "    projectile-multiplier: 1.00\n",
+        "");
     replace("menus.yml", "navigation:\n  history-enabled: true\n  max-history-size: 20\n", "");
     Files.writeString(
         temporary.resolve("items.yml"),
@@ -291,6 +303,9 @@ class ConfigurationSystemTest {
 
     assertTrue(Files.readString(temporary.resolve("menus.yml")).contains("history-enabled: true"));
     assertTrue(Files.readString(temporary.resolve("game.yml")).contains("duration-seconds: 10"));
+    assertTrue(
+        Files.readString(temporary.resolve("gameplay.yml"))
+            .contains("hit-invulnerability-ticks: 10"));
     String evolvedItems = Files.readString(temporary.resolve("items.yml"));
     assertTrue(evolvedItems.contains("demo:"));
     assertTrue(evolvedItems.contains("arenas-v2:"));
@@ -340,7 +355,7 @@ class ConfigurationSystemTest {
             .keys()
             .equals(service.snapshot().languages().get("en_US").keys()));
     try (var paths = Files.walk(temporary.resolve("backups"))) {
-      assertEquals(8, paths.filter(Files::isRegularFile).count());
+      assertEquals(9, paths.filter(Files::isRegularFile).count());
     }
   }
 

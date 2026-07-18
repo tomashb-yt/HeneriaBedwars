@@ -204,7 +204,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               gameService,
               gameEvents,
               clock,
-              () -> configurations.snapshot().gameplay().respawnDelaySeconds());
+              () -> configurations.snapshot().gameplay().respawnDelaySeconds(),
+              () -> configurations.snapshot().gameplay().respawnEnabled());
       GameRespawnService gameRespawns =
           new GameRespawnService(
               gameService,

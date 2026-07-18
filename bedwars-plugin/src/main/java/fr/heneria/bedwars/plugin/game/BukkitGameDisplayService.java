@@ -6,6 +6,7 @@ import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.game.GameId;
 import fr.heneria.bedwars.core.game.GameInstance;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.RuntimePlayer;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.display.RuntimeScoreboardRenderer;
 import fr.heneria.bedwars.core.game.display.RuntimeScoreboardView;
@@ -325,6 +326,17 @@ public final class BukkitGameDisplayService {
           message(
               event.finalDeath() ? "game.design-v15.death-final" : "game.design-v15.death-respawn",
               merge(values(game), Map.of("player", victim.getName()))));
+    Map<String, Object> combatValues = new LinkedHashMap<>();
+    combatValues.put("victim", coloredPlayerName(game, event.playerId()));
+    combatValues.put("final", event.finalDeath() ? " §c§lFINAL KILL !§r" : "");
+    event
+        .killerId()
+        .ifPresentOrElse(
+            killerId -> {
+              combatValues.put("killer", coloredPlayerName(game, killerId));
+              broadcast(game, "game.design-v16.combat-killed", combatValues);
+            },
+            () -> broadcast(game, "game.design-v16.combat-fallen", combatValues));
   }
 
   private void onRespawnScheduled(PlayerRespawnScheduledEvent event) {
@@ -558,5 +570,15 @@ public final class BukkitGameDisplayService {
 
   private static String coloredTeamName(fr.heneria.bedwars.api.game.RuntimeTeamSnapshot team) {
     return teamColor(team.color()) + team.displayName() + "§r";
+  }
+
+  private static String coloredPlayerName(GameInstance game, UUID playerId) {
+    Player online = Bukkit.getPlayer(playerId);
+    String name = online == null ? playerId.toString().substring(0, 8) : online.getName();
+    return game.player(playerId)
+        .flatMap(RuntimePlayer::teamId)
+        .flatMap(game::team)
+        .map(team -> teamColor(team.snapshot().color()) + name + "§r")
+        .orElse(name);
   }
 }

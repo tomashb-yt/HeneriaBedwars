@@ -1,5 +1,9 @@
 # Configuration
 
+## Ticket 016 — `gameplay.yml`
+
+Le profil `legacy_1_8` active les adaptations de combat uniquement pour les membres d'une instance `PLAYING`. Les nouvelles clés de combat sont ajoutées non destructivement aux anciens fichiers avec sauvegarde. Les valeurs sont lues à chaque événement; vitesse d'attaque et fenêtre d'invulnérabilité sont appliquées au début/respawn puis restaurées à la sortie.
+
 ## Ticket 015 — `shops.yml` et `upgrades.yml`
 
 Une offre d'équipement ajoute `kind: ARMOR|PICKAXE|AXE|SHEARS` et un `tier` positif. `ITEM` reste la valeur par défaut et n'utilise aucun niveau. La catégorie `TOOLS` rejoint les quatre rayons historiques. Les paliers d'outil doivent être présents dans l'ordre; un achat ne peut pas sauter le niveau précédent.
@@ -72,7 +76,7 @@ Au premier démarrage du Ticket 003, `menus.yml`, `languages/fr_FR.yml` et `lang
 
 ## `gameplay.yml`
 
-Toutes les valeurs sont chargées dans `GameplaySettings`, mais aucun comportement de jeu n'est encore appliqué.
+Toutes les valeurs sont chargées dans `GameplaySettings` et appliquées au runtime BedWars.
 
 | Clé | Type | Défaut / contrainte |
 |---|---|---|
@@ -81,6 +85,12 @@ Toutes les valeurs sont chargées dans `GameplaySettings`, mais aucun comporteme
 | `combat.attack-cooldown-enabled` | booléen | `false` |
 | `combat.shields-enabled` | booléen | `false` |
 | `combat.friendly-fire` | booléen | `false` |
+| `combat.hit-invulnerability-ticks` | entier | `10`, de 0 à 40 |
+| `combat.kill-credit-seconds` | entier | `10`, de 1 à 60 |
+| `combat.knockback.horizontal` | nombre | `0.40`, de 0 à 2 |
+| `combat.knockback.vertical` | nombre | `0.40`, de 0 à 2 |
+| `combat.knockback.sprint-multiplier` | nombre | `1.15`, de 0 à 3 |
+| `combat.knockback.projectile-multiplier` | nombre | `1.00`, de 0 à 3 |
 | `respawn.enabled` | booléen | `true` |
 | `respawn.delay-seconds` | entier | `5`, positif ou nul |
 | `respawn.protection-seconds` | entier | `3`, positif ou nul |

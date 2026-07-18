@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 016 — combat et dégâts
+
+`CombatPolicy` appartient au cœur et retourne une raison stable sans dépendre de Bukkit. `BukkitGamePlayListener` traduit les événements de dégâts, projectiles, knockback, bouclier, mort et vide vers cette politique; il ne décide ni respawn ni victoire. `CombatTracker` reste la mémoire bornée du dernier attaquant et `GameDeathService` reste l'unique décideur de mort finale.
+
+Le profil plateforme est appliqué par `BukkitRuntimePlayerGateway` au début et à chaque respawn. `PlayerPreGameSnapshot` capture aussi la vitesse d'attaque et la fenêtre maximale sans dégâts afin que lobby, départ volontaire et fin de partie restaurent exactement l'état antérieur. Voir `COMBAT_SYSTEM.md`.
+
 ## Ticket 015 — équipement et améliorations
 
 `core.game.equipment` porte `PlayerEquipment`, ses règles de progression et son snapshot immuable. `RuntimePlayer` en est l'unique propriétaire. `core.game.upgrade` décrit les catalogues, niveaux et achats d'équipe; `RuntimeTeam` reste la source de vérité des niveaux vivants.

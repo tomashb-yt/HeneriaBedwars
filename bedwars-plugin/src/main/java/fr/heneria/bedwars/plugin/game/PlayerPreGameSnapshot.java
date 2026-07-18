@@ -34,6 +34,8 @@ public record PlayerPreGameSnapshot(
     boolean flying,
     float walkSpeed,
     float flySpeed,
+    double attackSpeed,
+    int maximumNoDamageTicks,
     List<PotionEffect> effects,
     Scoreboard scoreboard) {
   public PlayerPreGameSnapshot {

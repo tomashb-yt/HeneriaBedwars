@@ -16,6 +16,7 @@ public final class ConfigurationDefaultsUpdater {
   private static final List<String> EVOLVING_FILES =
       List.of(
           "game.yml",
+          "gameplay.yml",
           "generators.yml",
           "shops.yml",
           "upgrades.yml",

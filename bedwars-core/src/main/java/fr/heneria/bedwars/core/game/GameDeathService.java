@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
 /** Decides respawn/final-death/team elimination without any Bukkit dependency. */
@@ -21,16 +22,27 @@ public final class GameDeathService {
   private final GameEventBus events;
   private final Clock clock;
   private final IntSupplier respawnDelaySeconds;
+  private final BooleanSupplier respawnEnabled;
 
   public GameDeathService(
       GameInstanceManager games,
       GameEventBus events,
       Clock clock,
       IntSupplier respawnDelaySeconds) {
+    this(games, events, clock, respawnDelaySeconds, () -> true);
+  }
+
+  public GameDeathService(
+      GameInstanceManager games,
+      GameEventBus events,
+      Clock clock,
+      IntSupplier respawnDelaySeconds,
+      BooleanSupplier respawnEnabled) {
     this.games = Objects.requireNonNull(games, "games");
     this.events = Objects.requireNonNull(events, "events");
     this.clock = Objects.requireNonNull(clock, "clock");
     this.respawnDelaySeconds = Objects.requireNonNull(respawnDelaySeconds, "respawnDelaySeconds");
+    this.respawnEnabled = Objects.requireNonNull(respawnEnabled, "respawnEnabled");
   }
 
   public GameDeathResult handle(UUID victimId, UUID killerId) {
@@ -56,7 +68,7 @@ public final class GameDeathService {
       victim.degradeTools();
       RuntimePlayer killer =
           killerId == null || killerId.equals(victimId) ? null : game.player(killerId).orElse(null);
-      if (team.bedAlive() && !forceFinal) {
+      if (respawnEnabled.getAsBoolean() && team.bedAlive() && !forceFinal) {
         Instant dueAt = now.plusSeconds(Math.max(0, respawnDelaySeconds.getAsInt()));
         victim.scheduleRespawn(now, dueAt);
         if (killer != null) killer.recordKill(false);

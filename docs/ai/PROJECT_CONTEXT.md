@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État Ticket 016 du 2026-07-18 : le combat `legacy_1_8` est actif dans les clones en `PLAYING`. Les attaques n'attendent plus le cooldown 1.9+, les boucliers et dégâts de balayage sont neutralisés, les épées récupèrent le point de dégât historique et le knockback horizontal/vertical est configurable. `CombatPolicy` protège spectateurs, joueurs en respawn, protection de réapparition, équipes alliées et instances différentes; le vide conserve le dernier attaquant récent. Les réglages originaux du joueur sont restaurés à sa sortie.
+
 État Ticket 015 du 2026-07-18 : la boutique d'objets propose désormais armures permanentes, pioches et haches à quatre niveaux ainsi que cisailles permanentes. Les outils exigent le niveau précédent et régressent d'un niveau à chaque mort. Un second PNJ, placé depuis la fiche d'équipe, vend Tranchant, Protection et Hâte; l'effet est partagé immédiatement avec les membres vivants et réappliqué au respawn.
 
 Correctif gameplay 012–014 du 2026-07-18 : les clones forcent le PVP, les joueurs vivants peuvent poser puis casser leurs propres blocs sans modifier la carte d'origine, et la mort utilise le respawn immédiat avec un compteur visible chaque seconde. La boutique colore la laine selon l'équipe, colore les prix selon la monnaie et nomme les drops Fer/Or/Diamant/Émeraude Heneria. Après victoire, les joueurs reviennent au lobby avant la suppression du clone; `/bw join` recrée ensuite une instance propre depuis l'arène active.

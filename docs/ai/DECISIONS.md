@@ -1,5 +1,14 @@
 # Décisions d'architecture
 
+## ADR-101 à ADR-106 — Combat 1.8 et dégâts BedWars
+
+- **ADR-101** — Toute autorisation de dégâts runtime passe par `CombatPolicy`, pur et indépendant de Bukkit.
+- **ADR-102** — Le profil `legacy_1_8` est réalisé par vitesse d'attaque élevée, suppression du balayage/bouclier et correction de dégâts d'épée; il ne remplace jamais les items du Ticket 015.
+- **ADR-103** — Le knockback utilise `EntityKnockbackByEntityEvent` et son vecteur final, sans annulation du dégât ni tâche différée par coup.
+- **ADR-104** — La protection de respawn, le friendly-fire et l'appartenance à la même instance sont vérifiés avant attribution d'un coup.
+- **ADR-105** — Le crédit d'une chute lit `CombatTracker` dans une fenêtre configurable; aucune statistique de combat n'est persistée.
+- **ADR-106** — Vitesse d'attaque et fenêtre d'invulnérabilité d'origine font partie du snapshot pré-partie et sont restaurées à la sortie.
+
 ## ADR-096 à ADR-100 — Équipement et améliorations
 
 - **ADR-096** — La progression d'équipement appartient au `RuntimePlayer`; armure et cisailles sont permanentes pendant la partie, pioches et haches perdent un niveau à chaque mort.

@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 016 — combat et dégâts
+
+Les tests purs couvrent les états non jouables, spectateurs, protection de respawn, friendly-fire, instances différentes et ennemis autorisés. Un scénario supplémentaire confirme que `respawn.enabled: false` force une mort finale. La configuration vérifie les nouvelles valeurs et leur évolution non destructive avec sauvegarde.
+
+Validation : 204 tests automatisés réussis, aucun échec ni erreur. La matrice Paper doit confirmer vitesse d'attaque, absence de sweep/bouclier, dégâts des épées, knockback normal/sprint/flèche, protection de trois secondes, allié invulnérable, ennemi tuable, chute avec kill-credit, message `FINAL KILL` et restauration après retour lobby.
+
 ## Ticket 015 — équipement et améliorations
 
 Les tests purs couvrent l'ordre obligatoire des outils, leur régression à la mort, la permanence de l'armure et des cisailles, le paiement par niveau, l'absence de mutation sur échec, le niveau maximum et l'événement interne. Les tests d'arène vérifient l'ajout/retrait du second PNJ; la configuration vérifie l'évolution non destructive de `upgrades.yml`, des offres et des deux langues.

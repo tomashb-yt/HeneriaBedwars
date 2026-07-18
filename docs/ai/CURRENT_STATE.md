@@ -1,5 +1,16 @@
 # État actuel
 
+## Ticket 016 — implémentation en validation Paper
+
+- profil `legacy_1_8` réellement appliqué : vitesse d'attaque immédiate, aucun balayage et aucun usage de bouclier;
+- point de dégâts historique ajouté aux coups d'épée de mêlée;
+- knockback constant configurable, avec multiplicateurs sprint et projectile;
+- politique pure pour `PLAYING`, spectateurs, respawn, protection, instances différentes et friendly-fire;
+- kill-credit configurable pour les chutes dans le vide et messages colorés avec `FINAL KILL`;
+- restauration de la vitesse d'attaque et des ticks d'invulnérabilité après la partie;
+- `respawn.enabled: false` produit réellement une mort finale;
+- 204 tests automatisés réussis; ressenti exact à confirmer avec deux joueurs sur Paper 1.21.x.
+
 ## Ticket 015 — implémentation en validation Paper
 
 - armure de cuir d'équipe au départ, puis mailles, fer ou diamant achetés définitivement pour la partie;
@@ -154,9 +165,9 @@
 
 ## Non disponible
 
-Les Tickets 012 à 015 sont implémentés mais restent en validation Paper multijoueur. Reconnexion, base de données, resource pack, PlaceholderAPI et combat 1.8 avancé ne sont pas encore disponibles.
+Les Tickets 012 à 016 sont implémentés mais restent en validation Paper multijoueur. Reconnexion, base de données, resource pack et PlaceholderAPI ne sont pas encore disponibles.
 
-Les 187 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 204 tests automatisés passent, sans échec ni erreur. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
 ## Ticket 011 - livraison initiale
 
 Les arènes portent désormais des définitions d'équipes immuables et persistantes (identifiant, nom, couleur, ordre, capacité et spawn). Les anciens YAML à base de `teams.count` et `teams.players-per-team` sont relus avec des équipes générées déterministes, sans perdre la définition; les spawns restent à renseigner avant validation complète.

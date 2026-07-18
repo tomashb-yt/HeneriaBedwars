@@ -1,5 +1,11 @@
 # Historique des tickets
 
+## Ticket 016 — Combat 1.8 et dégâts BedWars — 2026-07-18
+
+Le profil `legacy_1_8` agit maintenant réellement dans les clones runtime : vitesse d'attaque immédiate, balayage et boucliers neutralisés, point de dégâts historique pour les épées et knockback configurable avec variations sprint/projectile. `CombatPolicy` centralise les refus hors `PLAYING`, spectateur, respawn, protection, autre instance et friendly-fire.
+
+Le dernier attaquant conserve le crédit d'une chute pendant une fenêtre configurable et les messages de mort affichent les couleurs d'équipe ainsi que `FINAL KILL`. `respawn.enabled` est désormais respecté. Le snapshot pré-partie capture/restaure vitesse d'attaque et fenêtre d'invulnérabilité. Validation : 204 tests automatisés réussis; build, Spotless et Shadow JAR validés. Le ressenti multijoueur reste à confirmer sur Paper.
+
 ## Ticket 015 — Équipement, outils et améliorations — 2026-07-18
 
 La boutique possède un cinquième rayon Outils. Les armures mailles/fer/diamant et les cisailles sont conservées jusqu'à la fin de la partie; pioches et haches suivent quatre niveaux et régressent d'un palier à la mort. Le respawn reconstruit une armure aux couleurs de l'équipe, une épée en bois et les achats permanents.

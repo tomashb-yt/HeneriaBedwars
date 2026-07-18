@@ -1,8 +1,8 @@
 # Roadmap
 
-## Ticket 015 en validation
+## Ticket 016 en validation
 
-L'équipement durable, les outils évolutifs et les trois premières améliorations d'équipe sont raccordés aux boutiques et aux respawns. Le prochain ticket est le Ticket 016, consacré au combat 1.8 et aux dégâts BedWars; il ne doit pas réimplémenter les loadouts.
+Le profil de combat inspiré de la 1.8, les règles de dégâts BedWars, le knockback configurable et le kill-credit sont raccordés au runtime sans réimplémenter les loadouts. Le prochain ticket devra être défini après validation Paper multijoueur de cette boucle jouable.
 
 ## Correctif gameplay en validation
 
@@ -34,10 +34,10 @@ La configuration essentielle d'une arène est regroupée dans une vue de cinq li
 - [EN COURS — VALIDATION PAPER] Ticket 013 — Générateurs de ressources (assistant, persistance et drops runtime)
 - [EN COURS — VALIDATION PAPER] Ticket 014 — Boutiques, PNJ et achats atomiques
 - [EN COURS — VALIDATION PAPER] Ticket 015 — Équipement, outils et améliorations
-- [À FAIRE] Ticket 016 — Combat 1.8 et dégâts BedWars
+- [EN COURS — VALIDATION PAPER] Ticket 016 — Combat 1.8 et dégâts BedWars
 
 ## Grandes phases futures
 
-La logique automatisée des Tickets 012 à 015 est implémentée et doit encore être confirmée sur Paper multijoueur. Le Ticket 016 ajoutera le ressenti de combat 1.8 et les règles de dégâts sans modifier la progression d'équipement.
+La logique automatisée des Tickets 012 à 016 est implémentée et doit encore être confirmée sur Paper multijoueur. La priorité suivante est la stabilisation en jeu avant statistiques, stockage durable et réseau.
 
 Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.

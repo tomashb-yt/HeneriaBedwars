@@ -330,6 +330,25 @@ class GameInstanceEngineTest {
   }
 
   @Test
+  void disabledRespawnsTurnEveryPlayingDeathIntoAFinalDeath() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID red = game.team("red").orElseThrow().playerIds().iterator().next();
+    GameDeathService deaths =
+        new GameDeathService(
+            fixture.manager,
+            fixture.events,
+            Clock.fixed(NOW, ZoneOffset.UTC),
+            () -> 5,
+            () -> false);
+
+    GameDeathResult result = deaths.handle(red, null);
+
+    assertEquals(DeathDecision.FINAL_DEATH, result.decision());
+    assertTrue(game.player(red).orElseThrow().finalDeath());
+  }
+
+  @Test
   void finalDeathEliminatesTeamAndTransitionsToEnding() {
     Fixture fixture = new Fixture();
     GameInstance game = playingGame(fixture);

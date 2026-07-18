@@ -1,9 +1,12 @@
 package fr.heneria.bedwars.plugin.game;
 
 import fr.heneria.bedwars.api.game.GameState;
+import fr.heneria.bedwars.core.config.GameplaySettings;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.game.BedDestroyCode;
 import fr.heneria.bedwars.core.game.BedDestroyResult;
+import fr.heneria.bedwars.core.game.CombatDecision;
+import fr.heneria.bedwars.core.game.CombatPolicy;
 import fr.heneria.bedwars.core.game.CombatTracker;
 import fr.heneria.bedwars.core.game.DeathDecision;
 import fr.heneria.bedwars.core.game.GameBedService;
@@ -41,6 +44,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -48,10 +52,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.util.Vector;
 
 /** Bukkit boundary for PLAYING-only bed, death and spectator mechanics. */
 public final class BukkitGamePlayListener implements Listener {
-  private static final Duration KILL_CREDIT = Duration.ofSeconds(10);
   private final JavaPlugin plugin;
   private final ConfigurationService configurations;
   private final GameInstanceManager games;
@@ -60,6 +64,7 @@ public final class BukkitGamePlayListener implements Listener {
   private final BukkitRuntimePlayerGateway players;
   private final GameLobbyService lobby;
   private final CombatTracker combat;
+  private final CombatPolicy combatPolicy = new CombatPolicy();
   private final GameLocationMapper locations = new GameLocationMapper();
   private final RuntimeItemPdc runtimeItems;
   private final RuntimeItemActionRegistry itemActions = new RuntimeItemActionRegistry();
@@ -169,9 +174,17 @@ public final class BukkitGamePlayListener implements Listener {
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onDamage(EntityDamageEvent event) {
     if (!(event.getEntity() instanceof Player player)) return;
-    RuntimePlayer runtime = runtime(player).orElse(null);
-    if (runtime == null) return;
-    if (runtime.spectator() || runtime.protectedAt(Instant.now())) event.setCancelled(true);
+    GameInstance game = games.byPlayer(player.getUniqueId()).orElse(null);
+    RuntimePlayer runtime = game == null ? null : game.player(player.getUniqueId()).orElse(null);
+    if (game == null
+        || game.state() != GameState.PLAYING
+        || !runtimeWorld(game, player.getWorld().getName())) return;
+    if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK && legacyCombat()) {
+      event.setCancelled(true);
+      return;
+    }
+    if (combatPolicy.damage(game.state(), runtime, Instant.now()) != CombatDecision.ALLOW)
+      event.setCancelled(true);
   }
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -186,22 +199,71 @@ public final class BukkitGamePlayListener implements Listener {
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-  public void onSpectatorAttack(EntityDamageByEntityEvent event) {
+  public void onAttack(EntityDamageByEntityEvent event) {
     Player attacker = attacker(event.getDamager());
     if (attacker == null) return;
-    RuntimePlayer attacking = runtime(attacker).orElse(null);
-    if (attacking == null) return;
-    if (attacking.spectator()) {
+    GameInstance attackerGame = games.byPlayer(attacker.getUniqueId()).orElse(null);
+    RuntimePlayer attacking =
+        attackerGame == null ? null : attackerGame.player(attacker.getUniqueId()).orElse(null);
+    if (attacking != null
+        && (attacking.spectator() || attacking.respawning() || attacking.finalDeath())) {
       event.setCancelled(true);
       return;
     }
-    if (event.getEntity() instanceof Player victim
-        && !configurations.snapshot().gameplay().friendlyFire()) {
-      RuntimePlayer target = runtime(victim).orElse(null);
-      if (target != null
-          && attacking.teamId().isPresent()
-          && attacking.teamId().equals(target.teamId())) event.setCancelled(true);
+    if (!(event.getEntity() instanceof Player victim)) return;
+    GameInstance victimGame = games.byPlayer(victim.getUniqueId()).orElse(null);
+    RuntimePlayer target =
+        victimGame == null ? null : victimGame.player(victim.getUniqueId()).orElse(null);
+    if (victimGame == null || victimGame.state() != GameState.PLAYING) return;
+    boolean sameGame = attackerGame != null && attackerGame.id().equals(victimGame.id());
+    CombatDecision decision =
+        combatPolicy.attack(
+            victimGame.state(),
+            attacking,
+            target,
+            sameGame,
+            gameplay().friendlyFire(),
+            Instant.now());
+    if (decision != CombatDecision.ALLOW) {
+      event.setCancelled(true);
+      return;
     }
+    if (legacyCombat()
+        && event.getDamager() instanceof Player
+        && attacker.getInventory().getItemInMainHand().getType().name().endsWith("_SWORD"))
+      event.setDamage(event.getDamage() + 1.0);
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+  public void onKnockback(EntityKnockbackByEntityEvent event) {
+    if (!legacyCombat() || !(event.getEntity() instanceof Player victim)) return;
+    Player attacker = attacker(event.getSourceEntity());
+    if (attacker == null) return;
+    GameInstance game = playing(victim).orElse(null);
+    if (game == null || games.byPlayer(attacker.getUniqueId()).filter(game::equals).isEmpty())
+      return;
+    RuntimePlayer attacking = game.player(attacker.getUniqueId()).orElse(null);
+    RuntimePlayer target = game.player(victim.getUniqueId()).orElse(null);
+    if (combatPolicy.attack(
+            game.state(), attacking, target, true, gameplay().friendlyFire(), Instant.now())
+        != CombatDecision.ALLOW) return;
+
+    Vector current = event.getFinalKnockback().clone();
+    double length = Math.hypot(current.getX(), current.getZ());
+    if (length < 0.0001) {
+      current = victim.getLocation().toVector().subtract(attacker.getLocation().toVector());
+      length = Math.hypot(current.getX(), current.getZ());
+    }
+    if (length < 0.0001) return;
+    double multiplier = attacker.isSprinting() ? gameplay().sprintKnockbackMultiplier() : 1.0;
+    if (event.getSourceEntity() instanceof Projectile)
+      multiplier *= gameplay().projectileKnockbackMultiplier();
+    double horizontal = gameplay().knockbackHorizontal() * multiplier;
+    event.setFinalKnockback(
+        new Vector(
+            current.getX() / length * horizontal,
+            gameplay().knockbackVertical(),
+            current.getZ() / length * horizontal));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
@@ -211,7 +273,12 @@ public final class BukkitGamePlayListener implements Listener {
     UUID killer =
         Optional.ofNullable(victim.getKiller())
             .map(Player::getUniqueId)
-            .or(() -> combat.attacker(victim.getUniqueId(), Instant.now(), KILL_CREDIT))
+            .or(
+                () ->
+                    combat.attacker(
+                        victim.getUniqueId(),
+                        Instant.now(),
+                        Duration.ofSeconds(gameplay().killCreditSeconds())))
             .orElse(null);
     var result = deaths.handle(victim.getUniqueId(), killer);
     if (result.decision() == DeathDecision.IGNORE) return;
@@ -264,6 +331,13 @@ public final class BukkitGamePlayListener implements Listener {
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
   public void onInteract(PlayerInteractEvent event) {
+    if (playing(event.getPlayer()).isPresent()
+        && !gameplay().shieldsEnabled()
+        && event.getItem() != null
+        && event.getItem().getType() == Material.SHIELD) {
+      event.setCancelled(true);
+      return;
+    }
     RuntimePlayer runtime = runtime(event.getPlayer()).orElse(null);
     if (runtime == null || !runtime.spectator()) return;
     event.setCancelled(true);
@@ -382,5 +456,13 @@ public final class BukkitGamePlayListener implements Listener {
     return configurations
         .language()
         .message(key, configurations.snapshot().plugin().locale(), context);
+  }
+
+  private GameplaySettings gameplay() {
+    return configurations.snapshot().gameplay();
+  }
+
+  private boolean legacyCombat() {
+    return "legacy_1_8".equalsIgnoreCase(gameplay().combatProfile());
   }
 }

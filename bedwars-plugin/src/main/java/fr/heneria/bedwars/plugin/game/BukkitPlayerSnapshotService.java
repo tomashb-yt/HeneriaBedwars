@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -55,6 +57,8 @@ public final class BukkitPlayerSnapshotService {
             player.isFlying(),
             player.getWalkSpeed(),
             player.getFlySpeed(),
+            attackSpeed(player),
+            player.getMaximumNoDamageTicks(),
             List.copyOf(player.getActivePotionEffects()),
             player.getScoreboard()));
     return true;
@@ -91,6 +95,9 @@ public final class BukkitPlayerSnapshotService {
     player.setFlying(snapshot.allowFlight() && snapshot.flying());
     player.setWalkSpeed(snapshot.walkSpeed());
     player.setFlySpeed(snapshot.flySpeed());
+    AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+    if (attackSpeed != null) attackSpeed.setBaseValue(snapshot.attackSpeed());
+    player.setMaximumNoDamageTicks(snapshot.maximumNoDamageTicks());
     for (PotionEffect effect : player.getActivePotionEffects())
       player.removePotionEffect(effect.getType());
     player.addPotionEffects(snapshot.effects());
@@ -137,5 +144,10 @@ public final class BukkitPlayerSnapshotService {
   private static void requireMainThread() {
     if (!Bukkit.isPrimaryThread())
       throw new IllegalStateException("Player snapshots require the Bukkit server thread");
+  }
+
+  private static double attackSpeed(Player player) {
+    AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+    return attribute == null ? 4.0 : attribute.getBaseValue();
   }
 }

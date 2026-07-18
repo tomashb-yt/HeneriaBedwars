@@ -4,7 +4,7 @@
 
 HeneriaBedWars est un plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Le Ticket 012 est en validation : lits runtime, morts, respawns, éliminations et victoire provisoire sont implémentés, mais le parcours complet doit encore être confirmé sur Paper.
 
-Le Ticket 015 est en validation : chaque joueur reçoit une armure permanente, des outils évolutifs et des cisailles conservées, tandis que les équipes achètent Tranchant, Protection et Hâte auprès d'un second PNJ. Les progressions restent uniquement dans la `GameInstance`; le Ticket 016 garde le combat 1.8 avancé.
+Le Ticket 016 est en validation : le profil `legacy_1_8` neutralise le cooldown moderne, supprime balayage et bouclier, applique dégâts d'épée et knockback configurables, puis conserve les règles BedWars de protection, friendly-fire, vide et kill-credit. Les réglages Bukkit temporaires du joueur sont restaurés par son snapshot à la sortie.
 
 Le correctif de préparation du Ticket 012 rend les équipes, leurs spawns et leurs lits configurables depuis une fiche GUI. Le lit administratif est sélectionné en regardant un vrai lit complet dans le monde modèle; sa partie pied est persistée. Cela ne signifie pas que la destruction, la mort ou la réapparition runtime du Ticket 012 sont terminées.
 
@@ -56,6 +56,8 @@ Le Ticket 012 représente un lit par deux coordonnées de bloc et garde son éta
 Le Ticket 014 persiste uniquement la position administrative du PNJ dans l'équipe. Les villageois sont recréés dans le clone et identifiés par PDC. Tout achat passe par `ShopPurchaseService` et un `ShopInventory` atomique : ne jamais retirer la monnaie avant d'avoir prouvé que le produit peut être ajouté, ni persister un inventaire runtime dans l'arène.
 
 Le Ticket 015 conserve `PlayerEquipment` dans `RuntimePlayer` et les niveaux d'amélioration dans `RuntimeTeam`. Une mort dégrade uniquement pioches et haches d'un niveau; armure et cisailles restent. Les paiements d'amélioration passent par `TeamUpgradePurchaseService` et `TeamUpgradeWallet`. L'adaptateur Bukkit reconstruit le loadout après la téléportation de début et de respawn; ne jamais stocker ces niveaux dans `arenas/`.
+
+Le Ticket 016 centralise les autorisations dans `CombatPolicy`. Un listener ne doit jamais contourner cette politique pour un joueur runtime. Le knockback personnalisé passe par `EntityKnockbackByEntityEvent`; ne pas ajouter de tâche par coup. Vitesse d'attaque et fenêtre d'invulnérabilité doivent toujours être restaurées depuis `PlayerPreGameSnapshot`.
 
 Le correctif 013/014 ancre les drops de générateur au centre de leur bloc par PDC et une stabilisation centrale; ne jamais immobiliser un item joueur non identifié. Le rythme est recalculé une seule fois à la frontière `PLAYING` avec `GeneratorPacingPolicy`. Les hologrammes diamant/émeraude réutilisent le ticker central et l'échéance réelle de `RuntimeGenerator`, sans tâche individuelle.
 

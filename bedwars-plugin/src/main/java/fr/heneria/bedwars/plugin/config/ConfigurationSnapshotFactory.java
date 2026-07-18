@@ -171,6 +171,12 @@ public final class ConfigurationSnapshotFactory {
             gameplay.bool("combat.attack-cooldown-enabled", false),
             gameplay.bool("combat.shields-enabled", false),
             gameplay.bool("combat.friendly-fire", false),
+            gameplay.integer("combat.hit-invulnerability-ticks", 10, 0, 40),
+            gameplay.integer("combat.kill-credit-seconds", 10, 1, 60),
+            gameplay.decimal("combat.knockback.horizontal", 0.4, 0.0, 2.0),
+            gameplay.decimal("combat.knockback.vertical", 0.4, 0.0, 2.0),
+            gameplay.decimal("combat.knockback.sprint-multiplier", 1.15, 0.0, 3.0),
+            gameplay.decimal("combat.knockback.projectile-multiplier", 1.0, 0.0, 3.0),
             gameplay.bool("respawn.enabled", true),
             gameplay.integer("respawn.delay-seconds", 5, 0, Integer.MAX_VALUE),
             gameplay.integer("respawn.protection-seconds", 3, 0, Integer.MAX_VALUE),
@@ -755,6 +761,21 @@ public final class ConfigurationSnapshotFactory {
       Object value = document.value(key);
       if (value instanceof Number number) return number.doubleValue();
       problem(key, value, "number", fallback, "Missing or invalid value");
+      return fallback;
+    }
+
+    double decimal(String key, double fallback, double minimum, double maximum) {
+      Object value = document.value(key);
+      if (value instanceof Number number
+          && Double.isFinite(number.doubleValue())
+          && number.doubleValue() >= minimum
+          && number.doubleValue() <= maximum) return number.doubleValue();
+      problem(
+          key,
+          value,
+          "number between " + minimum + " and " + maximum,
+          fallback,
+          "Out-of-range value");
       return fallback;
     }
 

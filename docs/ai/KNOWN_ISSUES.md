@@ -1,14 +1,20 @@
 # Limitations connues
 
+## Ticket 016 — combat
+
+- Le ressenti du knockback, les coups sprintés, les flèches et la fenêtre de dix ticks doivent être ajustés après une vraie session Paper à deux joueurs; la compilation seule ne certifie pas le ressenti réseau.
+- Le profil vise un gameplay inspiré de la 1.8 sur un serveur 1.21, pas une émulation protocolaire exacte du client 1.8.
+- Les potions de combat avancées, fireballs BedWars personnalisées, pontage assisté et anti-cheat ne font pas partie de ce ticket.
+
 ## Ticket 015 — équipement et améliorations
 
 - L'application réelle des couleurs de cuir, enchantements et effets de potion doit encore être confirmée sur Paper 1.21.x à deux joueurs.
 - Une déconnexion reste une mort finale; la reconnexion et la restauration du loadout appartiennent à un ticket futur.
-- Forge, bassin de soins, pièges, raccourcis favoris et achat rapide ne sont pas inclus. Le combat 1.8 reste au Ticket 016.
+- Forge, bassin de soins, pièges, raccourcis favoris et achat rapide ne sont pas inclus.
 
 ## Correctif gameplay à confirmer sur Paper
 
-Les blocages explicites du placement et du PVP ont été retirés/corrigés. Le compteur de respawn, le repli de mort immédiate, les douze couleurs de laine, le retour lobby et la recréation publique disposent de tests purs ou de contrôles de configuration, mais leurs événements Bukkit réels exigent encore une partie à deux joueurs. Le combat 1.8 avancé, les outils persistants et les blocs spéciaux restent au prochain ticket.
+Les blocages explicites du placement et du PVP ont été retirés/corrigés. Le compteur de respawn, le repli de mort immédiate, les douze couleurs de laine, le retour lobby, la recréation publique et le profil de combat disposent de tests purs ou de contrôles de configuration, mais leurs événements Bukkit réels exigent encore une partie à deux joueurs.
 
 ## Correctif générateurs et PNJ
 

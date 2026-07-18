@@ -16,6 +16,8 @@ import java.util.concurrent.CompletionStage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -261,10 +263,15 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
     if (runtimeItems.clearIfRuntime(offHand)) player.getInventory().setItemInOffHand(null);
   }
 
-  private static void preparePlayingPlayer(Player player) {
+  private void preparePlayingPlayer(Player player) {
     player.getInventory().clear();
     player.getInventory().setArmorContents(new org.bukkit.inventory.ItemStack[4]);
     player.getInventory().setItemInOffHand(null);
+    var gameplay = configurations.snapshot().gameplay();
+    AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+    if (!gameplay.attackCooldownEnabled() && attackSpeed != null) attackSpeed.setBaseValue(1024.0);
+    player.setMaximumNoDamageTicks(gameplay.hitInvulnerabilityTicks());
+    player.setNoDamageTicks(0);
     player.updateInventory();
   }
 
