@@ -1,5 +1,13 @@
 # Configuration
 
+## Ticket 015 — `shops.yml` et `upgrades.yml`
+
+Une offre d'équipement ajoute `kind: ARMOR|PICKAXE|AXE|SHEARS` et un `tier` positif. `ITEM` reste la valeur par défaut et n'utilise aucun niveau. La catégorie `TOOLS` rejoint les quatre rayons historiques. Les paliers d'outil doivent être présents dans l'ordre; un achat ne peut pas sauter le niveau précédent.
+
+`upgrades.runtime-enabled` active le second PNJ. La clé historique `enabled` reste lisible dans les anciens fichiers mais ne pilote pas le runtime. Chaque entrée `upgrades.definitions.<type>` définit `currency`, la liste `prices`, `translation-key` et `order`. Les types livrés sont `sharpness`, `protection` et `haste`. La position du PNJ vit sous `teams.<id>.upgrade-shop` dans le YAML d'arène. Les niveaux achetés ne sont jamais persistés.
+
+`upgrades.yml`, `shops.yml`, `items.yml` et les deux langues évoluent non destructivement au démarrage, avec sauvegarde préalable.
+
 ## Correctif gameplay 012–014
 
 `lobby.yml > main-lobby` devient la destination prioritaire après une partie. Si ce point n'est pas configuré ou si son monde est absent, le joueur revient au spawn du monde `worlds.yml > fallback-world`. Un départ volontaire conserve la restauration exacte de la position précédente.
@@ -237,7 +245,7 @@ Depuis le Ticket 008, chaque carte persiste aussi `daylight-cycle`, `weather-cyc
 
 ## Fichiers préparatoires
 
-`upgrades.yml` reste préparatoire et ne déclenche aucune amélioration. `shops.yml` et `generators.yml` sont désormais actifs pour leurs systèmes runtime respectifs. `arenas/` est alimenté exclusivement par les services et assistants administratifs.
+`upgrades.yml`, `shops.yml` et `generators.yml` sont actifs pour leurs systèmes runtime respectifs. `arenas/` est alimenté exclusivement par les services et assistants administratifs; seules les positions des deux PNJ y sont persistées, jamais les achats vivants.
 
 ## Langues et messages
 

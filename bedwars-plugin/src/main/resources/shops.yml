@@ -14,6 +14,18 @@ shops:
     stone_sword: {category: COMBAT, material: STONE_SWORD, amount: 1, currency: IRON, price: 10, translation-key: shop.offer.stone_sword, order: 110}
     iron_sword: {category: COMBAT, material: IRON_SWORD, amount: 1, currency: GOLD, price: 7, translation-key: shop.offer.iron_sword, order: 120}
     golden_apple: {category: COMBAT, material: GOLDEN_APPLE, amount: 1, currency: GOLD, price: 3, translation-key: shop.offer.golden_apple, order: 130}
+    chainmail_armor: {category: COMBAT, material: CHAINMAIL_BOOTS, amount: 1, currency: IRON, price: 40, translation-key: shop.offer.chainmail_armor, order: 140, kind: ARMOR, tier: 1}
+    iron_armor: {category: COMBAT, material: IRON_BOOTS, amount: 1, currency: GOLD, price: 12, translation-key: shop.offer.iron_armor, order: 150, kind: ARMOR, tier: 2}
+    diamond_armor: {category: COMBAT, material: DIAMOND_BOOTS, amount: 1, currency: EMERALD, price: 6, translation-key: shop.offer.diamond_armor, order: 160, kind: ARMOR, tier: 3}
+    wooden_pickaxe: {category: TOOLS, material: WOODEN_PICKAXE, amount: 1, currency: IRON, price: 10, translation-key: shop.offer.wooden_pickaxe, order: 170, kind: PICKAXE, tier: 1}
+    iron_pickaxe: {category: TOOLS, material: IRON_PICKAXE, amount: 1, currency: IRON, price: 10, translation-key: shop.offer.iron_pickaxe, order: 180, kind: PICKAXE, tier: 2}
+    golden_pickaxe: {category: TOOLS, material: GOLDEN_PICKAXE, amount: 1, currency: GOLD, price: 3, translation-key: shop.offer.golden_pickaxe, order: 190, kind: PICKAXE, tier: 3}
+    diamond_pickaxe: {category: TOOLS, material: DIAMOND_PICKAXE, amount: 1, currency: GOLD, price: 6, translation-key: shop.offer.diamond_pickaxe, order: 200, kind: PICKAXE, tier: 4}
+    wooden_axe: {category: TOOLS, material: WOODEN_AXE, amount: 1, currency: IRON, price: 10, translation-key: shop.offer.wooden_axe, order: 201, kind: AXE, tier: 1}
+    stone_axe: {category: TOOLS, material: STONE_AXE, amount: 1, currency: IRON, price: 10, translation-key: shop.offer.stone_axe, order: 202, kind: AXE, tier: 2}
+    iron_axe: {category: TOOLS, material: IRON_AXE, amount: 1, currency: GOLD, price: 3, translation-key: shop.offer.iron_axe, order: 203, kind: AXE, tier: 3}
+    diamond_axe: {category: TOOLS, material: DIAMOND_AXE, amount: 1, currency: GOLD, price: 6, translation-key: shop.offer.diamond_axe, order: 204, kind: AXE, tier: 4}
+    shears: {category: TOOLS, material: SHEARS, amount: 1, currency: IRON, price: 20, translation-key: shop.offer.shears, order: 205, kind: SHEARS, tier: 1}
     bow: {category: RANGED, material: BOW, amount: 1, currency: GOLD, price: 12, translation-key: shop.offer.bow, order: 210}
     arrow: {category: RANGED, material: ARROW, amount: 8, currency: GOLD, price: 2, translation-key: shop.offer.arrow, order: 220}
     tnt: {category: UTILITY, material: TNT, amount: 1, currency: GOLD, price: 4, translation-key: shop.offer.tnt, order: 310}

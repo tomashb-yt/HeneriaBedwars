@@ -1,6 +1,22 @@
 config-version: 1
 
-# Preparatory only. Team upgrades are not implemented yet.
 upgrades:
-  enabled: false
-  definitions: {}
+  # Legacy compatibility key. Runtime activation uses runtime-enabled.
+  enabled: true
+  runtime-enabled: true
+  definitions:
+    sharpness:
+      currency: DIAMOND
+      prices: [4]
+      translation-key: upgrade.definition.sharpness
+      order: 10
+    protection:
+      currency: DIAMOND
+      prices: [2, 4, 8, 16]
+      translation-key: upgrade.definition.protection
+      order: 20
+    haste:
+      currency: DIAMOND
+      prices: [2, 4]
+      translation-key: upgrade.definition.haste
+      order: 30

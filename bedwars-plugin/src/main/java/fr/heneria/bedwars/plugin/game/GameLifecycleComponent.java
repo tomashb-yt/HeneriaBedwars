@@ -9,11 +9,13 @@ import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.event.GameStartEvent;
 import fr.heneria.bedwars.core.game.event.GameVictoryEvent;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
+import fr.heneria.bedwars.core.game.event.PlayerGameRespawnEvent;
 import fr.heneria.bedwars.core.game.generator.GameGeneratorService;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.equipment.BukkitEquipmentService;
 import fr.heneria.bedwars.plugin.game.shop.BukkitShopListener;
 import fr.heneria.bedwars.plugin.game.shop.BukkitShopNpcService;
 import org.bukkit.Bukkit;
@@ -43,6 +45,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
   private final BukkitGeneratorHologramService generatorHolograms;
   private final BukkitShopNpcService shops;
   private final BukkitShopListener shopListener;
+  private final BukkitEquipmentService equipment;
   private final GameDeathService deaths;
   private final GameRespawnService respawns;
   private final BukkitRuntimePlayerGateway players;
@@ -71,6 +74,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
       BukkitGeneratorHologramService generatorHolograms,
       BukkitShopNpcService shops,
       BukkitShopListener shopListener,
+      BukkitEquipmentService equipment,
       GameDeathService deaths,
       GameRespawnService respawns,
       BukkitRuntimePlayerGateway players,
@@ -91,6 +95,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     this.generatorHolograms = generatorHolograms;
     this.shops = shops;
     this.shopListener = shopListener;
+    this.equipment = equipment;
     this.deaths = deaths;
     this.respawns = respawns;
     this.players = players;
@@ -141,6 +146,12 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
                               .plusSeconds(
                                   configurations.snapshot().game().endingDurationSeconds()));
                     displays.handle(event);
+                    if (event instanceof GameStartEvent started)
+                      games
+                          .find(started.gameId())
+                          .ifPresent(game -> game.playerIds().forEach(equipment::apply));
+                    if (event instanceof PlayerGameRespawnEvent respawned)
+                      equipment.apply(respawned.playerId());
                   };
               if (Bukkit.isPrimaryThread()) action.run();
               else plugin.getServer().getScheduler().runTask(plugin, action);

@@ -1,5 +1,13 @@
 # Tests
 
+## Ticket 015 — équipement et améliorations
+
+Les tests purs couvrent l'ordre obligatoire des outils, leur régression à la mort, la permanence de l'armure et des cisailles, le paiement par niveau, l'absence de mutation sur échec, le niveau maximum et l'événement interne. Les tests d'arène vérifient l'ajout/retrait du second PNJ; la configuration vérifie l'évolution non destructive de `upgrades.yml`, des offres et des deux langues.
+
+Validation complète : 200 tests automatisés réussis, aucun échec ni erreur; build, Spotless et Shadow JAR validés.
+
+Matrice Paper requise : couleur d'armure pour deux équipes, achats des quatre paliers, mort et régression, respawn avec loadout, Tranchant partagé sur toutes les épées, Protection partagée sur toute l'armure, Hâte partagée, solde insuffisant, niveau maximum, destruction du clone et nouvelle partie sans ancienne progression.
+
 ## Correctif gameplay 012–014
 
 Les nouveaux scénarios vérifient le registre match-scoped des blocs placés, l'impossibilité de l'utiliser avant `PLAYING`, l'attente du retour lobby avant suppression du monde, les couleurs de laine dont AQUA, l'évolution des ressources v2 et la parité FR/EN. La matrice Paper doit encore confirmer PVP, événements de placement/explosion, mort immédiate, titres 5–1, retour lobby et nouveau clone après victoire.

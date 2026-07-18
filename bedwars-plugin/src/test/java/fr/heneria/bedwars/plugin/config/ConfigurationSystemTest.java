@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import fr.heneria.bedwars.core.config.ConfigurationId;
 import fr.heneria.bedwars.core.config.ConfigurationReloadResult;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
+import fr.heneria.bedwars.plugin.game.upgrade.BukkitUpgradeCatalog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -64,6 +65,12 @@ class ConfigurationSystemTest {
     assertEquals(
         service.snapshot().languages().get("fr_FR").keys(),
         service.snapshot().languages().get("en_US").keys());
+    assertEquals(
+        26,
+        service.snapshot().documents().get(ConfigurationId.SHOPS).values().keySet().stream()
+            .filter(key -> key.startsWith("shops.offers.") && key.endsWith(".material"))
+            .count());
+    assertEquals(3, new BukkitUpgradeCatalog(service, new TestLogger()).current().all().size());
   }
 
   @Test
@@ -272,6 +279,8 @@ class ConfigurationSystemTest {
         temporary.resolve("shops.yml"), "config-version: 1\nshops:\n  enabled: false\n");
     Files.writeString(
         temporary.resolve("generators.yml"), "config-version: 1\ngenerators:\n  enabled: false\n");
+    Files.writeString(
+        temporary.resolve("upgrades.yml"), "config-version: 1\nupgrades:\n  enabled: false\n");
     Path french = temporary.resolve("languages/fr_FR.yml");
     Path english = temporary.resolve("languages/en_US.yml");
     Files.writeString(french, Files.readString(french).replaceAll("(?ms)^gui:\\R.*\\z", ""));
@@ -295,12 +304,17 @@ class ConfigurationSystemTest {
     assertTrue(evolvedItems.contains("guide-v10:"));
     assertTrue(evolvedItems.contains("wallet-v2:"));
     assertTrue(evolvedItems.contains("blocks-selected-v2:"));
+    assertTrue(evolvedItems.contains("tools-selected-v2:"));
     String evolvedShops = Files.readString(temporary.resolve("shops.yml"));
     assertTrue(evolvedShops.contains("runtime-enabled: true"));
     assertTrue(evolvedShops.contains("wool:"));
     String evolvedGenerators = Files.readString(temporary.resolve("generators.yml"));
     assertTrue(evolvedGenerators.contains("pacing:"));
     assertTrue(evolvedGenerators.contains("holograms:"));
+    String evolvedUpgrades = Files.readString(temporary.resolve("upgrades.yml"));
+    assertTrue(evolvedUpgrades.contains("runtime-enabled: true"));
+    assertTrue(evolvedUpgrades.contains("sharpness:"));
+    assertTrue(evolvedUpgrades.contains("protection:"));
     assertEquals(
         "WHITE_WOOL",
         service
@@ -317,6 +331,7 @@ class ConfigurationSystemTest {
     assertTrue(Files.readString(french).contains("team-title-aqua-v6:"));
     assertTrue(Files.readString(french).contains("design-v15:"));
     assertTrue(Files.readString(french).contains("currency-v2:"));
+    assertTrue(Files.readString(french).contains("upgrade:"));
     assertTrue(
         service
             .snapshot()
@@ -325,7 +340,7 @@ class ConfigurationSystemTest {
             .keys()
             .equals(service.snapshot().languages().get("en_US").keys()));
     try (var paths = Files.walk(temporary.resolve("backups"))) {
-      assertEquals(7, paths.filter(Files::isRegularFile).count());
+      assertEquals(8, paths.filter(Files::isRegularFile).count());
     }
   }
 

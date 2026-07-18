@@ -1,15 +1,17 @@
 package fr.heneria.bedwars.plugin.game.shop;
 
+import fr.heneria.bedwars.core.game.equipment.EquipmentKind;
 import fr.heneria.bedwars.core.game.shop.ShopCurrency;
 import fr.heneria.bedwars.core.game.shop.ShopInventory;
 import fr.heneria.bedwars.core.game.shop.ShopOffer;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradeWallet;
 import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /** Atomic storage-content exchange used by the pure purchase policy. */
-public final class BukkitShopInventory implements ShopInventory {
+public final class BukkitShopInventory implements ShopInventory, TeamUpgradeWallet {
   private final Player player;
   private final String teamColor;
 
@@ -45,22 +47,19 @@ public final class BukkitShopInventory implements ShopInventory {
     return true;
   }
 
+  @Override
+  public boolean pay(ShopCurrency currency, int amount) {
+    ItemStack[] result = simulatePayment(currency, amount);
+    if (result == null) return false;
+    player.getInventory().setStorageContents(result);
+    player.updateInventory();
+    return true;
+  }
+
   private ItemStack[] simulate(ShopOffer offer) {
-    ItemStack[] contents = player.getInventory().getStorageContents();
-    ItemStack[] next = new ItemStack[contents.length];
-    for (int index = 0; index < contents.length; index++)
-      next[index] = contents[index] == null ? null : contents[index].clone();
-    int remainingPrice = offer.price();
-    Material currency = currency(offer.currency());
-    for (int index = 0; index < next.length && remainingPrice > 0; index++) {
-      ItemStack stack = next[index];
-      if (stack == null || stack.getType() != currency) continue;
-      int removed = Math.min(stack.getAmount(), remainingPrice);
-      remainingPrice -= removed;
-      if (removed == stack.getAmount()) next[index] = null;
-      else stack.setAmount(stack.getAmount() - removed);
-    }
-    if (remainingPrice > 0) return null;
+    ItemStack[] next = simulatePayment(offer.currency(), offer.price());
+    if (next == null) return null;
+    if (offer.kind() != EquipmentKind.ITEM) return next;
     Material product = productMaterial(offer);
     if (product == null || !product.isItem()) return null;
     int remainingProduct = offer.amount();
@@ -79,6 +78,24 @@ public final class BukkitShopInventory implements ShopInventory {
       remainingProduct -= amount;
     }
     return remainingProduct == 0 ? next : null;
+  }
+
+  private ItemStack[] simulatePayment(ShopCurrency shopCurrency, int price) {
+    ItemStack[] contents = player.getInventory().getStorageContents();
+    ItemStack[] next = new ItemStack[contents.length];
+    for (int index = 0; index < contents.length; index++)
+      next[index] = contents[index] == null ? null : contents[index].clone();
+    int remainingPrice = price;
+    Material currency = currency(shopCurrency);
+    for (int index = 0; index < next.length && remainingPrice > 0; index++) {
+      ItemStack stack = next[index];
+      if (stack == null || stack.getType() != currency) continue;
+      int removed = Math.min(stack.getAmount(), remainingPrice);
+      remainingPrice -= removed;
+      if (removed == stack.getAmount()) next[index] = null;
+      else stack.setAmount(stack.getAmount() - removed);
+    }
+    return remainingPrice == 0 ? next : null;
   }
 
   public Material productMaterial(ShopOffer offer) {

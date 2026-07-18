@@ -4,6 +4,7 @@ package fr.heneria.bedwars.core.game.shop;
 public enum ShopCategory {
   BLOCKS,
   COMBAT,
+  TOOLS,
   RANGED,
   UTILITY
 }

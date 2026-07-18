@@ -1,5 +1,11 @@
 # Limitations connues
 
+## Ticket 015 — équipement et améliorations
+
+- L'application réelle des couleurs de cuir, enchantements et effets de potion doit encore être confirmée sur Paper 1.21.x à deux joueurs.
+- Une déconnexion reste une mort finale; la reconnexion et la restauration du loadout appartiennent à un ticket futur.
+- Forge, bassin de soins, pièges, raccourcis favoris et achat rapide ne sont pas inclus. Le combat 1.8 reste au Ticket 016.
+
 ## Correctif gameplay à confirmer sur Paper
 
 Les blocages explicites du placement et du PVP ont été retirés/corrigés. Le compteur de respawn, le repli de mort immédiate, les douze couleurs de laine, le retour lobby et la recréation publique disposent de tests purs ou de contrôles de configuration, mais leurs événements Bukkit réels exigent encore une partie à deux joueurs. Le combat 1.8 avancé, les outils persistants et les blocs spéciaux restent au prochain ticket.
@@ -13,8 +19,8 @@ Les blocages explicites du placement et du PVP ont été retirés/corrigés. Le 
 ## Ticket 014 — boutiques
 
 - Les PNJ, clics, menus et échanges d'inventaire doivent encore être validés sur un serveur Paper avec plusieurs joueurs.
-- Le catalogue livre des objets simples. Les armures équipées, outils évolutifs, raccourcis favoris, pièges et améliorations d'équipe appartiennent au Ticket 015.
-- La laine du catalogue est actuellement blanche; sa coloration automatique selon l'équipe sera traitée avec l'équipement contextuel.
+- Le catalogue livre aussi l'équipement du Ticket 015. Les raccourcis favoris, pièges et autres améliorations avancées restent futurs.
+- La laine logique reste `WHITE_WOOL` dans le catalogue et devient automatiquement la couleur de l'équipe à l'achat.
 - Une équipe sans position de boutique reste jouable mais aucun PNJ n'est créé pour elle; la fiche indique clairement l'étape manquante.
 
 ## Ticket 013 — phase 2

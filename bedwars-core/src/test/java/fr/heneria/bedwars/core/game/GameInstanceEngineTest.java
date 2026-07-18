@@ -24,6 +24,7 @@ import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameRespawnEvent;
 import fr.heneria.bedwars.core.game.event.ShopPurchaseEvent;
+import fr.heneria.bedwars.core.game.event.TeamUpgradePurchaseEvent;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.game.shop.ShopCategory;
 import fr.heneria.bedwars.core.game.shop.ShopCurrency;
@@ -32,6 +33,11 @@ import fr.heneria.bedwars.core.game.shop.ShopOffer;
 import fr.heneria.bedwars.core.game.shop.ShopOfferId;
 import fr.heneria.bedwars.core.game.shop.ShopPurchaseCode;
 import fr.heneria.bedwars.core.game.shop.ShopPurchaseService;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradeDefinition;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradePurchaseCode;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradePurchaseService;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradeType;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradeWallet;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapTemplate;
 import fr.heneria.bedwars.core.map.MapType;
@@ -400,6 +406,63 @@ class GameInstanceEngineTest {
     assertEquals(0, full.exchanges);
   }
 
+  @Test
+  void teamUpgradePurchasePaysOncePerLevelAndBenefitsTheRuntimeTeam() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID playerId = game.team("red").orElseThrow().playerIds().iterator().next();
+    FakeUpgradeWallet wallet = new FakeUpgradeWallet(8, true);
+    TeamUpgradeDefinition definition =
+        new TeamUpgradeDefinition(
+            TeamUpgradeType.PROTECTION,
+            ShopCurrency.DIAMOND,
+            List.of(2, 4),
+            "upgrade.definition.protection",
+            10);
+    TeamUpgradePurchaseService service =
+        new TeamUpgradePurchaseService(
+            fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC));
+
+    assertEquals(
+        TeamUpgradePurchaseCode.SUCCESS, service.purchase(playerId, definition, wallet).code());
+    assertEquals(
+        TeamUpgradePurchaseCode.SUCCESS, service.purchase(playerId, definition, wallet).code());
+    assertEquals(2, game.team("red").orElseThrow().upgradeLevel(TeamUpgradeType.PROTECTION));
+    assertEquals(2, wallet.balance);
+    assertEquals(2, wallet.payments);
+    assertEquals(
+        2, fixture.published.stream().filter(TeamUpgradePurchaseEvent.class::isInstance).count());
+  }
+
+  @Test
+  void teamUpgradeDoesNotMutateWhenPaymentFailsOrLevelIsMaximum() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID playerId = game.team("red").orElseThrow().playerIds().iterator().next();
+    TeamUpgradeDefinition definition =
+        new TeamUpgradeDefinition(
+            TeamUpgradeType.SHARPNESS,
+            ShopCurrency.DIAMOND,
+            List.of(4),
+            "upgrade.definition.sharpness",
+            10);
+    TeamUpgradePurchaseService service =
+        new TeamUpgradePurchaseService(
+            fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC));
+    FakeUpgradeWallet failing = new FakeUpgradeWallet(4, false);
+
+    assertEquals(
+        TeamUpgradePurchaseCode.TRANSACTION_FAILED,
+        service.purchase(playerId, definition, failing).code());
+    assertEquals(0, game.team("red").orElseThrow().upgradeLevel(TeamUpgradeType.SHARPNESS));
+    FakeUpgradeWallet success = new FakeUpgradeWallet(8, true);
+    assertEquals(
+        TeamUpgradePurchaseCode.SUCCESS, service.purchase(playerId, definition, success).code());
+    assertEquals(
+        TeamUpgradePurchaseCode.MAX_LEVEL, service.purchase(playerId, definition, success).code());
+    assertEquals(1, success.payments);
+  }
+
   private static GameInstance playingGame(Fixture fixture) {
     GameInstance game =
         fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
@@ -576,6 +639,30 @@ class GameInstanceEngineTest {
       exchanges++;
       if (!exchangeSucceeds) return false;
       balance -= offer.price();
+      return true;
+    }
+  }
+
+  private static final class FakeUpgradeWallet implements TeamUpgradeWallet {
+    private int balance;
+    private final boolean succeeds;
+    private int payments;
+
+    private FakeUpgradeWallet(int balance, boolean succeeds) {
+      this.balance = balance;
+      this.succeeds = succeeds;
+    }
+
+    @Override
+    public int balance(ShopCurrency currency) {
+      return balance;
+    }
+
+    @Override
+    public boolean pay(ShopCurrency currency, int amount) {
+      payments++;
+      if (!succeeds) return false;
+      balance -= amount;
       return true;
     }
   }

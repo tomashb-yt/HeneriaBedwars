@@ -1,5 +1,13 @@
 # Décisions d'architecture
 
+## ADR-096 à ADR-100 — Équipement et améliorations
+
+- **ADR-096** — La progression d'équipement appartient au `RuntimePlayer`; armure et cisailles sont permanentes pendant la partie, pioches et haches perdent un niveau à chaque mort.
+- **ADR-097** — Les outils s'achètent séquentiellement afin que le catalogue reste configurable sans permettre de sauter un palier.
+- **ADR-098** — Les niveaux Tranchant, Protection et Hâte appartiennent au `RuntimeTeam` et ne sont jamais persistés dans l'arène.
+- **ADR-099** — Le paiement d'une amélioration et l'incrément de niveau sont coordonnés par `TeamUpgradePurchaseService`; le menu et le listener ne portent aucune règle métier.
+- **ADR-100** — Le loadout Bukkit est reconstruit depuis le snapshot runtime après téléportation de début/respawn et après achat, garantissant la même source de vérité pour tous les joueurs.
+
 ## ADR-090 à ADR-095 — Boucle jouable et recyclage
 
 - **ADR-090** — Le PVP d'un clone BedWars est toujours actif; le réglage PVP du modèle reste réservé à son monde administratif.

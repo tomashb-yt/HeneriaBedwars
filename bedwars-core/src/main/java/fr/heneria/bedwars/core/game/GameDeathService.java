@@ -53,6 +53,7 @@ public final class GameDeathService {
       team = victim.teamId().flatMap(game::team).orElse(null);
       if (team == null) return GameDeathResult.ignored();
       victim.recordDeath();
+      victim.degradeTools();
       RuntimePlayer killer =
           killerId == null || killerId.equals(victimId) ? null : game.player(killerId).orElse(null);
       if (team.bedAlive() && !forceFinal) {

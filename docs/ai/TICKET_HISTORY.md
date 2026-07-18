@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 015 — Équipement, outils et améliorations — 2026-07-18
+
+La boutique possède un cinquième rayon Outils. Les armures mailles/fer/diamant et les cisailles sont conservées jusqu'à la fin de la partie; pioches et haches suivent quatre niveaux et régressent d'un palier à la mort. Le respawn reconstruit une armure aux couleurs de l'équipe, une épée en bois et les achats permanents.
+
+La fiche d'équipe configure maintenant un PNJ d'améliorations distinct. Son menu compact propose Tranchant I, Protection I–IV et Hâte I–II avec niveau, prochain prix et solde. Les achats atomiques sont partagés avec l'équipe et appliqués immédiatement. `upgrades.yml`, `shops.yml`, les items et les langues évoluent sans écraser les personnalisations existantes.
+
+Validation : 200 tests automatisés réussis, aucun échec ni erreur, build complet, Spotless et Shadow JAR validés. La matrice Paper multijoueur reste obligatoire.
+
 ## Correctif gameplay Tickets 012–014 — 2026-07-18
 
 Le monde runtime force maintenant le PVP et n'autorise la destruction que des blocs posés pendant cette instance; la carte modèle reste intacte. La mort est immédiatement basculée en spectateur temporaire et le titre/actionbar suit chaque seconde de l'échéance de respawn. Les messages runtime adoptent une présentation Heneria cohérente.

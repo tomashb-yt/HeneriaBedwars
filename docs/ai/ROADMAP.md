@@ -1,8 +1,12 @@
 # Roadmap
 
+## Ticket 015 en validation
+
+L'équipement durable, les outils évolutifs et les trois premières améliorations d'équipe sont raccordés aux boutiques et aux respawns. Le prochain ticket est le Ticket 016, consacré au combat 1.8 et aux dégâts BedWars; il ne doit pas réimplémenter les loadouts.
+
 ## Correctif gameplay en validation
 
-Le socle des Tickets 012 à 014 est maintenant réellement jouable : combat activé dans le clone, construction limitée aux blocs des joueurs, respawn lisible, boutique colorée, minerais Heneria et recyclage complet des parties. Ces comportements doivent être confirmés à deux joueurs sur Paper avant de passer au Ticket 015; l'architecture du prochain ticket reste inchangée.
+Le socle des Tickets 012 à 015 est maintenant jouable : combat activé, construction limitée, respawn lisible, générateurs, boutiques, équipement et améliorations. Ces comportements doivent être confirmés à deux joueurs sur Paper avant de déclarer leurs validations closes; le prochain développement prévu est le Ticket 016.
 
 ## Correctif en validation — menus, PNJ et générateurs
 
@@ -29,11 +33,11 @@ La configuration essentielle d'une arène est regroupée dans une vue de cinq li
 - [EN COURS] Ticket 012 — Destruction des lits, morts, réapparitions, éliminations et victoire
 - [EN COURS — VALIDATION PAPER] Ticket 013 — Générateurs de ressources (assistant, persistance et drops runtime)
 - [EN COURS — VALIDATION PAPER] Ticket 014 — Boutiques, PNJ et achats atomiques
-- [À FAIRE] Ticket 015 — Équipement, outils et améliorations
+- [EN COURS — VALIDATION PAPER] Ticket 015 — Équipement, outils et améliorations
 - [À FAIRE] Ticket 016 — Combat 1.8 et dégâts BedWars
 
 ## Grandes phases futures
 
-La logique automatisée du Ticket 012 est implémentée; sa validation Paper multijoueur reste nécessaire pour le terminer. Le Ticket 013 fournit la configuration guidée et les drops Bukkit. Le Ticket 014 ajoute les positions de PNJ, le catalogue, le menu et les achats d'objets simples. Ces trois parcours doivent encore être confirmés sur Paper; équipement durable et améliorations sont reportés au Ticket 015.
+La logique automatisée des Tickets 012 à 015 est implémentée et doit encore être confirmée sur Paper multijoueur. Le Ticket 016 ajoutera le ressenti de combat 1.8 et les règles de dégâts sans modifier la progression d'équipement.
 
 Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.

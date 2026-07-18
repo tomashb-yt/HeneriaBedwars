@@ -1,5 +1,15 @@
 # État actuel
 
+## Ticket 015 — implémentation en validation Paper
+
+- armure de cuir d'équipe au départ, puis mailles, fer ou diamant achetés définitivement pour la partie;
+- pioches et haches à quatre niveaux, achat séquentiel et perte d'un niveau à la mort;
+- cisailles permanentes et épée en bois de secours à chaque respawn;
+- second PNJ d'améliorations configurable dans la quatrième colonne de la fiche d'équipe;
+- Tranchant I, Protection I–IV et Hâte I–II, payés en diamants et partagés avec toute l'équipe;
+- catalogues `shops.yml` et `upgrades.yml` évolués non destructivement sur les anciennes installations;
+- 200 tests automatisés réussis, build, formatage et JAR validés; apparence, enchantements et effets réels à confirmer sur Paper.
+
 ## Correctif gameplay 012–014 — validation Paper
 
 - PVP forcé dans les clones BedWars, indépendamment du mode de construction de la carte modèle;
@@ -25,12 +35,12 @@
 
 - emplacement et orientation de la boutique configurables dans la fiche de chaque équipe;
 - PNJ villageois protégé créé dans le clone et identifié par partie/équipe via PDC;
-- catalogue `shops.yml` configurable avec quatorze offres réparties en quatre catégories;
+- catalogue `shops.yml` configurable avec vingt-six offres réparties en cinq catégories;
 - menu compact affichant prix, quantité, solde et disponibilité, entièrement FR/EN;
 - achats limités aux joueurs vivants en `PLAYING`, refusés aux spectateurs;
 - échange atomique : aucune monnaie consommée si l'inventaire ne peut pas recevoir l'article;
 - événement Java interne `ShopPurchaseEvent` après réussite;
-- validation Paper réelle encore requise; armures, outils évolutifs et améliorations restent au Ticket 015.
+- validation Paper réelle encore requise; équipement et améliorations sont désormais raccordés par le Ticket 015.
 
 ## Ticket 013 — générateurs configurables en validation
 
@@ -144,7 +154,7 @@
 
 ## Non disponible
 
-Le cycle automatisé du Ticket 012 et les générateurs du Ticket 013 sont implémentés mais restent en validation Paper multijoueur. Les boutiques, PNJ, achats, améliorations, reconnexion, base de données, resource pack et PlaceholderAPI ne sont pas encore disponibles.
+Les Tickets 012 à 015 sont implémentés mais restent en validation Paper multijoueur. Reconnexion, base de données, resource pack, PlaceholderAPI et combat 1.8 avancé ne sont pas encore disponibles.
 
 Les 187 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
 ## Ticket 011 - livraison initiale

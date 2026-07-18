@@ -847,6 +847,22 @@ public final class ArenaEditorMenuFactory {
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
+                17,
+                GuiButton.builder()
+                    .itemKey(
+                        team.upgradeShopLocation().isPresent()
+                            ? "arena.teams.upgrade-shop-configured-v11"
+                            : "arena.teams.upgrade-shop-missing-v11")
+                    .itemPlaceholders(context -> values)
+                    .build())
+            .button(
+                26,
+                action(
+                    "arena.teams.set-upgrade-shop-v11",
+                    AdministrativeCommandPolicy.ARENA_EDIT,
+                    values,
+                    context -> setTeamUpgradeShop(context, playerId, arena, team, expected)))
+            .button(
                 45,
                 GuiButton.builder()
                     .itemKey("gui.back")
@@ -932,6 +948,29 @@ public final class ArenaEditorMenuFactory {
                           team.id(),
                           arenas.clearTeamShop(id, team.id(), expected),
                           "team-shop-clear")));
+    if (team.upgradeShopLocation().isPresent())
+      builder
+          .button(
+              35,
+              action(
+                  "arena.teams.teleport-upgrade-shop-v11",
+                  AdministrativeCommandPolicy.ARENA_TELEPORT,
+                  values,
+                  context -> teleport(context, playerId, team.upgradeShopLocation().orElseThrow())))
+          .button(
+              44,
+              action(
+                  "arena.teams.clear-upgrade-shop-v11",
+                  AdministrativeCommandPolicy.ARENA_EDIT,
+                  values,
+                  context ->
+                      mutateTeam(
+                          context,
+                          playerId,
+                          id,
+                          team.id(),
+                          arenas.clearTeamUpgradeShop(id, team.id(), expected),
+                          "team-upgrade-shop-clear")));
 
     return builder.build();
   }
@@ -1731,6 +1770,27 @@ public final class ArenaEditorMenuFactory {
         "team-shop");
   }
 
+  private void setTeamUpgradeShop(
+      GuiClickContext context,
+      UUID playerId,
+      ArenaDefinition arena,
+      ArenaTeamDefinition team,
+      long expected) {
+    Player player = player(playerId);
+    if (!correctArenaWorld(playerId, player, arena)) return;
+    mutateTeam(
+        context,
+        playerId,
+        arena.id().value(),
+        team.id(),
+        arenas.setTeamUpgradeShop(
+            arena.id().value(),
+            team.id(),
+            BukkitArenaLocations.from(player.getLocation()),
+            expected),
+        "team-upgrade-shop");
+  }
+
   private void selectTeamBed(
       GuiClickContext context,
       UUID playerId,
@@ -2228,9 +2288,17 @@ public final class ArenaEditorMenuFactory {
                 ? "arena.teams.status.configured"
                 : "arena.teams.status.missing",
             Map.of()));
+    values.put(
+        "team_upgrade_shop_status",
+        message(
+            team.upgradeShopLocation().isPresent()
+                ? "arena.teams.status.configured"
+                : "arena.teams.status.missing",
+            Map.of()));
     putLocation(values, "spawn", team.spawn());
     putLocation(values, "bed", team.bedLocation());
     putLocation(values, "shop", team.shopLocation());
+    putLocation(values, "upgrade_shop", team.upgradeShopLocation());
     return Map.copyOf(values);
   }
 

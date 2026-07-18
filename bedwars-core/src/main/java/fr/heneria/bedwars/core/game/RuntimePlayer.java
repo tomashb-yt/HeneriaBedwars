@@ -1,6 +1,10 @@
 package fr.heneria.bedwars.core.game;
 
 import fr.heneria.bedwars.api.game.RuntimePlayerSnapshot;
+import fr.heneria.bedwars.core.game.equipment.EquipmentKind;
+import fr.heneria.bedwars.core.game.equipment.EquipmentPurchaseCode;
+import fr.heneria.bedwars.core.game.equipment.PlayerEquipment;
+import fr.heneria.bedwars.core.game.equipment.PlayerEquipmentSnapshot;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -22,6 +26,7 @@ public final class RuntimePlayer {
   private Instant lastDeathAt;
   private Instant respawnAt;
   private Instant protectedUntil;
+  private final PlayerEquipment equipment = new PlayerEquipment();
 
   public RuntimePlayer(UUID playerId, Instant joinedAt) {
     this.playerId = Objects.requireNonNull(playerId, "playerId");
@@ -51,6 +56,22 @@ public final class RuntimePlayer {
 
   public synchronized void recordBedDestroyed() {
     bedsDestroyed++;
+  }
+
+  public EquipmentPurchaseCode canPurchaseEquipment(EquipmentKind kind, int tier) {
+    return equipment.canPurchase(kind, tier);
+  }
+
+  public boolean purchaseEquipment(EquipmentKind kind, int tier) {
+    return equipment.purchase(kind, tier);
+  }
+
+  public PlayerEquipmentSnapshot equipment() {
+    return equipment.snapshot();
+  }
+
+  public void degradeTools() {
+    equipment.onDeath();
   }
 
   public synchronized void spectator(boolean value) {

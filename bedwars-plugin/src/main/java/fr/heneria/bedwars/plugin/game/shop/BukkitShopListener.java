@@ -5,6 +5,7 @@ import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.game.shop.ShopCategory;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.upgrade.UpgradeMenuFactory;
 import fr.heneria.bedwars.plugin.gui.GuiService;
 import java.util.Objects;
 import org.bukkit.event.EventHandler;
@@ -20,18 +21,21 @@ public final class BukkitShopListener implements Listener {
   private final BukkitShopNpcService npcs;
   private final GuiService gui;
   private final ShopMenuFactory menus;
+  private final UpgradeMenuFactory upgradeMenus;
 
   public BukkitShopListener(
       GameInstanceManager games,
       ConfigurationService configurations,
       BukkitShopNpcService npcs,
       GuiService gui,
-      ShopMenuFactory menus) {
+      ShopMenuFactory menus,
+      UpgradeMenuFactory upgradeMenus) {
     this.games = Objects.requireNonNull(games, "games");
     this.configurations = Objects.requireNonNull(configurations, "configurations");
     this.npcs = Objects.requireNonNull(npcs, "npcs");
     this.gui = Objects.requireNonNull(gui, "gui");
     this.menus = Objects.requireNonNull(menus, "menus");
+    this.upgradeMenus = Objects.requireNonNull(upgradeMenus, "upgradeMenus");
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
@@ -57,7 +61,11 @@ public final class BukkitShopListener implements Listener {
                       PlaceholderContext.EMPTY));
       return;
     }
-    gui.open(event.getPlayer(), menus.menu(event.getPlayer().getUniqueId(), ShopCategory.BLOCKS));
+    gui.open(
+        event.getPlayer(),
+        token.type() == BukkitShopNpcService.NpcType.ITEM
+            ? menus.menu(event.getPlayer().getUniqueId(), ShopCategory.BLOCKS)
+            : upgradeMenus.menu(event.getPlayer().getUniqueId()));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)

@@ -371,12 +371,17 @@ items:
       teleport-bed-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>LIT • Visite indisponible", lore: ["<gray>Sélectionnez d'abord le lit."]}
       clear-bed-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>LIT • Rien à retirer", lore: ["<gray>Sélectionnez d'abord le lit."]}
       guide-v9: {material: WRITABLE_BOOK, name: "<aqua><bold>Configurer {team_name}", lore: ["<gray>En haut : <aqua>spawn <gray>et <red>lit", "<gray>En bas : <gold>boutique d'objets", "", "<yellow>1. Placez chaque position", "<yellow>2. Visitez pour vérifier", "<yellow>3. Lancez la partie"]}
-      guide-v10: {material: NETHER_STAR, glow: true, name: "<aqua><bold>Progression de {team_name}", lore: ["<aqua>Spawn : {team_spawn_status}", "<red>Lit : {team_bed_status}", "<gold>Boutique : {team_shop_status}", "", "<gray>Chaque colonne suit le même ordre :", "<white>état → définir → visiter → retirer", "", "<yellow>Les emplacements vides ne nécessitent", "<yellow>aucune action pour le moment."]}
+      guide-v10: {material: NETHER_STAR, glow: true, name: "<aqua><bold>Progression de {team_name}", lore: ["<aqua>Spawn : {team_spawn_status}", "<red>Lit : {team_bed_status}", "<gold>Boutique : {team_shop_status}", "<green>Améliorations : {team_upgrade_shop_status}", "", "<gray>Chaque colonne suit le même ordre :", "<white>état → définir → visiter → retirer"]}
       shop-configured-v9: {material: EMERALD, glow: true, name: "<green><bold>BOUTIQUE • Configurée", lore: ["<gray>{shop_world}", "<white>X {shop_x}  Y {shop_y}  Z {shop_z}", "", "<gray>Un PNJ apparaîtra ici dans", "<gray>le clone de la partie."]}
       shop-missing-v9: {material: VILLAGER_SPAWN_EGG, name: "<gold><bold>BOUTIQUE • À placer", lore: ["<gray>Placez-vous là où le PNJ", "<gray>de cette équipe doit apparaître."]}
       set-shop-v9: {material: ARMOR_STAND, name: "<gold><bold>BOUTIQUE • Définir ici", lore: ["<gray>Enregistre votre position et", "<gray>l'orientation de votre regard.", "", "<yellow>▸ Cliquez pour enregistrer"]}
       teleport-shop-v9: {material: ENDER_EYE, name: "<aqua>BOUTIQUE • Visiter", lore: ["<gray>Vérifie la position du futur PNJ.", "", "<yellow>▸ Cliquez pour vous téléporter"]}
       clear-shop-v9: {material: BARRIER, name: "<red>BOUTIQUE • Retirer", lore: ["<gray>Le PNJ ne sera plus créé", "<gray>pour cette équipe.", "", "<red>▸ Cliquez pour retirer"]}
+      upgrade-shop-configured-v11: {material: DIAMOND, glow: true, name: "<green><bold>AMÉLIORATIONS • Configurées", lore: ["<gray>{upgrade_shop_world}", "<white>X {upgrade_shop_x}  Y {upgrade_shop_y}  Z {upgrade_shop_z}", "", "<gray>Le PNJ d'améliorations apparaîtra ici."]}
+      upgrade-shop-missing-v11: {material: SMITHING_TABLE, name: "<green><bold>AMÉLIORATIONS • À placer", lore: ["<gray>Placez-vous à l'endroit du PNJ", "<gray>d'améliorations de l'équipe."]}
+      set-upgrade-shop-v11: {material: ARMOR_STAND, name: "<green><bold>AMÉLIORATIONS • Définir ici", lore: ["<gray>Enregistre position et orientation.", "", "<yellow>▸ Cliquez pour enregistrer"]}
+      teleport-upgrade-shop-v11: {material: ENDER_EYE, name: "<aqua>AMÉLIORATIONS • Visiter", lore: ["<gray>Vérifie la position du futur PNJ.", "", "<yellow>▸ Cliquez pour vous téléporter"]}
+      clear-upgrade-shop-v11: {material: BARRIER, name: "<red>AMÉLIORATIONS • Retirer", lore: ["<gray>Le PNJ d'améliorations", "<gray>ne sera plus créé.", "", "<red>▸ Cliquez pour retirer"]}
       teleport-shop-disabled-v9: {material: GRAY_DYE, name: "<dark_gray>BOUTIQUE • Visite indisponible", lore: ["<gray>Définissez d'abord la position."]}
       clear-shop-disabled-v9: {material: GRAY_DYE, name: "<dark_gray>BOUTIQUE • Rien à retirer", lore: ["<gray>Définissez d'abord la position."]}
       review: {material: WRITABLE_BOOK, name: "<gold>Vérifier l'arène", lore: ["<gray>Problèmes restants : <white>{validation_errors}", "", "<yellow>▸ Cliquez pour ouvrir le diagnostic"]}
@@ -616,6 +621,8 @@ items:
       ranged-selected-v2: {<<: *shop-ranged-v2, glow: true, name: "<yellow><bold>● DISTANCE"}
       utility-v2: &shop-utility-v2 {material: TNT, name: "<gold><bold>TACTIQUE", lore: ["<gray>Objets spéciaux pour créer", "<gray>une ouverture ou s'échapper.", "", "<yellow>▸ Voir les utilitaires"]}
       utility-selected-v2: {<<: *shop-utility-v2, glow: true, name: "<yellow><bold>● TACTIQUE"}
+      tools-v2: &shop-tools-v2 {material: GOLDEN_PICKAXE, name: "<gold><bold>OUTILS", lore: ["<gray>Outils permanents qui évoluent", "<gray>et perdent un niveau à la mort.", "", "<yellow>▸ Voir les outils"], item-flags: [HIDE_ATTRIBUTES]}
+      tools-selected-v2: {<<: *shop-tools-v2, glow: true, name: "<yellow><bold>● OUTILS"}
   game:
     public:
       general:

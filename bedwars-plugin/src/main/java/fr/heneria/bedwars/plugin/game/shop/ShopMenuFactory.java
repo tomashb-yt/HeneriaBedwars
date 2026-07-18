@@ -2,6 +2,8 @@ package fr.heneria.bedwars.plugin.game.shop;
 
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.RuntimePlayer;
+import fr.heneria.bedwars.core.game.equipment.EquipmentPurchaseCode;
 import fr.heneria.bedwars.core.game.shop.ShopCategory;
 import fr.heneria.bedwars.core.game.shop.ShopCurrency;
 import fr.heneria.bedwars.core.game.shop.ShopOffer;
@@ -11,6 +13,7 @@ import fr.heneria.bedwars.core.gui.Gui;
 import fr.heneria.bedwars.core.gui.GuiButton;
 import fr.heneria.bedwars.core.gui.GuiItem;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.equipment.BukkitEquipmentService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,16 +32,19 @@ public final class ShopMenuFactory {
   private final ConfigurationService configurations;
   private final BukkitShopCatalog catalogs;
   private final ShopPurchaseService purchases;
+  private final BukkitEquipmentService equipment;
 
   public ShopMenuFactory(
       GameInstanceManager games,
       ConfigurationService configurations,
       BukkitShopCatalog catalogs,
-      ShopPurchaseService purchases) {
+      ShopPurchaseService purchases,
+      BukkitEquipmentService equipment) {
     this.games = Objects.requireNonNull(games, "games");
     this.configurations = Objects.requireNonNull(configurations, "configurations");
     this.catalogs = Objects.requireNonNull(catalogs, "catalogs");
     this.purchases = Objects.requireNonNull(purchases, "purchases");
+    this.equipment = Objects.requireNonNull(equipment, "equipment");
   }
 
   public Gui menu(UUID playerId, ShopCategory selected) {
@@ -47,6 +53,7 @@ public final class ShopMenuFactory {
     if (player == null || game == null) return unavailable();
     var catalog = catalogs.current();
     BukkitShopInventory inventory = new BukkitShopInventory(player, teamColor(game, playerId));
+    RuntimePlayer runtimePlayer = game.player(playerId).orElseThrow();
     Map<String, Object> wallet = wallet(inventory);
     Gui.Builder builder =
         Gui.builder()
@@ -61,7 +68,7 @@ public final class ShopMenuFactory {
                     .itemPlaceholders(context -> wallet)
                     .build());
     ShopCategory[] categories = ShopCategory.values();
-    int[] categorySlots = {10, 12, 14, 16};
+    int[] categorySlots = {9, 11, 13, 15, 17};
     for (int index = 0; index < categories.length; index++) {
       ShopCategory category = categories[index];
       builder.button(
@@ -81,7 +88,7 @@ public final class ShopMenuFactory {
       builder.button(
           OFFER_SLOTS.get(index),
           GuiButton.builder()
-              .item(context -> offerItem(inventory, offer))
+              .item(context -> offerItem(inventory, runtimePlayer, offer))
               .cooldown(java.time.Duration.ofMillis(150))
               .onLeftClick(context -> purchase(context, player, selected, offer))
               .build());
@@ -111,6 +118,7 @@ public final class ShopMenuFactory {
     BukkitShopInventory inventory =
         new BukkitShopInventory(player, teamColor(game, player.getUniqueId()));
     var result = purchases.purchase(player.getUniqueId(), offer, inventory);
+    if (result.successful()) equipment.apply(player.getUniqueId());
     Map<String, Object> values =
         Map.of(
             "item",
@@ -138,17 +146,25 @@ public final class ShopMenuFactory {
     else context.replace(menu(player.getUniqueId(), category));
   }
 
-  private GuiItem offerItem(BukkitShopInventory inventory, ShopOffer offer) {
+  private GuiItem offerItem(
+      BukkitShopInventory inventory, RuntimePlayer runtimePlayer, ShopOffer offer) {
     int balance = inventory.balance(offer.currency());
     boolean enough = balance >= offer.price();
     boolean space = inventory.canExchange(offer);
-    boolean affordable = enough && space;
+    EquipmentPurchaseCode progression =
+        runtimePlayer.canPurchaseEquipment(offer.kind(), offer.tier());
+    boolean progressionReady = progression == EquipmentPurchaseCode.AVAILABLE;
+    boolean affordable = enough && space && progressionReady;
     String state =
-        message(
-            affordable
-                ? "shop.menu-v2.available"
-                : enough ? "shop.menu-v2.inventory-full" : "shop.menu-v2.insufficient",
-            Map.of("missing", Math.max(0, offer.price() - balance)));
+        progression == EquipmentPurchaseCode.ALREADY_OWNED
+            ? message("shop.menu-v2.already-owned", Map.of())
+            : progression == EquipmentPurchaseCode.WRONG_TIER
+                ? message("shop.menu-v2.wrong-tier", Map.of())
+                : message(
+                    affordable
+                        ? "shop.menu-v2.available"
+                        : enough ? "shop.menu-v2.inventory-full" : "shop.menu-v2.insufficient",
+                    Map.of("missing", Math.max(0, offer.price() - balance)));
     return new GuiItem(
         inventory.productMaterial(offer).name(),
         Math.min(99, offer.amount()),

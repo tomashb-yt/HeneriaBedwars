@@ -159,6 +159,11 @@ public final class ArenaValidator {
               location ->
                   checkLocationWorld(
                       problems, arena, location, "teams." + team.id().value() + ".shop"));
+      team.upgradeShopLocation()
+          .ifPresent(
+              location ->
+                  checkLocationWorld(
+                      problems, arena, location, "teams." + team.id().value() + ".upgrade-shop"));
     }
     if (total != arena.maximumPlayers())
       error(

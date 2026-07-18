@@ -18,6 +18,7 @@ public final class ConfigurationDefaultsUpdater {
           "game.yml",
           "generators.yml",
           "shops.yml",
+          "upgrades.yml",
           "menus.yml",
           "items.yml",
           "languages/fr_FR.yml",

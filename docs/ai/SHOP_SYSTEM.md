@@ -1,4 +1,4 @@
-# Système de boutiques — Ticket 014
+# Système de boutiques — Tickets 014–015
 
 ## Parcours administrateur
 
@@ -10,7 +10,7 @@ Au passage de l'instance en `WAITING`, les positions du monde modèle sont remap
 
 Le PNJ est recréé au passage `PLAYING` afin de réparer une création anticipée ou un chunk non prêt. Son apparition ne dépend plus du nombre d'offres valides : un catalogue vide produit un menu indisponible, jamais la disparition silencieuse du villageois. Les anciennes installations reçoivent les offres manquantes dans `shops.yml` au redémarrage, avec sauvegarde et sans écraser leurs valeurs.
 
-Le menu expose quatre catégories : blocs, combat, distance et utilitaires. Chaque article affiche sa quantité, son prix, la monnaie et le solde du joueur. Après achat, la vue et le portefeuille sont rafraîchis.
+Le menu expose cinq catégories : blocs, combat, outils, distance et utilitaires. Chaque article affiche sa quantité, son prix, la monnaie et le solde du joueur. Après achat, la vue et le portefeuille sont rafraîchis.
 
 La version v2 distingue visuellement chaque rayon, colore prix et solde selon le minerai et explique séparément un manque de ressources ou un inventaire plein. L'offre logique `WHITE_WOOL` est rendue puis livrée dans la couleur du `RuntimeTeam`, y compris AQUA en laine bleu clair. Les monnaies générées portent un nom localisé Heneria tout en restant reconnues par leur matériau vanilla.
 
@@ -38,6 +38,6 @@ Catégories acceptées : `BLOCKS`, `COMBAT`, `RANGED`, `UTILITY`. Monnaies accep
 
 `ShopPurchaseService` vérifie le contexte métier. `BukkitShopInventory` clone ensuite le stockage du joueur, simule le paiement et l'ajout complet du produit, puis remplace le contenu uniquement si l'ensemble réussit. Un inventaire plein, un solde insuffisant ou une offre invalide ne retire aucune ressource.
 
-## Hors périmètre
+## Équipement Ticket 015
 
-Le Ticket 014 ne gère pas les armures équipées, les outils évolutifs, les raccourcis favoris, les pièges ni les améliorations d'équipe. Ces mécaniques appartiennent au Ticket 015.
+Les offres `kind: ARMOR|PICKAXE|AXE|SHEARS` et leur `tier` mettent à jour la progression runtime au lieu de livrer un doublon physique. Les outils exigent le palier précédent. Le second PNJ utilise `upgrades.yml` et partage son achat avec l'équipe. Raccourcis favoris, pièges et Forge restent hors périmètre.

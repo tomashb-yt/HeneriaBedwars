@@ -1,5 +1,7 @@
 # API publique
 
+Le Ticket 015 ne modifie pas l'API publique. `PlayerEquipment`, `TeamUpgradePurchaseService` et leurs événements sont internes : les addons ne doivent pas muter directement l'équipement, les prix ou les niveaux d'une équipe.
+
 `/bw join <carte>` liste désormais les modèles associés aux arènes actives même lorsqu'aucune instance n'existe. Si nécessaire, la commande clone la carte puis rejoint la nouvelle instance; la création runtime n'accorde aucune permission administrative au joueur.
 
 Le Ticket 014 ne modifie pas l'API publique. `ShopPurchaseService`, `ShopInventory`, le catalogue et `ShopPurchaseEvent` sont des contrats Java internes : les addons ne doivent pas encore les importer. La surface publique reste en lecture seule afin de ne pas contourner les invariants d'achat et de cycle de partie.

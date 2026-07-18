@@ -1,5 +1,13 @@
 # Architecture actuelle
 
+## Ticket 015 — équipement et améliorations
+
+`core.game.equipment` porte `PlayerEquipment`, ses règles de progression et son snapshot immuable. `RuntimePlayer` en est l'unique propriétaire. `core.game.upgrade` décrit les catalogues, niveaux et achats d'équipe; `RuntimeTeam` reste la source de vérité des niveaux vivants.
+
+`ShopPurchaseService` valide aussi les paliers d'équipement avant l'échange atomique. `TeamUpgradePurchaseService` calcule le prochain prix, paie via `TeamUpgradeWallet`, incrémente le niveau puis publie `TeamUpgradePurchaseEvent`. `BukkitEquipmentService` traduit seulement le snapshot en armure colorée, outils, enchantements et Hâte après le début, l'achat ou le respawn.
+
+Les deux villageois utilisent le même cycle runtime et une identité PDC incluant leur type. Leurs positions sont administratives, mais aucune progression ne retourne dans le YAML d'arène.
+
 ## Correctif gameplay, boutique et recyclage
 
 `GameInstance` porte l'ensemble match-scoped des blocs placés. Le listener Bukkit enregistre uniquement un placement réussi en `PLAYING`, laisse casser ces blocs, protège le décor et filtre les explosions avec la même source de vérité. `BukkitRuntimeWorldService` force le PVP dans le clone sans modifier le réglage administratif de la carte modèle.

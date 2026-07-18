@@ -2,6 +2,7 @@ package fr.heneria.bedwars.core.game.shop;
 
 import fr.heneria.bedwars.api.game.GameState;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
+import fr.heneria.bedwars.core.game.equipment.EquipmentPurchaseCode;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.event.ShopPurchaseEvent;
 import java.time.Clock;
@@ -34,6 +35,11 @@ public final class ShopPurchaseService {
       return result(ShopPurchaseCode.NOT_IN_GAME, offer, inventory.balance(offer.currency()));
     if (player.spectator())
       return result(ShopPurchaseCode.SPECTATOR, offer, inventory.balance(offer.currency()));
+    EquipmentPurchaseCode equipment = player.canPurchaseEquipment(offer.kind(), offer.tier());
+    if (equipment == EquipmentPurchaseCode.ALREADY_OWNED)
+      return result(ShopPurchaseCode.ALREADY_OWNED, offer, inventory.balance(offer.currency()));
+    if (equipment == EquipmentPurchaseCode.WRONG_TIER)
+      return result(ShopPurchaseCode.WRONG_TIER, offer, inventory.balance(offer.currency()));
     int balance = inventory.balance(offer.currency());
     if (balance < offer.price()) return result(ShopPurchaseCode.INSUFFICIENT_FUNDS, offer, balance);
     if (!inventory.canExchange(offer))
@@ -41,6 +47,8 @@ public final class ShopPurchaseService {
     if (!inventory.exchange(offer))
       return result(
           ShopPurchaseCode.TRANSACTION_FAILED, offer, inventory.balance(offer.currency()));
+    if (!player.purchaseEquipment(offer.kind(), offer.tier()))
+      throw new IllegalStateException("Equipment progression changed during atomic purchase");
     events.publish(
         new ShopPurchaseEvent(
             game.id(),

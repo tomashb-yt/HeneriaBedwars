@@ -2,6 +2,9 @@ package fr.heneria.bedwars.core.game;
 
 import fr.heneria.bedwars.api.game.RuntimeTeamSnapshot;
 import fr.heneria.bedwars.core.arena.ArenaTeamDefinition;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradeSnapshot;
+import fr.heneria.bedwars.core.game.upgrade.TeamUpgradeType;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,6 +21,7 @@ public final class RuntimeTeam {
   private Optional<RuntimeLocation> spawn = Optional.empty();
   private boolean bedAlive = true;
   private boolean eliminated;
+  private final EnumMap<TeamUpgradeType, Integer> upgrades = new EnumMap<>(TeamUpgradeType.class);
 
   public RuntimeTeam(String id, String displayName, String color, int capacity) {
     this.id = text(id, "id");
@@ -98,6 +102,23 @@ public final class RuntimeTeam {
 
   public synchronized Set<UUID> playerIds() {
     return Set.copyOf(players);
+  }
+
+  public synchronized int upgradeLevel(TeamUpgradeType type) {
+    return upgrades.getOrDefault(Objects.requireNonNull(type, "type"), 0);
+  }
+
+  public synchronized int upgrade(TeamUpgradeType type, int maximumLevel) {
+    if (maximumLevel < 1) throw new IllegalArgumentException("maximumLevel must be positive");
+    int current = upgradeLevel(type);
+    if (current >= maximumLevel) return current;
+    int next = current + 1;
+    upgrades.put(type, next);
+    return next;
+  }
+
+  public synchronized TeamUpgradeSnapshot upgrades() {
+    return new TeamUpgradeSnapshot(upgrades);
   }
 
   public synchronized RuntimeTeamSnapshot snapshot() {

@@ -2,6 +2,7 @@ package fr.heneria.bedwars.plugin.game.shop;
 
 import fr.heneria.bedwars.core.config.ConfigurationDocument;
 import fr.heneria.bedwars.core.config.ConfigurationId;
+import fr.heneria.bedwars.core.game.equipment.EquipmentKind;
 import fr.heneria.bedwars.core.game.shop.ShopCatalog;
 import fr.heneria.bedwars.core.game.shop.ShopCategory;
 import fr.heneria.bedwars.core.game.shop.ShopCurrency;
@@ -54,7 +55,10 @@ public final class BukkitShopCatalog {
                     string(document, prefix + "currency", "IRON").toUpperCase(Locale.ROOT)),
                 integer(document, prefix + "price", 1),
                 string(document, prefix + "translation-key", "shop.offer." + id),
-                integer(document, prefix + "order", offers.size())));
+                integer(document, prefix + "order", offers.size()),
+                EquipmentKind.valueOf(
+                    string(document, prefix + "kind", "ITEM").toUpperCase(Locale.ROOT)),
+                integer(document, prefix + "tier", 0)));
       } catch (RuntimeException exception) {
         logger.warning("[Shop] Ignoring invalid offer '" + id + "': " + exception.getMessage());
       }
