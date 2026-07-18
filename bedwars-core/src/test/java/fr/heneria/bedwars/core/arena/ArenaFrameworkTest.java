@@ -189,7 +189,7 @@ class ArenaFrameworkTest {
   }
 
   @Test
-  void generatorsRejectDuplicateBlocksAndConvertToRuntimeDefinitions() {
+  void generatorsShareBlocksAcrossResourcesButRejectExactResourceDuplicates() {
     FakeRepository repository = new FakeRepository();
     ArenaService service = service(repository);
     ArenaDefinition created = service.create("alpha").arena().orElseThrow();
@@ -198,11 +198,21 @@ class ArenaFrameworkTest {
     ArenaDefinition added =
         service.addGenerator("alpha", iron, created.revision()).arena().orElseThrow();
 
+    ArenaDefinition combined =
+        service
+            .addGenerator(
+                "alpha",
+                generator("gold-1", GeneratorResource.GOLD, new ArenaVector(1.9, 64, 1.1)),
+                added.revision())
+            .arena()
+            .orElseThrow();
+    assertEquals(2, combined.generators().size());
+
     ArenaOperationResult duplicate =
         service.addGenerator(
             "alpha",
-            generator("gold-1", GeneratorResource.GOLD, new ArenaVector(1.9, 64, 1.1)),
-            added.revision());
+            generator("iron-2", GeneratorResource.IRON, new ArenaVector(1.1, 64, 1.9)),
+            combined.revision());
     assertEquals(ArenaOperationCode.INVALID_ARGUMENT, duplicate.code());
     assertEquals(1000, iron.runtime().interval().toMillis());
     assertEquals(iron.id(), iron.runtime().id());

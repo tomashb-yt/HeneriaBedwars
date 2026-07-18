@@ -1,5 +1,6 @@
 package fr.heneria.bedwars.plugin.arena;
 
+import fr.heneria.bedwars.core.arena.ArenaBlockPosition;
 import fr.heneria.bedwars.core.arena.ArenaBoundary;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
 import fr.heneria.bedwars.core.arena.ArenaGeneratorDefinition;
@@ -468,7 +469,7 @@ public final class ArenaEditorMenuFactory {
             .button(
                 settings.generatorsSlot(),
                 action(
-                    "arena.editor.assistant-generators-v7",
+                    "arena.editor.assistant-generators-v8",
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     Map.of("generator_count", arena.generators().size()),
                     context -> context.open(generators(playerId, id, expected))))
@@ -623,12 +624,13 @@ public final class ArenaEditorMenuFactory {
   public Gui generators(UUID playerId, String id, long expected) {
     ArenaDefinition arena = arenas.find(id).orElse(null);
     if (arena == null) return missing(playerId);
+    Map<String, Object> summary = generatorSummaryPlaceholders(arena);
     Gui.Builder builder =
         Gui.builder()
             .id("arena.generators." + id)
             .title(
                 message(
-                    "arena.generator.title",
+                    "arena.generator.title-v8",
                     Map.of(
                         "arena_name",
                         arena.displayName(),
@@ -639,9 +641,14 @@ public final class ArenaEditorMenuFactory {
             .button(
                 4,
                 GuiButton.builder()
-                    .itemKey("arena.generator.guide-v7")
-                    .itemPlaceholders(
-                        context -> Map.of("generator_count", arena.generators().size()))
+                    .itemKey("arena.generator.guide-v8")
+                    .itemPlaceholders(context -> summary)
+                    .build())
+            .button(
+                22,
+                GuiButton.builder()
+                    .itemKey("arena.generator.placement-v8")
+                    .itemPlaceholders(context -> summary)
                     .build());
     GeneratorResource[] resources = GeneratorResource.values();
     int[] addSlots = {10, 12, 14, 16};
@@ -650,22 +657,38 @@ public final class ArenaEditorMenuFactory {
       builder.button(
           addSlots[index],
           GuiButton.builder()
-              .itemKey("arena.generator.add." + resource.name().toLowerCase(Locale.ROOT) + "-v7")
+              .itemKey("arena.generator.add." + resource.name().toLowerCase(Locale.ROOT) + "-v8")
+              .itemPlaceholders(
+                  context ->
+                      Map.of(
+                          "resource_count",
+                          arena.generators().stream()
+                              .filter(generator -> generator.resource() == resource)
+                              .count(),
+                          "arena_world",
+                          arena.worldName().orElse("-")))
               .permission(AdministrativeCommandPolicy.ARENA_EDIT)
               .onLeftClick(context -> addGenerator(context, playerId, arena, resource, expected))
               .build());
     }
-    List<Integer> slots = List.of(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34);
+    List<Integer> slots = List.of(28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43);
+    if (arena.generators().isEmpty())
+      builder.button(
+          31,
+          GuiButton.builder()
+              .itemKey("arena.generator.empty-v8")
+              .itemPlaceholders(context -> summary)
+              .build());
     for (int index = 0; index < Math.min(slots.size(), arena.generators().size()); index++) {
       ArenaGeneratorDefinition generator = arena.generators().get(index);
-      Map<String, Object> values = generatorPlaceholders(generator);
+      Map<String, Object> values = generatorPlaceholders(arena, generator);
       builder.button(
           slots.get(index),
           GuiButton.builder()
               .itemKey(
                   "arena.generator.entry."
                       + generator.resource().name().toLowerCase(Locale.ROOT)
-                      + "-v7")
+                      + "-v8")
               .itemPlaceholders(context -> values)
               .permission(AdministrativeCommandPolicy.ARENA_EDIT)
               .onLeftClick(context -> teleport(context, playerId, generator.location()))
@@ -676,7 +699,21 @@ public final class ArenaEditorMenuFactory {
                   context -> context.open(removeGeneratorConfirmation(playerId, arena, generator)))
               .build());
     }
-    return builder.button(45, editorBackButton(playerId, id)).button(53, standard.close()).build();
+    return builder
+        .button(45, editorBackButton(playerId, id))
+        .button(
+            49,
+            GuiButton.builder()
+                .itemKey("gui.refresh")
+                .onLeftClick(
+                    context -> {
+                      ArenaDefinition current = arenas.find(id).orElse(null);
+                      if (current == null) openDashboard(playerId);
+                      else context.replace(generators(playerId, id, current.revision()));
+                    })
+                .build())
+        .button(53, standard.close())
+        .build();
   }
 
   public Gui players(UUID playerId, String id, long expected) {
@@ -1318,7 +1355,7 @@ public final class ArenaEditorMenuFactory {
 
   private Gui removeGeneratorConfirmation(
       UUID playerId, ArenaDefinition arena, ArenaGeneratorDefinition generator) {
-    Map<String, Object> values = generatorPlaceholders(generator);
+    Map<String, Object> values = generatorPlaceholders(arena, generator);
     return ConfirmationGui.builder()
         .id("arena.generator.remove." + arena.id().value() + '.' + generator.id().value())
         .title(message("arena.generator.remove-title", values))
@@ -1761,10 +1798,16 @@ public final class ArenaEditorMenuFactory {
     }
   }
 
-  private static Map<String, Object> generatorPlaceholders(ArenaGeneratorDefinition generator) {
+  private Map<String, Object> generatorPlaceholders(
+      ArenaDefinition arena, ArenaGeneratorDefinition generator) {
     Map<String, Object> values = new LinkedHashMap<>();
     values.put("generator_id", generator.id().value());
     values.put("generator_resource", generator.resource().name());
+    values.put(
+        "generator_resource_display",
+        message(
+            "arena.generator.resource." + generator.resource().name().toLowerCase(Locale.ROOT),
+            Map.of()));
     values.put("generator_level", generator.level());
     values.put("generator_interval", generator.intervalTicks() / 20.0);
     values.put("generator_capacity", generator.localCapacity());
@@ -1775,6 +1818,25 @@ public final class ArenaEditorMenuFactory {
         "generator_y", String.format(Locale.ROOT, "%.1f", generator.location().position().y()));
     values.put(
         "generator_z", String.format(Locale.ROOT, "%.1f", generator.location().position().z()));
+    ArenaBlockPosition block = ArenaBlockPosition.from(generator.location());
+    values.put(
+        "generator_group_count",
+        arena.generators().stream()
+            .filter(value -> ArenaBlockPosition.from(value.location()).equals(block))
+            .count());
+    return Map.copyOf(values);
+  }
+
+  private static Map<String, Object> generatorSummaryPlaceholders(ArenaDefinition arena) {
+    Map<String, Object> values = new LinkedHashMap<>();
+    values.put("generator_count", arena.generators().size());
+    values.put("arena_world", arena.worldName().orElse("-"));
+    for (GeneratorResource resource : GeneratorResource.values())
+      values.put(
+          resource.name().toLowerCase(Locale.ROOT) + "_count",
+          arena.generators().stream()
+              .filter(generator -> generator.resource() == resource)
+              .count());
     return Map.copyOf(values);
   }
 

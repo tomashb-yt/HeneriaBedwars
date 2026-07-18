@@ -17,6 +17,7 @@ Accepté pour la phase 2 du Ticket 013.
 - **ADR-076** — Le remappage modèle → clone conserve les coordonnées et remplace implicitement le monde; aucun nom de monde runtime n'est persisté.
 - **ADR-077** — La création, le déplacement et la suppression passent par l'assistant et `ArenaService`; le menu ne lit et n'écrit jamais directement le YAML.
 - **ADR-078** — L'adaptateur Bukkit émet uniquement en `PLAYING`, compte les items compatibles dans un rayon borné, fusionne les piles si demandé et fractionne les drops trop grands.
+- **ADR-079** — L'unicité d'un point porte sur la ressource et le bloc; fer et or peuvent partager une position, tandis qu'un doublon fer + fer au même bloc reste refusé.
 
 ## ADR-062 à ADR-070 — Gameplay des lits
 

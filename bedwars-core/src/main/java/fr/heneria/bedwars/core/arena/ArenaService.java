@@ -334,9 +334,12 @@ public final class ArenaService {
       return ArenaOperationResult.failure(
           ArenaOperationCode.INVALID_ARGUMENT, "Generator id already exists");
     if (current.generators().stream()
-        .anyMatch(value -> sameBlock(value.location(), generator.location())))
+        .anyMatch(
+            value ->
+                value.resource() == generator.resource()
+                    && sameBlock(value.location(), generator.location())))
       return ArenaOperationResult.failure(
-          ArenaOperationCode.INVALID_ARGUMENT, "Generator position already used");
+          ArenaOperationCode.INVALID_ARGUMENT, "This resource already uses that position");
     List<ArenaGeneratorDefinition> next = new java.util.ArrayList<>(current.generators());
     next.add(generator);
     return edit(
@@ -353,13 +356,19 @@ public final class ArenaService {
     ArenaDefinition current = find(rawId).orElse(null);
     if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
     if (conflict(current, expectedRevision)) return conflict(current);
-    if (current.generators().stream().noneMatch(value -> value.id().equals(generatorId)))
+    ArenaGeneratorDefinition moved =
+        current.generators().stream()
+            .filter(value -> value.id().equals(generatorId))
+            .findFirst()
+            .orElse(null);
+    if (moved == null)
       return ArenaOperationResult.failure(ArenaOperationCode.INVALID_ARGUMENT, "Unknown generator");
     if (current.generators().stream()
         .filter(value -> !value.id().equals(generatorId))
-        .anyMatch(value -> sameBlock(value.location(), location)))
+        .anyMatch(
+            value -> value.resource() == moved.resource() && sameBlock(value.location(), location)))
       return ArenaOperationResult.failure(
-          ArenaOperationCode.INVALID_ARGUMENT, "Generator position already used");
+          ArenaOperationCode.INVALID_ARGUMENT, "This resource already uses that position");
     List<ArenaGeneratorDefinition> next =
         current.generators().stream()
             .map(value -> value.id().equals(generatorId) ? value.at(location) : value)

@@ -32,6 +32,7 @@ game:
     hide-red-numbers: true
     update-interval-ticks: 20
     title: "<aqua><bold>HENERIA BEDWARS</bold></aqua>"
+    title-v7: "<aqua><bold>HENERIA</bold> <white>BEDWARS"
     server-name: "Heneria"
     server-address: "play.heneria.fr"
     waiting:
@@ -67,6 +68,43 @@ game:
         - "<white>Lits <dark_gray>» <aqua>{beds_destroyed}"
         - ""
         - "<aqua>{server_address}"
+    waiting-v7:
+      lines:
+        - ""
+        - "<gray>CARTE"
+        - "<aqua>{arena_name}"
+        - ""
+        - "<white>Joueurs <dark_gray>› <green>{players}<gray>/{maximum_players}"
+        - "<white>Requis <dark_gray>› <yellow>{minimum_players}"
+        - "<white>État <dark_gray>› {state_color}{state}"
+        - "{status_message}"
+        - ""
+        - "<yellow>{server_address}"
+    starting-v7:
+      lines:
+        - ""
+        - "<gray>CARTE"
+        - "<aqua>{arena_name}"
+        - ""
+        - "<white>Joueurs <dark_gray>› <green>{players}<gray>/{maximum_players}"
+        - "<white>Début dans <dark_gray>› <green><bold>{countdown}s"
+        - ""
+        - "<yellow>Préparez-vous !"
+        - ""
+        - "<yellow>{server_address}"
+    playing-v7:
+      lines:
+        - ""
+        - "<gray>CARTE <dark_gray>• <aqua>{arena_name}"
+        - ""
+        - "<white>Équipe <dark_gray>› {team_color}<bold>{team_name}"
+        - "<white>Lit <dark_gray>› {bed_status}"
+        - "<white>Équipes <dark_gray>› <green>{remaining_teams}"
+        - ""
+        - "<white>Éliminations <dark_gray>› <green>{kills}"
+        - "<white>Lits détruits <dark_gray>› <aqua>{beds_destroyed}"
+        - ""
+        - "<yellow>{server_address}"
 
   inventory:
     leave-slot: 8

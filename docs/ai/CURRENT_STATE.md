@@ -8,6 +8,7 @@
 - coordinateur global borné avec rotation équitable et sans tâche par générateur;
 - positions administratives persistées dans chaque YAML d'arène et conservées par révision optimiste;
 - assistant graphique pour ajouter, visiter, déplacer ou supprimer les quatre ressources;
+- fer et or partageables sur le même bloc, avec doublons d'une même ressource toujours refusés;
 - initialisation dans le clone et drops Bukkit uniquement pendant `PLAYING`, avec capacité locale et fusion des piles;
 - validation Paper réelle encore requise; hologrammes, sons, particules et niveaux automatiques restent futurs.
 
@@ -20,6 +21,8 @@
 - lit détruit → mort finale → spectateur permanent → élimination d'équipe;
 - dernière équipe active → `ENDING` → annonce → restauration et suppression du clone;
 - scoreboard de jeu et statistiques runtime kills/final kills/lits;
+- scoreboard v7 plus lisible avec couleur réelle de l'équipe et état vivant/détruit du lit;
+- destruction du lit signalée aux victimes par broadcast, message personnel, titre, actionbar et son;
 - validation multijoueur Paper encore requise, donc Ticket 012 non déclaré définitivement terminé.
 
 ## Correctif équipes et lancement — 2026-07-17
@@ -109,7 +112,7 @@
 
 Le cycle automatisé du Ticket 012 et les générateurs du Ticket 013 sont implémentés mais restent en validation Paper multijoueur. Les boutiques, PNJ, achats, améliorations, reconnexion, base de données, resource pack et PlaceholderAPI ne sont pas encore disponibles.
 
-Les 186 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 187 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
 ## Ticket 011 - livraison initiale
 
 Les arènes portent désormais des définitions d'équipes immuables et persistantes (identifiant, nom, couleur, ordre, capacité et spawn). Les anciens YAML à base de `teams.count` et `teams.players-per-team` sont relus avec des équipes générées déterministes, sans perdre la définition; les spawns restent à renseigner avant validation complète.

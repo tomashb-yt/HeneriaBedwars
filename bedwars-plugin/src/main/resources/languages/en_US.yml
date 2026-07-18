@@ -92,7 +92,13 @@ admin:
 arena:
   generator:
     title: "<aqua>Generators · <white>{arena_name} <gray>({generator_count})"
+    title-v8: "<aqua><bold>Resources <dark_gray>• <white>{arena_name}"
     remove-title: "<red>Remove {generator_id}?"
+    resource:
+      iron: "Iron"
+      gold: "Gold"
+      diamond: "Diamond"
+      emerald: "Emerald"
   runtime:
     creating: "<yellow>Preparing arena <white>{arena_id}<yellow>..."
     joined: "<green>You joined arena <white>{arena_id}<green>. Instance: <white>{game_id}<green>."
@@ -326,12 +332,16 @@ game:
     countdown: "<yellow>Start: <white>{countdown} s"
     waiting: "<yellow>Not enough players"
     footer: "<aqua>{footer}"
+    bed-alive: "<green><bold>✓ ALIVE"
+    bed-destroyed: "<red><bold>✗ DESTROYED"
   bed:
     own: "<red>You cannot destroy your own bed."
     destroyed: "<red>Team <white>{team}<red>'s bed was destroyed by <white>{destroyer}<red>!"
     destroyer: "<green>You destroyed team <white>{team}<green>'s bed!"
     victim-title: "<red><bold>BED DESTROYED!"
     victim-subtitle: "<gray>You will no longer respawn after your next death."
+    victim-chat: "<red><bold>⚠ YOUR BED WAS DESTROYED! <reset><white>You can no longer respawn."
+    victim-actionbar: "<red><bold>⚠ BED DESTROYED — NEXT DEATH IS FINAL ⚠"
   death:
     respawn: "<yellow>You died. Your bed is alive: respawn pending."
     final: "<red>You have been permanently eliminated."

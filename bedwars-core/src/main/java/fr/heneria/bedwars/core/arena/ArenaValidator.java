@@ -165,12 +165,14 @@ public final class ArenaValidator {
 
   private static void validateGenerators(List<ArenaProblem> problems, ArenaDefinition arena) {
     var ids = new HashSet<fr.heneria.bedwars.core.game.generator.GeneratorId>();
-    var blocks = new HashSet<ArenaBlockPosition>();
+    var placements = new HashSet<String>();
     for (ArenaGeneratorDefinition generator : arena.generators()) {
       String field = "generators." + generator.id().value();
       if (!ids.add(generator.id()))
         error(problems, "generator-id-duplicate", field, "Generator id is duplicated");
-      if (!blocks.add(ArenaBlockPosition.from(generator.location())))
+      String placement =
+          generator.resource().name() + '@' + ArenaBlockPosition.from(generator.location());
+      if (!placements.add(placement))
         error(problems, "generator-position-duplicate", field, "Generator position is duplicated");
       checkLocationWorld(problems, arena, generator.location(), field + ".location");
     }

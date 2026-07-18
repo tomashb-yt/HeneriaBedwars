@@ -92,7 +92,13 @@ admin:
 arena:
   generator:
     title: "<aqua>Générateurs · <white>{arena_name} <gray>({generator_count})"
+    title-v8: "<aqua><bold>Minerais <dark_gray>• <white>{arena_name}"
     remove-title: "<red>Supprimer {generator_id} ?"
+    resource:
+      iron: "Fer"
+      gold: "Or"
+      diamond: "Diamant"
+      emerald: "Émeraude"
   runtime:
     creating: "<yellow>Préparation de l'arène <white>{arena_id}<yellow>..."
     joined: "<green>Vous avez rejoint l'arène <white>{arena_id}<green>. Instance : <white>{game_id}<green>."
@@ -326,12 +332,16 @@ game:
     countdown: "<yellow>Début : <white>{countdown} s"
     waiting: "<yellow>Joueurs insuffisants"
     footer: "<aqua>{footer}"
+    bed-alive: "<green><bold>✓ EN VIE"
+    bed-destroyed: "<red><bold>✗ DÉTRUIT"
   bed:
     own: "<red>Vous ne pouvez pas détruire votre propre lit."
     destroyed: "<red>Le lit de l'équipe <white>{team}<red> a été détruit par <white>{destroyer}<red> !"
     destroyer: "<green>Vous avez détruit le lit de l'équipe <white>{team}<green> !"
     victim-title: "<red><bold>LIT DÉTRUIT !"
     victim-subtitle: "<gray>Vous ne réapparaîtrez plus après votre prochaine mort."
+    victim-chat: "<red><bold>⚠ VOTRE LIT A ÉTÉ DÉTRUIT ! <reset><white>Vous ne réapparaîtrez plus."
+    victim-actionbar: "<red><bold>⚠ LIT DÉTRUIT — PROCHAINE MORT DÉFINITIVE ⚠"
   death:
     respawn: "<yellow>Vous êtes mort. Votre lit est vivant : réapparition en cours."
     final: "<red>Vous êtes définitivement éliminé."

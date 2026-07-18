@@ -6,11 +6,13 @@
 
 `menus.yml` ajoute `arena-editor.assistant-v5.generators-slot`. Les apparences `arena.editor.assistant-generators-v7` et `arena.generator.*-v7` sont fusionnées dans les installations existantes. Les anciennes arènes sans section `generators` restent valides avec une liste vide.
 
+Le correctif UX v8 ajoute de nouvelles clés d'items et de langue sans écraser les personnalisations v7. Le menu affiche les comptes par ressource, le monde attendu, un état vide guidé et le nombre de minerais regroupés sur chaque bloc. Plusieurs ressources différentes peuvent partager un point.
+
 La clé historique `generators.enabled` n'active ni ne désactive globalement le système : une arène produit uniquement les générateurs explicitement placés dans son assistant et uniquement pendant `PLAYING`.
 
 ## Gameplay Ticket 012
 
-`game.yml` ajoute les effets de lits, la politique `AT_DEATH`, le crédit de kill, la reconnexion désactivée et `game.ending.duration-seconds`. Le scoreboard possède désormais `game.scoreboard.playing.lines` avec `{team_name}`, `{remaining_teams}`, `{kills}` et `{beds_destroyed}`. Les délais de respawn et de protection continuent d'utiliser les valeurs typées historiques de `gameplay.yml`.
+`game.yml` ajoute les effets de lits, la politique `AT_DEATH`, le crédit de kill, la reconnexion désactivée et `game.ending.duration-seconds`. Le scoreboard v7 utilise les nouveaux blocs `waiting-v7.lines`, `starting-v7.lines` et `playing-v7.lines`, ainsi que `title-v7`, afin que les installations existantes reçoivent le nouveau design sans écraser leurs anciennes clés. Les placeholders de jeu incluent `{team_color}`, `{team_name}`, `{bed_status}`, `{remaining_teams}`, `{kills}` et `{beds_destroyed}`. Les délais de respawn et de protection continuent d'utiliser les valeurs typées historiques de `gameplay.yml`.
 
 Les nouvelles clés sont fusionnées au démarrage dans les installations existantes. Une ancienne équipe qui ne conserve que le pied du lit est considérée incomplète : ouvrir sa fiche et sélectionner de nouveau le lit enregistre les deux moitiés et la direction.
 

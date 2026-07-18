@@ -12,6 +12,8 @@ Une échéance due avance directement jusqu'à la première date future. Même a
 
 `ArenaGeneratorDefinition` persiste l'identifiant, la ressource, la position dans le monde modèle, le niveau, l'intervalle, la quantité, la capacité et l'empilement sous `generators.definitions` dans chaque fichier d'arène. L'assistant permet d'ajouter les quatre ressources à la position actuelle, de visiter un point, de le déplacer avec Shift+gauche et de le supprimer avec confirmation.
 
+L'unicité porte sur le couple ressource + bloc. Deux générateurs de fer ne peuvent pas occuper le même bloc, mais du fer et de l'or peuvent volontairement partager exactement le même point comme sur les cartes BedWars classiques. Le menu v8 sépare le guide, les quatre actions de placement et la liste des points; chaque entrée indique combien de minerais partagent son bloc.
+
 Quand le clone atteint `WAITING`, ses générateurs runtime sont enregistrés une seule fois. Le ticker global appelle ensuite le service chaque tick; seules les parties `PLAYING` produisent. L'adaptateur Bukkit remplace le monde modèle par le clone, fusionne les piles compatibles proches et crée les objets restants par piles valides.
 
 Les valeurs par défaut viennent de `generators.yml`. Modifier ces valeurs affecte les nouveaux générateurs; ceux déjà enregistrés conservent leur snapshot dans le YAML de l'arène.

@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Correctif Ticket 013 — points combinés, menu v8 et alertes de lit — 2026-07-18
+
+Le contrôle des positions distingue désormais la ressource du bloc : fer et or peuvent partager exactement les mêmes coordonnées, mais deux générateurs identiques au même bloc restent refusés. Le menu v8 organise le parcours en guide, quatre boutons de placement et liste de vérification; il affiche les comptes par ressource, le monde modèle et les regroupements sur un point.
+
+Le scoreboard v7 possède une hiérarchie visuelle plus compacte, applique la vraie couleur Minecraft de l'équipe et indique clairement si son lit est vivant ou détruit. Une destruction de lit déclenche immédiatement le rafraîchissement du scoreboard et avertit les membres concernés par le broadcast général, un message personnel dans le chat, un titre, une actionbar et un son.
+
+Validation : 187 tests automatisés réussis, sans échec, erreur ni test ignoré; build complet, Spotless et Shadow JAR validés. Les écrans et alertes restent à confirmer sur un serveur Paper réel.
+
 ## Ticket 013 — phase 2, générateurs configurables et drops — 2026-07-18
 
 Les arènes persistent désormais leurs générateurs fer, or, diamant et émeraude. L'assistant principal ouvre une vue dédiée : un administrateur se place dans le monde modèle pour ajouter un point, peut le visiter, le déplacer avec Shift+gauche ou le supprimer après confirmation. Toutes les mutations utilisent `ArenaService`, la sauvegarde atomique et la révision optimiste existantes.

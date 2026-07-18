@@ -251,10 +251,11 @@ public final class BukkitGameDisplayService {
     var team = game.team(event.teamId()).orElse(null);
     Player destroyer = Bukkit.getPlayer(event.destroyerId());
     if (team == null) return;
+    var teamSnapshot = team.snapshot();
     Map<String, Object> additions =
         Map.of(
             "team",
-            team.snapshot().displayName(),
+            coloredTeamName(teamSnapshot),
             "destroyer",
             destroyer == null ? "?" : destroyer.getName());
     broadcast(game, "game.bed.destroyed", additions);
@@ -269,8 +270,16 @@ public final class BukkitGameDisplayService {
           5,
           60,
           10);
+      player.sendMessage(message("game.bed.victim-chat", merge(values(game), additions)));
+      player
+          .spigot()
+          .sendMessage(
+              ChatMessageType.ACTION_BAR,
+              TextComponent.fromLegacyText(
+                  message("game.bed.victim-actionbar", merge(values(game), additions))));
       player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
     }
+    refresh(game);
   }
 
   private void onDeath(PlayerGameDeathEvent event) {
@@ -342,7 +351,7 @@ public final class BukkitGameDisplayService {
     if (game == null) return;
     String team =
         game.team(event.teamId())
-            .map(value -> value.snapshot().displayName())
+            .map(value -> coloredTeamName(value.snapshot()))
             .orElse(event.teamId());
     broadcast(game, "game.team.eliminated", Map.of("team", team));
   }
@@ -352,7 +361,7 @@ public final class BukkitGameDisplayService {
     if (game == null) return;
     String team =
         game.team(event.teamId())
-            .map(value -> value.snapshot().displayName())
+            .map(value -> coloredTeamName(value.snapshot()))
             .orElse(event.teamId());
     broadcast(game, "game.victory.broadcast", Map.of("team", team));
     for (UUID playerId : game.playerIds()) {
@@ -425,21 +434,26 @@ public final class BukkitGameDisplayService {
     Map<String, Object> values = new LinkedHashMap<>(values(game));
     var runtime = game.player(playerId).orElse(null);
     var snapshot = runtime == null ? null : runtime.snapshot(java.time.Instant.now());
-    String teamName =
+    var team =
         runtime == null
-            ? "-"
-            : runtime
-                .teamId()
-                .flatMap(game::team)
-                .map(team -> team.snapshot().displayName())
-                .orElse("-");
+            ? null
+            : runtime.teamId().flatMap(game::team).map(value -> value.snapshot()).orElse(null);
+    String teamName = team == null ? "-" : team.displayName();
     values.put("team_name", teamName);
+    values.put("team_color", team == null ? "§7" : teamColor(team.color()));
+    values.put(
+        "bed_status",
+        message(
+            team != null && team.bedAlive()
+                ? "game.scoreboard.bed-alive"
+                : "game.scoreboard.bed-destroyed",
+            Map.of()));
     values.put("kills", snapshot == null ? 0 : snapshot.kills());
     values.put("beds_destroyed", snapshot == null ? 0 : snapshot.bedsDestroyed());
     values.put(
         "remaining_teams",
         game.teams().stream()
-            .filter(team -> !team.playerIds().isEmpty() && !team.eliminated())
+            .filter(candidate -> !candidate.playerIds().isEmpty() && !candidate.eliminated())
             .count());
     return Map.copyOf(values);
   }
@@ -470,5 +484,27 @@ public final class BukkitGameDisplayService {
   private void removeBossBar(GameId gameId) {
     BossBar removed = bossBars.remove(gameId);
     if (removed != null) removed.removeAll();
+  }
+
+  static String teamColor(String color) {
+    return switch (color.toUpperCase(java.util.Locale.ROOT)) {
+      case "RED" -> "§c";
+      case "BLUE" -> "§9";
+      case "GREEN" -> "§2";
+      case "YELLOW" -> "§e";
+      case "AQUA" -> "§b";
+      case "WHITE" -> "§f";
+      case "PINK" -> "§d";
+      case "GRAY" -> "§7";
+      case "LIME" -> "§a";
+      case "ORANGE" -> "§6";
+      case "PURPLE" -> "§5";
+      case "BLACK" -> "§8";
+      default -> "§f";
+    };
+  }
+
+  private static String coloredTeamName(fr.heneria.bedwars.api.game.RuntimeTeamSnapshot team) {
+    return teamColor(team.color()) + team.displayName() + "§r";
   }
 }

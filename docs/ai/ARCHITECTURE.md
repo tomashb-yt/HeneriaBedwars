@@ -6,6 +6,8 @@ Le package `core.game.generator` contient les identifiants, ressources, règles 
 
 `ArenaGeneratorDefinition` est la source administrative persistée : sa position appartient au monde modèle. Au passage `GameWaitingEvent`, `BukkitGameGeneratorRegistry` copie les snapshots dans l'instance; les coordonnées sont ensuite appliquées au monde cloné par `BukkitGameGeneratorAdapter`. Aucune donnée runtime ne revient dans le YAML.
 
+La clé d'occupation administrative est `(GeneratorResource, ArenaBlockPosition)`. Cette règle autorise plusieurs ressources différentes au même point tout en empêchant le doublon accidentel d'une même ressource. La capacité runtime reste calculée séparément par matériau.
+
 `GameGeneratorService` ne crée aucune tâche. Le ticker Bukkit existant l'appelle une seule fois pour toutes les instances. Le service ignore les parties hors `PLAYING` ou sans monde actif, limite les émissions par passage et fait tourner son point de départ pour éviter qu'un générateur ne soit affamé. Une échéance très en retard produit au maximum une émission, puis saute directement à la prochaine date future. L'adaptateur compte et fusionne uniquement la ressource compatible dans un rayon borné, puis fractionne les nouveaux objets selon la taille maximale d'une pile Minecraft.
 
 ## Ticket 012 — lits et cycle d'élimination
