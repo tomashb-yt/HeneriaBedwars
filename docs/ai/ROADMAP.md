@@ -1,5 +1,9 @@
 # Roadmap
 
+## Correctif en validation — menus, PNJ et générateurs
+
+La fiche d'équipe est désormais organisée en trois colonnes stables (spawn, lit et boutique), avec uniquement les actions réellement disponibles. Les PNJ de boutique sont réparés au démarrage du gameplay et les anciennes configurations reçoivent le catalogue par défaut sans écrasement. Les générateurs centrent et immobilisent leurs propres drops, adaptent modérément leur rythme à la population et affichent le prochain diamant ou la prochaine émeraude par hologramme. Une validation Paper multijoueur reste requise avant de clore les Tickets 013 et 014.
+
 ## Correctif livré — assistant compact et import de monde
 
 La configuration essentielle d'une arène est regroupée dans une vue de cinq lignes avec accès direct aux équipes. Les cartes externes peuvent être déposées dans le dossier d'import propre à chaque modèle puis remplacées depuis le menu avec sauvegarde. Le prochain ticket gameplay reste inchangé; cette livraison améliore uniquement l'administration et le stockage des modèles.

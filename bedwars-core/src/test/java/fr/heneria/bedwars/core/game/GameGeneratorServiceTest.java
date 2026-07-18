@@ -12,6 +12,7 @@ import fr.heneria.bedwars.core.game.generator.GameGeneratorService;
 import fr.heneria.bedwars.core.game.generator.GeneratorCapacityView;
 import fr.heneria.bedwars.core.game.generator.GeneratorDefinition;
 import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.GeneratorPacingPolicy;
 import fr.heneria.bedwars.core.game.generator.GeneratorResource;
 import fr.heneria.bedwars.core.game.generator.GeneratorStackingStrategy;
 import fr.heneria.bedwars.core.map.MapId;
@@ -131,6 +132,19 @@ class GameGeneratorServiceTest {
           return 0;
         });
     assertEquals(1, probes.get());
+  }
+
+  @Test
+  void playingBoundaryResetsTheFirstDeadlineToThePopulationAdjustedInterval() {
+    GameInstance game = game(false, generator("iron", 1, 8));
+    for (int index = 0; index < 8; index++) game.addPlayer(UUID.randomUUID(), NOW);
+    Instant startedAt = NOW.plusSeconds(10);
+    start(game, startedAt);
+
+    game.paceGenerators(new GeneratorPacingPolicy(true, 0.85, 1.60), startedAt);
+
+    assertEquals(Duration.ofMillis(850), game.generators().getFirst().definition().interval());
+    assertEquals(startedAt.plusMillis(850), game.generators().getFirst().nextEmissionAt());
   }
 
   private static GameInstance game(boolean playing, GeneratorDefinition... generators) {

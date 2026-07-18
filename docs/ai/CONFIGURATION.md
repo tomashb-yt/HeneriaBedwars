@@ -6,6 +6,8 @@
 
 La position du PNJ est persistée dans `arenas/<id>.yml`, sous l'équipe concernée via la section `shop`. Le monde enregistré doit être le monde modèle de l'arène; au runtime seules les coordonnées et l'orientation sont remappées dans le clone.
 
+Depuis le correctif 013/014, un ancien `shops.yml` reçoit au redémarrage les clés embarquées absentes après sauvegarde de l'original. Une valeur déjà personnalisée, y compris `runtime-enabled`, n'est jamais remplacée.
+
 ## Ticket 013 — générateurs
 
 `generators.yml` définit `generators.merge-radius` et, pour `iron`, `gold`, `diamond` et `emerald`, le matériau Bukkit, l'intervalle en ticks, la quantité, la capacité locale et la stratégie d'empilement. Ces valeurs servent uniquement lors de l'ajout d'un nouveau point depuis l'assistant; le résultat complet est ensuite persisté dans `arenas/<id>.yml` sous `generators.definitions`.
@@ -15,6 +17,8 @@ La position du PNJ est persistée dans `arenas/<id>.yml`, sous l'équipe concern
 Le correctif UX v8 ajoute de nouvelles clés d'items et de langue sans écraser les personnalisations v7. Le menu affiche les comptes par ressource, le monde attendu, un état vide guidé et le nombre de minerais regroupés sur chaque bloc. Plusieurs ressources différentes peuvent partager un point.
 
 La clé historique `generators.enabled` n'active ni ne désactive globalement le système : une arène produit uniquement les générateurs explicitement placés dans son assistant et uniquement pendant `PLAYING`.
+
+`generators.pacing.enabled` active le rythme adaptatif. `minimum-factor` vaut `0.85` et limite l'accélération à 15 %; `maximum-factor` vaut `1.60` et limite le ralentissement à 60 %. Le facteur dépend du rapport entre équipes configurées et joueurs présents au début du gameplay. `generators.holograms.enabled` et `height` contrôlent les compteurs diamant/émeraude. Ces nouvelles clés sont fusionnées au redémarrage avec sauvegarde de l'ancien fichier.
 
 ## Gameplay Ticket 012
 

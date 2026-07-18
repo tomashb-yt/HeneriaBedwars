@@ -60,6 +60,25 @@ class GeneratorDefinitionTest {
     assertEquals(original.localCapacity(), upgraded.localCapacity());
   }
 
+  @Test
+  void populationPacingIsBoundedForSparseAndBusyGames() {
+    GeneratorDefinition base = definition("diamond");
+    GeneratorPacingPolicy policy = new GeneratorPacingPolicy(true, 0.85, 1.60);
+
+    assertEquals(Duration.ofSeconds(48), policy.adjust(base, 8, 1).interval());
+    assertEquals(Duration.ofSeconds(30), policy.adjust(base, 4, 4).interval());
+    assertEquals(Duration.ofMillis(25_500), policy.adjust(base, 2, 16).interval());
+    assertEquals(
+        base.interval(),
+        new GeneratorPacingPolicy(false, 0.85, 1.60).adjust(base, 8, 1).interval());
+  }
+
+  @Test
+  void populationPacingRejectsIncoherentBounds() {
+    assertThrows(IllegalArgumentException.class, () -> new GeneratorPacingPolicy(true, 0, 1));
+    assertThrows(IllegalArgumentException.class, () -> new GeneratorPacingPolicy(true, 2, 1));
+  }
+
   private static GeneratorDefinition definition(String id) {
     return new GeneratorDefinition(
         new GeneratorId(id),

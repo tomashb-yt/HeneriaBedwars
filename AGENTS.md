@@ -55,6 +55,8 @@ Le Ticket 012 représente un lit par deux coordonnées de bloc et garde son éta
 
 Le Ticket 014 persiste uniquement la position administrative du PNJ dans l'équipe. Les villageois sont recréés dans le clone et identifiés par PDC. Tout achat passe par `ShopPurchaseService` et un `ShopInventory` atomique : ne jamais retirer la monnaie avant d'avoir prouvé que le produit peut être ajouté, ni persister un inventaire runtime dans l'arène.
 
+Le correctif 013/014 ancre les drops de générateur au centre de leur bloc par PDC et une stabilisation centrale; ne jamais immobiliser un item joueur non identifié. Le rythme est recalculé une seule fois à la frontière `PLAYING` avec `GeneratorPacingPolicy`. Les hologrammes diamant/émeraude réutilisent le ticker central et l'échéance réelle de `RuntimeGenerator`, sans tâche individuelle.
+
 ## Règles architecturales
 
 - `bedwars-api` ne dépend ni de Paper, ni de `bedwars-core`, ni de `bedwars-plugin`.

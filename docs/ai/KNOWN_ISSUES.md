@@ -1,5 +1,11 @@
 # Limitations connues
 
+## Correctif générateurs et PNJ
+
+- Les `TextDisplay`, l'ancrage des items et la réparation des villageois doivent encore être confirmés visuellement sur Paper 1.21.x.
+- Le rythme est capturé au passage `PLAYING`; une déconnexion ultérieure ne recalcule pas les intervalles en cours afin de garder un calendrier stable.
+- Les hologrammes couvrent diamant et émeraude. Fer et or restent volontairement sans texte pour éviter de surcharger les bases.
+
 ## Ticket 014 — boutiques
 
 - Les PNJ, clics, menus et échanges d'inventaire doivent encore être validés sur un serveur Paper avec plusieurs joueurs.
@@ -11,7 +17,7 @@
 
 - Les positions, la persistance, l'assistant et les drops runtime sont disponibles, mais doivent encore être confirmés sur un serveur Paper avec une vraie carte clonée.
 - L'écran affiche au maximum quatorze générateurs par arène; une pagination sera nécessaire pour les cartes qui dépassent cette limite.
-- Hologrammes, particules, sons et améliorations automatiques de niveau restent dans les phases suivantes.
+- Particules, sons et améliorations automatiques de niveau restent dans les phases suivantes.
 
 ## Ticket 012 en validation
 

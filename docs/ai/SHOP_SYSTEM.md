@@ -8,6 +8,8 @@ Ouvrir `/bedwars`, choisir l'arène, puis une équipe. La zone **BOUTIQUE** perm
 
 Au passage de l'instance en `WAITING`, les positions du monde modèle sont remappées dans le clone `hbw_game_*`. Un villageois protégé est créé pour chaque position configurée. Il n'ouvre la boutique qu'à un membre vivant de la même instance en état `PLAYING`.
 
+Le PNJ est recréé au passage `PLAYING` afin de réparer une création anticipée ou un chunk non prêt. Son apparition ne dépend plus du nombre d'offres valides : un catalogue vide produit un menu indisponible, jamais la disparition silencieuse du villageois. Les anciennes installations reçoivent les offres manquantes dans `shops.yml` au redémarrage, avec sauvegarde et sans écraser leurs valeurs.
+
 Le menu expose quatre catégories : blocs, combat, distance et utilitaires. Chaque article affiche sa quantité, son prix, la monnaie et le solde du joueur. Après achat, la vue et le portefeuille sont rafraîchis.
 
 ## Catalogue

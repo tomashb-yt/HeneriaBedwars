@@ -4,6 +4,15 @@ generators:
   # Legacy compatibility key. Activation is controlled by generators configured per arena.
   enabled: true
   merge-radius: 1.5
+  pacing:
+    enabled: true
+    # 0.85 means a busy game is at most 15% faster than the configured base interval.
+    minimum-factor: 0.85
+    # Sparse large-team maps slow down progressively, capped at 60%.
+    maximum-factor: 1.60
+  holograms:
+    enabled: true
+    height: 2.35
   defaults:
     iron: {material: IRON_INGOT, interval-ticks: 20, amount: 1, local-capacity: 48, stacking: MERGE_NEARBY}
     gold: {material: GOLD_INGOT, interval-ticks: 160, amount: 1, local-capacity: 16, stacking: MERGE_NEARBY}

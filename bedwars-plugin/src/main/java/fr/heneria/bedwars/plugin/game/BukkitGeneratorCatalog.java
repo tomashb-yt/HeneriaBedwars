@@ -5,6 +5,7 @@ import fr.heneria.bedwars.core.arena.ArenaLocation;
 import fr.heneria.bedwars.core.config.ConfigurationDocument;
 import fr.heneria.bedwars.core.config.ConfigurationId;
 import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.GeneratorPacingPolicy;
 import fr.heneria.bedwars.core.game.generator.GeneratorResource;
 import fr.heneria.bedwars.core.game.generator.GeneratorStackingStrategy;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
@@ -29,7 +30,7 @@ public final class BukkitGeneratorCatalog {
     return new ArenaGeneratorDefinition(
         new GeneratorId(type + '-' + sequence),
         resource,
-        location,
+        centered(location),
         1,
         integer("generators.defaults." + type + ".interval-ticks", fallbackInterval(resource)),
         integer("generators.defaults." + type + ".amount", 1),
@@ -56,10 +57,36 @@ public final class BukkitGeneratorCatalog {
     return 1.5;
   }
 
+  public GeneratorPacingPolicy pacingPolicy() {
+    return new GeneratorPacingPolicy(
+        bool("generators.pacing.enabled", true),
+        decimal("generators.pacing.minimum-factor", 0.85, 0.5, 1.0),
+        decimal("generators.pacing.maximum-factor", 1.6, 1.0, 3.0));
+  }
+
+  public boolean hologramsEnabled() {
+    return bool("generators.holograms.enabled", true);
+  }
+
+  public double hologramHeight() {
+    return decimal("generators.holograms.height", 2.35, 1.0, 5.0);
+  }
+
   private int integer(String path, int fallback) {
     Object value = document().value(path);
     if (value instanceof Number number) return Math.max(1, number.intValue());
     return fallback;
+  }
+
+  private boolean bool(String path, boolean fallback) {
+    Object value = document().value(path);
+    return value instanceof Boolean bool ? bool : fallback;
+  }
+
+  private double decimal(String path, double fallback, double minimum, double maximum) {
+    Object value = document().value(path);
+    double resolved = value instanceof Number number ? number.doubleValue() : fallback;
+    return Math.max(minimum, Math.min(maximum, resolved));
   }
 
   private String string(String path, String fallback) {
@@ -82,6 +109,17 @@ public final class BukkitGeneratorCatalog {
 
   private static boolean contains(List<ArenaGeneratorDefinition> values, String id) {
     return values.stream().anyMatch(value -> value.id().value().equals(id));
+  }
+
+  private static ArenaLocation centered(ArenaLocation location) {
+    return new ArenaLocation(
+        location.world(),
+        new fr.heneria.bedwars.core.arena.ArenaVector(
+            Math.floor(location.position().x()) + 0.5,
+            location.position().y(),
+            Math.floor(location.position().z()) + 0.5),
+        location.yaw(),
+        location.pitch());
   }
 
   private static int fallbackInterval(GeneratorResource resource) {

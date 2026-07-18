@@ -261,13 +261,17 @@ class ConfigurationSystemTest {
   }
 
   @Test
-  void startupAddsTicket003DefaultsToExistingMenusAndLanguagesWithBackups() throws Exception {
+  void startupEvolvesGameplayCatalogsMenusItemsAndLanguagesWithBackups() throws Exception {
     installer(new TestLogger()).installMissing();
     replace("game.yml", "\n  ending:\n    duration-seconds: 10\n", "\n");
     replace("menus.yml", "navigation:\n  history-enabled: true\n  max-history-size: 20\n", "");
     Files.writeString(
         temporary.resolve("items.yml"),
         "config-version: 1\nitems:\n  menu-border:\n    material: GRAY_STAINED_GLASS_PANE\n    amount: 1\n");
+    Files.writeString(
+        temporary.resolve("shops.yml"), "config-version: 1\nshops:\n  enabled: false\n");
+    Files.writeString(
+        temporary.resolve("generators.yml"), "config-version: 1\ngenerators:\n  enabled: false\n");
     Path french = temporary.resolve("languages/fr_FR.yml");
     Path english = temporary.resolve("languages/en_US.yml");
     Files.writeString(french, Files.readString(french).replaceAll("(?ms)^gui:\\R.*\\z", ""));
@@ -288,6 +292,20 @@ class ConfigurationSystemTest {
     assertTrue(evolvedItems.contains("assistant-choice-loaded:"));
     assertTrue(evolvedItems.contains("entry-aqua-v6:"));
     assertTrue(evolvedItems.contains("guide-v6:"));
+    assertTrue(evolvedItems.contains("guide-v10:"));
+    String evolvedShops = Files.readString(temporary.resolve("shops.yml"));
+    assertTrue(evolvedShops.contains("runtime-enabled: true"));
+    assertTrue(evolvedShops.contains("wool:"));
+    String evolvedGenerators = Files.readString(temporary.resolve("generators.yml"));
+    assertTrue(evolvedGenerators.contains("pacing:"));
+    assertTrue(evolvedGenerators.contains("holograms:"));
+    assertEquals(
+        "WHITE_WOOL",
+        service
+            .snapshot()
+            .documents()
+            .get(ConfigurationId.SHOPS)
+            .value("shops.offers.wool.material"));
     assertTrue(Files.readString(french).contains("gui:"));
     assertTrue(Files.readString(english).contains("gui:"));
     assertTrue(Files.readString(french).contains("title-v2:"));
@@ -303,7 +321,7 @@ class ConfigurationSystemTest {
             .keys()
             .equals(service.snapshot().languages().get("en_US").keys()));
     try (var paths = Files.walk(temporary.resolve("backups"))) {
-      assertEquals(5, paths.filter(Files::isRegularFile).count());
+      assertEquals(7, paths.filter(Files::isRegularFile).count());
     }
   }
 

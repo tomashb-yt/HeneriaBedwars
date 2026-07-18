@@ -16,8 +16,12 @@ L'unicité porte sur le couple ressource + bloc. Deux générateurs de fer ne pe
 
 Quand le clone atteint `WAITING`, ses générateurs runtime sont enregistrés une seule fois. Le ticker global appelle ensuite le service chaque tick; seules les parties `PLAYING` produisent. L'adaptateur Bukkit remplace le monde modèle par le clone, fusionne les piles compatibles proches et crée les objets restants par piles valides.
 
+À l'entrée en `PLAYING`, `GeneratorPacingPolicy` recalcule l'intervalle depuis le nombre d'équipes configurées et de joueurs présents. Le facteur reste entre `0.85` et `1.60`; la première échéance repart de cet instant, donc un long lobby ne déclenche pas de drop immédiat.
+
+Chaque drop appartient à une partie et un générateur via PDC. Il apparaît au centre du bloc, sans gravité ni vitesse, et le ticker partagé le replace si un effet externe le déplace. Les objets jetés par les joueurs ne portent pas ces PDC et ne sont ni comptés, ni fusionnés, ni immobilisés. Les générateurs diamant et émeraude possèdent un `TextDisplay` indiquant leur niveau et le temps restant calculé depuis l'échéance réelle.
+
 Les valeurs par défaut viennent de `generators.yml`. Modifier ces valeurs affecte les nouveaux générateurs; ceux déjà enregistrés conservent leur snapshot dans le YAML de l'arène.
 
 ## Phase suivante
 
-Les hologrammes, particules, sons, niveaux automatiques et une éventuelle pagination au-delà de quatorze points restent à ajouter sans modifier le moteur d'échéances.
+Les particules, sons, niveaux automatiques et une éventuelle pagination au-delà de quatorze points restent à ajouter sans modifier le moteur d'échéances.

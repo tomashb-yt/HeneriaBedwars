@@ -4,6 +4,7 @@ import fr.heneria.bedwars.api.game.GameSnapshot;
 import fr.heneria.bedwars.api.game.GameState;
 import fr.heneria.bedwars.core.game.generator.GeneratorDefinition;
 import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.GeneratorPacingPolicy;
 import fr.heneria.bedwars.core.game.generator.RuntimeGenerator;
 import java.time.Instant;
 import java.util.Comparator;
@@ -166,6 +167,23 @@ public final class GameInstance {
 
   public synchronized java.util.List<RuntimeGenerator> generators() {
     return java.util.List.copyOf(generators.values());
+  }
+
+  /** Applies the final population-aware pace synchronously at the PLAYING boundary. */
+  public synchronized void paceGenerators(GeneratorPacingPolicy policy, Instant now) {
+    if (state != GameState.PLAYING)
+      throw new IllegalStateException("Generator pacing is applied when gameplay starts");
+    Objects.requireNonNull(policy, "policy");
+    Objects.requireNonNull(now, "now");
+    int teams = arena.definition().teams().size();
+    int players = playerIds().size();
+    generators
+        .values()
+        .forEach(
+            generator ->
+                generator.reconfigureBeforeFirstEmission(
+                    policy.adjust(generator.definition(), teams, players), now));
+    updatedAt = now;
   }
 
   synchronized BedDestroyResult destroyBed(

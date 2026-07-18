@@ -40,4 +40,16 @@ public record GeneratorDefinition(
         localCapacity,
         stackingStrategy);
   }
+
+  public GeneratorDefinition withInterval(Duration newInterval) {
+    return new GeneratorDefinition(
+        id,
+        resource,
+        location,
+        level,
+        newInterval,
+        amountPerEmission,
+        localCapacity,
+        stackingStrategy);
+  }
 }

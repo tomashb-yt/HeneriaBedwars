@@ -790,7 +790,7 @@ public final class ArenaEditorMenuFactory {
                         + team.color().name().toLowerCase(Locale.ROOT)
                         + "-v6",
                     values))
-            .rows(5)
+            .rows(6)
             .fillEmptySlots(true)
             .button(
                 4,
@@ -808,7 +808,7 @@ public final class ArenaEditorMenuFactory {
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
-                15,
+                13,
                 GuiButton.builder()
                     .itemKey(
                         team.bedDefinition().isPresent()
@@ -817,34 +817,28 @@ public final class ArenaEditorMenuFactory {
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
-                13,
-                GuiButton.builder()
-                    .itemKey("arena.teams.guide-v9")
-                    .itemPlaceholders(context -> values)
-                    .build())
-            .button(
-                19,
+                20,
                 action(
                     "arena.teams.set-spawn-v6",
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     values,
                     context -> setTeamSpawn(context, playerId, arena, team, expected)))
             .button(
-                23,
+                22,
                 action(
                     "arena.teams.set-bed-v6",
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     values,
                     context -> selectTeamBed(context, playerId, arena, team, expected)))
             .button(
-                28,
+                24,
                 action(
                     "arena.teams.set-shop-v9",
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     values,
                     context -> setTeamShop(context, playerId, arena, team, expected)))
             .button(
-                31,
+                15,
                 GuiButton.builder()
                     .itemKey(
                         team.shopLocation().isPresent()
@@ -853,23 +847,22 @@ public final class ArenaEditorMenuFactory {
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
-                36,
+                45,
                 GuiButton.builder()
                     .itemKey("gui.back")
                     .onLeftClick(context -> context.replace(editor(playerId, id)))
                     .build())
             .button(
-                40,
+                49,
                 GuiButton.builder()
-                    .itemKey("arena.teams.review")
+                    .itemKey("arena.teams.guide-v10")
                     .itemPlaceholders(context -> values)
-                    .onLeftClick(context -> context.open(validation(playerId, id)))
                     .build())
-            .button(44, standard.close());
+            .button(53, standard.close());
     if (team.spawn().isPresent()) {
       builder
           .button(
-              20,
+              29,
               action(
                   "arena.teams.teleport-spawn-v6",
                   AdministrativeCommandPolicy.ARENA_TELEPORT,
@@ -877,7 +870,7 @@ public final class ArenaEditorMenuFactory {
                   context ->
                       teleportTeamSpawn(context, playerId, team, team.spawn().orElseThrow())))
           .button(
-              21,
+              38,
               action(
                   "arena.teams.clear-spawn-v6",
                   AdministrativeCommandPolicy.ARENA_EDIT,
@@ -890,24 +883,11 @@ public final class ArenaEditorMenuFactory {
                           team.id(),
                           arenas.clearTeamSpawn(id, team.id(), expected),
                           "team-spawn-clear")));
-    } else
-      builder
-          .button(
-              20,
-              GuiButton.builder()
-                  .itemKey("arena.teams.teleport-spawn-disabled-v6")
-                  .itemPlaceholders(context -> values)
-                  .build())
-          .button(
-              21,
-              GuiButton.builder()
-                  .itemKey("arena.teams.clear-spawn-disabled-v6")
-                  .itemPlaceholders(context -> values)
-                  .build());
+    }
     if (team.bedDefinition().isPresent()) {
       builder
           .button(
-              24,
+              31,
               action(
                   "arena.teams.teleport-bed-v6",
                   AdministrativeCommandPolicy.ARENA_TELEPORT,
@@ -915,7 +895,7 @@ public final class ArenaEditorMenuFactory {
                   context ->
                       teleportBed(context, playerId, team, team.bedLocation().orElseThrow())))
           .button(
-              25,
+              40,
               action(
                   "arena.teams.clear-bed-v6",
                   AdministrativeCommandPolicy.ARENA_EDIT,
@@ -928,31 +908,18 @@ public final class ArenaEditorMenuFactory {
                           team.id(),
                           arenas.clearTeamBed(id, team.id(), expected),
                           "team-bed-clear")));
-    } else
-      builder
-          .button(
-              24,
-              GuiButton.builder()
-                  .itemKey("arena.teams.teleport-bed-disabled-v6")
-                  .itemPlaceholders(context -> values)
-                  .build())
-          .button(
-              25,
-              GuiButton.builder()
-                  .itemKey("arena.teams.clear-bed-disabled-v6")
-                  .itemPlaceholders(context -> values)
-                  .build());
+    }
     if (team.shopLocation().isPresent())
       builder
           .button(
-              30,
+              33,
               action(
                   "arena.teams.teleport-shop-v9",
                   AdministrativeCommandPolicy.ARENA_TELEPORT,
                   values,
                   context -> teleport(context, playerId, team.shopLocation().orElseThrow())))
           .button(
-              32,
+              42,
               action(
                   "arena.teams.clear-shop-v9",
                   AdministrativeCommandPolicy.ARENA_EDIT,
@@ -965,20 +932,7 @@ public final class ArenaEditorMenuFactory {
                           team.id(),
                           arenas.clearTeamShop(id, team.id(), expected),
                           "team-shop-clear")));
-    else
-      builder
-          .button(
-              30,
-              GuiButton.builder()
-                  .itemKey("arena.teams.teleport-shop-disabled-v9")
-                  .itemPlaceholders(context -> values)
-                  .build())
-          .button(
-              32,
-              GuiButton.builder()
-                  .itemKey("arena.teams.clear-shop-disabled-v9")
-                  .itemPlaceholders(context -> values)
-                  .build());
+
     return builder.build();
   }
 

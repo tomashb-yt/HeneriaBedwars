@@ -4,7 +4,9 @@ import fr.heneria.bedwars.core.game.GameDeathService;
 import fr.heneria.bedwars.core.game.GameId;
 import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.game.GameRespawnService;
+import fr.heneria.bedwars.core.game.event.GameDestroyEvent;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
+import fr.heneria.bedwars.core.game.event.GameStartEvent;
 import fr.heneria.bedwars.core.game.event.GameVictoryEvent;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
 import fr.heneria.bedwars.core.game.generator.GameGeneratorService;
@@ -38,6 +40,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
   private final BukkitGameGeneratorRegistry generatorRegistry;
   private final GameGeneratorService generators;
   private final BukkitGameGeneratorAdapter generatorAdapter;
+  private final BukkitGeneratorHologramService generatorHolograms;
   private final BukkitShopNpcService shops;
   private final BukkitShopListener shopListener;
   private final GameDeathService deaths;
@@ -65,6 +68,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
       BukkitGameGeneratorRegistry generatorRegistry,
       GameGeneratorService generators,
       BukkitGameGeneratorAdapter generatorAdapter,
+      BukkitGeneratorHologramService generatorHolograms,
       BukkitShopNpcService shops,
       BukkitShopListener shopListener,
       GameDeathService deaths,
@@ -84,6 +88,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     this.generatorRegistry = generatorRegistry;
     this.generators = generators;
     this.generatorAdapter = generatorAdapter;
+    this.generatorHolograms = generatorHolograms;
     this.shops = shops;
     this.shopListener = shopListener;
     this.deaths = deaths;
@@ -118,6 +123,17 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
                                 generatorRegistry.initialize(game);
                                 shops.initialize(game);
                               });
+                    if (event instanceof GameStartEvent started)
+                      games
+                          .find(started.gameId())
+                          .ifPresent(
+                              game -> {
+                                generatorRegistry.activate(game);
+                                shops.initialize(game);
+                                generatorHolograms.initialize(game, started.occurredAt());
+                              });
+                    if (event instanceof GameDestroyEvent destroyed)
+                      generatorHolograms.remove(destroyed.gameId());
                     if (event instanceof GameVictoryEvent victory)
                       endingDeadlines.put(
                           victory.gameId(),
@@ -143,6 +159,8 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     HandlerList.unregisterAll(shopListener);
     lobby.shutdown();
     displays.clear();
+    generatorHolograms.clear();
+    generatorAdapter.clear();
     games.destroyAll("plugin-stop");
     closeSubscription();
     events.clear();
@@ -183,10 +201,12 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
         .tick(games.all(), java.time.Instant.now(), generatorAdapter)
         .emissions()
         .forEach(generatorAdapter::emit);
+    if (ticks % 5 == 0) generatorAdapter.stabilize();
     if (ticks % 20 == 0) {
       lobby.tick();
       respawns.tick();
       finishEndedGames();
+      generatorHolograms.refresh(games.all(), java.time.Instant.now());
     }
     int refresh = configurations.snapshot().game().scoreboardRefreshTicks();
     if (ticks % refresh == 0)

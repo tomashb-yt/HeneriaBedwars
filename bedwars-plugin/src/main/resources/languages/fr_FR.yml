@@ -630,6 +630,10 @@ map:
     association: "<red>Impossible de modifier l'association."
     invalid-world: "<red>Placez-vous dans le monde <white>{world_name}<red>."
     teleport: "<red>La téléportation a échoué."
+generator:
+  hologram:
+    diamond: "<aqua><bold>GÉNÉRATEUR DE DIAMANT</bold>\n<gray>Niveau <white>{level}\n<white>Prochain minerai : <aqua>{seconds}s"
+    emerald: "<green><bold>GÉNÉRATEUR D'ÉMERAUDE</bold>\n<gray>Niveau <white>{level}\n<white>Prochain minerai : <green>{seconds}s"
 shop:
   npc:
     name: "<gold><bold>Boutique <gray>• <white>{team}"

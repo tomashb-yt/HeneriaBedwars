@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Correctif runtime générateurs et boutiques
+
+`ConfigurationDefaultsUpdater` fait évoluer `shops.yml` et `generators.yml` comme les autres ressources versionnées, avec sauvegarde et sans remplacement des valeurs existantes. `BukkitShopNpcService` ne conditionne plus l'existence physique du PNJ au nombre d'offres valides et répare les PNJ à `GameStartEvent` après chargement explicite du chunk.
+
+`GeneratorPacingPolicy` applique à la frontière `PLAYING` un facteur `sqrt(équipes/joueurs)` borné par la configuration. `BukkitGameGeneratorAdapter` marque chaque drop par partie/générateur, ne fusionne que ces entités, les centre et les stabilise depuis le ticker partagé. `BukkitGeneratorHologramService` maintient les `TextDisplay` diamant/émeraude une fois par seconde à partir de `RuntimeGenerator.nextEmissionAt`; aucune tâche par générateur n'est créée.
+
 ## Ticket 014 — boutiques et achats runtime
 
 `core.game.shop` contient le catalogue immuable, les offres, monnaies, catégories et `ShopPurchaseService`. Ce service vérifie l'appartenance, l'état `PLAYING`, le statut spectateur, le solde et la capacité avant de demander un échange atomique au port `ShopInventory`; un succès publie `ShopPurchaseEvent` sur le bus Java interne.

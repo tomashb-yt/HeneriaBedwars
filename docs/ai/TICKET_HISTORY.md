@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Correctif Tickets 013–014 — menus, PNJ, rythme et hologrammes — 2026-07-18
+
+Après validation en jeu, la fiche d'équipe a été reconstruite sur six lignes avec trois colonnes stables spawn/lit/boutique. Les boutons suivent état, définir, visiter, retirer; les actions impossibles ne remplissent plus l'écran de barrières. La cause des PNJ absents était l'ancien `shops.yml`, qui ne faisait pas partie des fichiers évolutifs : il est maintenant sauvegardé puis complété sans écrasement, et le PNJ est créé indépendamment du catalogue puis réparé au démarrage.
+
+Les drops sont centrés sur le bloc, marqués par PDC, privés de gravité et stabilisés par la boucle globale. Les items joueurs restent intacts. Le rythme utilise un facteur borné équipes/joueurs au passage `PLAYING`; diamant et émeraude affichent un hologramme dont le compteur lit directement la prochaine échéance runtime.
+
+Validation : 193 tests automatisés réussis, aucun échec ni erreur; build complet, Spotless et Shadow JAR validés. L'apparition réelle des PNJ, l'immobilité des drops et le rendu des hologrammes restent à confirmer sur Paper.
+
 ## Ticket 014 — PNJ de boutique et achats d'objets — 2026-07-18
 
 La fiche d'équipe possède désormais une troisième zone guidée pour définir, visiter ou retirer la position de sa boutique. Cette donnée suit `ArenaService`, la révision optimiste et le YAML de l'arène. Lors de l'initialisation du clone, le plugin crée un villageois invulnérable et sans IA, lié à la partie et à l'équipe par PDC.

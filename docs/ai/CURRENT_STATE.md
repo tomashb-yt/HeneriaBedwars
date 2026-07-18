@@ -1,5 +1,15 @@
 # État actuel
 
+## Correctif Tickets 013–014 — validation Paper
+
+- fiche d'équipe en trois colonnes lisibles, sans barrières d'actions indisponibles;
+- migration non destructive des anciens `shops.yml` et `generators.yml` au redémarrage;
+- PNJ de boutique créés en attente puis réparés à l'entrée en `PLAYING`, indépendamment du nombre d'offres valides;
+- drops de générateur centrés, sans gravité, ancrés et isolés des items jetés par les joueurs;
+- rythme calculé selon équipes configurées et joueurs présents, avec accélération maximale de 15 % et ralentissement maximal de 60 %;
+- hologrammes diamant/émeraude affichant niveau et secondes avant la prochaine émission réelle.
+- validation automatisée complète : 193 tests réussis, build, formatage et Shadow JAR validés; contrôle visuel Paper encore requis.
+
 ## Ticket 014 — boutiques et achats en validation
 
 - emplacement et orientation de la boutique configurables dans la fiche de chaque équipe;

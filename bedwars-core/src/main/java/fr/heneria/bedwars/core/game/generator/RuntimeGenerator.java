@@ -9,7 +9,7 @@ import java.util.function.IntSupplier;
 
 /** Mutable match-scoped schedule for one immutable generator definition. */
 public final class RuntimeGenerator {
-  private final GeneratorDefinition definition;
+  private GeneratorDefinition definition;
   private Instant nextEmissionAt;
   private long emissions;
   private long capacityBlocks;
@@ -34,6 +34,17 @@ public final class RuntimeGenerator {
 
   public synchronized long capacityBlocks() {
     return capacityBlocks;
+  }
+
+  public synchronized void reconfigureBeforeFirstEmission(GeneratorDefinition value, Instant now) {
+    Objects.requireNonNull(value, "value");
+    Objects.requireNonNull(now, "now");
+    if (!definition.id().equals(value.id()))
+      throw new IllegalArgumentException("Generator id cannot change at runtime");
+    if (emissions != 0)
+      throw new IllegalStateException("Generator pacing is locked after its first emission");
+    definition = value;
+    nextEmissionAt = now.plus(value.interval());
   }
 
   synchronized GeneratorPollResult poll(

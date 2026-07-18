@@ -583,6 +583,10 @@ map:
     association: "<red>Could not update the association."
     invalid-world: "<red>Stand inside world <white>{world_name}<red>."
     teleport: "<red>Teleport failed."
+generator:
+  hologram:
+    diamond: "<aqua><bold>DIAMOND GENERATOR</bold>\n<gray>Tier <white>{level}\n<white>Next resource: <aqua>{seconds}s"
+    emerald: "<green><bold>EMERALD GENERATOR</bold>\n<gray>Tier <white>{level}\n<white>Next resource: <green>{seconds}s"
 shop:
   npc:
     name: "<gold><bold>Item Shop <gray>• <white>{team}"

@@ -1,5 +1,11 @@
 # Tests
 
+## Correctif Tickets 013–014
+
+La suite couvre désormais les bornes du rythme adaptatif, sa désactivation, le recalage de la première échéance à `PLAYING` et l'évolution d'anciens `shops.yml`/`generators.yml` avec sauvegardes. La matrice Paper doit confirmer la fiche en trois colonnes, les PNJ réparés, les drops immobiles et les compteurs holographiques synchronisés.
+
+La validation complète contient 193 tests automatisés réussis, sans échec ni erreur. `clean build test shadowJar spotlessCheck` et la production du JAR déployable passent.
+
 ## Ticket 014 — boutiques et achats
 
 La suite complète contient 190 tests automatisés réussis, sans échec, erreur ni test ignoré. Les nouveaux scénarios vérifient la position de boutique via `ArenaService`, sa suppression et son round-trip YAML, un achat réussi avec événement interne, et les refus sans échange lorsque le solde ou la place manquent. Le test de configuration recharge aussi `shops.yml`, `items.yml` et la parité FR/EN.

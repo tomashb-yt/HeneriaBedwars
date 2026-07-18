@@ -41,6 +41,7 @@ import fr.heneria.bedwars.plugin.game.BukkitGameGeneratorAdapter;
 import fr.heneria.bedwars.plugin.game.BukkitGameGeneratorRegistry;
 import fr.heneria.bedwars.plugin.game.BukkitGamePlayListener;
 import fr.heneria.bedwars.plugin.game.BukkitGeneratorCatalog;
+import fr.heneria.bedwars.plugin.game.BukkitGeneratorHologramService;
 import fr.heneria.bedwars.plugin.game.BukkitPlayerSnapshotService;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimePlayerGateway;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimeWorldService;
@@ -208,16 +209,20 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       CombatTracker combatTracker = new CombatTracker();
       BukkitGameBedRegistry runtimeBeds = new BukkitGameBedRegistry(projectLogger);
       BukkitGeneratorCatalog generatorCatalog = new BukkitGeneratorCatalog(configurations);
-      BukkitGameGeneratorRegistry runtimeGenerators = new BukkitGameGeneratorRegistry();
+      BukkitGameGeneratorRegistry runtimeGenerators =
+          new BukkitGameGeneratorRegistry(generatorCatalog);
       GameGeneratorService gameGenerators = new GameGeneratorService(64);
       BukkitGameGeneratorAdapter generatorAdapter =
-          new BukkitGameGeneratorAdapter(gameService, generatorCatalog);
+          new BukkitGameGeneratorAdapter(this, gameService, generatorCatalog);
+      BukkitGeneratorHologramService generatorHolograms =
+          new BukkitGeneratorHologramService(this, configurations, generatorCatalog);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       BukkitShopCatalog shopCatalog = new BukkitShopCatalog(configurations, projectLogger);
       ShopPurchaseService shopPurchases = new ShopPurchaseService(gameService, gameEvents, clock);
       ShopMenuFactory shopMenus =
           new ShopMenuFactory(gameService, configurations, shopCatalog, shopPurchases);
-      BukkitShopNpcService shopNpcs = new BukkitShopNpcService(this, configurations, shopCatalog);
+      BukkitShopNpcService shopNpcs =
+          new BukkitShopNpcService(this, configurations, shopCatalog, projectLogger);
       BukkitShopListener shopListener =
           new BukkitShopListener(gameService, configurations, shopNpcs, guiService, shopMenus);
       BukkitGameDisplayService gameDisplays =
@@ -342,6 +347,7 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   runtimeGenerators,
                   gameGenerators,
                   generatorAdapter,
+                  generatorHolograms,
                   shopNpcs,
                   shopListener,
                   gameDeaths,

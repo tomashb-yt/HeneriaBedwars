@@ -62,6 +62,12 @@ public final class BukkitShopCatalog {
     return new ShopCatalog(offers);
   }
 
+  public boolean enabled() {
+    ConfigurationDocument document =
+        configurations.snapshot().documents().get(ConfigurationId.SHOPS);
+    return bool(document, "shops.runtime-enabled", true);
+  }
+
   private static String string(ConfigurationDocument document, String key, String fallback) {
     Object value = document.value(key);
     return value == null ? fallback : String.valueOf(value).trim();

@@ -1,5 +1,13 @@
 # Décisions d'architecture
 
+## ADR-085 à ADR-089 — Stabilisation générateurs et réparation des PNJ
+
+- **ADR-085** — `shops.yml` et `generators.yml` rejoignent l'évolution non destructive des ressources version 1; les personnalisations existantes restent prioritaires.
+- **ADR-086** — Un PNJ configuré existe même avec un catalogue vide; l'indisponibilité des offres appartient au menu, pas au cycle de vie de l'entité.
+- **ADR-087** — Seuls les items portant l'identité PDC de leur partie et générateur peuvent être fusionnés, ancrés ou comptés dans la capacité.
+- **ADR-088** — Le facteur de rythme est capturé à `PLAYING`, borné entre `minimum-factor` et `maximum-factor`, puis la première échéance repart de cet instant.
+- **ADR-089** — Les hologrammes sont des `TextDisplay` runtime actualisés par le ticker central depuis l'échéance métier; aucune tâche ou horloge parallèle n'est autorisée.
+
 ## ADR-080 à ADR-084 — Boutiques runtime
 
 Accepté pour le Ticket 014.
