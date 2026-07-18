@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État Ticket 013 phase 1 du 2026-07-18 : `GeneratorDefinition` capture ressource, position runtime, niveau, intervalle, quantité, capacité locale et stratégie d'empilement. `GameGeneratorService` parcourt uniquement les instances `PLAYING` dont le monde est actif, applique un budget équitable et ne produit jamais une rafale de rattrapage. La persistance des positions, les drops Bukkit et l'assistant graphique appartiennent à la phase suivante.
+
 État Ticket 012 du 2026-07-18 : le clone runtime indexe les deux blocs de chaque lit. Un ennemi peut le détruire une seule fois; le propriétaire est bloqué. `GameDeathService` décide respawn ou mort finale, `GameRespawnService` utilise le ticker central, puis la dernière équipe active déclenche `ENDING` et le nettoyage différé. Le code et les tests automatisés sont disponibles; la validation Paper multijoueur reste obligatoire avant de déclarer le ticket définitivement terminé.
 
 État correctif runtime/équipes du 2026-07-17 : les cartes et titres d'équipe respectent leur couleur, la fiche est organisée en deux colonnes fixes spawn/lit et tous les retours sont localisés. Quand le countdown atteint `PLAYING`, chaque joueur est déplacé au spawn de son équipe dans le clone runtime. Ce déplacement lance la phase de partie mais n'active encore aucune mécanique de lit, mort, victoire, générateur ou boutique.

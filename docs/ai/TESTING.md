@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 013 — phase 1
+
+Neuf scénarios purs couvrent identifiants sûrs, règles bornées, upgrade immutable, activation limitée à `PLAYING`, absence de rattrapage en rafale, capacité locale lue seulement à échéance, budget global équitable et refus des enregistrements dupliqués ou tardifs. Aucun test ne prétend créer un item Bukkit : ce raccordement appartient à la phase suivante.
+
+La suite complète contient 183 tests automatisés réussis, sans échec, erreur ni test ignoré.
+
 ## Ticket 012 — phase automatisée
 
 La suite complète contient 174 tests automatisés réussis, sans échec, erreur ni test ignoré. Les nouveaux scénarios couvrent persistance pied/tête/direction, adjacency, index des deux blocs, protection du lit allié, double destruction, crédit unique, respawn centralisé, protection temporaire, mort finale, final kill, élimination, victoire et `ENDING`. La matrice Paper reste obligatoire pour les vrais événements de lit, mort immédiate, inventaires spectateur, titres, scoreboard et nettoyage multijoueur.

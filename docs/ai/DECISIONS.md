@@ -1,5 +1,14 @@
 # Décisions d'architecture
 
+## ADR-071 à ADR-074 — Fondation des générateurs
+
+Accepté pour la phase 1 du Ticket 013.
+
+- **ADR-071** — Une partie capture des `GeneratorDefinition` immuables; seul leur calendrier et leurs compteurs sont runtime.
+- **ADR-072** — Aucun générateur ne possède de tâche : un coordinateur global traite les échéances des instances actives.
+- **ADR-073** — Une échéance en retard émet au maximum une fois et saute les intervalles passés afin d'interdire les rafales de rattrapage.
+- **ADR-074** — La capacité locale vient d'un port de lecture plateforme; un budget global avec rotation garantit une charge bornée et équitable.
+
 ## ADR-062 à ADR-070 — Gameplay des lits
 
 Accepté pour la phase de validation Ticket 012.

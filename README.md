@@ -10,6 +10,8 @@ HeneriaBedWars est un plugin BedWars expérimental pour Spigot/Paper 1.21.x, dé
 
 Le moteur d'instances clone une carte, assigne les équipes et exécute maintenant le premier cycle BedWars : lits ennemis, mort avec respawn, mort finale, élimination et victoire provisoire. Cette livraison reste expérimentale tant que la matrice complète n'a pas été validée sur un serveur Paper réel.
 
+La fondation du Ticket 013 définit également les ressources et le calendrier centralisé des futurs générateurs. Elle ne crée pas encore d'items dans le monde et ne propose pas encore leur configuration en menu.
+
 ## Prérequis et compilation
 
 - JDK 21 ;
@@ -46,7 +48,7 @@ Au premier démarrage, le plugin crée les dix YAML principaux, `languages/fr_FR
 
 `/bedwars map` ouvre l'éditeur guidé des cartes modèles. La bibliothèque propose filtres, tri et création simple ou avancée. Une carte peut ensuite être ouverte et visitée, renommée, typée, réglée, liée à une arène, validée, sauvegardée, archivée, dupliquée ou supprimée avec les protections nécessaires. Le point d'arrivée et l'état « changements à sauvegarder » sont visibles directement. Les commandes détaillées restent disponibles pour l'administration avancée. Les dossiers `instances/game-<UUID>/` contiennent désormais les manifestes temporaires du moteur de parties. Voir [docs/ai/WORLD_SYSTEM.md](docs/ai/WORLD_SYSTEM.md).
 
-Les définitions administratives d'arènes sont stockées dans `arenas/<id>.yml`. `/bedwars setup`, `/bedwars arena` et `/bedwars arena menu` ouvrent l'éditeur complet : création par chat privé, filtres et tri, monde, positions, capacités, équipes générales, limites, validation, activation et suppression sauvegardée. Chaque modification est sauvegardée automatiquement et protégée par une révision contre les écrasements entre administrateurs. Une définition activée peut maintenant produire une instance technique isolée, mais pas encore une partie jouable : équipes BedWars configurables, lits, générateurs et matchmaking restent à venir.
+Les définitions administratives d'arènes sont stockées dans `arenas/<id>.yml`. `/bedwars setup`, `/bedwars arena` et `/bedwars arena menu` ouvrent l'éditeur complet : création par chat privé, filtres et tri, monde, positions, capacités, équipes générales, limites, validation, activation et suppression sauvegardée. Chaque modification est sauvegardée automatiquement et protégée par une révision contre les écrasements entre administrateurs. Une définition activée produit une instance jouable expérimentale avec équipes, lits, respawns et victoire; générateurs visibles, boutiques et matchmaking restent à venir.
 
 Le framework interne de menus est disponible via `/bedwars gui` ou `/hbw gui` avec `heneriabedwars.admin.gui`. Il démontre navigation, pagination, confirmation, rafraîchissement et protection des inventaires, sans fonctionnalité BedWars.
 

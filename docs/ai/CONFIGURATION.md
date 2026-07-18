@@ -1,5 +1,9 @@
 # Configuration
 
+## Ticket 013 — phase 1
+
+Cette phase n'ajoute volontairement aucune clé YAML. Les valeurs testées sont portées par des snapshots `GeneratorDefinition`; leur schéma persistant et leurs valeurs par défaut seront ajoutés avec l'éditeur administratif afin d'éviter une configuration temporaire incompatible.
+
 ## Gameplay Ticket 012
 
 `game.yml` ajoute les effets de lits, la politique `AT_DEATH`, le crédit de kill, la reconnexion désactivée et `game.ending.duration-seconds`. Le scoreboard possède désormais `game.scoreboard.playing.lines` avec `{team_name}`, `{remaining_teams}`, `{kills}` et `{beds_destroyed}`. Les délais de respawn et de protection continuent d'utiliser les valeurs typées historiques de `gameplay.yml`.

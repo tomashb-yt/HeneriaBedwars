@@ -4,6 +4,8 @@
 
 HeneriaBedWars est un plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Le Ticket 012 est en validation : lits runtime, morts, respawns, éliminations et victoire provisoire sont implémentés, mais le parcours complet doit encore être confirmé sur Paper.
 
+Le Ticket 013 a commencé par sa fondation Java pure : définitions runtime de générateurs, ressources, capacités locales et coordinateur d'échéances global borné. Aucun drop Bukkit ni réglage administratif de générateur n'est livré par cette première phase.
+
 Le correctif de préparation du Ticket 012 rend les équipes, leurs spawns et leurs lits configurables depuis une fiche GUI. Le lit administratif est sélectionné en regardant un vrai lit complet dans le monde modèle; sa partie pied est persistée. Cela ne signifie pas que la destruction, la mort ou la réapparition runtime du Ticket 012 sont terminées.
 
 Le correctif 010.1 réserve `/bedwars` sans argument au tableau de bord administratif avec `heneriabedwars.admin.dashboard`. Les seules actions joueur actuelles sont `game join` et `game leave`, protégées par `heneriabedwars.game.*`. Les items runtime portent `runtime_item` et `runtime_game_id` dans leur PDC et passent par `GameLobbyService`. Le scoreboard d'attente utilise des sessions personnelles stables; ne pas recréer ses objectifs à chaque rafraîchissement.

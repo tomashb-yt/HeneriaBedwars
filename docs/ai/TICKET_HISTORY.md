@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 013 — phase 1, moteur pur des générateurs — 2026-07-18
+
+Ajout de `GeneratorId`, des quatre ressources standard, des stratégies d'empilement et de `GeneratorDefinition`. Chaque `GameInstance` peut enregistrer avant le début ses `RuntimeGenerator`, dont les échéances et compteurs restent strictement dans le scope de la partie.
+
+`GameGeneratorService` parcourt toutes les parties actives depuis un appel central, refuse les mondes absents, respecte la capacité locale fournie par un port, plafonne les émissions et fait tourner le premier générateur visité. Les longues pauses sautent les échéances anciennes après une seule émission. Cette phase ne contient volontairement ni YAML, ni GUI, ni drop Bukkit.
+
+Validation : 183 tests automatisés réussis, 0 échec, 0 erreur et 0 test ignoré; build propre, Spotless, `git diff --check` et Shadow JAR contrôlés. Neuf scénarios sont propres au moteur de générateurs.
+
 ## Ticket 012 — première implémentation lits, respawns et éliminations — 2026-07-18
 
 Le modèle administratif enregistre désormais les deux blocs et la direction d'un lit tout en détectant les anciennes sélections incomplètes. Le clone vérifie physiquement ces blocs et construit un index O(1). La destruction ennemie est atomique, le lit allié et les autres blocs de carte restent protégés, et les explosions ne peuvent supprimer silencieusement un lit.

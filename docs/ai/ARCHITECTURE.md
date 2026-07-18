@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 013 — phase 1 des générateurs
+
+Le package `core.game.generator` contient les identifiants, ressources, règles immuables, échéances runtime et rapports de tick. `GameInstance` possède les `RuntimeGenerator` de son scope; ils ne sont ni globaux, ni persistés comme état vivant.
+
+`GameGeneratorService` ne crée aucune tâche. Le ticker de plateforme l'appellera une seule fois pour toutes les instances. Le service ignore les parties hors `PLAYING` ou sans monde actif, limite les émissions par passage et fait tourner son point de départ pour éviter qu'un générateur ne soit affamé. Une échéance très en retard produit au maximum une émission, puis saute directement à la prochaine date future.
+
 ## Ticket 012 — lits et cycle d'élimination
 
 `ArenaBedDefinition` décrit pied, tête et direction sans Bukkit; la position historique du pied reste lisible pour migration. `BukkitGameBedRegistry` vérifie les blocs du clone et remplit l'index O(1) de `GameInstance`. `GameBedService`, `GameDeathService`, `GameRespawnService` et `CombatTracker` portent les décisions pures. `BukkitGamePlayListener` adapte uniquement les événements de blocs, dégâts, mort, respawn et spectateur.

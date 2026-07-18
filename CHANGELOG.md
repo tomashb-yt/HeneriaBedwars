@@ -6,6 +6,7 @@ Toutes les évolutions importantes sont consignées ici selon une structure insp
 
 ### Added
 
+- Ticket 013, phase 1 : modèle pur des générateurs de ressources, calendrier sans tâche individuelle, capacité locale, anti-rattrapage en rafale et budget global équitable.
 - Ticket 012, première livraison jouable : lits persistants à deux blocs, index runtime, destruction ennemie atomique, protection du lit allié, morts, respawns centralisés, protection temporaire, morts finales, éliminations et victoire provisoire.
 - Scoreboard `PLAYING`, messages FR/EN, spectateur définitif avec téléporteur simple et item de sortie, puis nettoyage automatique de l'instance après la victoire.
 

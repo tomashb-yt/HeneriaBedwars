@@ -1,15 +1,20 @@
 # Limitations connues
 
+## Ticket 013 — phase 1
+
+- Le coordinateur et les règles sont disponibles uniquement dans le cœur pur; ils ne sont pas encore câblés au ticker Bukkit.
+- Les positions ne sont pas encore enregistrées dans les YAML d'arène et aucun item ressource n'est créé dans le clone.
+- Hologrammes, particules, sons, niveaux automatiques et configuration GUI restent dans les phases suivantes.
+
 ## Ticket 012 en validation
 
 - Les anciennes sélections de lit à un seul bloc doivent être refaites depuis la fiche d'équipe.
 - Le téléporteur spectateur suit actuellement le premier joueur actif; une liste graphique complète reste une amélioration ultérieure.
 - La reconnexion en `PLAYING` n'est pas prise en charge : une déconnexion est une élimination définitive.
 - La validation automatisée ne remplace pas un test Paper à deux comptes des événements de mort, respawn, destruction et fin.
-- Générateurs, boutiques, économie, équipement final, récompenses et PvP 1.8 complet restent absents.
+- Les générateurs visibles restent absents malgré leur fondation métier; boutiques, économie, équipement final, récompenses et PvP 1.8 complet restent absents.
 
 - La téléportation d'équipe au passage `PLAYING` est couverte par la résolution métier et la compilation Bukkit, mais doit encore être confirmée avec plusieurs joueurs sur un serveur Paper réel.
-- Après le positionnement, aucune mécanique BedWars active n'est encore livrée : lits destructibles, réapparitions, éliminations, victoire, générateurs et boutiques restent absents.
 
 ## Import de cartes externes
 
@@ -20,7 +25,7 @@
 ## Préparation Ticket 012 — configuration des équipes
 
 - La sélection GUI doit encore être validée sur Paper : l'administrateur doit être dans le monde modèle, regarder un lit complet à moins de huit blocs avant de cliquer sur « Sélectionner le lit regardé ».
-- La définition persistante conserve actuellement le bloc pied normalisé du lit. La destruction runtime, les réapparitions, les éliminations et la victoire du Ticket 012 ne sont pas encore implémentées.
+- La définition persistante conserve le pied historique ainsi que la tête et la direction dans ses métadonnées compatibles; les anciennes sélections à un bloc doivent être refaites.
 - Huit équipes au maximum sont affichées dans la vue compacte actuelle; les formats supérieurs restent persistables mais nécessiteront une pagination du menu.
 
 ## Correctif Ticket 010.1

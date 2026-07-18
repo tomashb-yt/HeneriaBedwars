@@ -1,5 +1,13 @@
 # État actuel
 
+## Ticket 013 — fondation des générateurs en cours
+
+- ressources `IRON`, `GOLD`, `DIAMOND` et `EMERALD` indépendantes de Bukkit;
+- définition runtime immuable avec niveau, intervalle, quantité, capacité et empilement;
+- état par `GameInstance`, calendrier déterministe et métriques d'émission/blocage;
+- coordinateur global borné avec rotation équitable et sans tâche par générateur;
+- aucun drop réel, hologramme, son, persistance YAML ou menu dans cette première phase.
+
 ## Ticket 012 — implémentation en validation
 
 - sélection administrative enregistrant pied, tête et direction du lit;
@@ -28,7 +36,7 @@
 - remplacement de monde BedWars depuis le menu, sauvegarde préalable, copie asynchrone, rollback et rechargement;
 - tests automatisés dédiés au stockage et au cycle d'import; validation Paper réelle encore requise.
 
-- Dernier ticket terminé : Ticket 011. Le Ticket 012 reste en cours et ne doit pas être considéré comme livré.
+- Dernier ticket terminé : Ticket 011. Le Ticket 012 reste en validation Paper et le Ticket 013 a commencé côté cœur pur.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 

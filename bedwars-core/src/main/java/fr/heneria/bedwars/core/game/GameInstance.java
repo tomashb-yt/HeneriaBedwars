@@ -2,6 +2,9 @@ package fr.heneria.bedwars.core.game;
 
 import fr.heneria.bedwars.api.game.GameSnapshot;
 import fr.heneria.bedwars.api.game.GameState;
+import fr.heneria.bedwars.core.game.generator.GeneratorDefinition;
+import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.RuntimeGenerator;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -12,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-/** One isolated live match scaffold. It intentionally contains no BedWars mechanics yet. */
+/** One isolated live match and its strictly match-scoped runtime state. */
 public final class GameInstance {
   private static final Map<GameState, Set<GameState>> TRANSITIONS = transitions();
 
@@ -25,6 +28,7 @@ public final class GameInstance {
   private final Map<String, Long> statistics = new LinkedHashMap<>();
   private final Map<RuntimeBlockPosition, RuntimeBed> bedIndex = new LinkedHashMap<>();
   private final Map<String, RuntimeBed> bedsByTeam = new LinkedHashMap<>();
+  private final Map<GeneratorId, RuntimeGenerator> generators = new LinkedHashMap<>();
   private GameState state = GameState.CREATING;
   private RuntimeWorldHandle world;
   private Instant updatedAt;
@@ -142,6 +146,26 @@ public final class GameInstance {
     boolean configured =
         arena.definition().teams().stream().allMatch(team -> team.bedDefinition().isPresent());
     return !configured || bedIndex.size() == teams.size() * 2;
+  }
+
+  /** Registers a generator snapshot before gameplay starts. */
+  public synchronized void registerGenerator(GeneratorDefinition definition, Instant now) {
+    if (state != GameState.CREATING && state != GameState.WAITING)
+      throw new IllegalStateException("Generators can only be registered before gameplay");
+    Objects.requireNonNull(definition, "definition");
+    RuntimeGenerator generator =
+        new RuntimeGenerator(definition, Objects.requireNonNull(now, "now"));
+    if (generators.putIfAbsent(definition.id(), generator) != null)
+      throw new IllegalStateException("Generator already registered: " + definition.id());
+    updatedAt = now;
+  }
+
+  public synchronized Optional<RuntimeGenerator> generator(GeneratorId id) {
+    return Optional.ofNullable(generators.get(Objects.requireNonNull(id, "id")));
+  }
+
+  public synchronized java.util.List<RuntimeGenerator> generators() {
+    return java.util.List.copyOf(generators.values());
   }
 
   synchronized BedDestroyResult destroyBed(
