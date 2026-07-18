@@ -14,6 +14,7 @@ import fr.heneria.bedwars.core.game.GameInstanceManager;
 import fr.heneria.bedwars.core.game.GameRespawnService;
 import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
+import fr.heneria.bedwars.core.game.generator.GameGeneratorService;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.gui.TextInputManager;
 import fr.heneria.bedwars.core.map.MapId;
@@ -35,7 +36,10 @@ import fr.heneria.bedwars.plugin.command.BedWarsCommand;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
 import fr.heneria.bedwars.plugin.game.BukkitGameBedRegistry;
 import fr.heneria.bedwars.plugin.game.BukkitGameDisplayService;
+import fr.heneria.bedwars.plugin.game.BukkitGameGeneratorAdapter;
+import fr.heneria.bedwars.plugin.game.BukkitGameGeneratorRegistry;
 import fr.heneria.bedwars.plugin.game.BukkitGamePlayListener;
+import fr.heneria.bedwars.plugin.game.BukkitGeneratorCatalog;
 import fr.heneria.bedwars.plugin.game.BukkitPlayerSnapshotService;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimePlayerGateway;
 import fr.heneria.bedwars.plugin.game.BukkitRuntimeWorldService;
@@ -198,6 +202,11 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               () -> configurations.snapshot().gameplay().respawnProtectionSeconds());
       CombatTracker combatTracker = new CombatTracker();
       BukkitGameBedRegistry runtimeBeds = new BukkitGameBedRegistry(projectLogger);
+      BukkitGeneratorCatalog generatorCatalog = new BukkitGeneratorCatalog(configurations);
+      BukkitGameGeneratorRegistry runtimeGenerators = new BukkitGameGeneratorRegistry();
+      GameGeneratorService gameGenerators = new GameGeneratorService(64);
+      BukkitGameGeneratorAdapter generatorAdapter =
+          new BukkitGameGeneratorAdapter(gameService, generatorCatalog);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
       BukkitGameDisplayService gameDisplays =
           new BukkitGameDisplayService(
@@ -287,7 +296,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               mapMenus,
               gameService,
               gameLobby,
-              runtimeGameMenus);
+              runtimeGameMenus,
+              generatorCatalog);
       arenaEditorReference.set(arenaEditor);
       bootstrap =
           new BedWarsBootstrap(
@@ -317,6 +327,9 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   waitingListener,
                   playListener,
                   runtimeBeds,
+                  runtimeGenerators,
+                  gameGenerators,
+                  generatorAdapter,
                   gameDeaths,
                   gameRespawns,
                   runtimePlayers,

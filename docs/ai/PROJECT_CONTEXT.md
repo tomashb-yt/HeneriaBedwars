@@ -1,6 +1,6 @@
 # Contexte du projet
 
-État Ticket 013 phase 1 du 2026-07-18 : `GeneratorDefinition` capture ressource, position runtime, niveau, intervalle, quantité, capacité locale et stratégie d'empilement. `GameGeneratorService` parcourt uniquement les instances `PLAYING` dont le monde est actif, applique un budget équitable et ne produit jamais une rafale de rattrapage. La persistance des positions, les drops Bukkit et l'assistant graphique appartiennent à la phase suivante.
+État Ticket 013 phase 2 du 2026-07-18 : les générateurs fer, or, diamant et émeraude sont placés depuis l'assistant d'arène, persistés dans `arenas/<id>.yml`, remappés vers le clone puis activés uniquement en `PLAYING`. Le ticker central utilise `GameGeneratorService`; l'adaptateur Bukkit compte les items proches, fusionne les piles et crée les drops sans tâche par générateur. Les hologrammes, sons, particules et améliorations de niveau restent futurs.
 
 État Ticket 012 du 2026-07-18 : le clone runtime indexe les deux blocs de chaque lit. Un ennemi peut le détruire une seule fois; le propriétaire est bloqué. `GameDeathService` décide respawn ou mort finale, `GameRespawnService` utilise le ticker central, puis la dernière équipe active déclenche `ENDING` et le nettoyage différé. Le code et les tests automatisés sont disponibles; la validation Paper multijoueur reste obligatoire avant de déclarer le ticket définitivement terminé.
 

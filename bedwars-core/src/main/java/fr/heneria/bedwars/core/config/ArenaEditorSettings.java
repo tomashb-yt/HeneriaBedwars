@@ -17,6 +17,7 @@ public record ArenaEditorSettings(
     int waitingSlot,
     int spectatorSlot,
     int teamsSlot,
+    int generatorsSlot,
     List<Integer> teamSlots,
     int validationSlot,
     int enableSlot,

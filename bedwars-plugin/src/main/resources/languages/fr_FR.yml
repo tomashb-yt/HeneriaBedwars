@@ -90,6 +90,9 @@ admin:
     lobby: "<gray>Lobby - prochain ticket"
     close: "<red>Fermer"
 arena:
+  generator:
+    title: "<aqua>Générateurs · <white>{arena_name} <gray>({generator_count})"
+    remove-title: "<red>Supprimer {generator_id} ?"
   runtime:
     creating: "<yellow>Préparation de l'arène <white>{arena_id}<yellow>..."
     joined: "<green>Vous avez rejoint l'arène <white>{arena_id}<green>. Instance : <white>{game_id}<green>."

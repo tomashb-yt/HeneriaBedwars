@@ -293,6 +293,7 @@ items:
       assistant-waiting-v5: {material: CLOCK, name: "<gold><bold>Spawn d'attente", lore: ["<gray>Les joueurs attendent ici avant", "<gray>le démarrage de la partie.", "", "<yellow>Gauche : placer ici", "<aqua>Droit : téléporter", "<red>Shift+droit : retirer"]}
       assistant-spectator-v5: {material: ENDER_EYE, name: "<aqua><bold>Spawn spectateur", lore: ["<gray>Point d'arrivée après élimination.", "", "<yellow>Gauche : placer ici", "<aqua>Droit : téléporter", "<red>Shift+droit : retirer"]}
       assistant-teams-v5: {material: WHITE_BANNER, name: "<light_purple><bold>Format des équipes", lore: ["<gray>Format : <white>{team_count} × {players_per_team}", "<gray>Capacité : <white>{capacity} joueurs", "", "<yellow>▸ Modifier le nombre et la taille", "<gray>Les équipes colorées sont juste dessous."]}
+      assistant-generators-v7: {material: DIAMOND, glow: true, name: "<aqua><bold>Générateurs de minerais", lore: ["<gray>Positions configurées : <white>{generator_count}", "", "<yellow>▸ Ajouter, déplacer ou vérifier", "<gray>les spawns de ressources"]}
       assistant-review-v5: {material: ORANGE_CONCRETE, name: "<gold><bold>Configuration à terminer", lore: ["<red>{validation_errors} erreur(s)", "<yellow>{validation_warnings} conseil(s)", "", "<white>{next_step}", "<yellow>▸ Voir les actions requises"]}
       assistant-review-ready-v5: {material: LIME_CONCRETE, glow: true, name: "<green><bold>Configuration complète", lore: ["<gray>La carte, les spawns et les équipes", "<gray>sont correctement configurés.", "", "<yellow>▸ Voir le récapitulatif"]}
       assistant-activation-ready-v5: {material: LIME_DYE, name: "<green><bold>Activer l'arène", lore: ["<gray>Rend cette arène disponible", "<gray>dans la sélection des parties.", "", "<yellow>▸ Cliquez pour confirmer"]}
@@ -369,6 +370,19 @@ items:
       teleport-bed-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>LIT • Visite indisponible", lore: ["<gray>Sélectionnez d'abord le lit."]}
       clear-bed-disabled-v6: {material: GRAY_DYE, name: "<dark_gray>LIT • Rien à retirer", lore: ["<gray>Sélectionnez d'abord le lit."]}
       review: {material: WRITABLE_BOOK, name: "<gold>Vérifier l'arène", lore: ["<gray>Problèmes restants : <white>{validation_errors}", "", "<yellow>▸ Cliquez pour ouvrir le diagnostic"]}
+    generator:
+      guide-v7: {material: NETHER_STAR, glow: true, name: "<aqua><bold>Générateurs de ressources", lore: ["<gray>Configurés : <white>{generator_count}", "", "<yellow>1. Placez-vous au point voulu", "<yellow>2. Cliquez sur une ressource", "<yellow>3. Vérifiez-la dans la liste"]}
+      add:
+        iron-v7: {material: IRON_INGOT, name: "<white><bold>Ajouter un générateur de fer", lore: ["<gray>Utilise votre position actuelle.", "", "<yellow>▸ Cliquez pour placer"]}
+        gold-v7: {material: GOLD_INGOT, name: "<gold><bold>Ajouter un générateur d'or", lore: ["<gray>Utilise votre position actuelle.", "", "<yellow>▸ Cliquez pour placer"]}
+        diamond-v7: {material: DIAMOND, name: "<aqua><bold>Ajouter un générateur de diamant", lore: ["<gray>Utilise votre position actuelle.", "", "<yellow>▸ Cliquez pour placer"]}
+        emerald-v7: {material: EMERALD, name: "<green><bold>Ajouter un générateur d'émeraude", lore: ["<gray>Utilise votre position actuelle.", "", "<yellow>▸ Cliquez pour placer"]}
+      entry:
+        iron-v7: &generator-entry-v7 {material: IRON_INGOT, name: "<white><bold>{generator_id}", lore: ["<gray>Ressource : <white>{generator_resource}", "<gray>Niveau : <white>{generator_level}", "<gray>Intervalle : <white>{generator_interval}s", "<gray>Capacité : <white>{generator_capacity}", "", "<gray>{generator_world}", "<white>X {generator_x}  Y {generator_y}  Z {generator_z}", "", "<aqua>Gauche : visiter", "<yellow>Shift+gauche : déplacer ici", "<red>Droit : supprimer"]}
+        gold-v7: {<<: *generator-entry-v7, material: GOLD_INGOT, name: "<gold><bold>{generator_id}"}
+        diamond-v7: {<<: *generator-entry-v7, material: DIAMOND, name: "<aqua><bold>{generator_id}"}
+        emerald-v7: {<<: *generator-entry-v7, material: EMERALD, name: "<green><bold>{generator_id}"}
+      remove-v7: {material: BARRIER, name: "<red><bold>Supprimer {generator_id}", lore: ["<gray>Le générateur ne produira plus", "<gray>de ressources dans cette arène.", "", "<red>▸ Confirmez pour supprimer"]}
     boundary:
       minimum: {material: BLUE_CONCRETE, name: "<blue>Definir le minimum", lore: ["<gray>Configure: <white>{minimum_configured}"]}
       maximum: {material: RED_CONCRETE, name: "<red>Definir le maximum", lore: ["<gray>Configure: <white>{maximum_configured}"]}

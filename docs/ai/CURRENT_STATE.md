@@ -1,12 +1,15 @@
 # État actuel
 
-## Ticket 013 — fondation des générateurs en cours
+## Ticket 013 — générateurs configurables en validation
 
 - ressources `IRON`, `GOLD`, `DIAMOND` et `EMERALD` indépendantes de Bukkit;
 - définition runtime immuable avec niveau, intervalle, quantité, capacité et empilement;
 - état par `GameInstance`, calendrier déterministe et métriques d'émission/blocage;
 - coordinateur global borné avec rotation équitable et sans tâche par générateur;
-- aucun drop réel, hologramme, son, persistance YAML ou menu dans cette première phase.
+- positions administratives persistées dans chaque YAML d'arène et conservées par révision optimiste;
+- assistant graphique pour ajouter, visiter, déplacer ou supprimer les quatre ressources;
+- initialisation dans le clone et drops Bukkit uniquement pendant `PLAYING`, avec capacité locale et fusion des piles;
+- validation Paper réelle encore requise; hologrammes, sons, particules et niveaux automatiques restent futurs.
 
 ## Ticket 012 — implémentation en validation
 
@@ -104,9 +107,9 @@
 
 ## Non disponible
 
-Le cycle automatisé du Ticket 012 est implémenté mais reste en validation Paper multijoueur. Les générateurs actifs, boutiques, PNJ, achats, améliorations, reconnexion, base de données, resource pack et PlaceholderAPI ne sont pas encore disponibles.
+Le cycle automatisé du Ticket 012 et les générateurs du Ticket 013 sont implémentés mais restent en validation Paper multijoueur. Les boutiques, PNJ, achats, améliorations, reconnexion, base de données, resource pack et PlaceholderAPI ne sont pas encore disponibles.
 
-Les 174 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
+Les 186 tests automatisés passent, sans échec, erreur ni test ignoré. Aucun serveur Minecraft n'est disponible dans l'environnement Codex pour certifier les tests en jeu.
 ## Ticket 011 - livraison initiale
 
 Les arènes portent désormais des définitions d'équipes immuables et persistantes (identifiant, nom, couleur, ordre, capacité et spawn). Les anciens YAML à base de `teams.count` et `teams.players-per-team` sont relus avec des équipes générées déterministes, sans perdre la définition; les spawns restent à renseigner avant validation complète.

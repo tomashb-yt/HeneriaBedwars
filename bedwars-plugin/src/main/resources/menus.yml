@@ -44,6 +44,7 @@ arena-editor:
     waiting-slot: 12
     spectator-slot: 14
     teams-slot: 16
+    generators-slot: 28
     team-slots: [19, 20, 21, 22, 23, 24, 25, 31]
     validation-slot: 40
     enable-slot: 38

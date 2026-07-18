@@ -55,6 +55,7 @@ public final class ArenaValidator {
         && arena.maximumPlayers() != arena.teamCount() * arena.playersPerTeam())
       error(problems, "capacity-mismatch", "players.maximum", "Maximum must equal team capacity");
     validateTeams(problems, arena);
+    validateGenerators(problems, arena);
     if (arena.waitingLocation().isEmpty())
       error(problems, "missing-waiting", "locations.waiting", "Waiting location is missing");
     checkLocationWorld(problems, arena, arena.waitingLocation().orElse(null), "locations.waiting");
@@ -160,6 +161,19 @@ public final class ArenaValidator {
           "team-capacity-mismatch",
           "teams.definitions",
           "Team capacities must equal maximum players");
+  }
+
+  private static void validateGenerators(List<ArenaProblem> problems, ArenaDefinition arena) {
+    var ids = new HashSet<fr.heneria.bedwars.core.game.generator.GeneratorId>();
+    var blocks = new HashSet<ArenaBlockPosition>();
+    for (ArenaGeneratorDefinition generator : arena.generators()) {
+      String field = "generators." + generator.id().value();
+      if (!ids.add(generator.id()))
+        error(problems, "generator-id-duplicate", field, "Generator id is duplicated");
+      if (!blocks.add(ArenaBlockPosition.from(generator.location())))
+        error(problems, "generator-position-duplicate", field, "Generator position is duplicated");
+      checkLocationWorld(problems, arena, generator.location(), field + ".location");
+    }
   }
 
   private void validateMapTemplate(List<ArenaProblem> problems, ArenaDefinition arena) {

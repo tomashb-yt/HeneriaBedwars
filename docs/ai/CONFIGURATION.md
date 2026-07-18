@@ -1,8 +1,12 @@
 # Configuration
 
-## Ticket 013 — phase 1
+## Ticket 013 — générateurs
 
-Cette phase n'ajoute volontairement aucune clé YAML. Les valeurs testées sont portées par des snapshots `GeneratorDefinition`; leur schéma persistant et leurs valeurs par défaut seront ajoutés avec l'éditeur administratif afin d'éviter une configuration temporaire incompatible.
+`generators.yml` définit `generators.merge-radius` et, pour `iron`, `gold`, `diamond` et `emerald`, le matériau Bukkit, l'intervalle en ticks, la quantité, la capacité locale et la stratégie d'empilement. Ces valeurs servent uniquement lors de l'ajout d'un nouveau point depuis l'assistant; le résultat complet est ensuite persisté dans `arenas/<id>.yml` sous `generators.definitions`.
+
+`menus.yml` ajoute `arena-editor.assistant-v5.generators-slot`. Les apparences `arena.editor.assistant-generators-v7` et `arena.generator.*-v7` sont fusionnées dans les installations existantes. Les anciennes arènes sans section `generators` restent valides avec une liste vide.
+
+La clé historique `generators.enabled` n'active ni ne désactive globalement le système : une arène produit uniquement les générateurs explicitement placés dans son assistant et uniquement pendant `PLAYING`.
 
 ## Gameplay Ticket 012
 

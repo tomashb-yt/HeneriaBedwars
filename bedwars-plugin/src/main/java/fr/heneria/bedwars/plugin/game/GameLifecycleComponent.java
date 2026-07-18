@@ -7,6 +7,7 @@ import fr.heneria.bedwars.core.game.GameRespawnService;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.event.GameVictoryEvent;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
+import fr.heneria.bedwars.core.game.generator.GameGeneratorService;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
@@ -32,6 +33,9 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
   private final GameWaitingListener waitingListener;
   private final BukkitGamePlayListener playListener;
   private final BukkitGameBedRegistry beds;
+  private final BukkitGameGeneratorRegistry generatorRegistry;
+  private final GameGeneratorService generators;
+  private final BukkitGameGeneratorAdapter generatorAdapter;
   private final GameDeathService deaths;
   private final GameRespawnService respawns;
   private final BukkitRuntimePlayerGateway players;
@@ -54,6 +58,9 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
       GameWaitingListener waitingListener,
       BukkitGamePlayListener playListener,
       BukkitGameBedRegistry beds,
+      BukkitGameGeneratorRegistry generatorRegistry,
+      GameGeneratorService generators,
+      BukkitGameGeneratorAdapter generatorAdapter,
       GameDeathService deaths,
       GameRespawnService respawns,
       BukkitRuntimePlayerGateway players,
@@ -68,6 +75,9 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     this.waitingListener = waitingListener;
     this.playListener = playListener;
     this.beds = beds;
+    this.generatorRegistry = generatorRegistry;
+    this.generators = generators;
+    this.generatorAdapter = generatorAdapter;
     this.deaths = deaths;
     this.respawns = respawns;
     this.players = players;
@@ -91,7 +101,13 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
               Runnable action =
                   () -> {
                     if (event instanceof GameWaitingEvent waiting)
-                      games.find(waiting.gameId()).ifPresent(beds::initialize);
+                      games
+                          .find(waiting.gameId())
+                          .ifPresent(
+                              game -> {
+                                beds.initialize(game);
+                                generatorRegistry.initialize(game);
+                              });
                     if (event instanceof GameVictoryEvent victory)
                       endingDeadlines.put(
                           victory.gameId(),
@@ -152,6 +168,10 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
 
   private void tick() {
     ticks++;
+    generators
+        .tick(games.all(), java.time.Instant.now(), generatorAdapter)
+        .emissions()
+        .forEach(generatorAdapter::emit);
     if (ticks % 20 == 0) {
       lobby.tick();
       respawns.tick();

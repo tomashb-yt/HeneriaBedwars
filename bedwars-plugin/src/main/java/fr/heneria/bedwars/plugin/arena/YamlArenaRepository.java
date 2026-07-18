@@ -2,6 +2,7 @@ package fr.heneria.bedwars.plugin.arena;
 
 import fr.heneria.bedwars.core.arena.ArenaBoundary;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
+import fr.heneria.bedwars.core.arena.ArenaGeneratorDefinition;
 import fr.heneria.bedwars.core.arena.ArenaId;
 import fr.heneria.bedwars.core.arena.ArenaLoadResult;
 import fr.heneria.bedwars.core.arena.ArenaLocation;
@@ -12,6 +13,9 @@ import fr.heneria.bedwars.core.arena.ArenaTeamDefinition;
 import fr.heneria.bedwars.core.arena.ArenaVector;
 import fr.heneria.bedwars.core.arena.TeamColor;
 import fr.heneria.bedwars.core.arena.TeamId;
+import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.GeneratorResource;
+import fr.heneria.bedwars.core.game.generator.GeneratorStackingStrategy;
 import fr.heneria.bedwars.plugin.config.SafeYamlWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -131,7 +135,8 @@ public final class YamlArenaRepository implements ArenaRepository {
         location(yaml.getConfigurationSection("locations.spectator")),
         boundary(yaml.getConfigurationSection("boundary")),
         new ArenaMetadata(created, updated, attributes),
-        teams(yaml.getConfigurationSection("teams.definitions")));
+        teams(yaml.getConfigurationSection("teams.definitions")),
+        generators(yaml.getConfigurationSection("generators.definitions")));
   }
 
   private static String serialize(ArenaDefinition arena) {
@@ -161,6 +166,16 @@ public final class YamlArenaRepository implements ArenaRepository {
       team.upgradeShopLocation()
           .ifPresent(location -> setLocation(yaml, prefix + ".upgrade-shop", location));
       team.metadata().forEach((key, value) -> yaml.set(prefix + ".metadata." + key, value));
+    }
+    for (ArenaGeneratorDefinition generator : arena.generators()) {
+      String prefix = "generators.definitions." + generator.id().value();
+      yaml.set(prefix + ".resource", generator.resource().name());
+      setLocation(yaml, prefix + ".location", generator.location());
+      yaml.set(prefix + ".level", generator.level());
+      yaml.set(prefix + ".interval-ticks", generator.intervalTicks());
+      yaml.set(prefix + ".amount", generator.amountPerEmission());
+      yaml.set(prefix + ".local-capacity", generator.localCapacity());
+      yaml.set(prefix + ".stacking", generator.stackingStrategy().name());
     }
     arena.waitingLocation().ifPresent(location -> setLocation(yaml, "locations.waiting", location));
     arena
@@ -232,6 +247,29 @@ public final class YamlArenaRepository implements ArenaRepository {
               metadata));
     }
     return List.copyOf(teams);
+  }
+
+  private static List<ArenaGeneratorDefinition> generators(ConfigurationSection section) {
+    if (section == null) return List.of();
+    List<ArenaGeneratorDefinition> generators = new ArrayList<>();
+    for (String rawId : section.getKeys(false)) {
+      ConfigurationSection value = section.getConfigurationSection(rawId);
+      if (value == null) throw new IllegalArgumentException("Invalid generator " + rawId);
+      generators.add(
+          new ArenaGeneratorDefinition(
+              new GeneratorId(rawId),
+              GeneratorResource.valueOf(
+                  requiredString(value, "resource").toUpperCase(java.util.Locale.ROOT)),
+              location(value.getConfigurationSection("location"))
+                  .orElseThrow(() -> new IllegalArgumentException("Missing generator location")),
+              value.getInt("level", 1),
+              value.getLong("interval-ticks"),
+              value.getInt("amount", 1),
+              value.getInt("local-capacity", 48),
+              GeneratorStackingStrategy.valueOf(
+                  value.getString("stacking", "MERGE_NEARBY").toUpperCase(java.util.Locale.ROOT))));
+    }
+    return List.copyOf(generators);
   }
 
   private static Optional<ArenaBoundary> boundary(ConfigurationSection section) {

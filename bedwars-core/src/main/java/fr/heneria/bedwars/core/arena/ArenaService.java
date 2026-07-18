@@ -324,6 +324,66 @@ public final class ArenaService {
         rawId, teamId, expectedRevision, team -> team.withBedDefinition(Optional.empty()));
   }
 
+  public synchronized ArenaOperationResult addGenerator(
+      String rawId, ArenaGeneratorDefinition generator, long expectedRevision) {
+    Objects.requireNonNull(generator, "generator");
+    ArenaDefinition current = find(rawId).orElse(null);
+    if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
+    if (conflict(current, expectedRevision)) return conflict(current);
+    if (current.generators().stream().anyMatch(value -> value.id().equals(generator.id())))
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "Generator id already exists");
+    if (current.generators().stream()
+        .anyMatch(value -> sameBlock(value.location(), generator.location())))
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "Generator position already used");
+    List<ArenaGeneratorDefinition> next = new java.util.ArrayList<>(current.generators());
+    next.add(generator);
+    return edit(
+        rawId, expectedRevision, arena -> arena.withGenerators(next, editStatus(arena), now()));
+  }
+
+  public synchronized ArenaOperationResult moveGenerator(
+      String rawId,
+      fr.heneria.bedwars.core.game.generator.GeneratorId generatorId,
+      ArenaLocation location,
+      long expectedRevision) {
+    Objects.requireNonNull(generatorId, "generatorId");
+    Objects.requireNonNull(location, "location");
+    ArenaDefinition current = find(rawId).orElse(null);
+    if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
+    if (conflict(current, expectedRevision)) return conflict(current);
+    if (current.generators().stream().noneMatch(value -> value.id().equals(generatorId)))
+      return ArenaOperationResult.failure(ArenaOperationCode.INVALID_ARGUMENT, "Unknown generator");
+    if (current.generators().stream()
+        .filter(value -> !value.id().equals(generatorId))
+        .anyMatch(value -> sameBlock(value.location(), location)))
+      return ArenaOperationResult.failure(
+          ArenaOperationCode.INVALID_ARGUMENT, "Generator position already used");
+    List<ArenaGeneratorDefinition> next =
+        current.generators().stream()
+            .map(value -> value.id().equals(generatorId) ? value.at(location) : value)
+            .toList();
+    return edit(
+        rawId, expectedRevision, arena -> arena.withGenerators(next, editStatus(arena), now()));
+  }
+
+  public synchronized ArenaOperationResult removeGenerator(
+      String rawId,
+      fr.heneria.bedwars.core.game.generator.GeneratorId generatorId,
+      long expectedRevision) {
+    Objects.requireNonNull(generatorId, "generatorId");
+    ArenaDefinition current = find(rawId).orElse(null);
+    if (current == null) return ArenaOperationResult.failure(ArenaOperationCode.NOT_FOUND, rawId);
+    if (conflict(current, expectedRevision)) return conflict(current);
+    List<ArenaGeneratorDefinition> next =
+        current.generators().stream().filter(value -> !value.id().equals(generatorId)).toList();
+    if (next.size() == current.generators().size())
+      return ArenaOperationResult.failure(ArenaOperationCode.INVALID_ARGUMENT, "Unknown generator");
+    return edit(
+        rawId, expectedRevision, arena -> arena.withGenerators(next, editStatus(arena), now()));
+  }
+
   private ArenaOperationResult updateTeam(
       String rawId,
       TeamId teamId,

@@ -8,10 +8,15 @@ import fr.heneria.bedwars.core.arena.ArenaBedDefinition;
 import fr.heneria.bedwars.core.arena.ArenaBlockPosition;
 import fr.heneria.bedwars.core.arena.ArenaBoundary;
 import fr.heneria.bedwars.core.arena.ArenaDefinition;
+import fr.heneria.bedwars.core.arena.ArenaGeneratorDefinition;
 import fr.heneria.bedwars.core.arena.ArenaId;
 import fr.heneria.bedwars.core.arena.ArenaLoadResult;
+import fr.heneria.bedwars.core.arena.ArenaLocation;
 import fr.heneria.bedwars.core.arena.ArenaVector;
 import fr.heneria.bedwars.core.arena.TeamId;
+import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.GeneratorResource;
+import fr.heneria.bedwars.core.game.generator.GeneratorStackingStrategy;
 import fr.heneria.bedwars.plugin.config.SafeYamlWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -141,5 +146,30 @@ class YamlArenaRepositoryTest {
             .orElseThrow()
             .bedDefinition()
             .orElseThrow());
+  }
+
+  @Test
+  void configuredGeneratorsRoundTripThroughYaml() throws Exception {
+    ArenaDefinition draft = ArenaDefinition.draft(new ArenaId("alpha"), CLOCK.instant());
+    ArenaGeneratorDefinition generator =
+        new ArenaGeneratorDefinition(
+            new GeneratorId("diamond-1"),
+            GeneratorResource.DIAMOND,
+            new ArenaLocation("hbw_template_alpha", new ArenaVector(12.5, 70, -4.5), 0, 0),
+            2,
+            600,
+            2,
+            12,
+            GeneratorStackingStrategy.MERGE_NEARBY);
+    ArenaDefinition configured =
+        draft.withGenerators(java.util.List.of(generator), draft.status(), CLOCK.instant());
+
+    repository.save(configured);
+
+    ArenaDefinition loaded = repository.loadAll().definitions().getFirst();
+    assertEquals(java.util.List.of(generator), loaded.generators());
+    assertTrue(
+        Files.readString(work.resolve("arenas/alpha.yml"), StandardCharsets.UTF_8)
+            .contains("diamond-1"));
   }
 }

@@ -1,10 +1,12 @@
 # Architecture actuelle
 
-## Ticket 013 — phase 1 des générateurs
+## Ticket 013 — générateurs persistants et runtime
 
 Le package `core.game.generator` contient les identifiants, ressources, règles immuables, échéances runtime et rapports de tick. `GameInstance` possède les `RuntimeGenerator` de son scope; ils ne sont ni globaux, ni persistés comme état vivant.
 
-`GameGeneratorService` ne crée aucune tâche. Le ticker de plateforme l'appellera une seule fois pour toutes les instances. Le service ignore les parties hors `PLAYING` ou sans monde actif, limite les émissions par passage et fait tourner son point de départ pour éviter qu'un générateur ne soit affamé. Une échéance très en retard produit au maximum une émission, puis saute directement à la prochaine date future.
+`ArenaGeneratorDefinition` est la source administrative persistée : sa position appartient au monde modèle. Au passage `GameWaitingEvent`, `BukkitGameGeneratorRegistry` copie les snapshots dans l'instance; les coordonnées sont ensuite appliquées au monde cloné par `BukkitGameGeneratorAdapter`. Aucune donnée runtime ne revient dans le YAML.
+
+`GameGeneratorService` ne crée aucune tâche. Le ticker Bukkit existant l'appelle une seule fois pour toutes les instances. Le service ignore les parties hors `PLAYING` ou sans monde actif, limite les émissions par passage et fait tourner son point de départ pour éviter qu'un générateur ne soit affamé. Une échéance très en retard produit au maximum une émission, puis saute directement à la prochaine date future. L'adaptateur compte et fusionne uniquement la ressource compatible dans un rayon borné, puis fractionne les nouveaux objets selon la taille maximale d'une pile Minecraft.
 
 ## Ticket 012 — lits et cycle d'élimination
 

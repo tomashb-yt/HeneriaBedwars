@@ -471,6 +471,7 @@ public final class ConfigurationSnapshotFactory {
     int waitingSlot = menus.integer(assistant + "waiting-slot", 12, 0, editorSize - 1);
     int spectatorSlot = menus.integer(assistant + "spectator-slot", 14, 0, editorSize - 1);
     int teamsSlot = menus.integer(assistant + "teams-slot", 16, 0, editorSize - 1);
+    int generatorsSlot = menus.integer(assistant + "generators-slot", 28, 0, editorSize - 1);
     List<Integer> teamSlots =
         menus.integerList(
             assistant + "team-slots", List.of(19, 20, 21, 22, 23, 24, 25, 31), editorSize);
@@ -499,6 +500,7 @@ public final class ConfigurationSnapshotFactory {
             waitingSlot,
             spectatorSlot,
             teamsSlot,
+            generatorsSlot,
             validationSlot,
             enableSlot,
             deleteSlot,
@@ -522,6 +524,7 @@ public final class ConfigurationSnapshotFactory {
         waitingSlot,
         spectatorSlot,
         teamsSlot,
+        generatorsSlot,
         teamSlots,
         validationSlot,
         enableSlot,

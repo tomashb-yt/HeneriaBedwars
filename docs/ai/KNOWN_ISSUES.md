@@ -1,10 +1,10 @@
 # Limitations connues
 
-## Ticket 013 — phase 1
+## Ticket 013 — phase 2
 
-- Le coordinateur et les règles sont disponibles uniquement dans le cœur pur; ils ne sont pas encore câblés au ticker Bukkit.
-- Les positions ne sont pas encore enregistrées dans les YAML d'arène et aucun item ressource n'est créé dans le clone.
-- Hologrammes, particules, sons, niveaux automatiques et configuration GUI restent dans les phases suivantes.
+- Les positions, la persistance, l'assistant et les drops runtime sont disponibles, mais doivent encore être confirmés sur un serveur Paper avec une vraie carte clonée.
+- L'écran affiche au maximum quatorze générateurs par arène; une pagination sera nécessaire pour les cartes qui dépassent cette limite.
+- Hologrammes, particules, sons et améliorations automatiques de niveau restent dans les phases suivantes.
 
 ## Ticket 012 en validation
 
@@ -12,7 +12,7 @@
 - Le téléporteur spectateur suit actuellement le premier joueur actif; une liste graphique complète reste une amélioration ultérieure.
 - La reconnexion en `PLAYING` n'est pas prise en charge : une déconnexion est une élimination définitive.
 - La validation automatisée ne remplace pas un test Paper à deux comptes des événements de mort, respawn, destruction et fin.
-- Les générateurs visibles restent absents malgré leur fondation métier; boutiques, économie, équipement final, récompenses et PvP 1.8 complet restent absents.
+- Les générateurs sont désormais actifs lorsqu'ils sont configurés; boutiques, économie, équipement final, récompenses et PvP 1.8 complet restent absents.
 
 - La téléportation d'équipe au passage `PLAYING` est couverte par la résolution métier et la compilation Bukkit, mais doit encore être confirmée avec plusieurs joueurs sur un serveur Paper réel.
 

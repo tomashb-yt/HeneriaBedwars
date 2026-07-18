@@ -9,6 +9,15 @@ Accepté pour la phase 1 du Ticket 013.
 - **ADR-073** — Une échéance en retard émet au maximum une fois et saute les intervalles passés afin d'interdire les rafales de rattrapage.
 - **ADR-074** — La capacité locale vient d'un port de lecture plateforme; un budget global avec rotation garantit une charge bornée et équitable.
 
+## ADR-075 à ADR-078 — Générateurs administratifs et Bukkit
+
+Accepté pour la phase 2 du Ticket 013.
+
+- **ADR-075** — Les positions de générateurs appartiennent à `ArenaDefinition` et suivent la même persistance atomique et la même révision optimiste que les autres réglages d'arène.
+- **ADR-076** — Le remappage modèle → clone conserve les coordonnées et remplace implicitement le monde; aucun nom de monde runtime n'est persisté.
+- **ADR-077** — La création, le déplacement et la suppression passent par l'assistant et `ArenaService`; le menu ne lit et n'écrit jamais directement le YAML.
+- **ADR-078** — L'adaptateur Bukkit émet uniquement en `PLAYING`, compte les items compatibles dans un rayon borné, fusionne les piles si demandé et fractionne les drops trop grands.
+
 ## ADR-062 à ADR-070 — Gameplay des lits
 
 Accepté pour la phase de validation Ticket 012.

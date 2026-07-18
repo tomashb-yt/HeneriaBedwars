@@ -23,7 +23,8 @@ public record ArenaDefinition(
     Optional<ArenaLocation> spectatorLocation,
     Optional<ArenaBoundary> boundary,
     ArenaMetadata metadata,
-    List<ArenaTeamDefinition> teams) {
+    List<ArenaTeamDefinition> teams,
+    List<ArenaGeneratorDefinition> generators) {
   public static final int CURRENT_CONFIG_VERSION = 1;
 
   public ArenaDefinition {
@@ -42,6 +43,47 @@ public record ArenaDefinition(
         Objects.requireNonNull(teams, "teams").isEmpty()
             ? defaultTeams(teamCount, playersPerTeam)
             : List.copyOf(teams);
+    generators = List.copyOf(Objects.requireNonNull(generators, "generators"));
+  }
+
+  /** Compatibility constructor for definitions created before persistent generators. */
+  public ArenaDefinition(
+      int configVersion,
+      long revision,
+      ArenaId id,
+      String displayName,
+      ArenaStatus status,
+      Optional<String> worldName,
+      Optional<String> template,
+      String environment,
+      int minimumPlayers,
+      int maximumPlayers,
+      int teamCount,
+      int playersPerTeam,
+      Optional<ArenaLocation> waitingLocation,
+      Optional<ArenaLocation> spectatorLocation,
+      Optional<ArenaBoundary> boundary,
+      ArenaMetadata metadata,
+      List<ArenaTeamDefinition> teams) {
+    this(
+        configVersion,
+        revision,
+        id,
+        displayName,
+        status,
+        worldName,
+        template,
+        environment,
+        minimumPlayers,
+        maximumPlayers,
+        teamCount,
+        playersPerTeam,
+        waitingLocation,
+        spectatorLocation,
+        boundary,
+        metadata,
+        teams,
+        List.of());
   }
 
   /** Compatibility constructor for version-1 definitions written before revisions existed. */
@@ -79,7 +121,8 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata,
-        defaultTeams(teamCount, playersPerTeam));
+        defaultTeams(teamCount, playersPerTeam),
+        List.of());
   }
 
   /** Compatibility constructor for version-1 definitions written before revisions existed. */
@@ -116,7 +159,8 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata,
-        defaultTeams(teamCount, playersPerTeam));
+        defaultTeams(teamCount, playersPerTeam),
+        List.of());
   }
 
   public static ArenaDefinition draft(ArenaId id, Instant now) {
@@ -137,7 +181,8 @@ public record ArenaDefinition(
         Optional.empty(),
         Optional.empty(),
         ArenaMetadata.created(now),
-        defaultTeams(4, 4));
+        defaultTeams(4, 4),
+        List.of());
   }
 
   public boolean enabled() {
@@ -171,7 +216,8 @@ public record ArenaDefinition(
         spectator,
         boundary,
         metadata.touched(now),
-        this.teams);
+        this.teams,
+        generators);
   }
 
   public ArenaDefinition withDisplayName(String value, ArenaStatus newStatus, Instant now) {
@@ -192,7 +238,8 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata.touched(now),
-        teams);
+        teams,
+        generators);
   }
 
   public ArenaDefinition withBoundary(
@@ -214,7 +261,8 @@ public record ArenaDefinition(
         spectatorLocation,
         value,
         metadata.touched(now),
-        teams);
+        teams,
+        generators);
   }
 
   /** Associates a stable map-template id and its managed Bukkit working-world name. */
@@ -237,7 +285,8 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata.touched(now),
-        teams);
+        teams,
+        generators);
   }
 
   /** Removes the map relation and its derived managed world. */
@@ -259,7 +308,8 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata.touched(now),
-        teams);
+        teams,
+        generators);
   }
 
   /** Changes only a derived status while loading; it does not create an administrative revision. */
@@ -281,7 +331,8 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata,
-        teams);
+        teams,
+        generators);
   }
 
   public ArenaDefinition withStatus(ArenaStatus newStatus, Instant now) {
@@ -318,7 +369,31 @@ public record ArenaDefinition(
         spectatorLocation,
         boundary,
         metadata.touched(now),
-        next);
+        next,
+        generators);
+  }
+
+  public ArenaDefinition withGenerators(
+      List<ArenaGeneratorDefinition> value, ArenaStatus newStatus, Instant now) {
+    return new ArenaDefinition(
+        configVersion,
+        revision + 1,
+        id,
+        displayName,
+        newStatus,
+        worldName,
+        template,
+        environment,
+        minimumPlayers,
+        maximumPlayers,
+        teamCount,
+        playersPerTeam,
+        waitingLocation,
+        spectatorLocation,
+        boundary,
+        metadata.touched(now),
+        teams,
+        List.copyOf(Objects.requireNonNull(value, "value")));
   }
 
   /** Changes one stable team without regenerating the remaining definitions. */

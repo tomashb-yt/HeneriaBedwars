@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.heneria.bedwars.core.game.generator.GeneratorId;
+import fr.heneria.bedwars.core.game.generator.GeneratorResource;
+import fr.heneria.bedwars.core.game.generator.GeneratorStackingStrategy;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
@@ -154,6 +157,58 @@ class ArenaFrameworkTest {
   }
 
   @Test
+  void generatorsAreAddedMovedAndRemovedWithOptimisticRevisions() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    ArenaGeneratorDefinition iron =
+        generator("iron-1", GeneratorResource.IRON, new ArenaVector(1, 64, 1));
+
+    ArenaDefinition added =
+        service.addGenerator("alpha", iron, created.revision()).arena().orElseThrow();
+    assertEquals(iron, added.generators().getFirst());
+
+    ArenaLocation movedLocation = new ArenaLocation("world", new ArenaVector(5, 65, 5), 0, 0);
+    ArenaDefinition moved =
+        service
+            .moveGenerator("alpha", iron.id(), movedLocation, added.revision())
+            .arena()
+            .orElseThrow();
+    assertEquals(movedLocation, moved.generators().getFirst().location());
+
+    ArenaOperationResult stale =
+        service.addGenerator(
+            "alpha",
+            generator("gold-1", GeneratorResource.GOLD, new ArenaVector(8, 64, 8)),
+            added.revision());
+    assertEquals(ArenaOperationCode.CONFLICT, stale.code());
+
+    ArenaDefinition removed =
+        service.removeGenerator("alpha", iron.id(), moved.revision()).arena().orElseThrow();
+    assertTrue(removed.generators().isEmpty());
+  }
+
+  @Test
+  void generatorsRejectDuplicateBlocksAndConvertToRuntimeDefinitions() {
+    FakeRepository repository = new FakeRepository();
+    ArenaService service = service(repository);
+    ArenaDefinition created = service.create("alpha").arena().orElseThrow();
+    ArenaGeneratorDefinition iron =
+        generator("iron-1", GeneratorResource.IRON, new ArenaVector(1.2, 64, 1.8));
+    ArenaDefinition added =
+        service.addGenerator("alpha", iron, created.revision()).arena().orElseThrow();
+
+    ArenaOperationResult duplicate =
+        service.addGenerator(
+            "alpha",
+            generator("gold-1", GeneratorResource.GOLD, new ArenaVector(1.9, 64, 1.1)),
+            added.revision());
+    assertEquals(ArenaOperationCode.INVALID_ARGUMENT, duplicate.code());
+    assertEquals(1000, iron.runtime().interval().toMillis());
+    assertEquals(iron.id(), iron.runtime().id());
+  }
+
+  @Test
   void deleteMustSucceedInRepositoryBeforeRegistryChanges() {
     FakeRepository repository = new FakeRepository();
     ArenaService service = service(repository);
@@ -274,6 +329,19 @@ class ArenaFrameworkTest {
   private static ArenaService service(FakeRepository repository) {
     return new ArenaService(
         repository, new ArenaRegistry(), new ArenaValidator(world -> world.equals("world")), CLOCK);
+  }
+
+  private static ArenaGeneratorDefinition generator(
+      String id, GeneratorResource resource, ArenaVector position) {
+    return new ArenaGeneratorDefinition(
+        new GeneratorId(id),
+        resource,
+        new ArenaLocation("world", position, 0, 0),
+        1,
+        20,
+        1,
+        48,
+        GeneratorStackingStrategy.MERGE_NEARBY);
   }
 
   private static ArenaDefinition complete(String id) {

@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 013 — phase 2, générateurs configurables et drops — 2026-07-18
+
+Les arènes persistent désormais leurs générateurs fer, or, diamant et émeraude. L'assistant principal ouvre une vue dédiée : un administrateur se place dans le monde modèle pour ajouter un point, peut le visiter, le déplacer avec Shift+gauche ou le supprimer après confirmation. Toutes les mutations utilisent `ArenaService`, la sauvegarde atomique et la révision optimiste existantes.
+
+Lors de la création d'une instance, les coordonnées du modèle sont copiées dans le clone. Le ticker central appelle le moteur pur; l'adaptateur Bukkit limite la production aux parties `PLAYING`, compte les items compatibles proches, respecte la capacité, fusionne les piles et fractionne les nouveaux drops. Les anciennes arènes restent compatibles avec une liste vide et les valeurs des nouveaux points viennent de `generators.yml`.
+
+Validation automatisée : 186 tests réussis, sans échec, erreur ni test ignoré. Les nouveaux scénarios couvrent le service, les doublons, le remappage runtime et le round-trip YAML. La validation Paper en jeu reste requise pour confirmer visuellement les drops dans un clone réel. Commit prévu : `feat(generators): add configurable resource generators`.
+
 ## Ticket 013 — phase 1, moteur pur des générateurs — 2026-07-18
 
 Ajout de `GeneratorId`, des quatre ressources standard, des stratégies d'empilement et de `GeneratorDefinition`. Chaque `GameInstance` peut enregistrer avant le début ses `RuntimeGenerator`, dont les échéances et compteurs restent strictement dans le scope de la partie.
