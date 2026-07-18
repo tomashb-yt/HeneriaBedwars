@@ -1,5 +1,12 @@
 # Limitations connues
 
+## Ticket 014 — boutiques
+
+- Les PNJ, clics, menus et échanges d'inventaire doivent encore être validés sur un serveur Paper avec plusieurs joueurs.
+- Le catalogue livre des objets simples. Les armures équipées, outils évolutifs, raccourcis favoris, pièges et améliorations d'équipe appartiennent au Ticket 015.
+- La laine du catalogue est actuellement blanche; sa coloration automatique selon l'équipe sera traitée avec l'équipement contextuel.
+- Une équipe sans position de boutique reste jouable mais aucun PNJ n'est créé pour elle; la fiche indique clairement l'étape manquante.
+
 ## Ticket 013 — phase 2
 
 - Les positions, la persistance, l'assistant et les drops runtime sont disponibles, mais doivent encore être confirmés sur un serveur Paper avec une vraie carte clonée.

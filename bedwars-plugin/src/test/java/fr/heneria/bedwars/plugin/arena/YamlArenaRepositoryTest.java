@@ -149,6 +149,34 @@ class YamlArenaRepositoryTest {
   }
 
   @Test
+  void teamShopLocationRoundTripsThroughYaml() throws Exception {
+    ArenaDefinition draft = ArenaDefinition.draft(new ArenaId("alpha"), CLOCK.instant());
+    ArenaLocation shop =
+        new ArenaLocation("hbw_template_alpha", new ArenaVector(8.5, 65, -3.5), 180, 0);
+    ArenaDefinition configured =
+        draft.withUpdatedTeam(
+            new TeamId("red"),
+            team -> team.withShopLocation(Optional.of(shop)),
+            draft.status(),
+            CLOCK.instant());
+
+    repository.save(configured);
+
+    ArenaDefinition loaded = repository.loadAll().definitions().getFirst();
+    assertEquals(
+        shop,
+        loaded.teams().stream()
+            .filter(team -> team.id().value().equals("red"))
+            .findFirst()
+            .orElseThrow()
+            .shopLocation()
+            .orElseThrow());
+    assertTrue(
+        Files.readString(work.resolve("arenas/alpha.yml"), StandardCharsets.UTF_8)
+            .contains("shop:"));
+  }
+
+  @Test
   void configuredGeneratorsRoundTripThroughYaml() throws Exception {
     ArenaDefinition draft = ArenaDefinition.draft(new ArenaId("alpha"), CLOCK.instant());
     ArenaGeneratorDefinition generator =

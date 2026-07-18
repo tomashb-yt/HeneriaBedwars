@@ -819,7 +819,7 @@ public final class ArenaEditorMenuFactory {
             .button(
                 13,
                 GuiButton.builder()
-                    .itemKey("arena.teams.guide-v6")
+                    .itemKey("arena.teams.guide-v9")
                     .itemPlaceholders(context -> values)
                     .build())
             .button(
@@ -836,6 +836,22 @@ public final class ArenaEditorMenuFactory {
                     AdministrativeCommandPolicy.ARENA_EDIT,
                     values,
                     context -> selectTeamBed(context, playerId, arena, team, expected)))
+            .button(
+                28,
+                action(
+                    "arena.teams.set-shop-v9",
+                    AdministrativeCommandPolicy.ARENA_EDIT,
+                    values,
+                    context -> setTeamShop(context, playerId, arena, team, expected)))
+            .button(
+                31,
+                GuiButton.builder()
+                    .itemKey(
+                        team.shopLocation().isPresent()
+                            ? "arena.teams.shop-configured-v9"
+                            : "arena.teams.shop-missing-v9")
+                    .itemPlaceholders(context -> values)
+                    .build())
             .button(
                 36,
                 GuiButton.builder()
@@ -924,6 +940,43 @@ public final class ArenaEditorMenuFactory {
               25,
               GuiButton.builder()
                   .itemKey("arena.teams.clear-bed-disabled-v6")
+                  .itemPlaceholders(context -> values)
+                  .build());
+    if (team.shopLocation().isPresent())
+      builder
+          .button(
+              30,
+              action(
+                  "arena.teams.teleport-shop-v9",
+                  AdministrativeCommandPolicy.ARENA_TELEPORT,
+                  values,
+                  context -> teleport(context, playerId, team.shopLocation().orElseThrow())))
+          .button(
+              32,
+              action(
+                  "arena.teams.clear-shop-v9",
+                  AdministrativeCommandPolicy.ARENA_EDIT,
+                  values,
+                  context ->
+                      mutateTeam(
+                          context,
+                          playerId,
+                          id,
+                          team.id(),
+                          arenas.clearTeamShop(id, team.id(), expected),
+                          "team-shop-clear")));
+    else
+      builder
+          .button(
+              30,
+              GuiButton.builder()
+                  .itemKey("arena.teams.teleport-shop-disabled-v9")
+                  .itemPlaceholders(context -> values)
+                  .build())
+          .button(
+              32,
+              GuiButton.builder()
+                  .itemKey("arena.teams.clear-shop-disabled-v9")
                   .itemPlaceholders(context -> values)
                   .build());
     return builder.build();
@@ -1703,6 +1756,27 @@ public final class ArenaEditorMenuFactory {
         "team-spawn");
   }
 
+  private void setTeamShop(
+      GuiClickContext context,
+      UUID playerId,
+      ArenaDefinition arena,
+      ArenaTeamDefinition team,
+      long expected) {
+    Player player = player(playerId);
+    if (!correctArenaWorld(playerId, player, arena)) return;
+    mutateTeam(
+        context,
+        playerId,
+        arena.id().value(),
+        team.id(),
+        arenas.setTeamShop(
+            arena.id().value(),
+            team.id(),
+            BukkitArenaLocations.from(player.getLocation()),
+            expected),
+        "team-shop");
+  }
+
   private void selectTeamBed(
       GuiClickContext context,
       UUID playerId,
@@ -2193,8 +2267,16 @@ public final class ArenaEditorMenuFactory {
                 ? "arena.teams.status.configured"
                 : "arena.teams.status.missing",
             Map.of()));
+    values.put(
+        "team_shop_status",
+        message(
+            team.shopLocation().isPresent()
+                ? "arena.teams.status.configured"
+                : "arena.teams.status.missing",
+            Map.of()));
     putLocation(values, "spawn", team.spawn());
     putLocation(values, "bed", team.bedLocation());
+    putLocation(values, "shop", team.shopLocation());
     return Map.copyOf(values);
   }
 

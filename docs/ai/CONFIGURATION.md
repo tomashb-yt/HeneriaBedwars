@@ -1,5 +1,11 @@
 # Configuration
 
+## Ticket 014 — `shops.yml`
+
+`shops.runtime-enabled` active la création des PNJ et le catalogue runtime. Chaque entrée `shops.offers.<id>` définit `category`, `material`, `amount`, `currency`, `price`, `translation-key` et `order`. Les catégories sont `BLOCKS`, `COMBAT`, `RANGED`, `UTILITY`; les monnaies sont `IRON`, `GOLD`, `DIAMOND`, `EMERALD`. Les identifiants suivent `[a-z0-9_-]{2,32}` et les valeurs numériques doivent être positives. Une offre invalide est ignorée avec avertissement, sans invalider les autres offres.
+
+La position du PNJ est persistée dans `arenas/<id>.yml`, sous l'équipe concernée via la section `shop`. Le monde enregistré doit être le monde modèle de l'arène; au runtime seules les coordonnées et l'orientation sont remappées dans le clone.
+
 ## Ticket 013 — générateurs
 
 `generators.yml` définit `generators.merge-radius` et, pour `iron`, `gold`, `diamond` et `emerald`, le matériau Bukkit, l'intervalle en ticks, la quantité, la capacité locale et la stratégie d'empilement. Ces valeurs servent uniquement lors de l'ajout d'un nouveau point depuis l'assistant; le résultat complet est ensuite persisté dans `arenas/<id>.yml` sous `generators.definitions`.
@@ -221,7 +227,7 @@ Depuis le Ticket 008, chaque carte persiste aussi `daylight-cycle`, `weather-cyc
 
 ## Fichiers préparatoires
 
-`shops.yml`, `upgrades.yml` et `generators.yml` ont `config-version: 1` et `enabled: false`. Leurs définitions ne déclenchent ni achat, ni amélioration, ni génération. `arenas/` est désormais alimenté par les commandes du Ticket 005.
+`upgrades.yml` reste préparatoire et ne déclenche aucune amélioration. `shops.yml` et `generators.yml` sont désormais actifs pour leurs systèmes runtime respectifs. `arenas/` est alimenté exclusivement par les services et assistants administratifs.
 
 ## Langues et messages
 

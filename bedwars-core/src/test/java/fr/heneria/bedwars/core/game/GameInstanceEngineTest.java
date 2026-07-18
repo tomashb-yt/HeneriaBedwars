@@ -23,7 +23,15 @@ import fr.heneria.bedwars.core.game.event.GameVictoryEvent;
 import fr.heneria.bedwars.core.game.event.GameWaitingEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameJoinEvent;
 import fr.heneria.bedwars.core.game.event.PlayerGameRespawnEvent;
+import fr.heneria.bedwars.core.game.event.ShopPurchaseEvent;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
+import fr.heneria.bedwars.core.game.shop.ShopCategory;
+import fr.heneria.bedwars.core.game.shop.ShopCurrency;
+import fr.heneria.bedwars.core.game.shop.ShopInventory;
+import fr.heneria.bedwars.core.game.shop.ShopOffer;
+import fr.heneria.bedwars.core.game.shop.ShopOfferId;
+import fr.heneria.bedwars.core.game.shop.ShopPurchaseCode;
+import fr.heneria.bedwars.core.game.shop.ShopPurchaseService;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapTemplate;
 import fr.heneria.bedwars.core.map.MapType;
@@ -302,6 +310,60 @@ class GameInstanceEngineTest {
     assertTrue(fixture.eventTypes().contains(GameVictoryEvent.class));
   }
 
+  @Test
+  void shopPurchaseIsAtomicAndPublishesAnInternalEvent() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID playerId = game.team("red").orElseThrow().playerIds().iterator().next();
+    FakeShopInventory inventory = new FakeShopInventory(12, true, true);
+    ShopOffer offer =
+        new ShopOffer(
+            new ShopOfferId("wool"),
+            ShopCategory.BLOCKS,
+            "WHITE_WOOL",
+            16,
+            ShopCurrency.IRON,
+            4,
+            "shop.offer.wool",
+            10);
+
+    var result =
+        new ShopPurchaseService(fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC))
+            .purchase(playerId, offer, inventory);
+
+    assertEquals(ShopPurchaseCode.SUCCESS, result.code());
+    assertEquals(8, result.balance());
+    assertEquals(1, inventory.exchanges);
+    assertTrue(fixture.eventTypes().contains(ShopPurchaseEvent.class));
+  }
+
+  @Test
+  void shopPurchaseNeverExchangesWhenFundsOrSpaceAreMissing() {
+    Fixture fixture = new Fixture();
+    GameInstance game = playingGame(fixture);
+    UUID playerId = game.team("red").orElseThrow().playerIds().iterator().next();
+    ShopOffer offer =
+        new ShopOffer(
+            new ShopOfferId("tnt"),
+            ShopCategory.UTILITY,
+            "TNT",
+            1,
+            ShopCurrency.GOLD,
+            4,
+            "shop.offer.tnt",
+            10);
+    ShopPurchaseService purchases =
+        new ShopPurchaseService(fixture.manager, fixture.events, Clock.fixed(NOW, ZoneOffset.UTC));
+    FakeShopInventory poor = new FakeShopInventory(3, true, true);
+    FakeShopInventory full = new FakeShopInventory(8, false, true);
+
+    assertEquals(
+        ShopPurchaseCode.INSUFFICIENT_FUNDS, purchases.purchase(playerId, offer, poor).code());
+    assertEquals(ShopPurchaseCode.INVENTORY_FULL, purchases.purchase(playerId, offer, full).code());
+    assertEquals(0, poor.exchanges);
+    assertEquals(0, full.exchanges);
+  }
+
   private static GameInstance playingGame(Fixture fixture) {
     GameInstance game =
         fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
@@ -448,6 +510,37 @@ class GameInstanceEngineTest {
     public CompletionStage<Void> destroy(RuntimeWorldHandle world) {
       destroyed = true;
       return CompletableFuture.completedFuture(null);
+    }
+  }
+
+  private static final class FakeShopInventory implements ShopInventory {
+    private int balance;
+    private final boolean space;
+    private final boolean exchangeSucceeds;
+    private int exchanges;
+
+    private FakeShopInventory(int balance, boolean space, boolean exchangeSucceeds) {
+      this.balance = balance;
+      this.space = space;
+      this.exchangeSucceeds = exchangeSucceeds;
+    }
+
+    @Override
+    public int balance(ShopCurrency currency) {
+      return balance;
+    }
+
+    @Override
+    public boolean canExchange(ShopOffer offer) {
+      return space;
+    }
+
+    @Override
+    public boolean exchange(ShopOffer offer) {
+      exchanges++;
+      if (!exchangeSucceeds) return false;
+      balance -= offer.price();
+      return true;
     }
   }
 

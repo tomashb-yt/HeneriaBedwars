@@ -1,5 +1,16 @@
 # État actuel
 
+## Ticket 014 — boutiques et achats en validation
+
+- emplacement et orientation de la boutique configurables dans la fiche de chaque équipe;
+- PNJ villageois protégé créé dans le clone et identifié par partie/équipe via PDC;
+- catalogue `shops.yml` configurable avec quatorze offres réparties en quatre catégories;
+- menu compact affichant prix, quantité, solde et disponibilité, entièrement FR/EN;
+- achats limités aux joueurs vivants en `PLAYING`, refusés aux spectateurs;
+- échange atomique : aucune monnaie consommée si l'inventaire ne peut pas recevoir l'article;
+- événement Java interne `ShopPurchaseEvent` après réussite;
+- validation Paper réelle encore requise; armures, outils évolutifs et améliorations restent au Ticket 015.
+
 ## Ticket 013 — générateurs configurables en validation
 
 - ressources `IRON`, `GOLD`, `DIAMOND` et `EMERALD` indépendantes de Bukkit;
@@ -42,11 +53,13 @@
 - remplacement de monde BedWars depuis le menu, sauvegarde préalable, copie asynchrone, rollback et rechargement;
 - tests automatisés dédiés au stockage et au cycle d'import; validation Paper réelle encore requise.
 
-- Dernier ticket terminé : Ticket 011. Le Ticket 012 reste en validation Paper et le Ticket 013 a commencé côté cœur pur.
+- Dernier ticket terminé : Ticket 011. Les Tickets 012 à 014 sont implémentés et restent en validation Paper.
 - Version : `0.1.0-SNAPSHOT`.
 - Cibles : Java 21, Spigot/Paper 1.21.x.
 
 ## Disponible
+
+- Ticket 014 : configuration guidée d'un PNJ de boutique par équipe, apparition dans le clone, menu d'achats par catégories et catalogue YAML rechargeable;
 
 - correctif de préparation du Ticket 012 : menu général des équipes avec résumé des spawns/lits, fiche colorée par équipe, sauvegarde automatique et retour sur la même fiche;
 - actions GUI distinctes pour définir, visiter et retirer le spawn; sélection d'un vrai lit regardé à moins de 8 blocs, contrôle des deux moitiés, du monde modèle et des doublons;

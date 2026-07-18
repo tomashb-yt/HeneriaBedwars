@@ -16,6 +16,7 @@ import fr.heneria.bedwars.core.game.countdown.GameCountdownService;
 import fr.heneria.bedwars.core.game.event.GameEventBus;
 import fr.heneria.bedwars.core.game.generator.GameGeneratorService;
 import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
+import fr.heneria.bedwars.core.game.shop.ShopPurchaseService;
 import fr.heneria.bedwars.core.gui.TextInputManager;
 import fr.heneria.bedwars.core.map.MapId;
 import fr.heneria.bedwars.core.map.MapOperationLock;
@@ -47,6 +48,10 @@ import fr.heneria.bedwars.plugin.game.GameAdminMenuFactory;
 import fr.heneria.bedwars.plugin.game.GameLifecycleComponent;
 import fr.heneria.bedwars.plugin.game.GamePublicInfoMenuFactory;
 import fr.heneria.bedwars.plugin.game.GameWaitingListener;
+import fr.heneria.bedwars.plugin.game.shop.BukkitShopCatalog;
+import fr.heneria.bedwars.plugin.game.shop.BukkitShopListener;
+import fr.heneria.bedwars.plugin.game.shop.BukkitShopNpcService;
+import fr.heneria.bedwars.plugin.game.shop.ShopMenuFactory;
 import fr.heneria.bedwars.plugin.gui.BukkitGuiService;
 import fr.heneria.bedwars.plugin.gui.BukkitTextInputService;
 import fr.heneria.bedwars.plugin.item.BukkitItemService;
@@ -208,6 +213,13 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
       BukkitGameGeneratorAdapter generatorAdapter =
           new BukkitGameGeneratorAdapter(gameService, generatorCatalog);
       guiService = new BukkitGuiService(this, configurations, itemService, projectLogger);
+      BukkitShopCatalog shopCatalog = new BukkitShopCatalog(configurations, projectLogger);
+      ShopPurchaseService shopPurchases = new ShopPurchaseService(gameService, gameEvents, clock);
+      ShopMenuFactory shopMenus =
+          new ShopMenuFactory(gameService, configurations, shopCatalog, shopPurchases);
+      BukkitShopNpcService shopNpcs = new BukkitShopNpcService(this, configurations, shopCatalog);
+      BukkitShopListener shopListener =
+          new BukkitShopListener(gameService, configurations, shopNpcs, guiService, shopMenus);
       BukkitGameDisplayService gameDisplays =
           new BukkitGameDisplayService(
               configurations,
@@ -330,6 +342,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
                   runtimeGenerators,
                   gameGenerators,
                   generatorAdapter,
+                  shopNpcs,
+                  shopListener,
                   gameDeaths,
                   gameRespawns,
                   runtimePlayers,

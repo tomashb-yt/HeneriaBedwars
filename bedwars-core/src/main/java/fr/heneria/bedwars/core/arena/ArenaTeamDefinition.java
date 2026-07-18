@@ -66,6 +66,21 @@ public record ArenaTeamDefinition(
         metadata);
   }
 
+  /** Stores the item-shop NPC position in the administrative template world. */
+  public ArenaTeamDefinition withShopLocation(Optional<ArenaLocation> value) {
+    return new ArenaTeamDefinition(
+        id,
+        displayName,
+        color,
+        order,
+        capacity,
+        spawn,
+        bedLocation,
+        value,
+        upgradeShopLocation,
+        metadata);
+  }
+
   /** Stores both bed halves while preserving the historical foot location field. */
   public ArenaTeamDefinition withBedDefinition(Optional<ArenaBedDefinition> value) {
     Map<String, String> next = new java.util.LinkedHashMap<>(metadata);

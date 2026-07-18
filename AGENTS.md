@@ -4,7 +4,7 @@
 
 HeneriaBedWars est un plugin BedWars modulaire pour Spigot/Paper 1.21.x. Il utilise Java 21, Gradle Kotlin DSL et le package racine `fr.heneria.bedwars`. La version actuelle est `0.1.0-SNAPSHOT`. Le Ticket 012 est en validation : lits runtime, morts, respawns, éliminations et victoire provisoire sont implémentés, mais le parcours complet doit encore être confirmé sur Paper.
 
-Le Ticket 013 a commencé par sa fondation Java pure : définitions runtime de générateurs, ressources, capacités locales et coordinateur d'échéances global borné. Aucun drop Bukkit ni réglage administratif de générateur n'est livré par cette première phase.
+Le Ticket 013 fournit les générateurs configurables et leurs drops runtime. Le Ticket 014 est en validation : chaque équipe peut définir son PNJ de boutique depuis sa fiche, le clone crée ces PNJ et le catalogue `shops.yml` alimente un menu d'achats atomiques. Équipement persistant, outils évolutifs et améliorations restent au Ticket 015.
 
 Le correctif de préparation du Ticket 012 rend les équipes, leurs spawns et leurs lits configurables depuis une fiche GUI. Le lit administratif est sélectionné en regardant un vrai lit complet dans le monde modèle; sa partie pied est persistée. Cela ne signifie pas que la destruction, la mort ou la réapparition runtime du Ticket 012 sont terminées.
 
@@ -52,6 +52,8 @@ Le Ticket 008 centralise l'administration des cartes dans le menu v4. Les comman
 Le Ticket 009 introduit `GameInstanceManager`. Une arène ne peut avoir qu'une instance vivante et un joueur ne peut appartenir qu'à une instance. Les clones `hbw_game_*` sont jetables, exclus des registres administratifs, déchargés sans sauvegarde puis supprimés. Les accès fichiers restent asynchrones; les appels Bukkit restent sur le thread serveur. Les événements `core.game.event` ne sont pas des événements Bukkit. Ne jamais persister `RuntimePlayer`, `RuntimeTeam` ou les statistiques runtime dans les YAML administratifs.
 
 Le Ticket 012 représente un lit par deux coordonnées de bloc et garde son état vivant/détruit dans `RuntimeBed`. Seul `GameBedService` attribue une destruction et seul `GameDeathService` décide respawn ou mort finale. Les respawns passent par le ticker central; aucune tâche par joueur. Les listeners gameplay doivent rester limités aux membres `PLAYING` et aux mondes `hbw_game_*`.
+
+Le Ticket 014 persiste uniquement la position administrative du PNJ dans l'équipe. Les villageois sont recréés dans le clone et identifiés par PDC. Tout achat passe par `ShopPurchaseService` et un `ShopInventory` atomique : ne jamais retirer la monnaie avant d'avoir prouvé que le produit peut être ajouté, ni persister un inventaire runtime dans l'arène.
 
 ## Règles architecturales
 

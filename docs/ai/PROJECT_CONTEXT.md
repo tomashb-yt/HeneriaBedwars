@@ -1,5 +1,7 @@
 # Contexte du projet
 
+État Ticket 014 du 2026-07-18 : la fiche de chaque équipe configure la position et l'orientation d'un PNJ de boutique. À la création du clone, un villageois protégé et identifié par PDC apparaît à cet emplacement. Pendant `PLAYING`, son menu propose les catégories blocs, combat, distance et utilitaires; les offres viennent de `shops.yml` et les échanges inventaire sont atomiques. Le Ticket 015 gardera la responsabilité de l'équipement durable, des outils évolutifs et des améliorations d'équipe.
+
 État Ticket 013 phase 2 du 2026-07-18 : les générateurs fer, or, diamant et émeraude sont placés depuis l'assistant d'arène, persistés dans `arenas/<id>.yml`, remappés vers le clone puis activés uniquement en `PLAYING`. Le ticker central utilise `GameGeneratorService`; l'adaptateur Bukkit compte les items proches, fusionne les piles et crée les drops sans tâche par générateur. Les hologrammes, sons, particules et améliorations de niveau restent futurs.
 
 État Ticket 012 du 2026-07-18 : le clone runtime indexe les deux blocs de chaque lit. Un ennemi peut le détruire une seule fois; le propriétaire est bloqué. `GameDeathService` décide respawn ou mort finale, `GameRespawnService` utilise le ticker central, puis la dernière équipe active déclenche `ENDING` et le nettoyage différé. Le code et les tests automatisés sont disponibles; la validation Paper multijoueur reste obligatoire avant de déclarer le ticket définitivement terminé.

@@ -1,5 +1,11 @@
 # Architecture actuelle
 
+## Ticket 014 — boutiques et achats runtime
+
+`core.game.shop` contient le catalogue immuable, les offres, monnaies, catégories et `ShopPurchaseService`. Ce service vérifie l'appartenance, l'état `PLAYING`, le statut spectateur, le solde et la capacité avant de demander un échange atomique au port `ShopInventory`; un succès publie `ShopPurchaseEvent` sur le bus Java interne.
+
+La frontière Bukkit charge un snapshot de `shops.yml`, adapte l'inventaire du joueur, affiche le menu catégorisé et crée les villageois runtime. Leur PDC porte l'UUID de partie et l'équipe; aucune apparence ou nom visible ne sert d'identité. La position du PNJ est une donnée administrative de `ArenaTeamDefinition`, tandis que l'entité n'existe que dans `hbw_game_*` et disparaît avec le clone.
+
 ## Ticket 013 — générateurs persistants et runtime
 
 Le package `core.game.generator` contient les identifiants, ressources, règles immuables, échéances runtime et rapports de tick. `GameInstance` possède les `RuntimeGenerator` de son scope; ils ne sont ni globaux, ni persistés comme état vivant.

@@ -24,7 +24,8 @@ public sealed interface GameEvent
         PlayerGameRespawnEvent,
         PlayerFinalDeathEvent,
         TeamEliminatedEvent,
-        GameVictoryEvent {
+        GameVictoryEvent,
+        ShopPurchaseEvent {
   GameId gameId();
 
   Instant occurredAt();

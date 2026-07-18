@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Ticket 014 — PNJ de boutique et achats d'objets — 2026-07-18
+
+La fiche d'équipe possède désormais une troisième zone guidée pour définir, visiter ou retirer la position de sa boutique. Cette donnée suit `ArenaService`, la révision optimiste et le YAML de l'arène. Lors de l'initialisation du clone, le plugin crée un villageois invulnérable et sans IA, lié à la partie et à l'équipe par PDC.
+
+En `PLAYING`, un clic ouvre un menu à quatre catégories. Les quatorze offres par défaut sont définies dans `shops.yml`; prix, quantité, monnaie, matériau, traduction et ordre sont rechargeables. Le moteur pur refuse les joueurs absents, hors partie active ou spectateurs. L'adaptateur simule l'inventaire complet avant d'appliquer simultanément paiement et produit, puis publie `ShopPurchaseEvent` après réussite. Équipement avancé et améliorations restent au Ticket 015.
+
+Validation : 190 tests automatisés réussis, sans échec, erreur ni test ignoré; build complet, tests, Spotless et Shadow JAR validés. Le parcours visuel et multijoueur reste à confirmer sur Paper.
+
 ## Correctif Ticket 013 — points combinés, menu v8 et alertes de lit — 2026-07-18
 
 Le contrôle des positions distingue désormais la ressource du bloc : fer et or peuvent partager exactement les mêmes coordonnées, mais deux générateurs identiques au même bloc restent refusés. Le menu v8 organise le parcours en guide, quatre boutons de placement et liste de vérification; il affiche les comptes par ressource, le monde modèle et les regroupements sur un point.

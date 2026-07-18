@@ -1,5 +1,7 @@
 # API publique
 
+Le Ticket 014 ne modifie pas l'API publique. `ShopPurchaseService`, `ShopInventory`, le catalogue et `ShopPurchaseEvent` sont des contrats Java internes : les addons ne doivent pas encore les importer. La surface publique reste en lecture seule afin de ne pas contourner les invariants d'achat et de cycle de partie.
+
 Le Ticket 012 ne modifie pas la surface publique : les snapshots existants reflètent maintenant kills, morts, final kills, lits détruits, état du lit et élimination. Les services de mutation des lits et morts restent internes afin de préserver leurs invariants atomiques.
 
 Depuis le Ticket 009, `HeneriaBedWarsApi` est enregistré dans le `ServicesManager` Bukkit et expose des snapshots runtime immuables. Les sous-commandes historiques restent compatibles; aucune permission existante n'est supprimée.
@@ -59,6 +61,8 @@ Le système de configuration reste interne. Ses points principaux sont `Configur
 Le framework GUI et `ItemService` restent strictement internes. Ce sont des contrats du module plugin enregistrés dans `ServiceRegistry`, pas encore une API d'addons. Les modèles purs de `bedwars-core/item` permettent une future stabilisation sans exposer Bukkit prématurément.
 
 `ArenaService` est également un service interne enregistré. `ArenaRepository` et les modèles de `bedwars-core/arena` ne sont pas encore exposés par `HeneriaBedWarsApi`; aucune API publique n'a donc été modifiée silencieusement.
+
+La configuration de boutique se fait uniquement depuis la fiche graphique d'équipe. Aucune nouvelle commande joueur ou permission n'est ajoutée au Ticket 014.
 
 `MapTemplateService`, `MapTemplateRepository`, `MapWorldService` et `MapFileService` restent aussi internes. Leurs modèles purs préparent une future API sans exposer Bukkit ni promettre une stabilité d'addon au Ticket 007.
 

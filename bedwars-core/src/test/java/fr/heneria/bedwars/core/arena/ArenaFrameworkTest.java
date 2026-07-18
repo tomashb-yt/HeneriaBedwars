@@ -151,7 +151,15 @@ class ArenaFrameworkTest {
     assertEquals(spawn, withSpawn.teams().get(0).spawn().orElseThrow());
     assertTrue(withSpawn.teams().get(1).bedLocation().isEmpty());
 
-    ArenaOperationResult duplicate = service.setTeamBed("alpha", blue, bed, withSpawn.revision());
+    ArenaLocation shop = new ArenaLocation("world", new ArenaVector(15, 65, 15), 180, 0);
+    ArenaDefinition withShop =
+        service.setTeamShop("alpha", red, shop, withSpawn.revision()).arena().orElseThrow();
+    assertEquals(shop, withShop.teams().get(0).shopLocation().orElseThrow());
+    ArenaDefinition withoutShop =
+        service.clearTeamShop("alpha", red, withShop.revision()).arena().orElseThrow();
+    assertTrue(withoutShop.teams().get(0).shopLocation().isEmpty());
+
+    ArenaOperationResult duplicate = service.setTeamBed("alpha", blue, bed, withoutShop.revision());
     assertEquals(ArenaOperationCode.INVALID_ARGUMENT, duplicate.code());
     assertTrue(service.find("alpha").orElseThrow().teams().get(1).bedLocation().isEmpty());
   }

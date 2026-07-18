@@ -19,13 +19,13 @@ La configuration essentielle d'une arène est regroupée dans une vue de cinq li
 - [TERMINÉ] Ticket 011 — Équipes BedWars et navigateur public
 - [TERMINÉ] Correctif de configuration — fiches d'équipes, spawns, sélection des lits et commandes de secours
 - [EN COURS] Ticket 012 — Destruction des lits, morts, réapparitions, éliminations et victoire
-- [EN COURS] Ticket 013 — Générateurs de ressources (phase 2 : assistant, persistance et drops runtime)
-- [À FAIRE] Ticket 014 — Boutiques et achats
+- [EN COURS — VALIDATION PAPER] Ticket 013 — Générateurs de ressources (assistant, persistance et drops runtime)
+- [EN COURS — VALIDATION PAPER] Ticket 014 — Boutiques, PNJ et achats atomiques
 - [À FAIRE] Ticket 015 — Équipement, outils et améliorations
 - [À FAIRE] Ticket 016 — Combat 1.8 et dégâts BedWars
 
 ## Grandes phases futures
 
-La logique automatisée du Ticket 012 est implémentée; sa validation Paper multijoueur reste nécessaire pour le terminer. La phase 2 du Ticket 013 fournit désormais les définitions administratives, la persistance, la configuration guidée et les drops Bukkit. Une validation Paper réelle reste nécessaire avant de déclarer ce ticket terminé; hologrammes et niveaux automatiques sont reportés.
+La logique automatisée du Ticket 012 est implémentée; sa validation Paper multijoueur reste nécessaire pour le terminer. Le Ticket 013 fournit la configuration guidée et les drops Bukkit. Le Ticket 014 ajoute les positions de PNJ, le catalogue, le menu et les achats d'objets simples. Ces trois parcours doivent encore être confirmés sur Paper; équipement durable et améliorations sont reportés au Ticket 015.
 
 Fondation, configurations, interfaces, items, définitions d'arènes, éditeur administratif, cartes modèles, instances temporaires et lobby de partie sont terminés. Les équipes détaillées, lits, générateurs, boutiques, améliorations, combat, statistiques, stockage SQL, réseau et API de mutation restent futurs.

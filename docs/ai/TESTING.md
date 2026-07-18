@@ -1,5 +1,11 @@
 # Tests
 
+## Ticket 014 — boutiques et achats
+
+La suite complète contient 190 tests automatisés réussis, sans échec, erreur ni test ignoré. Les nouveaux scénarios vérifient la position de boutique via `ArenaService`, sa suppression et son round-trip YAML, un achat réussi avec événement interne, et les refus sans échange lorsque le solde ou la place manquent. Le test de configuration recharge aussi `shops.yml`, `items.yml` et la parité FR/EN.
+
+La matrice Paper doit encore confirmer : apparition et orientation des PNJ dans le clone, invulnérabilité, ouverture uniquement en `PLAYING`, refus spectateur, affichage des quatre catégories, achat avec piles réparties, inventaire plein, solde insuffisant, fermeture de partie et disparition du monde/PNJ.
+
 ## Ticket 013 — phase 1
 
 Neuf scénarios purs couvrent identifiants sûrs, règles bornées, upgrade immutable, activation limitée à `PLAYING`, absence de rattrapage en rafale, capacité locale lue seulement à échéance, budget global équitable et refus des enregistrements dupliqués ou tardifs. Aucun test ne prétend créer un item Bukkit : ce raccordement appartient à la phase suivante.

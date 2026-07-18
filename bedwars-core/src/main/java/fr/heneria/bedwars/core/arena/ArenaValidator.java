@@ -154,6 +154,11 @@ public final class ArenaValidator {
               "teams." + team.id().value() + ".bed",
               "Team bed is in a different world");
       }
+      team.shopLocation()
+          .ifPresent(
+              location ->
+                  checkLocationWorld(
+                      problems, arena, location, "teams." + team.id().value() + ".shop"));
     }
     if (total != arena.maximumPlayers())
       error(

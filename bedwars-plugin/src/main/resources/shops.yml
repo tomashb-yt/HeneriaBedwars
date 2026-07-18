@@ -1,6 +1,22 @@
 config-version: 1
 
-# Preparatory only. Purchases are not implemented yet.
 shops:
-  enabled: false
-  categories: {}
+  # Legacy compatibility key. Runtime activation uses runtime-enabled.
+  enabled: true
+  runtime-enabled: true
+  catalog-revision: 1
+  offers:
+    wool: {category: BLOCKS, material: WHITE_WOOL, amount: 16, currency: IRON, price: 4, translation-key: shop.offer.wool, order: 10}
+    oak_planks: {category: BLOCKS, material: OAK_PLANKS, amount: 16, currency: GOLD, price: 4, translation-key: shop.offer.oak_planks, order: 20}
+    end_stone: {category: BLOCKS, material: END_STONE, amount: 12, currency: IRON, price: 24, translation-key: shop.offer.end_stone, order: 30}
+    ladder: {category: BLOCKS, material: LADDER, amount: 8, currency: IRON, price: 4, translation-key: shop.offer.ladder, order: 40}
+    obsidian: {category: BLOCKS, material: OBSIDIAN, amount: 4, currency: EMERALD, price: 4, translation-key: shop.offer.obsidian, order: 50}
+    stone_sword: {category: COMBAT, material: STONE_SWORD, amount: 1, currency: IRON, price: 10, translation-key: shop.offer.stone_sword, order: 110}
+    iron_sword: {category: COMBAT, material: IRON_SWORD, amount: 1, currency: GOLD, price: 7, translation-key: shop.offer.iron_sword, order: 120}
+    golden_apple: {category: COMBAT, material: GOLDEN_APPLE, amount: 1, currency: GOLD, price: 3, translation-key: shop.offer.golden_apple, order: 130}
+    bow: {category: RANGED, material: BOW, amount: 1, currency: GOLD, price: 12, translation-key: shop.offer.bow, order: 210}
+    arrow: {category: RANGED, material: ARROW, amount: 8, currency: GOLD, price: 2, translation-key: shop.offer.arrow, order: 220}
+    tnt: {category: UTILITY, material: TNT, amount: 1, currency: GOLD, price: 4, translation-key: shop.offer.tnt, order: 310}
+    fireball: {category: UTILITY, material: FIRE_CHARGE, amount: 1, currency: IRON, price: 40, translation-key: shop.offer.fireball, order: 320}
+    water_bucket: {category: UTILITY, material: WATER_BUCKET, amount: 1, currency: GOLD, price: 3, translation-key: shop.offer.water_bucket, order: 330}
+    ender_pearl: {category: UTILITY, material: ENDER_PEARL, amount: 1, currency: EMERALD, price: 4, translation-key: shop.offer.ender_pearl, order: 340}

@@ -324,6 +324,19 @@ public final class ArenaService {
         rawId, teamId, expectedRevision, team -> team.withBedDefinition(Optional.empty()));
   }
 
+  public synchronized ArenaOperationResult setTeamShop(
+      String rawId, TeamId teamId, ArenaLocation location, long expectedRevision) {
+    Objects.requireNonNull(location, "location");
+    return updateTeam(
+        rawId, teamId, expectedRevision, team -> team.withShopLocation(Optional.of(location)));
+  }
+
+  public synchronized ArenaOperationResult clearTeamShop(
+      String rawId, TeamId teamId, long expectedRevision) {
+    return updateTeam(
+        rawId, teamId, expectedRevision, team -> team.withShopLocation(Optional.empty()));
+  }
+
   public synchronized ArenaOperationResult addGenerator(
       String rawId, ArenaGeneratorDefinition generator, long expectedRevision) {
     Objects.requireNonNull(generator, "generator");

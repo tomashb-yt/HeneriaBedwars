@@ -12,6 +12,8 @@ import fr.heneria.bedwars.core.game.lobby.GameLobbyService;
 import fr.heneria.bedwars.core.lifecycle.LifecycleComponent;
 import fr.heneria.bedwars.core.logging.ProjectLogger;
 import fr.heneria.bedwars.plugin.config.ConfigurationService;
+import fr.heneria.bedwars.plugin.game.shop.BukkitShopListener;
+import fr.heneria.bedwars.plugin.game.shop.BukkitShopNpcService;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -36,6 +38,8 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
   private final BukkitGameGeneratorRegistry generatorRegistry;
   private final GameGeneratorService generators;
   private final BukkitGameGeneratorAdapter generatorAdapter;
+  private final BukkitShopNpcService shops;
+  private final BukkitShopListener shopListener;
   private final GameDeathService deaths;
   private final GameRespawnService respawns;
   private final BukkitRuntimePlayerGateway players;
@@ -61,6 +65,8 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
       BukkitGameGeneratorRegistry generatorRegistry,
       GameGeneratorService generators,
       BukkitGameGeneratorAdapter generatorAdapter,
+      BukkitShopNpcService shops,
+      BukkitShopListener shopListener,
       GameDeathService deaths,
       GameRespawnService respawns,
       BukkitRuntimePlayerGateway players,
@@ -78,6 +84,8 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     this.generatorRegistry = generatorRegistry;
     this.generators = generators;
     this.generatorAdapter = generatorAdapter;
+    this.shops = shops;
+    this.shopListener = shopListener;
     this.deaths = deaths;
     this.respawns = respawns;
     this.players = players;
@@ -95,6 +103,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
     plugin.getServer().getPluginManager().registerEvents(waitingListener, plugin);
     plugin.getServer().getPluginManager().registerEvents(playListener, plugin);
+    plugin.getServer().getPluginManager().registerEvents(shopListener, plugin);
     eventSubscription =
         events.subscribe(
             event -> {
@@ -107,6 +116,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
                               game -> {
                                 beds.initialize(game);
                                 generatorRegistry.initialize(game);
+                                shops.initialize(game);
                               });
                     if (event instanceof GameVictoryEvent victory)
                       endingDeadlines.put(
@@ -130,6 +140,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     HandlerList.unregisterAll(this);
     HandlerList.unregisterAll(waitingListener);
     HandlerList.unregisterAll(playListener);
+    HandlerList.unregisterAll(shopListener);
     lobby.shutdown();
     displays.clear();
     games.destroyAll("plugin-stop");

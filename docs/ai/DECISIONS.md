@@ -1,5 +1,15 @@
 # Décisions d'architecture
 
+## ADR-080 à ADR-084 — Boutiques runtime
+
+Accepté pour le Ticket 014.
+
+- **ADR-080** — La position d'une boutique appartient à l'équipe administrative; l'entité PNJ reste exclusivement runtime dans le clone.
+- **ADR-081** — Les PNJ sont identifiés par PDC `shop_game_id` et `shop_team_id`, jamais par leur nom, leur profession ou leur apparence.
+- **ADR-082** — Le catalogue actif est un snapshot immuable construit depuis `shops.yml`; une offre invalide est isolée et journalisée sans casser les autres.
+- **ADR-083** — `ShopPurchaseService` porte toutes les règles d'autorisation; le listener et le menu ne mutent pas directement le runtime métier.
+- **ADR-084** — Le retrait de monnaie et l'ajout du produit forment un unique échange d'inventaire simulé puis appliqué; un refus ne consomme rien.
+
 ## ADR-071 à ADR-074 — Fondation des générateurs
 
 Accepté pour la phase 1 du Ticket 013.
