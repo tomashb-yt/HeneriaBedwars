@@ -354,6 +354,9 @@ game:
     success-subtitle: "<gray>Vous êtes temporairement protégé."
     failed-title: "<red>Réapparition impossible"
     failed-subtitle: "<gray>Le spawn de votre équipe est introuvable."
+    countdown-title-v15: "<red><bold>ÉLIMINÉ"
+    countdown-subtitle-v15: "<gray>Réapparition dans <yellow><bold>{seconds}s"
+    countdown-actionbar-v15: "<dark_gray>Respawn <gray>• <yellow>{seconds} seconde(s)"
   spectator:
     no-targets: "<yellow>Aucun joueur actif à suivre."
     teleported: "<green>Vous suivez maintenant <white>{player}<green>."
@@ -363,6 +366,26 @@ game:
     title: "<gold><bold>VICTOIRE !"
     subtitle: "<yellow>L'équipe {team} remporte la partie."
     broadcast: "<gold>Victoire de l'équipe <white>{team}<gold> !"
+  design-v15:
+    join-success: "<dark_gray>[<aqua><bold>HENERIA</bold></aqua><dark_gray>] <green>Vous rejoignez <white>{arena_name} <dark_gray>• <gray>{players}/{maximum_players} joueurs"
+    join-broadcast: "<dark_gray>[<green>+<dark_gray>] <white>{player} <gray>a rejoint la partie <dark_gray>• <white>{players}/{maximum_players}"
+    countdown-started: "<dark_gray>[<aqua><bold>HENERIA</bold></aqua><dark_gray>] <yellow>La partie se prépare. Restez prêt !"
+    countdown-forced: "<dark_gray>[<red>!<dark_gray>] <yellow>Le démarrage a été forcé par un administrateur."
+    countdown-seconds: "<dark_gray>[<yellow>⌛<dark_gray>] <gray>Début dans <yellow><bold>{countdown} seconde(s)"
+    countdown-cancelled: "<dark_gray>[<red>✘<dark_gray>] <red>Démarrage annulé <dark_gray>• <gray>Il manque des joueurs."
+    countdown-accelerated: "<dark_gray>[<green>⚡<dark_gray>] <green>Partie complète <dark_gray>• <gray>Démarrage dans <white>{countdown}s"
+    start-success: "<dark_gray>[<green>✔<dark_gray>] <green>Combat lancé <dark_gray>• <gray>Défendez votre lit et éliminez vos adversaires."
+    start-teleport-failed: "<dark_gray>[<red>✘<dark_gray>] <red>Spawn d'équipe introuvable. Prévenez un administrateur."
+    bed-own: "<dark_gray>[<red>✘<dark_gray>] <red>Vous ne pouvez pas détruire le lit de votre équipe."
+    bed-destroyed: "<dark_gray>[<red>⚔<dark_gray>] <white>{destroyer} <gray>a détruit le lit de l'équipe {team}<gray>."
+    bed-destroyer: "<dark_gray>[<green>✔<dark_gray>] <green>Lit détruit <dark_gray>• <gray>L'équipe {team} <gray>ne peut plus réapparaître."
+    bed-victim: "<dark_gray>[<red>⚠<dark_gray>] <red><bold>VOTRE LIT EST DÉTRUIT</bold> <dark_gray>• <gray>Votre prochaine mort sera définitive."
+    death-respawn: "<dark_gray>[<yellow>☠<dark_gray>] <gray>Vous êtes éliminé temporairement. Préparez votre retour."
+    death-final: "<dark_gray>[<red>☠<dark_gray>] <red>Élimination définitive <dark_gray>• <gray>Votre lit était détruit."
+    spectator-no-targets: "<dark_gray>[<yellow>!<dark_gray>] <yellow>Aucun joueur actif à observer."
+    spectator-teleported: "<dark_gray>[<aqua>➜<dark_gray>] <gray>Vous observez maintenant <white>{player}<gray>."
+    team-eliminated: "<dark_gray>[<red>✘<dark_gray>] <gray>L'équipe {team} <gray>est définitivement éliminée."
+    victory: "<dark_gray>[<gold>★<dark_gray>] <gold><bold>VICTOIRE</bold> <dark_gray>• <gray>L'équipe {team} <gray>remporte la partie !"
   error:
     teleport: "<red>La téléportation vers la partie a échoué."
     internal: "<red>Une erreur interne du lobby est survenue."
@@ -631,6 +654,11 @@ map:
     invalid-world: "<red>Placez-vous dans le monde <white>{world_name}<red>."
     teleport: "<red>La téléportation a échoué."
 generator:
+  item:
+    iron: "<white><bold>Fer Heneria"
+    gold: "<gold><bold>Or Heneria"
+    diamond: "<aqua><bold>Diamant Heneria"
+    emerald: "<green><bold>Émeraude Heneria"
   hologram:
     diamond: "<aqua><bold>GÉNÉRATEUR DE DIAMANT</bold>\n<gray>Niveau <white>{level}\n<white>Prochain minerai : <aqua>{seconds}s"
     emerald: "<green><bold>GÉNÉRATEUR D'ÉMERAUDE</bold>\n<gray>Niveau <white>{level}\n<white>Prochain minerai : <green>{seconds}s"
@@ -645,6 +673,15 @@ shop:
     balance: "<gray>Vous possédez : <white>{balance}"
     available: "<yellow>▸ Cliquez pour acheter"
     unavailable: "<red>Ressources insuffisantes"
+  menu-v2:
+    title: "<dark_gray>HENERIA <gray>• <white>{category}"
+    offer-name: "<white><bold>{item}"
+    amount: "<dark_gray>Quantité <gray>• <white>{amount} article(s)"
+    price: "<dark_gray>Prix <gray>• {currency_color}<bold>{price} {currency}"
+    balance: "<dark_gray>Solde <gray>• {currency_color}{balance} {currency}"
+    available: "<green>✔ Achat disponible\n<yellow>▸ Cliquez pour acheter"
+    insufficient: "<red>✘ Il vous manque {missing} ressource(s)"
+    inventory-full: "<red>✘ Inventaire plein"
   category:
     blocks: "Blocs"
     combat: "Combat"
@@ -655,6 +692,11 @@ shop:
     gold: "or"
     diamond: "diamant(s)"
     emerald: "émeraude(s)"
+  currency-v2:
+    iron: "Fer Heneria"
+    gold: "Or Heneria"
+    diamond: "Diamant Heneria"
+    emerald: "Émeraude Heneria"
   purchase:
     success: "<green>Achat réussi : <white>{amount}× {item}<green> pour <white>{price} {currency}<green>."
     not_in_game: "<red>Vous n'êtes dans aucune partie."
@@ -663,6 +705,14 @@ shop:
     insufficient_funds: "<red>Il vous manque des ressources pour cet achat."
     inventory_full: "<red>Votre inventaire est plein."
     transaction_failed: "<red>L'achat a échoué sans consommer vos ressources."
+  purchase-v2:
+    success: "<dark_gray>[<green>✔<dark_gray>] <green>Achat effectué <dark_gray>• <white>{amount}× {item} <gray>pour {currency_color}<bold>{price} {currency}"
+    not_in_game: "<dark_gray>[<red>✘<dark_gray>] <red>Vous n'êtes dans aucune partie."
+    not_playing: "<dark_gray>[<red>✘<dark_gray>] <red>La boutique est disponible uniquement pendant la partie."
+    spectator: "<dark_gray>[<red>✘<dark_gray>] <red>Un spectateur ne peut pas acheter."
+    insufficient_funds: "<dark_gray>[<red>✘<dark_gray>] <red>Il vous manque <white>{missing}<red> ressource(s)."
+    inventory_full: "<dark_gray>[<red>✘<dark_gray>] <red>Libérez une place dans votre inventaire."
+    transaction_failed: "<dark_gray>[<red>✘<dark_gray>] <red>Achat annulé : aucune ressource n'a été consommée."
   offer:
     wool: "Laine"
     oak_planks: "Planches de chêne"

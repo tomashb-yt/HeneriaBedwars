@@ -82,6 +82,15 @@ public final class BukkitRuntimePlayerGateway implements RuntimePlayerGateway {
   }
 
   @Override
+  public CompletionStage<Boolean> finish(UUID playerId) {
+    return main(
+        () -> {
+          Player player = Bukkit.getPlayer(playerId);
+          return player != null && snapshots.restoreToLobby(player);
+        });
+  }
+
+  @Override
   public void disconnect(UUID playerId) {
     Runnable action =
         () -> {

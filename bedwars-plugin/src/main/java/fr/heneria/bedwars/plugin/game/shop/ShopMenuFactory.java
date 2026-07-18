@@ -46,18 +46,18 @@ public final class ShopMenuFactory {
     var game = games.byPlayer(playerId).orElse(null);
     if (player == null || game == null) return unavailable();
     var catalog = catalogs.current();
-    BukkitShopInventory inventory = new BukkitShopInventory(player);
+    BukkitShopInventory inventory = new BukkitShopInventory(player, teamColor(game, playerId));
     Map<String, Object> wallet = wallet(inventory);
     Gui.Builder builder =
         Gui.builder()
             .id("game.shop." + selected.name().toLowerCase(Locale.ROOT))
-            .title(message("shop.menu.title", Map.of("category", categoryName(selected))))
+            .title(message("shop.menu-v2.title", Map.of("category", categoryName(selected))))
             .rows(6)
             .fillEmptySlots(true)
             .button(
                 4,
                 GuiButton.builder()
-                    .itemKey("shop.wallet-v1")
+                    .itemKey("shop.wallet-v2")
                     .itemPlaceholders(context -> wallet)
                     .build());
     ShopCategory[] categories = ShopCategory.values();
@@ -70,12 +70,12 @@ public final class ShopMenuFactory {
               .itemKey(
                   "shop.category."
                       + category.name().toLowerCase(Locale.ROOT)
-                      + (category == selected ? "-selected-v1" : "-v1"))
+                      + (category == selected ? "-selected-v2" : "-v2"))
               .onLeftClick(context -> context.replace(menu(playerId, category)))
               .build());
     }
     List<ShopOffer> offers = catalog.category(selected);
-    if (offers.isEmpty()) builder.button(31, GuiButton.builder().itemKey("shop.empty-v1").build());
+    if (offers.isEmpty()) builder.button(31, GuiButton.builder().itemKey("shop.empty-v2").build());
     for (int index = 0; index < Math.min(offers.size(), OFFER_SLOTS.size()); index++) {
       ShopOffer offer = offers.get(index);
       builder.button(
@@ -107,7 +107,10 @@ public final class ShopMenuFactory {
       Player player,
       ShopCategory category,
       ShopOffer offer) {
-    var result = purchases.purchase(player.getUniqueId(), offer, new BukkitShopInventory(player));
+    var game = games.byPlayer(player.getUniqueId()).orElse(null);
+    BukkitShopInventory inventory =
+        new BukkitShopInventory(player, teamColor(game, player.getUniqueId()));
+    var result = purchases.purchase(player.getUniqueId(), offer, inventory);
     Map<String, Object> values =
         Map.of(
             "item",
@@ -118,10 +121,12 @@ public final class ShopMenuFactory {
             offer.price(),
             "currency",
             currencyName(offer.currency()),
+            "currency_color",
+            currencyColor(offer.currency()),
             "missing",
             Math.max(0, offer.price() - result.balance()));
     player.sendMessage(
-        message("shop.purchase." + result.code().name().toLowerCase(Locale.ROOT), values));
+        message("shop.purchase-v2." + result.code().name().toLowerCase(Locale.ROOT), values));
     player.playSound(
         player.getLocation(),
         result.successful() ? Sound.ENTITY_EXPERIENCE_ORB_PICKUP : Sound.BLOCK_NOTE_BLOCK_BASS,
@@ -135,18 +140,37 @@ public final class ShopMenuFactory {
 
   private GuiItem offerItem(BukkitShopInventory inventory, ShopOffer offer) {
     int balance = inventory.balance(offer.currency());
-    boolean affordable = balance >= offer.price() && inventory.canExchange(offer);
-    String state = message(affordable ? "shop.menu.available" : "shop.menu.unavailable", Map.of());
+    boolean enough = balance >= offer.price();
+    boolean space = inventory.canExchange(offer);
+    boolean affordable = enough && space;
+    String state =
+        message(
+            affordable
+                ? "shop.menu-v2.available"
+                : enough ? "shop.menu-v2.inventory-full" : "shop.menu-v2.insufficient",
+            Map.of("missing", Math.max(0, offer.price() - balance)));
     return new GuiItem(
-        offer.material(),
+        inventory.productMaterial(offer).name(),
         Math.min(99, offer.amount()),
-        message(offer.translationKey(), Map.of()),
+        message(
+            "shop.menu-v2.offer-name", Map.of("item", message(offer.translationKey(), Map.of()))),
         List.of(
-            message("shop.menu.amount", Map.of("amount", offer.amount())),
+            message("shop.menu-v2.amount", Map.of("amount", offer.amount())),
             message(
-                "shop.menu.price",
-                Map.of("price", offer.price(), "currency", currencyName(offer.currency()))),
-            message("shop.menu.balance", Map.of("balance", balance)),
+                "shop.menu-v2.price",
+                Map.of(
+                    "price",
+                    offer.price(),
+                    "currency",
+                    currencyName(offer.currency()),
+                    "currency_color",
+                    currencyColor(offer.currency()))),
+            message(
+                "shop.menu-v2.balance",
+                Map.of(
+                    "balance", balance,
+                    "currency", currencyName(offer.currency()),
+                    "currency_color", currencyColor(offer.currency()))),
             "",
             state),
         affordable,
@@ -165,7 +189,25 @@ public final class ShopMenuFactory {
   }
 
   private String currencyName(ShopCurrency currency) {
-    return message("shop.currency." + currency.name().toLowerCase(Locale.ROOT), Map.of());
+    return message("shop.currency-v2." + currency.name().toLowerCase(Locale.ROOT), Map.of());
+  }
+
+  private static String currencyColor(ShopCurrency currency) {
+    return switch (currency) {
+      case IRON -> "\u00a7f";
+      case GOLD -> "\u00a76";
+      case DIAMOND -> "\u00a7b";
+      case EMERALD -> "\u00a7a";
+    };
+  }
+
+  private static String teamColor(fr.heneria.bedwars.core.game.GameInstance game, UUID playerId) {
+    if (game == null) return "WHITE";
+    return game.player(playerId)
+        .flatMap(fr.heneria.bedwars.core.game.RuntimePlayer::teamId)
+        .flatMap(game::team)
+        .map(team -> team.snapshot().color())
+        .orElse("WHITE");
   }
 
   private String message(String key, Map<String, ?> values) {
@@ -182,7 +224,7 @@ public final class ShopMenuFactory {
         .title("Boutique indisponible")
         .rows(3)
         .fillEmptySlots(true)
-        .button(13, GuiButton.builder().itemKey("shop.empty-v1").build())
+        .button(13, GuiButton.builder().itemKey("shop.empty-v2").build())
         .build();
   }
 }

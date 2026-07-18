@@ -1,5 +1,7 @@
 package fr.heneria.bedwars.plugin.game;
 
+import fr.heneria.bedwars.core.arena.ArenaDefinition;
+import fr.heneria.bedwars.core.arena.ArenaService;
 import fr.heneria.bedwars.core.command.AdministrativeCommandPolicy;
 import fr.heneria.bedwars.core.config.PlaceholderContext;
 import fr.heneria.bedwars.core.game.GameInstance;
@@ -30,6 +32,7 @@ public final class GameCommandHandler {
   private final GameInstanceManager games;
   private final GameCountdownService countdowns;
   private final GameLobbyService lobby;
+  private final ArenaService arenas;
   private final ConfigurationService configurations;
 
   public GameCommandHandler(
@@ -37,11 +40,13 @@ public final class GameCommandHandler {
       GameInstanceManager games,
       GameCountdownService countdowns,
       GameLobbyService lobby,
+      ArenaService arenas,
       ConfigurationService configurations) {
     this.plugin = plugin;
     this.games = games;
     this.countdowns = countdowns;
     this.lobby = lobby;
+    this.arenas = arenas;
     this.configurations = configurations;
   }
 
@@ -199,9 +204,30 @@ public final class GameCommandHandler {
       return send(
           player, "game.help.usage.join", Map.of("maps", String.join(", ", publicMapIds())));
     GameInstance instance = bestPublicGame(args[1]);
-    if (instance == null)
+    if (instance != null) {
+      join(player, player, instance);
+      return true;
+    }
+    ArenaDefinition arena = publicArena(args[1]);
+    if (arena == null)
       return send(player, "game.error.no-available-instance", Map.of("map", args[1]));
-    join(player, player, instance);
+    send(player, "game.command.creating", Map.of("arena_id", arena.id().value()));
+    games
+        .create(arena.id().value())
+        .whenComplete(
+            (created, failure) ->
+                main(
+                    () -> {
+                      GameInstance available =
+                          created != null && created.successful()
+                              ? created.instance().orElse(null)
+                              : games.byArena(arena.id().value()).orElse(null);
+                      if (failure != null || available == null) {
+                        send(player, "game.error.no-available-instance", Map.of("map", args[1]));
+                        return;
+                      }
+                      join(player, player, available);
+                    }));
     return true;
   }
 
@@ -347,15 +373,27 @@ public final class GameCommandHandler {
   }
 
   private List<String> publicMapIds() {
-    return games.all().stream()
-        .filter(
-            game ->
-                game.state() == fr.heneria.bedwars.api.game.GameState.WAITING
-                    || game.state() == fr.heneria.bedwars.api.game.GameState.STARTING)
-        .map(game -> game.arena().template().id().value())
+    return arenas.list().stream()
+        .filter(ArenaDefinition::enabled)
+        .filter(arena -> arenas.validate(arena).valid())
+        .flatMap(arena -> arena.template().stream())
         .distinct()
         .sorted()
         .toList();
+  }
+
+  private ArenaDefinition publicArena(String reference) {
+    String wanted = reference.trim();
+    return arenas.list().stream()
+        .filter(ArenaDefinition::enabled)
+        .filter(arena -> arenas.validate(arena).valid())
+        .filter(
+            arena ->
+                arena.id().value().equalsIgnoreCase(wanted)
+                    || arena.displayName().equalsIgnoreCase(wanted)
+                    || arena.template().filter(value -> value.equalsIgnoreCase(wanted)).isPresent())
+        .findFirst()
+        .orElse(null);
   }
 
   private GameInstance bestPublicGame(String reference) {

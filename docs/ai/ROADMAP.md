@@ -1,5 +1,9 @@
 # Roadmap
 
+## Correctif gameplay en validation
+
+Le socle des Tickets 012 à 014 est maintenant réellement jouable : combat activé dans le clone, construction limitée aux blocs des joueurs, respawn lisible, boutique colorée, minerais Heneria et recyclage complet des parties. Ces comportements doivent être confirmés à deux joueurs sur Paper avant de passer au Ticket 015; l'architecture du prochain ticket reste inchangée.
+
 ## Correctif en validation — menus, PNJ et générateurs
 
 La fiche d'équipe est désormais organisée en trois colonnes stables (spawn, lit et boutique), avec uniquement les actions réellement disponibles. Les PNJ de boutique sont réparés au démarrage du gameplay et les anciennes configurations reçoivent le catalogue par défaut sans écrasement. Les générateurs centrent et immobilisent leurs propres drops, adaptent modérément leur rythme à la population et affichent le prochain diamant ou la prochaine émeraude par hologramme. Une validation Paper multijoueur reste requise avant de clore les Tickets 013 et 014.

@@ -12,6 +12,8 @@ Le PNJ est recréé au passage `PLAYING` afin de réparer une création anticip�
 
 Le menu expose quatre catégories : blocs, combat, distance et utilitaires. Chaque article affiche sa quantité, son prix, la monnaie et le solde du joueur. Après achat, la vue et le portefeuille sont rafraîchis.
 
+La version v2 distingue visuellement chaque rayon, colore prix et solde selon le minerai et explique séparément un manque de ressources ou un inventaire plein. L'offre logique `WHITE_WOOL` est rendue puis livrée dans la couleur du `RuntimeTeam`, y compris AQUA en laine bleu clair. Les monnaies générées portent un nom localisé Heneria tout en restant reconnues par leur matériau vanilla.
+
 ## Catalogue
 
 Les offres vivent sous `shops.offers.<id>` dans `shops.yml` :

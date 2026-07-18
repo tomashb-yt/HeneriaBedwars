@@ -293,6 +293,8 @@ class ConfigurationSystemTest {
     assertTrue(evolvedItems.contains("entry-aqua-v6:"));
     assertTrue(evolvedItems.contains("guide-v6:"));
     assertTrue(evolvedItems.contains("guide-v10:"));
+    assertTrue(evolvedItems.contains("wallet-v2:"));
+    assertTrue(evolvedItems.contains("blocks-selected-v2:"));
     String evolvedShops = Files.readString(temporary.resolve("shops.yml"));
     assertTrue(evolvedShops.contains("runtime-enabled: true"));
     assertTrue(evolvedShops.contains("wool:"));
@@ -313,6 +315,8 @@ class ConfigurationSystemTest {
     assertTrue(Files.readString(french).contains("assistant-title:"));
     assertTrue(Files.readString(french).contains("subtitle-v6:"));
     assertTrue(Files.readString(french).contains("team-title-aqua-v6:"));
+    assertTrue(Files.readString(french).contains("design-v15:"));
+    assertTrue(Files.readString(french).contains("currency-v2:"));
     assertTrue(
         service
             .snapshot()

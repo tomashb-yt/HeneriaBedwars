@@ -1,5 +1,11 @@
 # Runtime des parties et lobby d'attente
 
+## Correctif jouabilité et retour lobby
+
+Le clone force le PVP même si le monde modèle était protégé pendant sa construction. Les placements réussis sont enregistrés dans `GameInstance`; seuls ces blocs peuvent ensuite être cassés ou détruits par une explosion, tandis que le décor et les lits restent gouvernés par leurs services dédiés.
+
+À une mort avec lit vivant, la gamerule de respawn immédiat évite l'écran vanilla et un repli Spigot force le retour si nécessaire. Le titre et l'actionbar sont recalculés chaque seconde depuis l'échéance runtime. À la fin, `finish` restaure l'état du joueur au lobby avant le déchargement. La surface publique liste les cartes d'arènes actives, pas seulement les instances déjà chargées.
+
 ## Ticket 012 — cycle jouable
 
 Pendant `PLAYING`, `GameBedService` protège le lit allié et attribue une seule destruction ennemie. Une mort consulte l'état du lit au moment exact de la décision : lit vivant, le joueur passe spectateur temporaire et réapparaît; lit détruit, il devient spectateur définitif. Les respawns sont des données de `RuntimePlayer` avancées chaque seconde, sans tâche individuelle.

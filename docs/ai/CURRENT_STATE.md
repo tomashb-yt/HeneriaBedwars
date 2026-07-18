@@ -1,5 +1,16 @@
 # État actuel
 
+## Correctif gameplay 012–014 — validation Paper
+
+- PVP forcé dans les clones BedWars, indépendamment du mode de construction de la carte modèle;
+- placement autorisé aux joueurs actifs, avec registre runtime permettant de casser uniquement les blocs posés;
+- mort immédiate et compteur titre/actionbar actualisé à 5, 4, 3, 2 et 1 seconde;
+- laine de boutique adaptée aux douze couleurs d'équipe et prix colorés par monnaie;
+- drops renommés Fer, Or, Diamant et Émeraude Heneria sans casser leur utilisation comme monnaie;
+- retour de fin de match au lobby avant suppression complète du clone;
+- arène active de nouveau listée et clonée à la demande par `/bw join` après nettoyage.
+- validation automatisée complète : 196 tests réussis, build, formatage et JAR déployable validés.
+
 ## Correctif Tickets 013–014 — validation Paper
 
 - fiche d'équipe en trois colonnes lisibles, sans barrières d'actions indisponibles;

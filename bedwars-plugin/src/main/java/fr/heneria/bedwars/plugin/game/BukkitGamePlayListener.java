@@ -84,44 +84,58 @@ public final class BukkitGamePlayListener implements Listener {
     this.runtimeItems = new RuntimeItemPdc(plugin);
   }
 
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onBreak(BlockBreakEvent event) {
     GameInstance game = playing(event.getPlayer()).orElse(null);
     if (game == null || !runtimeWorld(game, event.getBlock().getWorld().getName())) return;
-    event.setCancelled(true);
     BedDestroyResult result =
         beds.destroy(event.getPlayer().getUniqueId(), position(event.getBlock()));
     if (result.code() == BedDestroyCode.OWN_BED) {
-      event.getPlayer().sendMessage(message("game.bed.own", PlaceholderContext.EMPTY));
+      event.setCancelled(true);
+      event.getPlayer().sendMessage(message("game.design-v15.bed-own", PlaceholderContext.EMPTY));
       return;
     }
-    if (!result.successful()) return;
-    var bed = result.bed().orElseThrow();
-    event
-        .getBlock()
-        .getWorld()
-        .getBlockAt(bed.foot().x(), bed.foot().y(), bed.foot().z())
-        .setType(Material.AIR, false);
-    event
-        .getBlock()
-        .getWorld()
-        .getBlockAt(bed.head().x(), bed.head().y(), bed.head().z())
-        .setType(Material.AIR, false);
+    if (result.successful()) {
+      event.setCancelled(true);
+      var bed = result.bed().orElseThrow();
+      event
+          .getBlock()
+          .getWorld()
+          .getBlockAt(bed.foot().x(), bed.foot().y(), bed.foot().z())
+          .setType(Material.AIR, false);
+      event
+          .getBlock()
+          .getWorld()
+          .getBlockAt(bed.head().x(), bed.head().y(), bed.head().z())
+          .setType(Material.AIR, false);
+      return;
+    }
+    if (game.removePlacedBlock(position(event.getBlock()))) return;
+    event.setCancelled(true);
   }
 
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onPlace(BlockPlaceEvent event) {
-    if (playing(event.getPlayer()).isPresent()) event.setCancelled(true);
+    RuntimePlayer runtime = runtime(event.getPlayer()).orElse(null);
+    if (runtime != null && (runtime.spectator() || runtime.respawning() || runtime.finalDeath()))
+      event.setCancelled(true);
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onPlaced(BlockPlaceEvent event) {
+    GameInstance game = playing(event.getPlayer()).orElse(null);
+    if (game == null || !runtimeWorld(game, event.getBlock().getWorld().getName())) return;
+    game.recordPlacedBlock(position(event.getBlock()));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
   public void onExplosion(EntityExplodeEvent event) {
-    protectBeds(event.getLocation().getWorld().getName(), event.blockList());
+    protectRuntimeMap(event.getLocation().getWorld().getName(), event.blockList());
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
   public void onBlockExplosion(BlockExplodeEvent event) {
-    protectBeds(event.getBlock().getWorld().getName(), event.blockList());
+    protectRuntimeMap(event.getBlock().getWorld().getName(), event.blockList());
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
@@ -206,6 +220,14 @@ public final class BukkitGamePlayListener implements Listener {
     event.setDroppedExp(0);
     event.setKeepLevel(true);
     combat.forget(victim.getUniqueId());
+    plugin
+        .getServer()
+        .getScheduler()
+        .runTask(
+            plugin,
+            () -> {
+              if (victim.isOnline() && victim.isDead()) victim.spigot().respawn();
+            });
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
@@ -275,14 +297,14 @@ public final class BukkitGamePlayListener implements Listener {
       if (target == null) {
         event
             .getPlayer()
-            .sendMessage(message("game.spectator.no-targets", PlaceholderContext.EMPTY));
+            .sendMessage(message("game.design-v15.spectator-no-targets", PlaceholderContext.EMPTY));
       } else {
         event.getPlayer().teleport(target.getLocation());
         event
             .getPlayer()
             .sendMessage(
                 message(
-                    "game.spectator.teleported",
+                    "game.design-v15.spectator-teleported",
                     PlaceholderContext.builder().put("player", target.getName()).build()));
       }
     }
@@ -308,7 +330,7 @@ public final class BukkitGamePlayListener implements Listener {
     itemActions.forget(playerId);
   }
 
-  private void protectBeds(String worldName, java.util.List<org.bukkit.block.Block> blocks) {
+  private void protectRuntimeMap(String worldName, java.util.List<org.bukkit.block.Block> blocks) {
     GameInstance game =
         games.all().stream()
             .filter(candidate -> candidate.state() == GameState.PLAYING)
@@ -316,7 +338,12 @@ public final class BukkitGamePlayListener implements Listener {
             .findFirst()
             .orElse(null);
     if (game == null) return;
-    blocks.removeIf(block -> game.bedAt(position(block)).isPresent());
+    blocks.removeIf(
+        block -> {
+          RuntimeBlockPosition position = position(block);
+          if (game.bedAt(position).isPresent()) return true;
+          return !game.removePlacedBlock(position);
+        });
   }
 
   private boolean runtimeBed(org.bukkit.block.Block block) {

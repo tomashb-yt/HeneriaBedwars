@@ -1,5 +1,13 @@
 # Historique des tickets
 
+## Correctif gameplay Tickets 012–014 — 2026-07-18
+
+Le monde runtime force maintenant le PVP et n'autorise la destruction que des blocs posés pendant cette instance; la carte modèle reste intacte. La mort est immédiatement basculée en spectateur temporaire et le titre/actionbar suit chaque seconde de l'échéance de respawn. Les messages runtime adoptent une présentation Heneria cohérente.
+
+La boutique v2 affiche rayons, prix et soldes plus lisiblement. La laine blanche logique devient la couleur de l'équipe lors du rendu et de l'achat; les minerais générés portent un nom Heneria localisé. Après victoire, le manager attend le retour au lobby, supprime entièrement le clone, libère l'arène et `/bw join` en crée un nouveau à la demande.
+
+Validation : 196 tests automatisés réussis, aucun échec ni erreur; compilation complète, Spotless et Shadow JAR validés. La matrice Paper à deux joueurs reste obligatoire.
+
 ## Correctif Tickets 013–014 — menus, PNJ, rythme et hologrammes — 2026-07-18
 
 Après validation en jeu, la fiche d'équipe a été reconstruite sur six lignes avec trois colonnes stables spawn/lit/boutique. Les boutons suivent état, définir, visiter, retirer; les actions impossibles ne remplissent plus l'écran de barrières. La cause des PNJ absents était l'ancien `shops.yml`, qui ne faisait pas partie des fichiers évolutifs : il est maintenant sauvegardé puis complété sans écrasement, et le PNJ est créé indépendamment du catalogue puis réparé au démarrage.

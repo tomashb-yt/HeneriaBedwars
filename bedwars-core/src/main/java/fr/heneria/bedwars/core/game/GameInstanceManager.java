@@ -297,6 +297,7 @@ public final class GameInstanceManager {
     GameInstance instance = find(id).orElse(null);
     if (instance == null)
       return completed(GameOperationResult.failure(GameOperationCode.NOT_FOUND, id.toString()));
+    java.util.List<UUID> departingPlayers;
     synchronized (this) {
       if (!destroying.add(id))
         return completed(
@@ -317,16 +318,33 @@ public final class GameInstanceManager {
             GameOperationResult.failure(
                 GameOperationCode.INVALID_STATE, instance, exception.getMessage()));
       }
-      for (UUID playerId : instance.playerIds()) {
+      departingPlayers = java.util.List.copyOf(instance.playerIds());
+      for (UUID playerId : departingPlayers) {
         byPlayer.remove(playerId);
         instance.removePlayer(playerId, now());
-        players.leave(playerId);
-        events.publish(new PlayerGameLeaveEvent(id, playerId, now()));
       }
     }
     RuntimeWorldHandle world = instance.world().orElse(null);
+    CompletableFuture<?>[] restorations =
+        departingPlayers.stream()
+            .map(
+                playerId ->
+                    players
+                        .finish(playerId)
+                        .handle(
+                            (restored, failure) -> {
+                              events.publish(new PlayerGameLeaveEvent(id, playerId, now()));
+                              return null;
+                            })
+                        .toCompletableFuture())
+            .toArray(CompletableFuture[]::new);
     CompletionStage<Void> destruction =
-        world == null ? CompletableFuture.completedFuture(null) : worlds.destroy(world);
+        CompletableFuture.allOf(restorations)
+            .thenCompose(
+                ignored ->
+                    world == null
+                        ? CompletableFuture.completedFuture(null)
+                        : worlds.destroy(world));
     return destruction.handle(
         (ignored, failure) -> {
           if (failure != null) {

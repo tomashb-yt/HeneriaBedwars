@@ -1,5 +1,14 @@
 # Décisions d'architecture
 
+## ADR-090 à ADR-095 — Boucle jouable et recyclage
+
+- **ADR-090** — Le PVP d'un clone BedWars est toujours actif; le réglage PVP du modèle reste réservé à son monde administratif.
+- **ADR-091** — La carte runtime est immuable par défaut. Seuls les blocs enregistrés dans `GameInstance` après un placement réussi peuvent être cassés ou détruits par une explosion.
+- **ADR-092** — Le respawn immédiat repose sur la gamerule du clone avec un repli Spigot au tick suivant; son affichage lit l'unique échéance `RuntimePlayer.respawnAt` depuis le ticker central.
+- **ADR-093** — `WHITE_WOOL` est l'offre logique de laine d'équipe et devient dynamiquement la laine du `RuntimeTeam` au rendu comme à l'échange atomique.
+- **ADR-094** — Les noms Heneria sont des métadonnées visuelles; la monnaie continue d'être reconnue par son matériau vanilla pour conserver compatibilité et empilement.
+- **ADR-095** — La fin de match attend le retour lobby avant la destruction du monde. Une arène active sans instance reste publiquement sélectionnable et est clonée à la demande.
+
 ## ADR-085 à ADR-089 — Stabilisation générateurs et réparation des PNJ
 
 - **ADR-085** — `shops.yml` et `generators.yml` rejoignent l'évolution non destructive des ressources version 1; les personnalisations existantes restent prioritaires.

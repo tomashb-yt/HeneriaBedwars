@@ -1,5 +1,11 @@
 # Tests
 
+## Correctif gameplay 012–014
+
+Les nouveaux scénarios vérifient le registre match-scoped des blocs placés, l'impossibilité de l'utiliser avant `PLAYING`, l'attente du retour lobby avant suppression du monde, les couleurs de laine dont AQUA, l'évolution des ressources v2 et la parité FR/EN. La matrice Paper doit encore confirmer PVP, événements de placement/explosion, mort immédiate, titres 5–1, retour lobby et nouveau clone après victoire.
+
+Validation complète : 196 tests automatisés réussis, aucun échec ni erreur; build propre, Spotless et Shadow JAR validés.
+
 ## Correctif Tickets 013–014
 
 La suite couvre désormais les bornes du rythme adaptatif, sa désactivation, le recalage de la première échéance à `PLAYING` et l'évolution d'anciens `shops.yml`/`generators.yml` avec sauvegardes. La matrice Paper doit confirmer la fiche en trois colonnes, les PNJ réparés, les drops immobiles et les compteurs holographiques synchronisés.

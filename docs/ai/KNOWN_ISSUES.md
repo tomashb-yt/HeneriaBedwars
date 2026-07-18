@@ -1,5 +1,9 @@
 # Limitations connues
 
+## Correctif gameplay à confirmer sur Paper
+
+Les blocages explicites du placement et du PVP ont été retirés/corrigés. Le compteur de respawn, le repli de mort immédiate, les douze couleurs de laine, le retour lobby et la recréation publique disposent de tests purs ou de contrôles de configuration, mais leurs événements Bukkit réels exigent encore une partie à deux joueurs. Le combat 1.8 avancé, les outils persistants et les blocs spéciaux restent au prochain ticket.
+
 ## Correctif générateurs et PNJ
 
 - Les `TextDisplay`, l'ancrage des items et la réparation des villageois doivent encore être confirmés visuellement sur Paper 1.21.x.

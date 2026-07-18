@@ -16,6 +16,8 @@ Un `BlockBreakEvent` n'est traité que pour un membre `PLAYING` dans le monde de
 
 `GameDeathService` choisit `RESPAWN`, `FINAL_DEATH` ou `IGNORE`. La politique `AT_DEATH` accorde le respawn si le lit était vivant à la mort. `GameRespawnService` balaie les échéances depuis le ticker central, téléporte au spawn d'équipe et active `protectedUntil`.
 
+Le clone active `doImmediateRespawn`; un appel Spigot au tick suivant sert de repli. Pendant le délai, `BukkitGameDisplayService` affiche chaque seconde restante dans le titre et l'actionbar sans créer de tâche par joueur.
+
 Sans lit, le joueur devient spectateur définitif. Quand aucun membre de l'équipe ne peut revenir, l'équipe est éliminée. Une seule équipe participante restante produit `GameVictoryEvent`, `ENDING`, annonce, délai, restauration des snapshots et suppression du clone.
 
 ## Limites

@@ -1,5 +1,11 @@
 # Configuration
 
+## Correctif gameplay 012–014
+
+`lobby.yml > main-lobby` devient la destination prioritaire après une partie. Si ce point n'est pas configuré ou si son monde est absent, le joueur revient au spawn du monde `worlds.yml > fallback-world`. Un départ volontaire conserve la restauration exacte de la position précédente.
+
+Les nouvelles apparences `shop.*-v2`, traductions `shop.menu-v2`, `shop.purchase-v2`, `game.design-v15` et noms `generator.item.*` sont fusionnés sans écraser les personnalisations existantes. `shops.yml` continue d'utiliser `WHITE_WOOL` pour l'offre logique : la couleur réelle est choisie à l'achat depuis l'équipe.
+
 ## Ticket 014 — `shops.yml`
 
 `shops.runtime-enabled` active la création des PNJ et le catalogue runtime. Chaque entrée `shops.offers.<id>` définit `category`, `material`, `amount`, `currency`, `price`, `translation-key` et `order`. Les catégories sont `BLOCKS`, `COMBAT`, `RANGED`, `UTILITY`; les monnaies sont `IRON`, `GOLD`, `DIAMOND`, `EMERALD`. Les identifiants suivent `[a-z0-9_-]{2,32}` et les valeurs numériques doivent être positives. Une offre invalide est ignorée avec avertissement, sans invalider les autres offres.

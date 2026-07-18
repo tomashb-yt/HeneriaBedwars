@@ -1,11 +1,13 @@
 package fr.heneria.bedwars.plugin.game;
 
+import fr.heneria.bedwars.core.config.LobbySettings;
 import fr.heneria.bedwars.core.config.WorldManagerSettings;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,10 +17,13 @@ import org.bukkit.potion.PotionEffect;
 /** Main-thread-only in-memory capture and restoration service for pre-game player state. */
 public final class BukkitPlayerSnapshotService {
   private final WorldManagerSettings worlds;
+  private final Supplier<LobbySettings> lobbySettings;
   private final Map<UUID, PlayerPreGameSnapshot> snapshots = new LinkedHashMap<>();
 
-  public BukkitPlayerSnapshotService(WorldManagerSettings worlds) {
+  public BukkitPlayerSnapshotService(
+      WorldManagerSettings worlds, Supplier<LobbySettings> lobbySettings) {
     this.worlds = worlds;
+    this.lobbySettings = lobbySettings;
   }
 
   /** Captures once and refuses a second mutable snapshot for the same player. */
@@ -57,22 +62,20 @@ public final class BukkitPlayerSnapshotService {
 
   /** Restores and removes a snapshot only after the destination teleport succeeds. */
   public synchronized boolean restore(Player player) {
+    return restore(player, false);
+  }
+
+  /** Restores gameplay state but always sends match participants back to the main lobby. */
+  public synchronized boolean restoreToLobby(Player player) {
+    return restore(player, true);
+  }
+
+  private boolean restore(Player player, boolean mainLobby) {
     requireMainThread();
     PlayerPreGameSnapshot snapshot = snapshots.get(player.getUniqueId());
     if (snapshot == null) return false;
-    World destination = Bukkit.getWorld(snapshot.worldName());
-    if (destination == null) destination = Bukkit.getWorld(worlds.fallbackWorld());
-    if (destination == null) return false;
-    Location location =
-        destination.getName().equals(snapshot.worldName())
-            ? new Location(
-                destination,
-                snapshot.x(),
-                snapshot.y(),
-                snapshot.z(),
-                snapshot.yaw(),
-                snapshot.pitch())
-            : destination.getSpawnLocation();
+    Location location = mainLobby ? lobbyLocation() : previousLocation(snapshot);
+    if (location == null) return false;
     if (!player.teleport(location)) return false;
     player.getInventory().setStorageContents(snapshot.storage());
     player.getInventory().setArmorContents(snapshot.armor());
@@ -96,6 +99,27 @@ public final class BukkitPlayerSnapshotService {
     player.updateInventory();
     snapshots.remove(player.getUniqueId());
     return true;
+  }
+
+  private Location lobbyLocation() {
+    LobbySettings lobby = lobbySettings.get();
+    if (lobby.configured()) {
+      World world = Bukkit.getWorld(lobby.world());
+      if (world != null)
+        return new Location(world, lobby.x(), lobby.y(), lobby.z(), lobby.yaw(), lobby.pitch());
+    }
+    World fallback = Bukkit.getWorld(worlds.fallbackWorld());
+    return fallback == null ? null : fallback.getSpawnLocation();
+  }
+
+  private Location previousLocation(PlayerPreGameSnapshot snapshot) {
+    World destination = Bukkit.getWorld(snapshot.worldName());
+    if (destination == null) destination = Bukkit.getWorld(worlds.fallbackWorld());
+    if (destination == null) return null;
+    return destination.getName().equals(snapshot.worldName())
+        ? new Location(
+            destination, snapshot.x(), snapshot.y(), snapshot.z(), snapshot.yaw(), snapshot.pitch())
+        : destination.getSpawnLocation();
   }
 
   public synchronized Optional<PlayerPreGameSnapshot> find(UUID playerId) {

@@ -204,6 +204,7 @@ public final class GameLifecycleComponent implements LifecycleComponent, Listene
     if (ticks % 5 == 0) generatorAdapter.stabilize();
     if (ticks % 20 == 0) {
       lobby.tick();
+      displays.refreshRespawns(games.all(), java.time.Instant.now());
       respawns.tick();
       finishEndedGames();
       generatorHolograms.refresh(games.all(), java.time.Instant.now());

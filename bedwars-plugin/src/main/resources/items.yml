@@ -596,7 +596,9 @@ items:
       summary-v5: {material: FILLED_MAP, glow: true, name: "<gold><bold>Remplacer {map_name} ?", lore: ["<gray>Source : <white>{import_path}", "", "<yellow>Le monde ouvert sera fermé.", "<yellow>L'ancienne version sera sauvegardée.", "<yellow>Le nouveau monde sera chargé.", "", "<red>Vérifiez que level.dat est présent."]}
   shop:
     wallet-v1: {material: CHEST, name: "<gold><bold>Vos ressources", lore: ["<white>Fer : <gray>{iron}", "<gold>Or : <white>{gold}", "<aqua>Diamants : <white>{diamond}", "<green>Émeraudes : <white>{emerald}", "", "<dark_gray>Le menu se met à jour après achat."]}
+    wallet-v2: {material: ENDER_CHEST, glow: true, name: "<gold><bold>PORTE-MONNAIE HENERIA", lore: ["<white>Fer Heneria <dark_gray>• <white>{iron}", "<gold>Or Heneria <dark_gray>• <white>{gold}", "<aqua>Diamant Heneria <dark_gray>• <white>{diamond}", "<green>Émeraude Heneria <dark_gray>• <white>{emerald}", "", "<gray>Les ressources sont mises à jour", "<gray>après chaque achat."]}
     empty-v1: {material: BARRIER, name: "<red>Aucun article disponible", lore: ["<gray>Cette catégorie est vide ou", "<gray>le catalogue est désactivé."]}
+    empty-v2: {material: MINECART, name: "<yellow><bold>RAYON INDISPONIBLE", lore: ["<gray>Aucun article n'est proposé", "<gray>dans cette catégorie.", "", "<white>Essayez un autre rayon."]}
     category:
       blocks-v1: &shop-blocks {material: WHITE_WOOL, name: "<white><bold>Blocs", lore: ["<gray>Défense et construction.", "", "<yellow>▸ Cliquez pour ouvrir"]}
       blocks-selected-v1: {<<: *shop-blocks, glow: true, name: "<yellow><bold>● BLOCS"}
@@ -606,6 +608,14 @@ items:
       ranged-selected-v1: {<<: *shop-ranged, glow: true, name: "<yellow><bold>● DISTANCE"}
       utility-v1: &shop-utility {material: TNT, name: "<gold><bold>Utilitaires", lore: ["<gray>Objets tactiques.", "", "<yellow>▸ Cliquez pour ouvrir"]}
       utility-selected-v1: {<<: *shop-utility, glow: true, name: "<yellow><bold>● UTILITAIRES"}
+      blocks-v2: &shop-blocks-v2 {material: WHITE_WOOL, name: "<white><bold>CONSTRUCTION", lore: ["<gray>Blocs pour avancer et défendre", "<gray>le lit de votre équipe.", "", "<yellow>▸ Voir les blocs"]}
+      blocks-selected-v2: {<<: *shop-blocks-v2, glow: true, name: "<yellow><bold>● CONSTRUCTION"}
+      combat-v2: &shop-combat-v2 {material: IRON_SWORD, name: "<red><bold>COMBAT", lore: ["<gray>Armes pour repousser", "<gray>les équipes adverses.", "", "<yellow>▸ Voir les armes"], item-flags: [HIDE_ATTRIBUTES]}
+      combat-selected-v2: {<<: *shop-combat-v2, glow: true, name: "<yellow><bold>● COMBAT"}
+      ranged-v2: &shop-ranged-v2 {material: BOW, name: "<aqua><bold>DISTANCE", lore: ["<gray>Arcs, flèches et contrôle", "<gray>des ponts à distance.", "", "<yellow>▸ Voir les projectiles"]}
+      ranged-selected-v2: {<<: *shop-ranged-v2, glow: true, name: "<yellow><bold>● DISTANCE"}
+      utility-v2: &shop-utility-v2 {material: TNT, name: "<gold><bold>TACTIQUE", lore: ["<gray>Objets spéciaux pour créer", "<gray>une ouverture ou s'échapper.", "", "<yellow>▸ Voir les utilitaires"]}
+      utility-selected-v2: {<<: *shop-utility-v2, glow: true, name: "<yellow><bold>● TACTIQUE"}
   game:
     public:
       general:

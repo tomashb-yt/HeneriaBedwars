@@ -57,6 +57,8 @@ Le Ticket 014 persiste uniquement la position administrative du PNJ dans l'équi
 
 Le correctif 013/014 ancre les drops de générateur au centre de leur bloc par PDC et une stabilisation centrale; ne jamais immobiliser un item joueur non identifié. Le rythme est recalculé une seule fois à la frontière `PLAYING` avec `GeneratorPacingPolicy`. Les hologrammes diamant/émeraude réutilisent le ticker central et l'échéance réelle de `RuntimeGenerator`, sans tâche individuelle.
 
+Le correctif gameplay 012–014 force le PVP uniquement dans les clones runtime et protège la carte modèle en n'autorisant la destruction que des blocs enregistrés par `GameInstance.recordPlacedBlock`. Une fin de partie doit attendre `RuntimePlayerGateway.finish` avant de décharger le monde; ce chemin restaure l'état du joueur au lobby configuré ou au spawn du monde de secours. `/bw join` peut recréer à la demande une instance propre depuis une arène active.
+
 ## Règles architecturales
 
 - `bedwars-api` ne dépend ni de Paper, ni de `bedwars-core`, ni de `bedwars-plugin`.

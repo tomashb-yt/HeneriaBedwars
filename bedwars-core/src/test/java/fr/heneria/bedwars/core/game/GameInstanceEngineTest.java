@@ -125,6 +125,23 @@ class GameInstanceEngineTest {
   }
 
   @Test
+  void onlyPlayerPlacedBlocksCanBeConsumedFromTheRuntimeMap() {
+    GameInstance game = instance();
+    RuntimeBlockPosition placed = new RuntimeBlockPosition(4, 65, -2);
+    game.transition(GameState.WAITING, NOW.plusSeconds(1));
+    assertFalse(game.recordPlacedBlock(placed));
+    game.transition(GameState.STARTING, NOW.plusSeconds(2));
+    game.transition(GameState.PLAYING, NOW.plusSeconds(3));
+
+    assertTrue(game.recordPlacedBlock(placed));
+    assertFalse(game.recordPlacedBlock(placed));
+    assertTrue(game.isPlacedBlock(placed));
+    assertEquals(1, game.placedBlockCount());
+    assertTrue(game.removePlacedBlock(placed));
+    assertFalse(game.removePlacedBlock(placed));
+  }
+
+  @Test
   void destructionEvacuatesPlayersDeletesWorldAndReleasesArena() {
     Fixture fixture = new Fixture();
     GameInstance game =
@@ -139,6 +156,25 @@ class GameInstanceEngineTest {
     assertTrue(fixture.worlds.destroyed);
     assertFalse(fixture.manager.byPlayer(player).isPresent());
     assertTrue(fixture.eventTypes().contains(GameDestroyEvent.class));
+  }
+
+  @Test
+  void destructionWaitsForLobbyReturnBeforeDeletingTheRuntimeWorld() {
+    Fixture fixture = new Fixture();
+    fixture.players.finished = new CompletableFuture<>();
+    GameInstance game =
+        fixture.manager.create("arena1").toCompletableFuture().join().instance().orElseThrow();
+    UUID player = UUID.randomUUID();
+    fixture.manager.join(game.id(), player).toCompletableFuture().join();
+
+    CompletableFuture<GameOperationResult> destruction =
+        fixture.manager.destroy(game.id(), "victory").toCompletableFuture();
+    assertFalse(destruction.isDone());
+    assertFalse(fixture.worlds.destroyed);
+    fixture.players.finished.complete(true);
+
+    assertTrue(destruction.join().successful());
+    assertTrue(fixture.worlds.destroyed);
   }
 
   @Test
@@ -545,6 +581,8 @@ class GameInstanceEngineTest {
   }
 
   private static final class FakePlayers implements RuntimePlayerGateway {
+    CompletableFuture<Boolean> finished = CompletableFuture.completedFuture(true);
+
     @Override
     public CompletionStage<Boolean> enter(
         UUID playerId,
@@ -557,6 +595,11 @@ class GameInstanceEngineTest {
     @Override
     public CompletionStage<Boolean> leave(UUID playerId) {
       return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
+    public CompletionStage<Boolean> finish(UUID playerId) {
+      return finished;
     }
   }
 }

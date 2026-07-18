@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /** Resolves validated generator defaults without exposing Bukkit to the core. */
 public final class BukkitGeneratorCatalog {
@@ -49,6 +50,24 @@ public final class BukkitGeneratorCatalog {
       case DIAMOND -> Material.DIAMOND;
       case EMERALD -> Material.EMERALD;
     };
+  }
+
+  /** Creates one localized Heneria currency stack while preserving its vanilla material. */
+  public ItemStack item(GeneratorResource resource, int amount) {
+    ItemStack item = new ItemStack(material(resource), amount);
+    var meta = item.getItemMeta();
+    if (meta != null) {
+      String suffix = resource.name().toLowerCase(java.util.Locale.ROOT);
+      meta.setDisplayName(
+          configurations
+              .language()
+              .message(
+                  "generator.item." + suffix,
+                  configurations.snapshot().plugin().locale(),
+                  fr.heneria.bedwars.core.config.PlaceholderContext.EMPTY));
+      item.setItemMeta(meta);
+    }
+    return item;
   }
 
   public double mergeRadius() {

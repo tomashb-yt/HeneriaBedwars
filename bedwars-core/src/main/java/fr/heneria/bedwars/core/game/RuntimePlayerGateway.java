@@ -13,6 +13,11 @@ public interface RuntimePlayerGateway {
 
   CompletionStage<Boolean> leave(UUID playerId);
 
+  /** Restores a player after a completed match, preferably at the configured main lobby. */
+  default CompletionStage<Boolean> finish(UUID playerId) {
+    return leave(playerId);
+  }
+
   /** Drops an in-memory snapshot for an offline player without attempting a teleport. */
   default void disconnect(UUID playerId) {}
 

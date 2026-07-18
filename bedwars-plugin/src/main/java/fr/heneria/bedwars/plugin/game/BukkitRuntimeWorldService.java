@@ -236,7 +236,8 @@ public final class BukkitRuntimeWorldService implements RuntimeWorldService {
 
   private void applySettings(World world, MapTemplate template) {
     world.setDifficulty(Difficulty.valueOf(template.settings().difficulty()));
-    world.setPVP(template.settings().pvp());
+    // Administrative map preview settings must never disable combat in a live BedWars clone.
+    world.setPVP(true);
     world.setSpawnFlags(false, false);
     world.setAutoSave(false);
     world.setTime(template.settings().fixedTime());

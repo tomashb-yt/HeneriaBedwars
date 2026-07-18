@@ -86,7 +86,7 @@ public final class BukkitGameGeneratorAdapter implements GeneratorCapacityView {
     }
     while (remaining > 0) {
       int amount = Math.min(remaining, material.getMaxStackSize());
-      Item item = world.dropItem(location, new ItemStack(material, amount));
+      Item item = world.dropItem(location, catalog.item(emission.generator().resource(), amount));
       anchor(item, location, emission.gameId(), emission.generator().id());
       remaining -= amount;
     }

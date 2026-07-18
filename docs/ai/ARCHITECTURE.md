@@ -1,5 +1,13 @@
 # Architecture actuelle
 
+## Correctif gameplay, boutique et recyclage
+
+`GameInstance` porte l'ensemble match-scoped des blocs placés. Le listener Bukkit enregistre uniquement un placement réussi en `PLAYING`, laisse casser ces blocs, protège le décor et filtre les explosions avec la même source de vérité. `BukkitRuntimeWorldService` force le PVP dans le clone sans modifier le réglage administratif de la carte modèle.
+
+`RuntimePlayerGateway.finish` sépare la fin de match d'un départ volontaire. `GameInstanceManager.destroy` attend toutes les restaurations, puis décharge et supprime le clone. Le gateway Bukkit privilégie le lobby configuré et utilise sinon le spawn du monde de secours. La commande publique résout les arènes actives même sans instance et clone une nouvelle partie à la demande.
+
+Le compteur de respawn est rendu une fois par seconde par le ticker central depuis `RuntimePlayer.respawnAt`. `BukkitShopInventory` résout la laine depuis la couleur du `RuntimeTeam`; les minerais gardent leur matériau vanilla comme identité économique et ajoutent seulement un nom Heneria localisé.
+
 ## Correctif runtime générateurs et boutiques
 
 `ConfigurationDefaultsUpdater` fait évoluer `shops.yml` et `generators.yml` comme les autres ressources versionnées, avec sauvegarde et sans remplacement des valeurs existantes. `BukkitShopNpcService` ne conditionne plus l'existence physique du PNJ au nombre d'offres valides et répare les PNJ à `GameStartEvent` après chargement explicite du chunk.

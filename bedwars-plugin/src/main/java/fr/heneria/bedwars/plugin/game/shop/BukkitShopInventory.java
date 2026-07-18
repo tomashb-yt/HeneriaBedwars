@@ -11,9 +11,15 @@ import org.bukkit.inventory.ItemStack;
 /** Atomic storage-content exchange used by the pure purchase policy. */
 public final class BukkitShopInventory implements ShopInventory {
   private final Player player;
+  private final String teamColor;
 
   public BukkitShopInventory(Player player) {
+    this(player, "WHITE");
+  }
+
+  public BukkitShopInventory(Player player, String teamColor) {
     this.player = Objects.requireNonNull(player, "player");
+    this.teamColor = Objects.requireNonNullElse(teamColor, "WHITE");
   }
 
   @Override
@@ -55,7 +61,7 @@ public final class BukkitShopInventory implements ShopInventory {
       else stack.setAmount(stack.getAmount() - removed);
     }
     if (remainingPrice > 0) return null;
-    Material product = Material.matchMaterial(offer.material());
+    Material product = productMaterial(offer);
     if (product == null || !product.isItem()) return null;
     int remainingProduct = offer.amount();
     for (ItemStack stack : next) {
@@ -73,6 +79,30 @@ public final class BukkitShopInventory implements ShopInventory {
       remainingProduct -= amount;
     }
     return remainingProduct == 0 ? next : null;
+  }
+
+  public Material productMaterial(ShopOffer offer) {
+    Material configured = Material.matchMaterial(offer.material());
+    if (configured != Material.WHITE_WOOL) return configured;
+    return teamWool(teamColor);
+  }
+
+  public static Material teamWool(String color) {
+    if (color == null) return Material.WHITE_WOOL;
+    return switch (color.toUpperCase(java.util.Locale.ROOT)) {
+      case "RED" -> Material.RED_WOOL;
+      case "BLUE" -> Material.BLUE_WOOL;
+      case "GREEN" -> Material.GREEN_WOOL;
+      case "YELLOW" -> Material.YELLOW_WOOL;
+      case "AQUA" -> Material.LIGHT_BLUE_WOOL;
+      case "PINK" -> Material.PINK_WOOL;
+      case "GRAY" -> Material.GRAY_WOOL;
+      case "LIME" -> Material.LIME_WOOL;
+      case "ORANGE" -> Material.ORANGE_WOOL;
+      case "PURPLE" -> Material.PURPLE_WOOL;
+      case "BLACK" -> Material.BLACK_WOOL;
+      default -> Material.WHITE_WOOL;
+    };
   }
 
   public static Material currency(ShopCurrency currency) {

@@ -53,6 +53,7 @@ public final class BukkitGameDisplayService {
       new RuntimeScoreboardRenderer(new MessageRenderer());
   private final Map<UUID, BukkitScoreboardSession> scoreboards = new LinkedHashMap<>();
   private final Map<GameId, BossBar> bossBars = new LinkedHashMap<>();
+  private final Map<UUID, Long> respawnSeconds = new LinkedHashMap<>();
 
   public BukkitGameDisplayService(
       ConfigurationService configurations,
@@ -125,20 +126,43 @@ public final class BukkitGameDisplayService {
     bossBars.values().forEach(BossBar::removeAll);
     bossBars.clear();
     scoreboards.clear();
+    respawnSeconds.clear();
+  }
+
+  /** Refreshes every active respawn title from the central one-second game ticker. */
+  public void refreshRespawns(
+      java.util.Collection<GameInstance> activeGames, java.time.Instant now) {
+    java.util.Set<UUID> active = new java.util.HashSet<>();
+    for (GameInstance game : activeGames) {
+      if (game.state() != fr.heneria.bedwars.api.game.GameState.PLAYING) continue;
+      for (var runtime : game.runtimePlayers()) {
+        if (!runtime.respawning()) continue;
+        var dueAt = runtime.respawnAt().orElse(null);
+        if (dueAt == null) continue;
+        long seconds = remainingSeconds(now, dueAt);
+        if (seconds < 1) continue;
+        active.add(runtime.playerId());
+        if (java.util.Objects.equals(respawnSeconds.put(runtime.playerId(), seconds), seconds))
+          continue;
+        Player player = Bukkit.getPlayer(runtime.playerId());
+        if (player != null) showRespawnCountdown(player, game, seconds);
+      }
+    }
+    respawnSeconds.keySet().retainAll(active);
   }
 
   private void onJoin(PlayerGameJoinEvent event) {
     GameInstance game = games.find(event.gameId()).orElse(null);
     Player player = Bukkit.getPlayer(event.playerId());
     if (game == null || player == null) return;
-    player.sendMessage(message("game.join.success", values(game)));
+    player.sendMessage(message("game.design-v15.join-success", values(game)));
     player.sendTitle(
         message("game.waiting.title", values(game)),
         message("game.waiting.subtitle", values(game)),
         10,
         40,
         10);
-    broadcast(game, "game.join.broadcast", Map.of("player", player.getName()));
+    broadcast(game, "game.design-v15.join-broadcast", Map.of("player", player.getName()));
     BossBar bar = bossBars.get(game.id());
     if (bar != null) bar.addPlayer(player);
     refresh(game);
@@ -146,6 +170,7 @@ public final class BukkitGameDisplayService {
 
   private void onLeave(PlayerGameLeaveEvent event) {
     scoreboards.remove(event.playerId());
+    respawnSeconds.remove(event.playerId());
     Player player = Bukkit.getPlayer(event.playerId());
     if (player != null) bossBars.values().forEach(bar -> bar.removePlayer(player));
     GameInstance game = games.find(event.gameId()).orElse(null);
@@ -155,7 +180,10 @@ public final class BukkitGameDisplayService {
   private void onCountdownStart(GameCountdownStartEvent event) {
     GameInstance game = games.find(event.gameId()).orElse(null);
     if (game == null) return;
-    broadcast(game, event.forced() ? "game.countdown.forced" : "game.countdown.started", Map.of());
+    broadcast(
+        game,
+        event.forced() ? "game.design-v15.countdown-forced" : "game.design-v15.countdown-started",
+        Map.of());
     GameSettings settings = configurations.snapshot().game();
     if (settings.bossBarEnabled()) {
       BossBar bar =
@@ -179,7 +207,7 @@ public final class BukkitGameDisplayService {
     Map<String, Object> extra = Map.of("countdown", remaining);
     GameSettings settings = configurations.snapshot().game();
     if (settings.chatAnnouncementSeconds().contains(remaining))
-      broadcast(game, "game.countdown.seconds", extra);
+      broadcast(game, "game.design-v15.countdown-seconds", extra);
     for (UUID playerId : game.playerIds()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player == null) continue;
@@ -207,7 +235,7 @@ public final class BukkitGameDisplayService {
     GameInstance game = games.find(event.gameId()).orElse(null);
     removeBossBar(event.gameId());
     if (game != null) {
-      broadcast(game, "game.countdown.cancelled", Map.of());
+      broadcast(game, "game.design-v15.countdown-cancelled", Map.of());
       refresh(game);
     }
   }
@@ -215,7 +243,10 @@ public final class BukkitGameDisplayService {
   private void onCountdownAccelerate(GameCountdownAccelerateEvent event) {
     GameInstance game = games.find(event.gameId()).orElse(null);
     if (game != null)
-      broadcast(game, "game.countdown.accelerated", Map.of("countdown", event.remainingSeconds()));
+      broadcast(
+          game,
+          "game.design-v15.countdown-accelerated",
+          Map.of("countdown", event.remainingSeconds()));
   }
 
   private void onStart(GameStartEvent event) {
@@ -240,7 +271,9 @@ public final class BukkitGameDisplayService {
           50,
           10);
       player.sendMessage(
-          message(moved ? "game.start.message-v6" : "game.start.teleport-failed-v6", values(game)));
+          message(
+              moved ? "game.design-v15.start-success" : "game.design-v15.start-teleport-failed",
+              values(game)));
       updateScoreboard(player, game);
     }
   }
@@ -258,9 +291,10 @@ public final class BukkitGameDisplayService {
             coloredTeamName(teamSnapshot),
             "destroyer",
             destroyer == null ? "?" : destroyer.getName());
-    broadcast(game, "game.bed.destroyed", additions);
+    broadcast(game, "game.design-v15.bed-destroyed", additions);
     if (destroyer != null)
-      destroyer.sendMessage(message("game.bed.destroyer", merge(values(game), additions)));
+      destroyer.sendMessage(
+          message("game.design-v15.bed-destroyer", merge(values(game), additions)));
     for (UUID playerId : team.playerIds()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player == null) continue;
@@ -270,7 +304,7 @@ public final class BukkitGameDisplayService {
           5,
           60,
           10);
-      player.sendMessage(message("game.bed.victim-chat", merge(values(game), additions)));
+      player.sendMessage(message("game.design-v15.bed-victim", merge(values(game), additions)));
       player
           .spigot()
           .sendMessage(
@@ -289,7 +323,7 @@ public final class BukkitGameDisplayService {
     if (victim != null)
       victim.sendMessage(
           message(
-              event.finalDeath() ? "game.death.final" : "game.death.respawn",
+              event.finalDeath() ? "game.design-v15.death-final" : "game.design-v15.death-respawn",
               merge(values(game), Map.of("player", victim.getName()))));
   }
 
@@ -297,20 +331,16 @@ public final class BukkitGameDisplayService {
     GameInstance game = games.find(event.gameId()).orElse(null);
     Player player = Bukkit.getPlayer(event.playerId());
     if (game == null || player == null) return;
-    long seconds =
-        Math.max(0, java.time.Duration.between(event.occurredAt(), event.respawnAt()).toSeconds());
-    player.sendTitle(
-        message("game.respawn.title", values(game)),
-        message("game.respawn.subtitle", merge(values(game), Map.of("seconds", seconds))),
-        5,
-        40,
-        5);
+    long seconds = remainingSeconds(event.occurredAt(), event.respawnAt());
+    respawnSeconds.put(event.playerId(), seconds);
+    showRespawnCountdown(player, game, seconds);
   }
 
   private void onRespawn(PlayerGameRespawnEvent event) {
     GameInstance game = games.find(event.gameId()).orElse(null);
     Player player = Bukkit.getPlayer(event.playerId());
     if (game == null || player == null) return;
+    respawnSeconds.remove(event.playerId());
     boolean moved =
         game.world()
             .flatMap(
@@ -331,6 +361,7 @@ public final class BukkitGameDisplayService {
     GameInstance game = games.find(event.gameId()).orElse(null);
     Player player = Bukkit.getPlayer(event.playerId());
     if (game == null || player == null) return;
+    respawnSeconds.remove(event.playerId());
     game.world()
         .ifPresent(
             world ->
@@ -353,7 +384,7 @@ public final class BukkitGameDisplayService {
         game.team(event.teamId())
             .map(value -> coloredTeamName(value.snapshot()))
             .orElse(event.teamId());
-    broadcast(game, "game.team.eliminated", Map.of("team", team));
+    broadcast(game, "game.design-v15.team-eliminated", Map.of("team", team));
   }
 
   private void onVictory(GameVictoryEvent event) {
@@ -363,7 +394,7 @@ public final class BukkitGameDisplayService {
         game.team(event.teamId())
             .map(value -> coloredTeamName(value.snapshot()))
             .orElse(event.teamId());
-    broadcast(game, "game.victory.broadcast", Map.of("team", team));
+    broadcast(game, "game.design-v15.victory", Map.of("team", team));
     for (UUID playerId : game.playerIds()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player != null)
@@ -484,6 +515,27 @@ public final class BukkitGameDisplayService {
   private void removeBossBar(GameId gameId) {
     BossBar removed = bossBars.remove(gameId);
     if (removed != null) removed.removeAll();
+  }
+
+  private void showRespawnCountdown(Player player, GameInstance game, long seconds) {
+    Map<String, Object> values = merge(values(game), Map.of("seconds", seconds));
+    player.sendTitle(
+        message("game.respawn.countdown-title-v15", values),
+        message("game.respawn.countdown-subtitle-v15", values),
+        0,
+        25,
+        0);
+    player
+        .spigot()
+        .sendMessage(
+            ChatMessageType.ACTION_BAR,
+            TextComponent.fromLegacyText(message("game.respawn.countdown-actionbar-v15", values)));
+    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 0.6f, 1.1f);
+  }
+
+  private static long remainingSeconds(java.time.Instant now, java.time.Instant dueAt) {
+    long millis = Math.max(0L, java.time.Duration.between(now, dueAt).toMillis());
+    return (millis + 999L) / 1000L;
   }
 
   static String teamColor(String color) {

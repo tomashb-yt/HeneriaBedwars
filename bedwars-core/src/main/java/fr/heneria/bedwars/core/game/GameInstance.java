@@ -30,6 +30,7 @@ public final class GameInstance {
   private final Map<RuntimeBlockPosition, RuntimeBed> bedIndex = new LinkedHashMap<>();
   private final Map<String, RuntimeBed> bedsByTeam = new LinkedHashMap<>();
   private final Map<GeneratorId, RuntimeGenerator> generators = new LinkedHashMap<>();
+  private final Set<RuntimeBlockPosition> placedBlocks = new java.util.LinkedHashSet<>();
   private GameState state = GameState.CREATING;
   private RuntimeWorldHandle world;
   private Instant updatedAt;
@@ -147,6 +148,25 @@ public final class GameInstance {
     boolean configured =
         arena.definition().teams().stream().allMatch(team -> team.bedDefinition().isPresent());
     return !configured || bedIndex.size() == teams.size() * 2;
+  }
+
+  /** Records a player-built block so the immutable map itself remains protected. */
+  public synchronized boolean recordPlacedBlock(RuntimeBlockPosition position) {
+    if (state != GameState.PLAYING) return false;
+    return placedBlocks.add(Objects.requireNonNull(position, "position"));
+  }
+
+  /** Consumes a player-built block when it is broken or destroyed by an explosion. */
+  public synchronized boolean removePlacedBlock(RuntimeBlockPosition position) {
+    return placedBlocks.remove(Objects.requireNonNull(position, "position"));
+  }
+
+  public synchronized boolean isPlacedBlock(RuntimeBlockPosition position) {
+    return placedBlocks.contains(Objects.requireNonNull(position, "position"));
+  }
+
+  public synchronized int placedBlockCount() {
+    return placedBlocks.size();
   }
 
   /** Registers a generator snapshot before gameplay starts. */

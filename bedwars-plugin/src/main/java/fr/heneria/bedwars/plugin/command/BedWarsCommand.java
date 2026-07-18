@@ -99,7 +99,8 @@ public final class BedWarsCommand implements CommandExecutor, TabCompleter {
         new MapCommandHandler(
             plugin, mapService, mapWorldService, configurations, guiService, mapMenus, logger);
     this.gameCommands =
-        new GameCommandHandler(plugin, gameService, gameCountdowns, gameLobby, configurations);
+        new GameCommandHandler(
+            plugin, gameService, gameCountdowns, gameLobby, arenaService, configurations);
   }
 
   @Override

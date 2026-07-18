@@ -180,7 +180,8 @@ public final class HeneriaBedWarsPlugin extends JavaPlugin {
               getServer().getWorldContainer().toPath(),
               projectLogger);
       itemService = new BukkitItemService(this, configurations, projectLogger);
-      BukkitPlayerSnapshotService playerSnapshots = new BukkitPlayerSnapshotService(worldSettings);
+      BukkitPlayerSnapshotService playerSnapshots =
+          new BukkitPlayerSnapshotService(worldSettings, () -> configurations.snapshot().lobby());
       BukkitRuntimePlayerGateway runtimePlayers =
           new BukkitRuntimePlayerGateway(
               this, worldSettings, configurations, itemService, playerSnapshots);

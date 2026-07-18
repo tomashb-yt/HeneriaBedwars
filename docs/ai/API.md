@@ -1,5 +1,7 @@
 # API publique
 
+`/bw join <carte>` liste désormais les modèles associés aux arènes actives même lorsqu'aucune instance n'existe. Si nécessaire, la commande clone la carte puis rejoint la nouvelle instance; la création runtime n'accorde aucune permission administrative au joueur.
+
 Le Ticket 014 ne modifie pas l'API publique. `ShopPurchaseService`, `ShopInventory`, le catalogue et `ShopPurchaseEvent` sont des contrats Java internes : les addons ne doivent pas encore les importer. La surface publique reste en lecture seule afin de ne pas contourner les invariants d'achat et de cycle de partie.
 
 Le Ticket 012 ne modifie pas la surface publique : les snapshots existants reflètent maintenant kills, morts, final kills, lits détruits, état du lit et élimination. Les services de mutation des lits et morts restent internes afin de préserver leurs invariants atomiques.

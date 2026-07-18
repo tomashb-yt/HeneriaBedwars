@@ -1,5 +1,9 @@
 # Cycle des parties
 
+## Correctif de recyclage
+
+À la victoire, `ENDING` conserve l'affichage pendant la durée configurée. Le nettoyage attend ensuite le retour de tous les joueurs au lobby, décharge le clone sans sauvegarde et supprime son dossier. L'arène administrative reste active : un nouveau `/bw join <carte>` recrée un clone propre, ce qui garantit qu'aucun bloc posé ni minerai de la partie précédente ne survit.
+
 ## Ticket 012
 
 ```mermaid

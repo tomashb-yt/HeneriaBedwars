@@ -1,5 +1,7 @@
 # Contexte du projet
 
+Correctif gameplay 012–014 du 2026-07-18 : les clones forcent le PVP, les joueurs vivants peuvent poser puis casser leurs propres blocs sans modifier la carte d'origine, et la mort utilise le respawn immédiat avec un compteur visible chaque seconde. La boutique colore la laine selon l'équipe, colore les prix selon la monnaie et nomme les drops Fer/Or/Diamant/Émeraude Heneria. Après victoire, les joueurs reviennent au lobby avant la suppression du clone; `/bw join` recrée ensuite une instance propre depuis l'arène active.
+
 Correctif Tickets 013–014 du 2026-07-18 : la fiche d'équipe adopte trois colonnes fixes spawn/lit/boutique et masque les actions impossibles. Les anciens `shops.yml` reçoivent désormais non destructivement le catalogue manquant; les PNJ sont recréés au démarrage de la partie même si le catalogue est vide. Les minerais apparaissent au centre exact du bloc, restent ancrés, suivent un rythme borné selon équipes/joueurs et les points diamant/émeraude affichent leur prochaine échéance par hologramme.
 
 État Ticket 014 du 2026-07-18 : la fiche de chaque équipe configure la position et l'orientation d'un PNJ de boutique. À la création du clone, un villageois protégé et identifié par PDC apparaît à cet emplacement. Pendant `PLAYING`, son menu propose les catégories blocs, combat, distance et utilitaires; les offres viennent de `shops.yml` et les échanges inventaire sont atomiques. Le Ticket 015 gardera la responsabilité de l'équipement durable, des outils évolutifs et des améliorations d'équipe.

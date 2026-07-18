@@ -354,6 +354,9 @@ game:
     success-subtitle: "<gray>You are temporarily protected."
     failed-title: "<red>Respawn failed"
     failed-subtitle: "<gray>Your team spawn could not be found."
+    countdown-title-v15: "<red><bold>ELIMINATED"
+    countdown-subtitle-v15: "<gray>Respawning in <yellow><bold>{seconds}s"
+    countdown-actionbar-v15: "<dark_gray>Respawn <gray>• <yellow>{seconds} second(s)"
   spectator:
     no-targets: "<yellow>There is no active player to follow."
     teleported: "<green>You are now following <white>{player}<green>."
@@ -363,6 +366,26 @@ game:
     title: "<gold><bold>VICTORY!"
     subtitle: "<yellow>Team {team} wins the game."
     broadcast: "<gold>Team <white>{team}<gold> wins!"
+  design-v15:
+    join-success: "<dark_gray>[<aqua><bold>HENERIA</bold></aqua><dark_gray>] <green>Joining <white>{arena_name} <dark_gray>• <gray>{players}/{maximum_players} players"
+    join-broadcast: "<dark_gray>[<green>+<dark_gray>] <white>{player} <gray>joined the game <dark_gray>• <white>{players}/{maximum_players}"
+    countdown-started: "<dark_gray>[<aqua><bold>HENERIA</bold></aqua><dark_gray>] <yellow>The game is getting ready. Stay prepared!"
+    countdown-forced: "<dark_gray>[<red>!<dark_gray>] <yellow>The start was forced by an administrator."
+    countdown-seconds: "<dark_gray>[<yellow>⌛<dark_gray>] <gray>Starting in <yellow><bold>{countdown} second(s)"
+    countdown-cancelled: "<dark_gray>[<red>✘<dark_gray>] <red>Start cancelled <dark_gray>• <gray>More players are required."
+    countdown-accelerated: "<dark_gray>[<green>⚡<dark_gray>] <green>Game full <dark_gray>• <gray>Starting in <white>{countdown}s"
+    start-success: "<dark_gray>[<green>✔<dark_gray>] <green>Combat started <dark_gray>• <gray>Defend your bed and eliminate your enemies."
+    start-teleport-failed: "<dark_gray>[<red>✘<dark_gray>] <red>Team spawn missing. Contact an administrator."
+    bed-own: "<dark_gray>[<red>✘<dark_gray>] <red>You cannot destroy your own team's bed."
+    bed-destroyed: "<dark_gray>[<red>⚔<dark_gray>] <white>{destroyer} <gray>destroyed team {team}<gray>'s bed."
+    bed-destroyer: "<dark_gray>[<green>✔<dark_gray>] <green>Bed destroyed <dark_gray>• <gray>Team {team} <gray>can no longer respawn."
+    bed-victim: "<dark_gray>[<red>⚠<dark_gray>] <red><bold>YOUR BED WAS DESTROYED</bold> <dark_gray>• <gray>Your next death is final."
+    death-respawn: "<dark_gray>[<yellow>☠<dark_gray>] <gray>You were temporarily eliminated. Prepare to return."
+    death-final: "<dark_gray>[<red>☠<dark_gray>] <red>Final elimination <dark_gray>• <gray>Your bed was destroyed."
+    spectator-no-targets: "<dark_gray>[<yellow>!<dark_gray>] <yellow>No active player to spectate."
+    spectator-teleported: "<dark_gray>[<aqua>➜<dark_gray>] <gray>You are now spectating <white>{player}<gray>."
+    team-eliminated: "<dark_gray>[<red>✘<dark_gray>] <gray>Team {team} <gray>has been eliminated."
+    victory: "<dark_gray>[<gold>★<dark_gray>] <gold><bold>VICTORY</bold> <dark_gray>• <gray>Team {team} <gray>wins the game!"
   error:
     teleport: "<red>Teleporting to the game failed."
     internal: "<red>An internal lobby error occurred."
@@ -584,6 +607,11 @@ map:
     invalid-world: "<red>Stand inside world <white>{world_name}<red>."
     teleport: "<red>Teleport failed."
 generator:
+  item:
+    iron: "<white><bold>Heneria Iron"
+    gold: "<gold><bold>Heneria Gold"
+    diamond: "<aqua><bold>Heneria Diamond"
+    emerald: "<green><bold>Heneria Emerald"
   hologram:
     diamond: "<aqua><bold>DIAMOND GENERATOR</bold>\n<gray>Tier <white>{level}\n<white>Next resource: <aqua>{seconds}s"
     emerald: "<green><bold>EMERALD GENERATOR</bold>\n<gray>Tier <white>{level}\n<white>Next resource: <green>{seconds}s"
@@ -598,6 +626,15 @@ shop:
     balance: "<gray>You have: <white>{balance}"
     available: "<yellow>▸ Click to purchase"
     unavailable: "<red>Not enough resources"
+  menu-v2:
+    title: "<dark_gray>HENERIA <gray>• <white>{category}"
+    offer-name: "<white><bold>{item}"
+    amount: "<dark_gray>Amount <gray>• <white>{amount} item(s)"
+    price: "<dark_gray>Price <gray>• {currency_color}<bold>{price} {currency}"
+    balance: "<dark_gray>Balance <gray>• {currency_color}{balance} {currency}"
+    available: "<green>✔ Purchase available\n<yellow>▸ Click to buy"
+    insufficient: "<red>✘ Missing {missing} resource(s)"
+    inventory-full: "<red>✘ Inventory full"
   category:
     blocks: "Blocks"
     combat: "Combat"
@@ -608,6 +645,11 @@ shop:
     gold: "gold"
     diamond: "diamond(s)"
     emerald: "emerald(s)"
+  currency-v2:
+    iron: "Heneria Iron"
+    gold: "Heneria Gold"
+    diamond: "Heneria Diamond"
+    emerald: "Heneria Emerald"
   purchase:
     success: "<green>Purchased <white>{amount}× {item}<green> for <white>{price} {currency}<green>."
     not_in_game: "<red>You are not in a game."
@@ -616,6 +658,14 @@ shop:
     insufficient_funds: "<red>You do not have enough resources."
     inventory_full: "<red>Your inventory is full."
     transaction_failed: "<red>The purchase failed without consuming your resources."
+  purchase-v2:
+    success: "<dark_gray>[<green>✔<dark_gray>] <green>Purchase complete <dark_gray>• <white>{amount}× {item} <gray>for {currency_color}<bold>{price} {currency}"
+    not_in_game: "<dark_gray>[<red>✘<dark_gray>] <red>You are not in a game."
+    not_playing: "<dark_gray>[<red>✘<dark_gray>] <red>The shop is only available during a game."
+    spectator: "<dark_gray>[<red>✘<dark_gray>] <red>Spectators cannot purchase items."
+    insufficient_funds: "<dark_gray>[<red>✘<dark_gray>] <red>You are missing <white>{missing}<red> resource(s)."
+    inventory_full: "<dark_gray>[<red>✘<dark_gray>] <red>Free one inventory slot first."
+    transaction_failed: "<dark_gray>[<red>✘<dark_gray>] <red>Purchase cancelled: no resource was consumed."
   offer:
     wool: "Wool"
     oak_planks: "Oak Planks"
