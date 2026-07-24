@@ -16,6 +16,7 @@ public final class InMemoryStatisticsRepository implements StatisticsRepository 
   private final Map<UUID, PlayerStatistics> players = new LinkedHashMap<>();
   private final Map<UUID, PlayerIdentity> identities = new LinkedHashMap<>();
   private final Map<String, UUID> identityNames = new LinkedHashMap<>();
+  private final Map<UUID, PlayerBalance> balances = new LinkedHashMap<>();
   private final Set<GameId> matches = new java.util.HashSet<>();
 
   @Override
@@ -25,6 +26,13 @@ public final class InMemoryStatisticsRepository implements StatisticsRepository 
 
   @Override
   public synchronized CompletionStage<MatchRecordResult> record(CompletedMatchStatistics match) {
+    return record(match, List.of());
+  }
+
+  @Override
+  public synchronized CompletionStage<MatchRecordResult> record(
+      CompletedMatchStatistics match, List<MatchReward> rewards) {
+    Map<UUID, MatchReward> rewardsByPlayer = validateRewards(match, rewards);
     if (!matches.add(match.gameId()))
       return CompletableFuture.completedFuture(MatchRecordResult.ALREADY_RECORDED);
     for (MatchParticipantStatistics participant : match.participants()) {
@@ -46,6 +54,16 @@ public final class InMemoryStatisticsRepository implements StatisticsRepository 
               streak,
               Math.max(current.bestWinStreak(), streak),
               Optional.of(match.completedAt())));
+      MatchReward reward = rewardsByPlayer.get(participant.playerId());
+      if (reward != null) {
+        PlayerBalance currentBalance =
+            balances.getOrDefault(
+                participant.playerId(), PlayerBalance.empty(participant.playerId()));
+        balances.put(
+            participant.playerId(),
+            new PlayerBalance(
+                participant.playerId(), add(currentBalance.coins(), reward.totalCoins())));
+      }
     }
     return CompletableFuture.completedFuture(MatchRecordResult.RECORDED);
   }
@@ -53,6 +71,12 @@ public final class InMemoryStatisticsRepository implements StatisticsRepository 
   @Override
   public synchronized CompletionStage<Optional<PlayerStatistics>> find(UUID playerId) {
     return CompletableFuture.completedFuture(Optional.ofNullable(players.get(playerId)));
+  }
+
+  @Override
+  public synchronized CompletionStage<PlayerBalance> balance(UUID playerId) {
+    return CompletableFuture.completedFuture(
+        balances.getOrDefault(playerId, PlayerBalance.empty(playerId)));
   }
 
   @Override
@@ -108,4 +132,24 @@ public final class InMemoryStatisticsRepository implements StatisticsRepository 
 
   @Override
   public void close() {}
+
+  private static Map<UUID, MatchReward> validateRewards(
+      CompletedMatchStatistics match, List<MatchReward> rewards) {
+    Map<UUID, MatchReward> result = new LinkedHashMap<>();
+    Set<UUID> participants =
+        match.participants().stream()
+            .map(MatchParticipantStatistics::playerId)
+            .collect(java.util.stream.Collectors.toUnmodifiableSet());
+    for (MatchReward reward : List.copyOf(rewards)) {
+      if (!participants.contains(reward.playerId()))
+        throw new IllegalArgumentException("reward player is not a match participant");
+      if (result.put(reward.playerId(), reward) != null)
+        throw new IllegalArgumentException("duplicate player reward");
+    }
+    return result;
+  }
+
+  private static long add(long left, long right) {
+    return Long.MAX_VALUE - left < right ? Long.MAX_VALUE : left + right;
+  }
 }

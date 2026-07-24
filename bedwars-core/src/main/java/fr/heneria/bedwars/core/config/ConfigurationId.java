@@ -12,6 +12,7 @@ public enum ConfigurationId {
   SHOPS("shops.yml"),
   UPGRADES("upgrades.yml"),
   GENERATORS("generators.yml"),
+  REWARDS("rewards.yml"),
   WORLDS("worlds.yml");
 
   private final String fileName;

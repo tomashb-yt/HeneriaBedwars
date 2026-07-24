@@ -7,21 +7,32 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Supplier;
 
 /** Captures final runtime snapshots and exposes durable player aggregates. */
 public final class StatisticsService {
   private final StatisticsRepository repository;
   private final ProgressionPolicy progression = new ProgressionPolicy();
+  private final Supplier<fr.heneria.bedwars.core.config.RewardSettings> rewards;
 
   public StatisticsService(StatisticsRepository repository) {
+    this(
+        repository,
+        () -> new fr.heneria.bedwars.core.config.RewardSettings(false, 0, 0, 0, 0, 0, 0));
+  }
+
+  public StatisticsService(
+      StatisticsRepository repository,
+      Supplier<fr.heneria.bedwars.core.config.RewardSettings> rewards) {
     this.repository = Objects.requireNonNull(repository, "repository");
+    this.rewards = Objects.requireNonNull(rewards, "rewards");
   }
 
   public CompletionStage<Void> initialize() {
     return repository.initialize();
   }
 
-  public CompletionStage<MatchRecordResult> record(
+  public CompletionStage<MatchRewardOutcome> record(
       GameInstance game, String winnerTeamId, Instant completedAt) {
     Objects.requireNonNull(game, "game");
     Objects.requireNonNull(winnerTeamId, "winnerTeamId");
@@ -40,14 +51,22 @@ public final class StatisticsService {
                         player.bedsDestroyed(),
                         Math.max(0, player.playTime().toSeconds())))
             .toList();
-    return repository.record(
+    CompletedMatchStatistics match =
         new CompletedMatchStatistics(
             game.id(),
             snapshot.arenaId(),
             snapshot.mapTemplateId(),
             winnerTeamId,
             completedAt,
-            participants));
+            participants);
+    RewardPolicy policy = new RewardPolicy(rewards.get());
+    List<MatchReward> grants = participants.stream().map(policy::reward).toList();
+    return repository
+        .record(match, grants)
+        .thenApply(
+            result ->
+                new MatchRewardOutcome(
+                    result, result == MatchRecordResult.RECORDED ? grants : List.of()));
   }
 
   public CompletionStage<PlayerStatistics> statistics(UUID playerId) {
@@ -55,6 +74,11 @@ public final class StatisticsService {
     return repository
         .find(playerId)
         .thenApply(found -> found.orElseGet(() -> PlayerStatistics.empty(playerId)));
+  }
+
+  public CompletionStage<PlayerBalance> balance(UUID playerId) {
+    Objects.requireNonNull(playerId, "playerId");
+    return repository.balance(playerId);
   }
 
   public CompletionStage<Void> rememberPlayer(UUID playerId, String name) {
@@ -65,8 +89,10 @@ public final class StatisticsService {
     PlayerIdentity identity = new PlayerIdentity(playerId, currentName);
     return repository
         .saveIdentity(identity)
-        .thenCompose(ignored -> statistics(playerId))
-        .thenApply(value -> profile(identity, value));
+        .thenCompose(
+            ignored ->
+                statistics(playerId)
+                    .thenCombine(balance(playerId), (value, balance) -> profile(identity, value, balance)));
   }
 
   public CompletionStage<Optional<PlayerStatisticsProfile>> profile(String playerName) {
@@ -79,7 +105,10 @@ public final class StatisticsService {
                     .map(
                         value ->
                             statistics(value.playerId())
-                                .thenApply(statistics -> Optional.of(profile(value, statistics))))
+                                .thenCombine(
+                                    balance(value.playerId()),
+                                    (statistics, balance) ->
+                                        Optional.of(profile(value, statistics, balance))))
                     .orElseGet(
                         () ->
                             java.util.concurrent.CompletableFuture.completedFuture(
@@ -97,8 +126,9 @@ public final class StatisticsService {
     return progression.progression(value);
   }
 
-  private PlayerStatisticsProfile profile(PlayerIdentity identity, PlayerStatistics value) {
-    return new PlayerStatisticsProfile(identity, value, progression.progression(value));
+  private PlayerStatisticsProfile profile(
+      PlayerIdentity identity, PlayerStatistics value, PlayerBalance balance) {
+    return new PlayerStatisticsProfile(identity, value, progression.progression(value), balance);
   }
 
   public void close() {

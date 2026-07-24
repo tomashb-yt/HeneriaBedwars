@@ -13,6 +13,7 @@ public record ConfigurationSnapshot(
     GameplaySettings gameplay,
     LobbySettings lobby,
     StorageSettings storage,
+    RewardSettings rewards,
     WorldManagerSettings worlds,
     MenuSettings menus,
     ItemRegistry items,

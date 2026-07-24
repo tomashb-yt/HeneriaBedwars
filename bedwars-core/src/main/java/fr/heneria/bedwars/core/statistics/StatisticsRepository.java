@@ -11,7 +11,12 @@ public interface StatisticsRepository extends AutoCloseable {
 
   CompletionStage<MatchRecordResult> record(CompletedMatchStatistics match);
 
+  CompletionStage<MatchRecordResult> record(
+      CompletedMatchStatistics match, List<MatchReward> rewards);
+
   CompletionStage<Optional<PlayerStatistics>> find(UUID playerId);
+
+  CompletionStage<PlayerBalance> balance(UUID playerId);
 
   CompletionStage<Void> saveIdentity(PlayerIdentity identity);
 
