@@ -1,0 +1,35 @@
+name: HeneriaZombie
+version: '${version}'
+main: fr.heneria.zombie.plugin.HeneriaZombiePlugin
+description: Modular Zombies minigame foundation for Heneria
+api-version: '1.21'
+authors:
+  - Heneria
+website: https://github.com/tomashb-yt/HeneriaBedwars
+
+commands:
+  zombie:
+    description: Displays HeneriaZombie information and administration help
+    usage: /zombie [help|reload]
+    permission: zombie.command.use
+
+permissions:
+  zombie.admin:
+    description: Grants every HeneriaZombie administrative permission
+    default: op
+    children:
+      zombie.command.use: true
+      zombie.command.reload: true
+      zombie.editor: true
+  zombie.command.use:
+    description: Allows use of the base /zombie command
+    default: true
+  zombie.command.reload:
+    description: Allows safe configuration and message reload
+    default: op
+  zombie.editor:
+    description: Reserves access to the future universal map editor
+    default: op
+  zombie.play:
+    description: Reserves access to future Zombies matchmaking
+    default: true

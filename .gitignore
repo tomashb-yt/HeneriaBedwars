@@ -1,19 +1,12 @@
 .gradle/
-build/
-**/build/
 .idea/
 *.iml
-.vscode/
-out/
-logs/
+**/build/
 run/
+server/
+logs/
+plugins/
 *.log
-.DS_Store
-Thumbs.db
-.env
-*.env
-.gradle-bootstrap*/
-.classpath-copy/
-.manual-test-classes/
-.gradle-*-bin.zip
-'@ + $zip + @'
+*.db
+*.db-shm
+*.db-wal

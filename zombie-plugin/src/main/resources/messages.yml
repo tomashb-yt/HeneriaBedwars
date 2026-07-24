@@ -1,0 +1,18 @@
+command:
+  information: |-
+    <dark_gray>━━━━━━━━ <red><bold>HeneriaZombie</bold></red> <dark_gray>━━━━━━━━</dark_gray>
+    <gray>Version : <white><version></white>
+    <gray>État : <white><state></white>
+    <gray>Maps enregistrées : <white><maps></white>
+    <gray>Instances actives : <white><instances></white>
+    <gray>Aide : <white>/zombie help</white>
+  help: |-
+    <red><bold>HeneriaZombie</bold></red> <gray>— Commandes</gray>
+    <white>/zombie</white> <dark_gray>:</dark_gray> <gray>informations du plugin</gray>
+    <white>/zombie help</white> <dark_gray>:</dark_gray> <gray>affiche cette aide</gray>
+    <white>/zombie reload</white> <dark_gray>:</dark_gray> <gray>recharge les options sûres</gray>
+  usage: '<red>Usage : /zombie [help|reload]</red>'
+  no-permission: '<red>Vous ne possédez pas la permission nécessaire.</red>'
+  reload-success: '<green>Configuration rechargée avec succès (<warnings> avertissement(s)).</green>'
+  reload-failure: '<red>Rechargement refusé : <errors> erreur(s). La configuration précédente reste active.</red>'
+  reload-busy: '<yellow>Le plugin ne peut pas être rechargé dans son état actuel.</yellow>'

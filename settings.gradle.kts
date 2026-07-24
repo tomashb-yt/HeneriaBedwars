@@ -1,12 +1,18 @@
-rootProject.name = "HeneriaBedWars"
-
-include("bedwars-api", "bedwars-core", "bedwars-plugin")
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    maven("https://repo.papermc.io/repository/maven-public/")
+  }
+}
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-        maven("https://repo.papermc.io/repository/maven-public/")
-    }
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
+  }
 }
+
+rootProject.name = "HeneriaZombie"
+
+include("zombie-api", "zombie-core", "zombie-plugin")

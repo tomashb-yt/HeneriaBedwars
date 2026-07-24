@@ -1,0 +1,26 @@
+config-version: 1
+
+plugin:
+  language: fr_FR
+  debug: false
+  check-for-updates: false
+
+server:
+  lobby-world: zombie_lobby
+  fallback-world: world
+
+storage:
+  type: sqlite
+  sqlite-file: data.db
+
+instances:
+  maximum-concurrent-games: -1
+  automatic-cleanup: true
+
+gui:
+  default-theme: dark
+  sounds-enabled: true
+  animations-enabled: true
+
+documentation:
+  require-context-update: true
