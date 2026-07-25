@@ -105,4 +105,3 @@ Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 - cycle de vie avec rollback et registre de services explicitement possédé ;
 - API publique de diagnostic, tests, formatage et JAR déployable ;
 - validation manuelle du démarrage et de l'arrêt sur Paper 1.21.11.
-
