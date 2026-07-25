@@ -1,0 +1,79 @@
+default-theme: dark
+
+themes:
+  dark:
+    background:
+      material: BLACK_STAINED_GLASS_PANE
+      name: " "
+    colors:
+      primary: AQUA
+      success: GREEN
+      warning: GOLD
+      danger: RED
+      disabled: DARK_GRAY
+
+menus:
+  player-main:
+    title: "<dark_gray>Heneria Zombies"
+    size: 54
+    theme: dark
+    buttons:
+      play: {slot: 20, material: NETHER_STAR, name: "<green>Jouer", lore: ["<gray>Ouvre les parties disponibles.", "", "<yellow>Cliquez pour continuer."], permission: zombie.gui.player, sound: UI_BUTTON_CLICK, actions: {left: nav.instances}}
+      join: {slot: 22, material: ENDER_EYE, name: "<aqua>Rejoindre une partie", lore: ["<gray>Consulte les instances actives."], permission: zombie.gui.player, actions: {left: nav.instances}}
+      group: {slot: 24, material: PLAYER_HEAD, name: "<dark_gray>Groupe — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
+      profile: {slot: 29, material: NAME_TAG, name: "<dark_gray>Profil — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
+      statistics: {slot: 31, material: BOOK, name: "<dark_gray>Statistiques — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
+      settings: {slot: 33, material: COMPARATOR, name: "<dark_gray>Paramètres — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
+      help: {slot: 49, material: PAPER, name: "<blue>Aide", lore: ["<gray>Utilisez /zombie help."], actions: {left: feedback.unavailable}}
+
+  admin-main:
+    title: "<dark_gray>Administration Zombies"
+    size: 54
+    theme: dark
+    buttons:
+      maps: {slot: 20, material: FILLED_MAP, name: "<aqua>Gestion des maps", lore: ["<gray>Prévisualiser et créer des instances.", "", "<yellow>Cliquez pour ouvrir."], permission: zombie.gui.maps, sound: UI_BUTTON_CLICK, actions: {left: nav.maps}}
+      instances: {slot: 22, material: ENDER_EYE, name: "<light_purple>Instances actives", lore: ["<gray>Inspecter, rejoindre ou arrêter."], permission: zombie.gui.instances, actions: {left: nav.instances}}
+      settings: {slot: 24, material: COMPARATOR, name: "<dark_gray>Configuration — indisponible", lore: ["<gray>Éditeur prévu dans un prochain ticket."], permission: zombie.gui.settings, actions: {left: feedback.unavailable}}
+      editor: {slot: 29, material: BLAZE_ROD, name: "<dark_gray>Éditeur — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], permission: zombie.editor, actions: {left: feedback.unavailable}}
+      diagnostics: {slot: 31, material: REDSTONE_TORCH, name: "<blue>Diagnostics", lore: ["<gray>État technique sans donnée sensible."], permission: zombie.gui.diagnostics, actions: {left: nav.diagnostics}}
+      documentation: {slot: 33, material: WRITABLE_BOOK, name: "<blue>Documentation et version", lore: ["<gray>Consultez /zombie et les fichiers docs."], actions: {left: feedback.unavailable}}
+      reload: {slot: 49, material: LIME_DYE, name: "<green>Recharger les GUI", lore: ["<gray>Activation atomique si la configuration est valide."], permission: zombie.command.reload, actions: {left: config.reload}}
+
+  maps:
+    title: "<dark_gray>Sélecteur de maps"
+    size: 54
+    theme: dark
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: ["<gray>Menu précédent."], actions: {left: nav.back}}
+      previous: {slot: 47, material: SPECTRAL_ARROW, name: "<blue>Page précédente", lore: ["<gray>Afficher la page précédente."], actions: {left: page.previous}}
+      search: {slot: 48, material: OAK_SIGN, name: "<yellow>Rechercher", lore: ["<gray>Saisie privée dans le chat.", "<gray>Entrez une valeur vide pour tout afficher."], actions: {left: maps.search}}
+      next: {slot: 51, material: SPECTRAL_ARROW, name: "<blue>Page suivante", lore: ["<gray>Afficher la page suivante."], actions: {left: page.next}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: ["<gray>Menu principal."], actions: {left: nav.home}}
+
+  instances:
+    title: "<dark_gray>Instances actives"
+    size: 54
+    theme: dark
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: ["<gray>Menu précédent."], actions: {left: nav.back}}
+      previous: {slot: 47, material: SPECTRAL_ARROW, name: "<blue>Page précédente", lore: ["<gray>Afficher la page précédente."], actions: {left: page.previous}}
+      next: {slot: 51, material: SPECTRAL_ARROW, name: "<blue>Page suivante", lore: ["<gray>Afficher la page suivante."], actions: {left: page.next}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: ["<gray>Menu principal."], actions: {left: nav.home}}
+
+  diagnostics:
+    title: "<dark_gray>Diagnostics Zombies"
+    size: 54
+    theme: dark
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: ["<gray>Menu précédent."], actions: {left: nav.back}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: ["<gray>Menu principal."], actions: {left: nav.home}}
+
+  confirmation:
+    title: "<dark_red>Confirmation requise"
+    size: 45
+    theme: dark
+    buttons:
+      confirm: {slot: 29, material: LIME_CONCRETE, name: "<green>Confirmer", lore: ["<gray>Exécute définitivement l'action."], permission: zombie.gui.dangerous-actions, sound: BLOCK_NOTE_BLOCK_PLING, actions: {left: confirmation.confirm}}
+      cancel: {slot: 33, material: RED_CONCRETE, name: "<red>Annuler", lore: ["<gray>Retour sans modification."], sound: UI_BUTTON_CLICK, actions: {left: confirmation.cancel}}

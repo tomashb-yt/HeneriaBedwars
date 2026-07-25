@@ -7,6 +7,9 @@ import fr.heneria.zombie.core.command.ZombieCommandParser;
 import fr.heneria.zombie.core.instance.GameInstanceSnapshot;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.config.ReloadResult;
+import fr.heneria.zombie.plugin.gui.GuiConfigurationService;
+import fr.heneria.zombie.plugin.gui.GuiId;
+import fr.heneria.zombie.plugin.gui.GuiService;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.instance.PlayerInstanceResult;
 import fr.heneria.zombie.plugin.map.MapPreviewService;
@@ -42,6 +45,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
   private final InstanceCoordinator coordinator;
   private final MapTemplateCatalog templates;
   private final MapPreviewService previews;
+  private final GuiConfigurationService guiConfigurations;
+  private final GuiService guiService;
   private final Executor mainThread;
 
   /**
@@ -66,6 +71,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       InstanceCoordinator coordinator,
       MapTemplateCatalog templates,
       MapPreviewService previews,
+      GuiConfigurationService guiConfigurations,
+      GuiService guiService,
       Executor mainThread) {
     this.version = Objects.requireNonNull(version, "version");
     this.api = Objects.requireNonNull(api, "api");
@@ -75,6 +82,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     this.coordinator = Objects.requireNonNull(coordinator, "coordinator");
     this.templates = Objects.requireNonNull(templates, "templates");
     this.previews = Objects.requireNonNull(previews, "previews");
+    this.guiConfigurations = Objects.requireNonNull(guiConfigurations, "guiConfigurations");
+    this.guiService = Objects.requireNonNull(guiService, "guiService");
     this.mainThread = Objects.requireNonNull(mainThread, "mainThread");
   }
 
@@ -89,7 +98,13 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       return true;
     }
     ZombieCommandAction action = parser.parse(arguments);
-    if (isAdministrative(action) && !sender.hasPermission(ADMIN_PERMISSION)) {
+    if (action == ZombieCommandAction.ADMIN && !sender.hasPermission("zombie.gui.admin")) {
+      sender.sendMessage(messages.render("command.no-permission"));
+      return true;
+    }
+    if (action != ZombieCommandAction.ADMIN
+        && isAdministrative(action)
+        && !sender.hasPermission(ADMIN_PERMISSION)) {
       sender.sendMessage(messages.render("command.no-permission"));
       return true;
     }
@@ -98,6 +113,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       case HELP -> sender.sendMessage(messages.render("command.help"));
       case RELOAD -> reload(sender);
       case LOBBY -> withPlayer(sender, player -> returnToLobby(sender, player, false));
+      case ADMIN ->
+          withPlayer(sender, player -> guiService.openHome(player, new GuiId("admin-main")));
       case MAP_LIST -> listMaps(sender);
       case MAP_PREVIEW -> preview(sender, arguments[2]);
       case MAP_LEAVE -> withPlayer(sender, player -> returnToLobby(sender, player, true));
@@ -121,7 +138,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     if (arguments.length == 1) {
       return filter(
           sender.hasPermission(ADMIN_PERMISSION)
-              ? List.of("help", "lobby", "map", "instance", "reload")
+              ? List.of("help", "lobby", "admin", "map", "instance", "reload")
               : List.of("help", "lobby", "instance"),
           arguments[0]);
     }
@@ -378,13 +395,30 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     }
     try {
       ReloadResult result = configurations.reload();
-      sender.sendMessage(
-          messages.render(
-              result.successful() ? "command.reload-success" : "command.reload-failure",
-              result.successful() ? "warnings" : "errors",
-              Integer.toString(result.issues().size())));
-    } finally {
+      if (!result.successful()) {
+        sender.sendMessage(
+            messages.render(
+                "command.reload-failure", "errors", Integer.toString(result.issues().size())));
+        state.compareAndSet(PluginState.RELOADING, PluginState.RUNNING);
+        return;
+      }
+      guiConfigurations
+          .reloadAsync()
+          .whenCompleteAsync(
+              (ignored, failure) -> {
+                sender.sendMessage(
+                    failure == null
+                        ? messages.render(
+                            "command.reload-success",
+                            "warnings",
+                            Integer.toString(result.issues().size()))
+                        : messages.render("command.reload-failure", "errors", "GUI"));
+                state.compareAndSet(PluginState.RELOADING, PluginState.RUNNING);
+              },
+              mainThread);
+    } catch (RuntimeException failure) {
       state.compareAndSet(PluginState.RELOADING, PluginState.RUNNING);
+      throw failure;
     }
   }
 
@@ -402,7 +436,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
 
   private static boolean isAdministrative(ZombieCommandAction action) {
     return switch (action) {
-      case INSTANCE_CREATE, INSTANCE_LIST, INSTANCE_STOP, INSTANCE_INFO -> true;
+      case ADMIN, INSTANCE_CREATE, INSTANCE_LIST, INSTANCE_STOP, INSTANCE_INFO -> true;
       case MAP_LIST, MAP_PREVIEW, MAP_LEAVE -> true;
       default -> false;
     };

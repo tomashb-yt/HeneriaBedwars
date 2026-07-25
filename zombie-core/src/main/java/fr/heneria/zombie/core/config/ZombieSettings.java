@@ -202,8 +202,23 @@ public record ZombieSettings(
    * @param defaultTheme stable theme identifier
    * @param soundsEnabled whether GUI sounds are enabled
    * @param animationsEnabled whether GUI animations are enabled
+   * @param sessionTimeoutSeconds inactive session expiry
+   * @param inputTimeoutSeconds chat input expiry
+   * @param confirmationDelayTicks dangerous-action delay
+   * @param mapsMenuTicks map menu refresh interval
+   * @param instancesMenuTicks instance menu refresh interval
+   * @param diagnosticsMenuTicks diagnostics refresh interval
    */
-  public record GuiOptions(String defaultTheme, boolean soundsEnabled, boolean animationsEnabled) {
+  public record GuiOptions(
+      String defaultTheme,
+      boolean soundsEnabled,
+      boolean animationsEnabled,
+      int sessionTimeoutSeconds,
+      int inputTimeoutSeconds,
+      int confirmationDelayTicks,
+      int mapsMenuTicks,
+      int instancesMenuTicks,
+      int diagnosticsMenuTicks) {
     public GuiOptions {
       Objects.requireNonNull(defaultTheme, "defaultTheme");
     }

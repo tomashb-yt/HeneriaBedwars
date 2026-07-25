@@ -179,7 +179,13 @@ public final class ConfigurationManager {
             new GuiOptions(
                 config.getString("gui.default-theme", ""),
                 config.getBoolean("gui.sounds-enabled", true),
-                config.getBoolean("gui.animations-enabled", true)),
+                config.getBoolean("gui.animations-enabled", true),
+                config.getInt("gui.session-timeout-seconds", 300),
+                config.getInt("gui.input-timeout-seconds", 60),
+                config.getInt("gui.confirmation-delay-ticks", 20),
+                config.getInt("gui.refresh.maps-menu-ticks", 100),
+                config.getInt("gui.refresh.instances-menu-ticks", 20),
+                config.getInt("gui.refresh.diagnostics-menu-ticks", 40)),
             new DocumentationOptions(
                 config.getBoolean("documentation.require-context-update", true)));
     Map<String, String> mergedMessages = bundledMessages();

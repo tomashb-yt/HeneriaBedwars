@@ -59,7 +59,7 @@ class ZombieSettingsValidatorTest {
         new ChatOptions(true, true, true, true),
         new ReconnectOptions(true, 30, true, true),
         new WorldRuleOptions(false, false, false, false, false, false, false, false, true, true),
-        new GuiOptions("dark", true, true),
+        new GuiOptions("dark", true, true, 300, 60, 20, 100, 20, 40),
         new DocumentationOptions(true));
   }
 }

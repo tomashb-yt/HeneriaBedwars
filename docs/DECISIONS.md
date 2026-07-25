@@ -79,3 +79,19 @@ Un dossier contenant `level.dat` est une map détectable sans manifeste manuel. 
 lu directement depuis le NBT hors thread serveur et la capacité utilise une valeur globale
 configurable. Un aperçu ne charge jamais le modèle source : il utilise une copie temporaire hors du
 registre des parties, supprimée après déchargement confirmé.
+
+## ADR-017 — Un moteur GUI, des registres extensibles
+
+Un unique `GuiService` gère cycle de vie et protections. Écrans et callbacks sont enregistrés par
+injection dans deux registres locaux. Aucun module ne doit ajouter sa propre politique de clic ni
+identifier une action grâce au nom d'un item.
+
+## ADR-018 — Configuration GUI cachée et atomique
+
+`guis.yml` est lu hors thread serveur, validé complètement et activé par échange atomique. Une
+erreur conserve le snapshot précédent. Les rendus ne lisent jamais le disque.
+
+## ADR-019 — Jeton de vue et rafraîchissement partagé
+
+Chaque ouverture tourne un jeton empêchant un clic obsolète. Une seule tâche entretient toutes les
+sessions et rafraîchit les inventaires en place selon leur intervalle.

@@ -14,6 +14,7 @@ class ZombieCommandParserTest {
     assertEquals(ZombieCommandAction.HELP, parser.parse(new String[] {"HELP"}));
     assertEquals(ZombieCommandAction.RELOAD, parser.parse(new String[] {"reload"}));
     assertEquals(ZombieCommandAction.LOBBY, parser.parse(new String[] {"lobby"}));
+    assertEquals(ZombieCommandAction.ADMIN, parser.parse(new String[] {"admin"}));
     assertEquals(ZombieCommandAction.MAP_LIST, parser.parse(new String[] {"map", "list"}));
     assertEquals(
         ZombieCommandAction.MAP_PREVIEW, parser.parse(new String[] {"map", "preview", "crypt"}));

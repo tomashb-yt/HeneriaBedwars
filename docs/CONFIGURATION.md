@@ -1,6 +1,6 @@
 # Configuration
 
-**Statut :** configuration globale v1 opérationnelle au Ticket 002.
+**Statut :** configuration globale v1 et configuration GUI opérationnelles au Ticket 003.
 
 ## Chargement
 
@@ -49,6 +49,25 @@ conservation d'inventaire et sauvetage du vide.
 Si Paper refuse de charger ou créer `lobby.world`, le plugin utilise `server.fallback-world` et
 journalise un avertissement au lieu de se désactiver. Le monde dédié sera retenté au prochain
 démarrage.
+
+## GUI
+
+`guis.yml` est installé dans `plugins/HeneriaZombie` et complété en mémoire par les valeurs
+embarquées. Il configure thèmes, titres, tailles, matériaux, textes, lore, slots, permissions,
+sons et actions. Un candidat invalide conserve le snapshot précédent.
+
+```yaml
+gui:
+  session-timeout-seconds: 300
+  input-timeout-seconds: 60
+  confirmation-delay-ticks: 20
+  refresh:
+    maps-menu-ticks: 100
+    instances-menu-ticks: 20
+    diagnostics-menu-ticks: 40
+```
+
+Les lectures sont asynchrones et les rendus utilisent seulement le cache validé.
 
 ## Modèle de monde
 

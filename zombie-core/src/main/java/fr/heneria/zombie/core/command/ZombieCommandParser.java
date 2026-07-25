@@ -23,6 +23,7 @@ public final class ZombieCommandParser {
         case "help" -> ZombieCommandAction.HELP;
         case "reload" -> ZombieCommandAction.RELOAD;
         case "lobby" -> ZombieCommandAction.LOBBY;
+        case "admin" -> ZombieCommandAction.ADMIN;
         default -> ZombieCommandAction.UNKNOWN;
       };
     }

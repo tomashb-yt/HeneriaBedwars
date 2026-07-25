@@ -15,6 +15,13 @@ import fr.heneria.zombie.plugin.api.PaperZombieApi;
 import fr.heneria.zombie.plugin.command.ZombieCommand;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.display.ContextScoreboardService;
+import fr.heneria.zombie.plugin.gui.GuiActionRegistry;
+import fr.heneria.zombie.plugin.gui.GuiChatInputListener;
+import fr.heneria.zombie.plugin.gui.GuiConfigurationService;
+import fr.heneria.zombie.plugin.gui.GuiListener;
+import fr.heneria.zombie.plugin.gui.GuiRegistry;
+import fr.heneria.zombie.plugin.gui.GuiScreens;
+import fr.heneria.zombie.plugin.gui.GuiService;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.isolation.PaperAudienceService;
 import fr.heneria.zombie.plugin.isolation.VisibilityService;
@@ -56,6 +63,7 @@ public final class ZombieBootstrap {
   private ExecutorService ioExecutor;
   private InstanceCoordinator coordinator;
   private MapPreviewService previewService;
+  private GuiService guiService;
   private BukkitTask maintenanceTask;
 
   /**
@@ -173,8 +181,60 @@ public final class ZombieBootstrap {
             visibility,
             mainThread);
     previewService = new MapPreviewService(templates, worlds, lobby, mainThread);
-
     api = new PaperZombieApi(state, templates::count, registry::size);
+    GuiRegistry guiRegistry = new GuiRegistry();
+    GuiActionRegistry guiActions = new GuiActionRegistry();
+    GuiConfigurationService guiConfigurations =
+        new GuiConfigurationService(
+            plugin.getDataFolder().toPath(),
+            plugin.getClass().getClassLoader(),
+            ioExecutor,
+            () -> {
+              java.util.HashSet<String> known = new java.util.HashSet<>(GuiScreens.ACTION_IDS);
+              known.addAll(guiActions.ids());
+              return java.util.Set.copyOf(known);
+            },
+            diagnostic -> plugin.getLogger().warning(diagnostic));
+    var guiOptions = configurations.current().settings().gui();
+    guiService =
+        new GuiService(
+            plugin,
+            guiRegistry,
+            guiActions,
+            guiConfigurations,
+            Clock.systemUTC(),
+            Duration.ofSeconds(guiOptions.sessionTimeoutSeconds()),
+            () -> configurations.current().settings().gui().inputTimeoutSeconds(),
+            () -> configurations.current().settings().gui().soundsEnabled());
+    new GuiScreens(
+            plugin,
+            plugin.getPluginMeta().getVersion(),
+            guiRegistry,
+            guiActions,
+            guiConfigurations,
+            configurations,
+            guiService,
+            templates,
+            previewService,
+            coordinator,
+            sessions,
+            api,
+            mainThread,
+            Clock.systemUTC())
+        .register();
+    guiConfigurations
+        .initializeAsync()
+        .whenComplete(
+            (ignored, failure) -> {
+              if (failure != null) {
+                plugin
+                    .getLogger()
+                    .severe(
+                        "guis.yml rejected; bundled defaults remain active: "
+                            + failure.getMessage());
+              }
+            });
+
     registerServices(
         configurations,
         messages,
@@ -194,8 +254,18 @@ public final class ZombieBootstrap {
         new IsolatedChatListener(sessions, visibilityPolicy, configurations, messages),
         new ContextDeathListener(sessions, audiences),
         new InstanceWorldProtectionListener(worlds, sessions, configurations, previewService),
-        new MapPreviewListener(previewService));
-    registerCommand(configurations, messages, templates, previewService, mainThread);
+        new MapPreviewListener(previewService),
+        new GuiListener(guiService),
+        new GuiChatInputListener(plugin, guiService));
+    registerCommand(
+        configurations,
+        messages,
+        templates,
+        previewService,
+        guiConfigurations,
+        guiService,
+        mainThread);
+    registerPlayerGuiCommand(guiService);
 
     maintenanceTask =
         plugin
@@ -214,6 +284,10 @@ public final class ZombieBootstrap {
 
   /** Releases tasks, players, worlds, API registration and executor threads. */
   public void stop() {
+    if (guiService != null) {
+      guiService.shutdown();
+      guiService = null;
+    }
     if (maintenanceTask != null) {
       maintenanceTask.cancel();
       maintenanceTask = null;
@@ -289,6 +363,8 @@ public final class ZombieBootstrap {
       MessageService messages,
       MapTemplateCatalog templates,
       MapPreviewService previews,
+      GuiConfigurationService guiConfigurations,
+      GuiService guiService,
       PaperMainThreadExecutor mainThread) {
     PluginCommand command = plugin.getCommand("zombie");
     if (command == null) {
@@ -304,8 +380,30 @@ public final class ZombieBootstrap {
             coordinator,
             templates,
             previews,
+            guiConfigurations,
+            guiService,
             mainThread);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
+  }
+
+  private void registerPlayerGuiCommand(GuiService guiService) {
+    PluginCommand command = plugin.getCommand("zombies");
+    if (command == null) {
+      throw new IllegalStateException("Command zombies is missing from plugin.yml");
+    }
+    command.setExecutor(
+        (sender, ignored, label, arguments) -> {
+          if (!(sender instanceof org.bukkit.entity.Player player)) {
+            sender.sendMessage("Cette commande doit être utilisée en jeu.");
+          } else if (!player.hasPermission("zombie.gui.player")) {
+            player.sendMessage(
+                net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
+                    .deserialize("<red>Vous n'avez pas la permission."));
+          } else {
+            guiService.openHome(player, new fr.heneria.zombie.plugin.gui.GuiId("player-main"));
+          }
+          return true;
+        });
   }
 }

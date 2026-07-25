@@ -6,6 +6,7 @@ public enum ZombieCommandAction {
   HELP,
   RELOAD,
   LOBBY,
+  ADMIN,
   MAP_LIST,
   MAP_PREVIEW,
   MAP_LEAVE,

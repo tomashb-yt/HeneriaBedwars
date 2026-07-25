@@ -1,6 +1,6 @@
 # Modèles de données
 
-**Statut :** modèles runtime du Ticket 002 opérationnels ; gameplay à venir.
+**Statut :** modèles runtime et sessions GUI opérationnels ; gameplay à venir.
 
 ## Instance
 
@@ -50,6 +50,13 @@ temporaire. Un aperçu n'est ni une instance ni une session de gameplay.
 `ZombieSettings` et ses records imbriqués forment un snapshot immuable. La configuration globale
 reste en version 1, les anciennes installations obtenant les nouvelles valeurs par défaut sans
 écrasement. Les messages livrés complètent en mémoire les clés absentes du fichier utilisateur.
+
+## GUI
+
+`GuiSession` contient UUID joueur, jeton de vue, menu/contexte, accueil, historique borné, page,
+recherche, filtres, données temporaires, confirmation, saisie et actualisation. Sa fermeture
+libère ces références. Les snapshots de thèmes et menus sont immuables. `GuiPagination.Page`
+expose tranche, index, nombre de pages et total sans plafond global.
 
 ## Persistance
 

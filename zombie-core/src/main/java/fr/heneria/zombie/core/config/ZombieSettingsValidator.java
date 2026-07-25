@@ -73,6 +73,14 @@ public final class ZombieSettingsValidator {
     if (settings.gui().defaultTheme().isBlank()) {
       error(issues, "gui.default-theme", "GUI theme must not be blank");
     }
+    if (settings.gui().sessionTimeoutSeconds() <= 0
+        || settings.gui().inputTimeoutSeconds() <= 0
+        || settings.gui().confirmationDelayTicks() < 0
+        || settings.gui().mapsMenuTicks() <= 0
+        || settings.gui().instancesMenuTicks() <= 0
+        || settings.gui().diagnosticsMenuTicks() <= 0) {
+      error(issues, "gui", "GUI timeouts and refresh intervals must be positive");
+    }
     if (!settings.documentation().requireContextUpdate()) {
       issues.add(
           new ConfigurationIssue(

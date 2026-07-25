@@ -1,6 +1,6 @@
 # Architecture
 
-**Statut :** fondation et instances isolées opérationnelles au Ticket 002.
+**Statut :** fondation, instances isolées et framework GUI opérationnels au Ticket 003.
 
 ## Modules
 
@@ -80,8 +80,15 @@ déconnexion et mort sont supprimées puis redirigées vers le contexte exact.
 mémoire sans écraser les personnalisations. Le rechargement est refusé tant qu'une instance est
 active, car modifier les chemins ou règles d'un monde vivant serait ambigu.
 
+## Frontière GUI
+
+`GuiService` possède les sessions, la navigation et le rafraîchissement. Les registres injectés
+d'écrans et d'actions rendent les modules extensibles. `GuiListener` ne contient aucune logique
+métier. `GuiConfigurationService` installe et valide `guis.yml` sur le pool I/O, puis échange son
+snapshot atomiquement. Les écrans délèguent les mutations aux services existants.
+
 ## Extensions futures
 
 Le manifeste facultatif `zombie-map.yml` reste un adaptateur minimal. Le futur schéma de map
 versionné devra s'intégrer derrière le catalogue sans déplacer de logique Paper dans le core.
-Manches, zombies, matchmaking et GUI ne font pas partie de cette architecture livrée.
+Manches, zombies, matchmaking et éditeurs métier ne font pas partie de cette architecture livrée.

@@ -62,6 +62,13 @@ gui:
   default-theme: dark
   sounds-enabled: true
   animations-enabled: true
+  session-timeout-seconds: 300
+  input-timeout-seconds: 60
+  confirmation-delay-ticks: 20
+  refresh:
+    maps-menu-ticks: 100
+    instances-menu-ticks: 20
+    diagnostics-menu-ticks: 40
 
 documentation:
   require-context-update: true

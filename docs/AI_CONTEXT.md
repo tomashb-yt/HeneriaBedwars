@@ -27,7 +27,7 @@ mécaniques originales optionnelles par map.
 - fichiers hors thread serveur, appels Bukkit sur le thread serveur ;
 - snapshots de configuration validés puis activés atomiquement.
 
-## État réel — Ticket 002
+## État réel — Ticket 003
 
 Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 
@@ -75,6 +75,17 @@ l'introduction d'inventaires de valeur.
   clients Minecraft ;
 - un arrêt serveur conserve les dossiers d'instance, car leur suppression serait incertaine ;
 - `-1` retire le plafond fonctionnel, sans supprimer les limites matérielles.
+
+## Interfaces livrées au Ticket 003
+
+Le moteur GUI configurable fournit des sessions isolées, navigation, pagination sans plafond,
+recherche privée par chat, permissions, confirmations, rafraîchissement partagé et activation
+atomique de `guis.yml`. Les menus disponibles sont joueur, administration, maps, instances,
+diagnostics et confirmation. Ils réutilisent les services du Ticket 002.
+
+Le modèle de map reste minimal. Groupe, profil, statistiques, paramètres, éditeurs, export et
+suppression restent explicitement désactivés. Le rendu multi-clients doit encore être validé
+manuellement sur Paper.
 
 ## Reprise
 

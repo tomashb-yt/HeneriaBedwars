@@ -1,9 +1,10 @@
 # Commandes et permissions
 
-**Statut :** commandes temporaires du Ticket 002 opérationnelles.
+**Statut :** commandes Ticket 002 et accès GUI Ticket 003 opérationnels.
 
 ## Commandes joueur
 
+- `/zombies` — ouvre le menu principal joueur ;
 - `/zombie` — état, version et compteurs réels ;
 - `/zombie help` — aide ;
 - `/zombie lobby` — retour sûr au lobby ;
@@ -14,6 +15,7 @@ Elles exigent `zombie.command.use` et, pour les transitions joueur, `zombie.play
 
 ## Commandes administratives
 
+- `/zombie admin` — ouvre le menu principal administrateur ;
 - `/zombie map list` — rescane les dossiers contenant `level.dat` ;
 - `/zombie map preview <mapId>` — ouvre une copie temporaire sans créer de partie ;
 - `/zombie map leave` — retourne au lobby, décharge et supprime la copie ;
@@ -36,3 +38,7 @@ pendant une partie ou un aperçu.
 - `zombie.play` autorise les commandes joueur.
 
 Les valeurs par défaut et la hiérarchie exacte figurent dans `plugin.yml`.
+
+Les GUI ajoutent `zombie.gui.player`, `zombie.gui.admin`, `zombie.gui.maps`,
+`zombie.gui.instances`, `zombie.gui.settings`, `zombie.gui.diagnostics` et
+`zombie.gui.dangerous-actions`. La dernière autorise les confirmations destructives.

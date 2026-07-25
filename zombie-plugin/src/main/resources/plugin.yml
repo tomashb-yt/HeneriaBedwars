@@ -10,8 +10,12 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   zombie:
     description: Manages the HeneriaZombie lobby and isolated instances
-    usage: /zombie [help|lobby|reload|map|instance]
+    usage: /zombie [help|lobby|admin|reload|map|instance]
     permission: zombie.command.use
+  zombies:
+    description: Opens the HeneriaZombie player menu
+    usage: /zombies
+    permission: zombie.gui.player
 
 permissions:
   zombie.admin:
@@ -24,6 +28,14 @@ permissions:
       zombie.chat.global: true
       zombie.world.bypass: true
       zombie.editor: true
+      zombie.play: true
+      zombie.gui.player: true
+      zombie.gui.admin: true
+      zombie.gui.maps: true
+      zombie.gui.instances: true
+      zombie.gui.settings: true
+      zombie.gui.diagnostics: true
+      zombie.gui.dangerous-actions: true
   zombie.command.use:
     description: Allows use of the base /zombie command
     default: true
@@ -45,3 +57,24 @@ permissions:
   zombie.play:
     description: Allows lobby and instance player commands
     default: true
+  zombie.gui.player:
+    description: Opens player-facing GUI screens
+    default: true
+  zombie.gui.admin:
+    description: Opens the administrative GUI
+    default: op
+  zombie.gui.maps:
+    description: Displays and operates the map selector
+    default: op
+  zombie.gui.instances:
+    description: Displays and operates instance management
+    default: op
+  zombie.gui.settings:
+    description: Reserves access to future global GUI settings
+    default: op
+  zombie.gui.diagnostics:
+    description: Displays non-sensitive runtime diagnostics
+    default: op
+  zombie.gui.dangerous-actions:
+    description: Confirms destructive GUI actions
+    default: op
