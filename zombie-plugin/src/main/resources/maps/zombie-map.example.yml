@@ -1,0 +1,9 @@
+schema-version: 1
+map-id: example
+maximum-players: 4
+spawn:
+  x: 0.5
+  y: 65.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0

@@ -9,7 +9,11 @@ import java.util.Objects;
  * @param plugin plugin-level options
  * @param server server world options
  * @param storage persistence options
+ * @param lobby central lobby options
  * @param instances instance capacity options
+ * @param chat chat isolation options
+ * @param reconnect reconnection options
+ * @param worldRules runtime world protection options
  * @param gui interface options
  * @param documentation documentation policy
  */
@@ -18,7 +22,11 @@ public record ZombieSettings(
     PluginOptions plugin,
     ServerOptions server,
     StorageOptions storage,
+    LobbyOptions lobby,
     InstanceOptions instances,
+    ChatOptions chat,
+    ReconnectOptions reconnect,
+    WorldRuleOptions worldRules,
     GuiOptions gui,
     DocumentationOptions documentation) {
 
@@ -27,7 +35,11 @@ public record ZombieSettings(
     Objects.requireNonNull(plugin, "plugin");
     Objects.requireNonNull(server, "server");
     Objects.requireNonNull(storage, "storage");
+    Objects.requireNonNull(lobby, "lobby");
     Objects.requireNonNull(instances, "instances");
+    Objects.requireNonNull(chat, "chat");
+    Objects.requireNonNull(reconnect, "reconnect");
+    Objects.requireNonNull(worldRules, "worldRules");
     Objects.requireNonNull(gui, "gui");
     Objects.requireNonNull(documentation, "documentation");
   }
@@ -72,12 +84,115 @@ public record ZombieSettings(
   }
 
   /**
+   * Central lobby options.
+   *
+   * @param world lobby world
+   * @param spawn lobby spawn
+   */
+  public record LobbyOptions(String world, LocationOptions spawn) {
+    public LobbyOptions {
+      Objects.requireNonNull(world, "world");
+      Objects.requireNonNull(spawn, "spawn");
+    }
+  }
+
+  /**
+   * Serialized location.
+   *
+   * @param world world name
+   * @param x x coordinate
+   * @param y y coordinate
+   * @param z z coordinate
+   * @param yaw yaw
+   * @param pitch pitch
+   */
+  public record LocationOptions(
+      String world, double x, double y, double z, float yaw, float pitch) {
+    public LocationOptions {
+      Objects.requireNonNull(world, "world");
+    }
+  }
+
+  /**
    * Instance capacity options.
    *
+   * @param worldsDirectory runtime worlds directory
+   * @param templatesDirectory source templates directory
+   * @param deleteWorldAfterGame whether clean worlds are deleted
+   * @param preserveFailedWorlds whether uncertain worlds are retained
+   * @param unloadDelaySeconds delay before unloading
+   * @param creationTimeoutSeconds maximum creation duration
    * @param maximumConcurrentGames {@code -1} for no functional cap, otherwise a positive cap
-   * @param automaticCleanup whether disposable worlds should be cleaned automatically
+   * @param preventEntryWithoutSession whether unmanaged world entry is blocked
    */
-  public record InstanceOptions(int maximumConcurrentGames, boolean automaticCleanup) {}
+  public record InstanceOptions(
+      String worldsDirectory,
+      String templatesDirectory,
+      boolean deleteWorldAfterGame,
+      boolean preserveFailedWorlds,
+      int unloadDelaySeconds,
+      int creationTimeoutSeconds,
+      int maximumConcurrentGames,
+      boolean preventEntryWithoutSession) {
+    public InstanceOptions {
+      Objects.requireNonNull(worldsDirectory, "worldsDirectory");
+      Objects.requireNonNull(templatesDirectory, "templatesDirectory");
+    }
+  }
+
+  /**
+   * Chat isolation options.
+   *
+   * @param isolationEnabled whether viewers are context-filtered
+   * @param lobbyChannelEnabled whether lobby chat is enabled
+   * @param instanceChannelEnabled whether instance chat is enabled
+   * @param allowGlobalAdminChannel whether authorized administrators may prefix messages with !
+   */
+  public record ChatOptions(
+      boolean isolationEnabled,
+      boolean lobbyChannelEnabled,
+      boolean instanceChannelEnabled,
+      boolean allowGlobalAdminChannel) {}
+
+  /**
+   * Reconnection policy options.
+   *
+   * @param enabled whether instance membership survives a disconnect
+   * @param gracePeriodSeconds grace duration
+   * @param reservePlayerSlot whether membership keeps occupying a slot
+   * @param returnToLobbyAfterExpiration whether expiration resets to lobby
+   */
+  public record ReconnectOptions(
+      boolean enabled,
+      int gracePeriodSeconds,
+      boolean reservePlayerSlot,
+      boolean returnToLobbyAfterExpiration) {}
+
+  /**
+   * Fundamental runtime-world protections.
+   *
+   * @param allowNaturalMobSpawning natural spawning
+   * @param allowWeatherCycle weather cycle
+   * @param allowTimeCycle time cycle
+   * @param allowBlockBreaking block breaking
+   * @param allowBlockPlacing block placing
+   * @param allowItemDropping item dropping
+   * @param allowItemPickup item pickup
+   * @param allowPvp player versus player damage
+   * @param keepInventory inventory retention on death
+   * @param voidRescueEnabled void rescue
+   */
+  public record WorldRuleOptions(
+      boolean allowNaturalMobSpawning,
+      boolean allowWeatherCycle,
+      boolean allowTimeCycle,
+      boolean allowBlockBreaking,
+      boolean allowBlockPlacing,
+      boolean allowItemDropping,
+      boolean allowItemPickup,
+      boolean allowPvp,
+      boolean keepInventory,
+      boolean voidRescueEnabled) {}
 
   /**
    * GUI presentation options.

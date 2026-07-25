@@ -33,9 +33,15 @@ public final class ZombieSettingsValidator {
       error(issues, "server.fallback-world", "Fallback world must not be blank");
     }
     if (!"sqlite".equals(settings.storage().type().toLowerCase(Locale.ROOT))) {
-      error(issues, "storage.type", "Ticket 001 supports only the sqlite configuration value");
+      error(issues, "storage.type", "Only the sqlite configuration value is supported");
     }
     validateSqlitePath(settings.storage().sqliteFile(), issues);
+    if (settings.lobby().world().isBlank() || settings.lobby().spawn().world().isBlank()) {
+      error(issues, "lobby", "Lobby world and spawn world must not be blank");
+    }
+    if (!settings.lobby().world().equals(settings.lobby().spawn().world())) {
+      error(issues, "lobby.spawn.world", "Lobby spawn must belong to the lobby world");
+    }
 
     int maximumGames = settings.instances().maximumConcurrentGames();
     if (maximumGames == 0 || maximumGames < -1) {
@@ -43,6 +49,22 @@ public final class ZombieSettingsValidator {
           issues,
           "instances.maximum-concurrent-games",
           "Maximum games must be -1 or a positive integer");
+    }
+    validateRelativeDirectory(
+        settings.instances().worldsDirectory(), "instances.worlds-directory", issues);
+    validateRelativeDirectory(
+        settings.instances().templatesDirectory(), "instances.templates-directory", issues);
+    if (settings.instances().worldsDirectory().equals(settings.instances().templatesDirectory())) {
+      error(issues, "instances", "Worlds and templates directories must be different");
+    }
+    if (settings.instances().unloadDelaySeconds() < 0) {
+      error(issues, "instances.unload-delay-seconds", "Unload delay cannot be negative");
+    }
+    if (settings.instances().creationTimeoutSeconds() <= 0) {
+      error(issues, "instances.creation-timeout-seconds", "Creation timeout must be positive");
+    }
+    if (settings.reconnect().gracePeriodSeconds() <= 0) {
+      error(issues, "reconnect.grace-period-seconds", "Reconnect grace period must be positive");
     }
     if (settings.gui().defaultTheme().isBlank()) {
       error(issues, "gui.default-theme", "GUI theme must not be blank");
@@ -55,6 +77,22 @@ public final class ZombieSettingsValidator {
               "Central context updates are disabled"));
     }
     return List.copyOf(issues);
+  }
+
+  private static void validateRelativeDirectory(
+      String configuredPath, String configPath, List<ConfigurationIssue> issues) {
+    if (configuredPath.isBlank()) {
+      error(issues, configPath, "Directory must not be blank");
+      return;
+    }
+    try {
+      Path path = Path.of(configuredPath);
+      if (path.isAbsolute() || path.getNameCount() != 1 || path.normalize().startsWith("..")) {
+        error(issues, configPath, "Directory must be one safe relative folder name");
+      }
+    } catch (InvalidPathException invalidPath) {
+      error(issues, configPath, "Directory path is invalid");
+    }
   }
 
   private static void validateSqlitePath(String configuredPath, List<ConfigurationIssue> issues) {

@@ -8,11 +8,40 @@ command:
     <gray>Aide : <white>/zombie help</white>
   help: |-
     <red><bold>HeneriaZombie</bold></red> <gray>— Commandes</gray>
-    <white>/zombie</white> <dark_gray>:</dark_gray> <gray>informations du plugin</gray>
-    <white>/zombie help</white> <dark_gray>:</dark_gray> <gray>affiche cette aide</gray>
+    <white>/zombie lobby</white> <dark_gray>:</dark_gray> <gray>retourne au lobby</gray>
+    <white>/zombie instance join <id></white> <dark_gray>:</dark_gray> <gray>rejoint une instance</gray>
+    <white>/zombie instance leave</white> <dark_gray>:</dark_gray> <gray>quitte une instance</gray>
+    <white>/zombie instance create <map></white> <dark_gray>:</dark_gray> <gray>crée une instance</gray>
+    <white>/zombie instance list</white> <dark_gray>:</dark_gray> <gray>liste les instances</gray>
+    <white>/zombie instance info <id></white> <dark_gray>:</dark_gray> <gray>inspecte une instance</gray>
+    <white>/zombie instance stop <id></white> <dark_gray>:</dark_gray> <gray>arrête une instance</gray>
     <white>/zombie reload</white> <dark_gray>:</dark_gray> <gray>recharge les options sûres</gray>
-  usage: '<red>Usage : /zombie [help|reload]</red>'
+  usage: '<red>Usage : /zombie [help|lobby|reload|instance <create|list|join|leave|stop|info>]</red>'
   no-permission: '<red>Vous ne possédez pas la permission nécessaire.</red>'
+  player-only: '<red>Cette commande doit être exécutée par un joueur.</red>'
+  lobby-success: '<green>Vous êtes maintenant dans le lobby Zombies.</green>'
+  instance-created: '<green>Instance <id> créée sur la map <map>.</green>'
+  instance-create-failure: '<red>Création impossible : <reason>.</red>'
+  instance-list-header: '<gray>Instances actives : <white><count></white></gray>'
+  instance-list-entry: '<dark_gray>•</dark_gray> <white><id></white> <gray><map> — <state> — <players>/<maximum></gray>'
+  instance-info: |-
+    <red><bold>Instance <id></bold></red>
+    <gray>Map : <white><map></white>
+    <gray>État : <white><state></white>
+    <gray>Joueurs : <white><players>/<maximum></white>
+  instance-not-found: '<red>Instance introuvable ou identifiant ambigu.</red>'
+  instance-joined: '<green>Instance <id> rejointe.</green>'
+  instance-left: '<green>Instance quittée ; retour au lobby effectué.</green>'
+  instance-join-refused: '<red>Entrée refusée : <reason>.</red>'
+  instance-join-failure: '<red>Entrée impossible : <reason>.</red>'
+  instance-stopped: '<green>Instance <id> arrêtée et nettoyée.</green>'
+  instance-stop-failure: '<red>Arrêt non confirmé : <reason>.</red>'
   reload-success: '<green>Configuration rechargée avec succès (<warnings> avertissement(s)).</green>'
   reload-failure: '<red>Rechargement refusé : <errors> erreur(s). La configuration précédente reste active.</red>'
-  reload-busy: '<yellow>Le plugin ne peut pas être rechargé dans son état actuel.</yellow>'
+  reload-busy: '<yellow>Le rechargement est interdit pendant une instance ou une transition du plugin.</yellow>'
+
+context:
+  player-joined: '<dark_gray>+</dark_gray> <gray><player> s''est connecté.</gray>'
+  player-left: '<dark_gray>-</dark_gray> <gray><player> a quitté le lobby.</gray>'
+  player-disconnected: '<yellow><player> est déconnecté ; sa place est temporairement réservée.</yellow>'
+  chat-disabled: '<red>Le chat est désactivé dans ce contexte.</red>'

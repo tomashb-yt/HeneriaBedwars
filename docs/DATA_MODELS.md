@@ -1,21 +1,52 @@
 # Modèles de données
 
-**Statut :** règles de modélisation adoptées ; modèles gameplay à venir.
+**Statut :** modèles runtime du Ticket 002 opérationnels ; gameplay à venir.
 
-## Objectif et périmètre
+## Instance
 
-Séparer les données administratives persistantes, les agrégats joueur et l'état runtime.
+`GameInstance` est un agrégat mutable synchronisé. `GameInstanceSnapshot` est sa vue immuable :
 
-## Informations connues
+- UUID technique ;
+- identifiant stable de map ;
+- nom de monde facultatif pendant la création ;
+- état du cycle ;
+- ensemble défensivement copié des joueurs ;
+- capacité ;
+- date de création ;
+- propriétaire facultatif ;
+- accès `PUBLIC` ou `PRIVATE` ;
+- dernier diagnostic facultatif.
 
-Les identifiants techniques sont stables et distincts des noms affichés. Les records immuables
-représentent les snapshots de configuration. Une future `MapDefinition` versionnée ne contiendra
-jamais une instance vivante. Les états de manche, zombies, joueurs et monde seront possédés par une
-instance et ne seront pas sérialisés dans les YAML administratifs.
+`GameInstanceRegistry` possède les agrégats actifs. Un monde est représenté dans le core par
+`WorldInstanceHandle`, sans type Bukkit.
 
-SQLite accueillera les données relationnelles réellement persistantes avec migrations. Les accès
-seront asynchrones et les résultats reviendront au thread serveur avant tout appel Paper.
+## Session joueur
 
-## À compléter
+`PlayerSession` contient l'UUID joueur, le contexte `LOBBY` ou `INSTANCE`, un UUID d'instance
+facultatif, le statut en ligne et une échéance de reconnexion facultative. Ses invariants
+interdisent un contexte instance sans identifiant et un contexte lobby avec identifiant.
 
-Identifiants, schéma de map, session joueur, instance, zones, entités, progression et tables SQL.
+`PlayerStateSnapshot`, limité au module Paper, copie défensivement inventaire, armure, main
+secondaire, expérience, santé, alimentation, effets, mode, position, vitesses et vol.
+
+## Modèle de map minimal
+
+`MapTemplateDefinition` contient :
+
+- `mapId`, limité à 64 caractères sûrs ;
+- `maximumPlayers`, strictement positif ;
+- le spawn `x`, `y`, `z`, `yaw`, `pitch`.
+
+Le fichier source porte `schema-version: 1`. Ce modèle technique sert uniquement au clonage du
+Ticket 002 et sera remplacé ou migré lorsque le schéma complet des maps sera défini.
+
+## Configuration
+
+`ZombieSettings` et ses records imbriqués forment un snapshot immuable. La configuration globale
+reste en version 1, les anciennes installations obtenant les nouvelles valeurs par défaut sans
+écrasement. Les messages livrés complètent en mémoire les clés absentes du fichier utilisateur.
+
+## Persistance
+
+Les instances et sessions sont runtime. Elles ne sont pas écrites dans YAML ou SQLite. SQLite
+reste réservé aux futures données réellement persistantes avec migrations et accès asynchrones.

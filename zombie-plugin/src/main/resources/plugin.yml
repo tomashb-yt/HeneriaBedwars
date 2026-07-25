@@ -9,8 +9,8 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 
 commands:
   zombie:
-    description: Displays HeneriaZombie information and administration help
-    usage: /zombie [help|reload]
+    description: Manages the HeneriaZombie lobby and isolated instances
+    usage: /zombie [help|lobby|reload|instance]
     permission: zombie.command.use
 
 permissions:
@@ -20,6 +20,9 @@ permissions:
     children:
       zombie.command.use: true
       zombie.command.reload: true
+      zombie.instance.admin: true
+      zombie.chat.global: true
+      zombie.world.bypass: true
       zombie.editor: true
   zombie.command.use:
     description: Allows use of the base /zombie command
@@ -27,9 +30,18 @@ permissions:
   zombie.command.reload:
     description: Allows safe configuration and message reload
     default: op
+  zombie.instance.admin:
+    description: Allows instance creation, inspection, listing and shutdown
+    default: op
+  zombie.chat.global:
+    description: Allows the explicit ! administrative global chat channel
+    default: op
+  zombie.world.bypass:
+    description: Bypasses runtime-world interaction protections
+    default: op
   zombie.editor:
     description: Reserves access to the future universal map editor
     default: op
   zombie.play:
-    description: Reserves access to future Zombies matchmaking
+    description: Allows lobby and instance player commands
     default: true

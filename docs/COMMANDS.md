@@ -1,26 +1,34 @@
 # Commandes et permissions
 
-**Statut :** surface Ticket 001 opérationnelle.
+**Statut :** commandes temporaires du Ticket 002 opérationnelles.
 
-## Objectif et périmètre
+## Commandes joueur
 
-Documenter les commandes réellement disponibles et leurs contrôles d'accès.
+- `/zombie` — état, version et compteurs réels ;
+- `/zombie help` — aide ;
+- `/zombie lobby` — retour sûr au lobby ;
+- `/zombie instance join <id>` — rejoint l'unique instance correspondant au préfixe UUID ;
+- `/zombie instance leave` — quitte l'instance et restaure le lobby.
 
-## Commandes
+Elles exigent `zombie.command.use` et, pour les transitions joueur, `zombie.play`.
 
-- `/zombie` — version, état, maps enregistrées, instances actives et aide ;
-- `/zombie help` — aide minimale ;
-- `/zombie reload` — recharge uniquement la configuration globale sûre et les messages.
+## Commandes administratives
 
-Le reload refuse un candidat invalide et conserve l'ancien. Au Ticket 001, les compteurs maps et
-instances valent zéro.
+- `/zombie instance create <mapId>` — copie le modèle et crée une instance publique ;
+- `/zombie instance list` — liste UUID abrégé, map, état et capacité ;
+- `/zombie instance info <id>` — détaille une instance ;
+- `/zombie instance stop <id>` — expulse, décharge et nettoie ;
+- `/zombie reload` — recharge un candidat valide lorsqu'aucune instance n'est active.
+
+Les quatre commandes d'instance exigent `zombie.instance.admin`. Le reload exige en plus
+`zombie.command.reload`. Un préfixe UUID ambigu est refusé.
 
 ## Permissions
 
-`zombie.command.use` autorise la commande de base ; `zombie.command.reload` autorise le reload ;
-`zombie.admin` regroupe les droits administratifs ; `zombie.editor` et `zombie.play` réservent les
-futures fonctions. Les valeurs par défaut figurent dans `plugin.yml`.
+- `zombie.admin` regroupe tous les droits administratifs ;
+- `zombie.chat.global` permet le canal global explicite avec le préfixe `!` ;
+- `zombie.world.bypass` contourne les protections des mondes d'instance ;
+- `zombie.editor` réserve le futur éditeur ;
+- `zombie.play` autorise les commandes joueur.
 
-## À compléter
-
-Sous-commandes de maps, éditeur, parties et diagnostics avec permissions granulaires.
+Les valeurs par défaut et la hiérarchie exacte figurent dans `plugin.yml`.

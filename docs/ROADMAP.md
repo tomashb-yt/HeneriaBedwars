@@ -1,24 +1,21 @@
 # Roadmap
 
-**Statut :** Ticket 001 terminé ; ordre suivant indicatif.
-
-## Objectif et périmètre
-
-Découper le produit en incréments terminés, compilés, testés et documentés. Une ligne planifiée
-n'est pas une promesse de fonction disponible.
+**Statut :** Tickets 001 et 002 terminés dans le code.
 
 ## Étapes
 
-1. **Ticket 001 — Fondation et documentation centrale :** terminé et validé sur Paper 1.21.11.
-2. **Modèles et registre de maps :** schéma versionné, validation et dépôt sûr.
-3. **Éditeur universel :** sessions, outil et GUI sans gameplay.
-4. **Mondes et instances :** clones, machine d'état, nettoyage et restauration joueur.
-5. **Lobby et matchmaking :** séparation de visibilité et transitions.
+1. **Ticket 001 — Fondation et documentation centrale :** terminé.
+2. **Ticket 002 — Lobby et instances isolées :** lobby, clones, sessions, isolation et commandes
+   terminés ; aucune boucle de jeu.
+3. **Schéma complet et registre de maps :** remplacer ou migrer le manifeste minimal, valider
+   zones et collections.
+4. **Éditeur universel :** sessions administratives, outil et GUI.
+5. **Lobby enrichi et matchmaking :** sélection de map, files et groupes.
 6. **Boucle classique minimale :** manches, zombies, points, mort et réanimation.
 7. **Économie de map :** portes, barricades, armes, boîte, courant, atouts et Pack-a-Punch.
 8. **Contenu avancé :** bonus, spéciaux, boss, pièges et quêtes.
-9. **Fonctions originales :** modules indépendants, uniquement après le socle classique.
+9. **Fonctions originales :** modules indépendants après stabilisation du socle classique.
 10. **Persistance et exploitation :** profils nécessaires, migrations, métriques et outils admin.
 
-Chaque étape sera subdivisée avant implémentation. SQLite ne sera activé qu'avec un besoin
-persistant défini.
+Chaque étape devient un ticket borné, compilé, testé, documenté et publié. SQLite ne sera activé
+qu'avec un modèle persistant défini.

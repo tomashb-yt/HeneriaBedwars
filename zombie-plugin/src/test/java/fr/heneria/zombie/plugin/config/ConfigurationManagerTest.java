@@ -26,6 +26,7 @@ class ConfigurationManagerTest {
     assertEquals("fr_FR", manager.current().settings().plugin().language());
     assertEquals(-1, manager.current().settings().instances().maximumConcurrentGames());
     assertEquals("data.db", manager.current().settings().storage().sqliteFile());
+    assertTrue(manager.current().messages().containsKey("command.instance-created"));
   }
 
   @Test

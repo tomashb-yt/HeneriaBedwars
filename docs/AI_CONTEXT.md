@@ -2,114 +2,78 @@
 
 Avant de modifier le projet :
 
-1. Lire ce fichier intégralement.
-2. Lire `ARCHITECTURE.md`.
-3. Lire `DECISIONS.md`.
-4. Lire les documents liés au système modifié.
-5. Vérifier le code existant avant de proposer une nouvelle architecture.
-6. Mettre à jour la documentation après toute modification.
-7. Ne jamais considérer une conversation externe comme source de vérité.
-8. Considérer le dépôt et sa documentation comme la source de vérité.
+1. lire ce fichier intégralement ;
+2. lire `ARCHITECTURE.md`, `DECISIONS.md` et `ROADMAP.md` ;
+3. lire les documents du système modifié et les dernières entrées du changelog ;
+4. inspecter Git et le code réel ;
+5. synchroniser documentation, tests et code avant de terminer.
+
+Le dépôt est la source de vérité. Une conversation externe ne l'est jamais.
 
 ## Vision
 
-HeneriaZombie vise un mini-jeu Zombies haut de gamme sur un seul serveur Paper. Un lobby central
-accueillera les joueurs, plusieurs maps pourront être enregistrées et plusieurs parties isolées
-pourront vivre simultanément. L'inspiration classique est Black Ops 2, sans reproduire ses contenus
-protégés. L'identité propre vient de systèmes optionnels configurables map par map.
-
-## Objectifs fonctionnels
-
-- séparer totalement les joueurs du lobby de ceux des parties ;
-- cloner ou charger des mondes dédiés pour chaque instance logique ;
-- proposer un configurateur universel en jeu, principalement par GUI ;
-- accepter un nombre non plafonné arbitrairement de maps, instances ou spawns de zombies ;
-- conserver des interfaces cohérentes, accessibles et configurables ;
-- rendre chaque système de gameplay modulaire, testable et désactivable lorsque pertinent ;
-- persister en SQLite les données structurées sans bloquer le thread serveur.
-
-`-1` dans la capacité d'instances signifie « aucune limite fonctionnelle fixe ». Les ressources,
-la sécurité et les protections opérationnelles du serveur restent les limites réelles.
-
-## Lobby et instances prévus
-
-Le lobby est un contexte sans gameplay Zombies. Rejoindre une partie créera une session joueur et
-une instance indépendante liée à une définition de map validée. Visibilité, inventaire, monde,
-scoreboard et état de jeu seront cloisonnés. Un arrêt devra restaurer les joueurs avant de libérer
-le monde. Rien de ce paragraphe n'est encore implémenté.
-
-## Configurateur universel prévu
-
-L'éditeur devra pouvoir décrire n'importe quelle map sans hypothèse sur sa forme : zones, portes,
-achats, machines, chemins, objectifs et une collection extensible de spawns identifiés. Il
-enregistrera des identifiants stables et une version de schéma, puis affichera les erreurs avant
-activation. Il n'existe pas encore dans le Ticket 001.
-
-## Gameplay à préserver
-
-Le socle futur couvrira manches, points, portes, barricades, armes murales, boîte mystère, courant,
-atouts, Pack-a-Punch, bonus, réanimations, zombies spéciaux, boss, Easter Eggs, pièges et partie
-infinie.
-
-Les extensions originales envisagées sont : directeur adaptatif, reliques, mutations de manche,
-règles de zone, événements dynamiques, contrats, quêtes modulaires, arbres d'amélioration d'armes,
-extraction, fins multiples et évolution dynamique de zones. Elles devront être indépendamment
-désactivables par map.
+HeneriaZombie est un mini-jeu Zombies haut de gamme exécuté sur un seul serveur Paper. Un lobby
+central et plusieurs parties totalement isolées coexistent dans le même processus. Le projet
+reprend les principes familiers du genre sans reproduire de contenu protégé et garde ses
+mécaniques originales optionnelles par map.
 
 ## Conventions techniques
 
-Java 21, Gradle Kotlin DSL et Paper 1.21.x sont imposés. Adventure représente les textes. YAML
-sert aux configurations lisibles ; JSON sera réservé aux structures exportables complexes ;
-SQLite servira aux données persistantes. Les appels Paper restent dans `zombie-plugin`, la logique
-testable dans `zombie-core` et les contrats publics stables dans `zombie-api`. Les services sont
-assemblés explicitement, sans singleton global.
+- Java 21, Gradle Kotlin DSL et Paper 1.21.x ;
+- Adventure pour les textes et audiences ;
+- YAML versionné pour la configuration lisible ;
+- `zombie-api` sans plateforme, `zombie-core` sans Paper et `zombie-plugin` comme frontière Paper ;
+- injection explicite par constructeur, sans singleton global mutable ;
+- fichiers hors thread serveur, appels Bukkit sur le thread serveur ;
+- snapshots de configuration validés puis activés atomiquement.
 
-## Structure
+## État réel — Ticket 002
 
-- `zombie-api` : contrats publics indépendants ;
-- `zombie-core` : application et domaine sans Paper ;
-- `zombie-plugin` : adaptateurs Paper et JAR déployable ;
-- `docs` : source de vérité inter-IA ;
-- `zombie-plugin/src/main/resources` : manifeste et valeurs par défaut.
+Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 
-## État réel — Ticket 001 validé
+- un lobby central chargé au démarrage et un état joueur de lobby standardisé ;
+- des modèles de monde minimaux identifiés par `zombie-map.yml` ;
+- des instances simultanées à identifiant UUID, capacité par map et cycle contrôlé ;
+- copie asynchrone, chargement Paper, déchargement puis suppression sûre des mondes ;
+- sessions joueur exclusives, capture/restauration d'état et reconnexion avec délai ;
+- isolation de visibilité, tablist, chat, messages de mort et audiences Adventure ;
+- scoreboards indépendants par contexte ;
+- protections configurables des mondes d'instance ;
+- commandes temporaires de création, inspection, entrée, sortie et arrêt ;
+- compteurs API réels pour les modèles et instances.
 
-Terminé dans le code : build multi-module, configuration immuable validée, installation des YAML,
-rechargement transactionnel des options sûres, états de cycle de vie, registre local de services,
-API publique de diagnostic, `/zombie`, `/zombie help`, `/zombie reload`, permissions et tests
-unitaires. Les compteurs de maps et d'instances valent honnêtement zéro.
+Les états sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`, `CLEANING`, `CLOSED` et
+`ERROR`. Aucune manche, aucun zombie et aucun matchmaking ne sont implémentés.
 
-La chaîne `clean qualityGate` passe et un démarrage manuel Paper 1.21.11 a validé l'activation,
-les trois commandes et l'arrêt propre.
+## Modèle de map minimal du Ticket 002
 
-Non implémenté : lobby, maps, éditeur, instances, mondes clonés, stockage SQLite actif, GUI et tout
-gameplay. Aucun listener gameplay n'est enregistré.
+Le catalogue lit `<world-container>/zombie_templates/<mapId>/zombie-map.yml`. Ce format ne
+remplace pas le futur registre de maps : il fournit uniquement l'identifiant, la capacité et le
+spawn requis pour valider le clonage d'instances. Le schéma complet et l'éditeur restent à venir.
 
-## Fichiers importants
+## Stratégie joueur
 
-- `AGENTS.md` : procédure de travail ;
-- `build.gradle.kts` et `settings.gradle.kts` : build ;
-- `HeneriaZombiePlugin.java` : entrée Paper ;
-- `ZombieBootstrap.java` : composition ;
-- `ConfigurationManager.java` : chargement transactionnel ;
-- `config.yml`, `messages.yml`, `plugin.yml` : ressources livrées ;
-- `ROADMAP.md` et `DECISIONS.md` : ordre et contraintes.
+À la première prise en charge, le plugin capture l'état pré-plugin en mémoire. Le lobby reçoit un
+profil vide et standardisé. L'entrée en instance capture ce profil lobby, applique un profil de
+partie propre et téléporte au spawn du modèle. La sortie restaure le profil lobby.
 
-## Prochaines étapes
+Lors d'un arrêt normal, les joueurs sont renvoyés au lobby avant le déchargement des mondes. Les
+snapshots ne sont pas persistés après un crash brutal du processus ; le serveur conserve toutefois
+son propre `playerdata`. Une persistance transactionnelle dédiée sera nécessaire avant
+l'introduction d'inventaires de valeur.
 
-Le prochain ticket doit préciser les modèles de map et leur registre avant d'ajouter l'éditeur ou
-le gameplay. L'isolation des mondes et sessions viendra ensuite, puis le lobby, les GUI et les
-systèmes de manches par incréments terminés et testés.
+## Limites connues
 
-## Risques connus
+- le modèle de map est volontairement minimal et n'a pas encore de GUI ;
+- les instances restent en attente jusqu'à leur arrêt administratif : aucune boucle de jeu ;
+- SQLite est configuré mais aucune donnée métier ne justifie encore l'ouverture d'une connexion ;
+- le test automatisé simule plusieurs sessions, mais une validation visuelle complète exige trois
+  clients Minecraft ;
+- un arrêt serveur conserve les dossiers d'instance, car leur suppression serait incertaine ;
+- `-1` retire le plafond fonctionnel, sans supprimer les limites matérielles.
 
-La présence des mondes configurés n'est pas validée au Ticket 001. SQLite est configuré mais aucune
-connexion n'est ouverte. Un nombre illimité fonctionnel d'instances n'est pas une garantie de
-capacité matérielle. Les API Paper peuvent évoluer entre sous-versions 1.21. Chaque futur système
-doit protéger le thread serveur, les restaurations joueur et la suppression de mondes.
+## Reprise
 
-## Règle de reprise
-
-Comparer toujours documentation, tests et code. Ne jamais annoncer une fonction planifiée comme
-livrée. Après chaque ticket, actualiser ce fichier, les documents concernés, le changelog et les
-décisions nouvelles, puis exécuter la définition de terminé d'`AGENTS.md`.
+Le prochain incrément doit suivre `ROADMAP.md`, utiliser les services existants au lieu de créer un
+second registre de sessions ou d'instances, et préserver la frontière Paper. Ne jamais annoncer
+les fonctionnalités de gameplay planifiées comme déjà livrées.

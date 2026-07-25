@@ -1,4 +1,5 @@
-# Ressources de maps
+# Modèle minimal de map
 
-Les exemples de définition de map arriveront avec le schéma versionné du configurateur universel.
-Ce dossier ne contient volontairement aucune map déclarée comme jouable.
+Le Ticket 002 lit un `zombie-map.yml` dans chaque dossier de monde modèle. Copiez
+`zombie-map.example.yml` à la racine du monde et adaptez son identifiant, sa capacité et son
+spawn. Le futur schéma universel de map remplacera ou migrera ce manifeste minimal.

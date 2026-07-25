@@ -3,7 +3,7 @@ package fr.heneria.zombie.core.command;
 import java.util.Locale;
 import java.util.Objects;
 
-/** Pure parser for the initial {@code /zombie} command surface. */
+/** Pure parser for the {@code /zombie} command surface. */
 public final class ZombieCommandParser {
 
   /**
@@ -17,12 +17,32 @@ public final class ZombieCommandParser {
     if (arguments.length == 0) {
       return ZombieCommandAction.INFORMATION;
     }
-    if (arguments.length != 1) {
+    String root = arguments[0].toLowerCase(Locale.ROOT);
+    if (arguments.length == 1) {
+      return switch (root) {
+        case "help" -> ZombieCommandAction.HELP;
+        case "reload" -> ZombieCommandAction.RELOAD;
+        case "lobby" -> ZombieCommandAction.LOBBY;
+        default -> ZombieCommandAction.UNKNOWN;
+      };
+    }
+    if (!root.equals("instance")) {
       return ZombieCommandAction.UNKNOWN;
     }
-    return switch (arguments[0].toLowerCase(Locale.ROOT)) {
-      case "help" -> ZombieCommandAction.HELP;
-      case "reload" -> ZombieCommandAction.RELOAD;
+    String operation = arguments[1].toLowerCase(Locale.ROOT);
+    return switch (operation) {
+      case "create" ->
+          arguments.length == 3 ? ZombieCommandAction.INSTANCE_CREATE : ZombieCommandAction.UNKNOWN;
+      case "list" ->
+          arguments.length == 2 ? ZombieCommandAction.INSTANCE_LIST : ZombieCommandAction.UNKNOWN;
+      case "join" ->
+          arguments.length == 3 ? ZombieCommandAction.INSTANCE_JOIN : ZombieCommandAction.UNKNOWN;
+      case "leave" ->
+          arguments.length == 2 ? ZombieCommandAction.INSTANCE_LEAVE : ZombieCommandAction.UNKNOWN;
+      case "stop" ->
+          arguments.length == 3 ? ZombieCommandAction.INSTANCE_STOP : ZombieCommandAction.UNKNOWN;
+      case "info" ->
+          arguments.length == 3 ? ZombieCommandAction.INSTANCE_INFO : ZombieCommandAction.UNKNOWN;
       default -> ZombieCommandAction.UNKNOWN;
     };
   }

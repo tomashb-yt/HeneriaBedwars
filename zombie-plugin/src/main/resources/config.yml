@@ -9,13 +9,53 @@ server:
   lobby-world: zombie_lobby
   fallback-world: world
 
+lobby:
+  world: zombie_lobby
+  spawn:
+    world: zombie_lobby
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
 storage:
   type: sqlite
   sqlite-file: data.db
 
 instances:
+  worlds-directory: zombie_instances
+  templates-directory: zombie_templates
+  delete-world-after-game: true
+  preserve-failed-worlds: true
+  unload-delay-seconds: 5
+  creation-timeout-seconds: 60
   maximum-concurrent-games: -1
-  automatic-cleanup: true
+  prevent-entry-without-session: true
+
+chat:
+  isolation-enabled: true
+  lobby-channel-enabled: true
+  instance-channel-enabled: true
+  allow-global-admin-channel: true
+
+reconnect:
+  enabled: true
+  grace-period-seconds: 180
+  reserve-player-slot: true
+  return-to-lobby-after-expiration: true
+
+world-rules:
+  allow-natural-mob-spawning: false
+  allow-weather-cycle: false
+  allow-time-cycle: false
+  allow-block-breaking: false
+  allow-block-placing: false
+  allow-item-dropping: false
+  allow-item-pickup: true
+  allow-pvp: false
+  keep-inventory: true
+  void-rescue-enabled: true
 
 gui:
   default-theme: dark

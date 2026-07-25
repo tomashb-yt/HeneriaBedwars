@@ -1,29 +1,76 @@
 # Configuration
 
-**Statut :** configuration globale v1 opérationnelle ; formats de map à venir.
+**Statut :** configuration globale v1 opérationnelle au Ticket 002.
 
-## Objectif et périmètre
+## Chargement
 
-Décrire les fichiers lisibles, leurs invariants et le reload sûr du Ticket 001.
+`config.yml` et `messages.yml` sont créés uniquement s'ils manquent. Un candidat est désérialisé,
+validé puis activé atomiquement. Une erreur conserve le dernier snapshot valide. Les clés
+MiniMessage livrées complètent en mémoire les clés utilisateur absentes sans modifier le fichier.
 
-## Informations connues
+`/zombie reload` est refusé pendant toute instance active. Le reload ne recrée ni lobby, ni monde,
+ni pool d'exécution.
 
-`config.yml` contient `config-version: 1`, la langue, le debug, les mondes, la cible SQLite, la
-capacité d'instances et les préférences GUI. `maximum-concurrent-games: -1` enlève le plafond
-fonctionnel, pas les limites matérielles. Le chemin SQLite doit rester relatif au dossier du plugin.
-Le seul type accepté à ce stade est `sqlite`.
+## Lobby et instances
 
-`messages.yml` contient les modèles MiniMessage. Les valeurs par défaut sont copiées seulement si
-le fichier manque. `/zombie reload` construit et valide un candidat, puis le remplace atomiquement ;
-en cas d'erreur, l'ancien snapshot reste actif. Le reload ne touche ni monde, ni map, ni partie.
+```yaml
+lobby:
+  world: zombie_lobby
+  spawn:
+    world: zombie_lobby
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
+instances:
+  worlds-directory: zombie_instances
+  templates-directory: zombie_templates
+  delete-world-after-game: true
+  preserve-failed-worlds: true
+  unload-delay-seconds: 5
+  creation-timeout-seconds: 60
+  maximum-concurrent-games: -1
+  prevent-entry-without-session: true
+```
+
+Les deux dossiers doivent être des noms relatifs simples et distincts. `-1` signifie aucune limite
+fonctionnelle fixe ; `0` est invalide.
+
+## Chat, reconnexion et règles
+
+`chat` active l'isolation des canaux lobby/instance et le canal administratif `!`.
+`reconnect` configure le délai, la réservation de place et le retour lobby après expiration.
+`world-rules` contrôle apparitions naturelles, cycles, modifications de blocs, objets, PVP,
+conservation d'inventaire et sauvetage du vide.
+
+## Modèle de monde
+
+Chaque modèle se trouve dans :
+
+```text
+<world-container>/zombie_templates/<mapId>/
+```
+
+Il s'agit d'un monde Paper valide contenant :
+
+```yaml
+schema-version: 1
+map-id: crypt
+maximum-players: 4
+spawn:
+  x: 0.5
+  y: 65.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+```
+
+Le fichier doit être nommé `zombie-map.yml`. Les identifiants acceptent minuscules, chiffres,
+underscore et tiret. Les liens symboliques sont refusés.
 
 ## Validation
 
-Version, champs obligatoires, backend, chemin, capacité et thème sont contrôlés. Une erreur bloque
-l'activation ; un avertissement est journalisé. Le monde lobby absent sera diagnostiqué par le
-futur service de lobby, car le Ticket 001 ne charge aucun monde.
-
-## À compléter
-
-Migrations, configuration par map, schémas JSON, secrets MySQL éventuels et commandes de diagnostic
-seront documentés lors de leur implémentation.
+Version, champs obligatoires, backend SQLite, chemins, cohérence du lobby, capacités, délais et
+thème sont validés. Un avertissement est journalisé ; une erreur bloque l'activation.

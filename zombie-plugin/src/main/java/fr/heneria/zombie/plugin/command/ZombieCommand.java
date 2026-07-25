@@ -2,29 +2,43 @@ package fr.heneria.zombie.plugin.command;
 
 import fr.heneria.zombie.api.PluginState;
 import fr.heneria.zombie.api.ZombieApi;
+import fr.heneria.zombie.core.command.ZombieCommandAction;
 import fr.heneria.zombie.core.command.ZombieCommandParser;
+import fr.heneria.zombie.core.instance.GameInstanceSnapshot;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.config.ReloadResult;
+import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
+import fr.heneria.zombie.plugin.instance.PlayerInstanceResult;
 import fr.heneria.zombie.plugin.message.MessageService;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Paper adapter for the minimal Ticket 001 command surface. */
+/** Paper adapter for lobby and isolated-instance commands. */
 public final class ZombieCommand implements CommandExecutor, TabCompleter {
 
+  private static final String ADMIN_PERMISSION = "zombie.instance.admin";
   private final String version;
   private final ZombieApi api;
   private final AtomicReference<PluginState> state;
-  private final ZombieCommandParser parser;
+  private final ZombieCommandParser parser = new ZombieCommandParser();
   private final ConfigurationManager configurations;
   private final MessageService messages;
+  private final InstanceCoordinator coordinator;
+  private final Executor mainThread;
 
   /**
    * Creates the command adapter.
@@ -34,19 +48,24 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
    * @param state shared lifecycle state
    * @param configurations configuration manager
    * @param messages message renderer
+   * @param coordinator instance coordinator
+   * @param mainThread Paper main-thread executor
    */
   public ZombieCommand(
       String version,
       ZombieApi api,
       AtomicReference<PluginState> state,
       ConfigurationManager configurations,
-      MessageService messages) {
+      MessageService messages,
+      InstanceCoordinator coordinator,
+      Executor mainThread) {
     this.version = Objects.requireNonNull(version, "version");
     this.api = Objects.requireNonNull(api, "api");
     this.state = Objects.requireNonNull(state, "state");
     this.configurations = Objects.requireNonNull(configurations, "configurations");
     this.messages = Objects.requireNonNull(messages, "messages");
-    this.parser = new ZombieCommandParser();
+    this.coordinator = Objects.requireNonNull(coordinator, "coordinator");
+    this.mainThread = Objects.requireNonNull(mainThread, "mainThread");
   }
 
   @Override
@@ -59,10 +78,35 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       sender.sendMessage(messages.render("command.no-permission"));
       return true;
     }
-    switch (parser.parse(arguments)) {
+    ZombieCommandAction action = parser.parse(arguments);
+    if (isAdministrative(action) && !sender.hasPermission(ADMIN_PERMISSION)) {
+      sender.sendMessage(messages.render("command.no-permission"));
+      return true;
+    }
+    switch (action) {
       case INFORMATION -> showInformation(sender);
       case HELP -> sender.sendMessage(messages.render("command.help"));
       case RELOAD -> reload(sender);
+      case LOBBY ->
+          withPlayer(
+              sender,
+              player -> {
+                coordinator.leave(player);
+                sender.sendMessage(messages.render("command.lobby-success"));
+              });
+      case INSTANCE_CREATE -> create(sender, arguments[2]);
+      case INSTANCE_LIST -> list(sender);
+      case INSTANCE_JOIN -> join(sender, arguments[2]);
+      case INSTANCE_LEAVE ->
+          withPlayer(
+              sender,
+              player -> {
+                boolean left = coordinator.leave(player);
+                sender.sendMessage(
+                    messages.render(left ? "command.instance-left" : "command.lobby-success"));
+              });
+      case INSTANCE_STOP -> stop(sender, arguments[2]);
+      case INSTANCE_INFO -> info(sender, arguments[2]);
       case UNKNOWN -> sender.sendMessage(messages.render("command.usage"));
     }
     return true;
@@ -74,14 +118,152 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       @NotNull Command command,
       @NotNull String alias,
       @NotNull String[] arguments) {
-    if (arguments.length != 1) {
-      return List.of();
+    if (arguments.length == 1) {
+      return filter(
+          sender.hasPermission(ADMIN_PERMISSION)
+              ? List.of("help", "lobby", "instance", "reload")
+              : List.of("help", "lobby", "instance"),
+          arguments[0]);
     }
-    String prefix = arguments[0].toLowerCase(java.util.Locale.ROOT);
-    return List.of("help", "reload").stream()
-        .filter(value -> value.startsWith(prefix))
-        .filter(value -> !value.equals("reload") || sender.hasPermission("zombie.command.reload"))
-        .toList();
+    if (arguments.length == 2 && arguments[0].equalsIgnoreCase("instance")) {
+      return filter(
+          sender.hasPermission(ADMIN_PERMISSION)
+              ? List.of("create", "list", "join", "leave", "stop", "info")
+              : List.of("join", "leave"),
+          arguments[1]);
+    }
+    if (arguments.length == 3
+        && arguments[0].equalsIgnoreCase("instance")
+        && List.of("join", "stop", "info").contains(arguments[1].toLowerCase(Locale.ROOT))) {
+      return filter(
+          coordinator.activeInstances().stream().map(snapshot -> shortId(snapshot.id())).toList(),
+          arguments[2]);
+    }
+    return List.of();
+  }
+
+  private void create(CommandSender sender, String mapId) {
+    coordinator
+        .create(mapId.toLowerCase(Locale.ROOT), Optional.empty())
+        .whenCompleteAsync(
+            (created, failure) -> {
+              if (failure != null) {
+                sender.sendMessage(
+                    messages.render(
+                        "command.instance-create-failure", "reason", safeFailureMessage(failure)));
+                return;
+              }
+              sender.sendMessage(
+                  messages.render(
+                      "command.instance-created",
+                      "id",
+                      shortId(created.id()),
+                      "map",
+                      created.mapId()));
+            },
+            mainThread);
+  }
+
+  private void list(CommandSender sender) {
+    Collection<GameInstanceSnapshot> active = coordinator.activeInstances();
+    sender.sendMessage(
+        messages.render("command.instance-list-header", "count", Integer.toString(active.size())));
+    for (GameInstanceSnapshot instance : active) {
+      sender.sendMessage(renderInstance("command.instance-list-entry", instance));
+    }
+  }
+
+  private void join(CommandSender sender, String identifier) {
+    withPlayer(
+        sender,
+        player -> {
+          Optional<GameInstanceSnapshot> resolved = resolve(identifier);
+          if (resolved.isEmpty()) {
+            sender.sendMessage(messages.render("command.instance-not-found"));
+            return;
+          }
+          coordinator
+              .join(player, resolved.get().id())
+              .whenCompleteAsync(
+                  (result, failure) -> {
+                    if (failure != null) {
+                      sender.sendMessage(
+                          messages.render(
+                              "command.instance-join-failure",
+                              "reason",
+                              safeFailureMessage(failure)));
+                    } else if (result == PlayerInstanceResult.SUCCESS) {
+                      sender.sendMessage(
+                          messages.render(
+                              "command.instance-joined", "id", shortId(resolved.get().id())));
+                    } else {
+                      sender.sendMessage(
+                          messages.render(
+                              "command.instance-join-refused", "reason", result.name()));
+                    }
+                  },
+                  mainThread);
+        });
+  }
+
+  private void stop(CommandSender sender, String identifier) {
+    Optional<GameInstanceSnapshot> resolved = resolve(identifier);
+    if (resolved.isEmpty()) {
+      sender.sendMessage(messages.render("command.instance-not-found"));
+      return;
+    }
+    coordinator
+        .stop(resolved.get().id())
+        .whenCompleteAsync(
+            (stopped, failure) -> {
+              if (failure != null || !Boolean.TRUE.equals(stopped)) {
+                sender.sendMessage(
+                    messages.render(
+                        "command.instance-stop-failure",
+                        "reason",
+                        failure == null ? "cleanup not confirmed" : safeFailureMessage(failure)));
+              } else {
+                sender.sendMessage(
+                    messages.render(
+                        "command.instance-stopped", "id", shortId(resolved.get().id())));
+              }
+            },
+            mainThread);
+  }
+
+  private void info(CommandSender sender, String identifier) {
+    Optional<GameInstanceSnapshot> resolved = resolve(identifier);
+    if (resolved.isEmpty()) {
+      sender.sendMessage(messages.render("command.instance-not-found"));
+      return;
+    }
+    sender.sendMessage(renderInstance("command.instance-info", resolved.get()));
+  }
+
+  private net.kyori.adventure.text.Component renderInstance(
+      String key, GameInstanceSnapshot instance) {
+    return messages.render(
+        key,
+        "id",
+        shortId(instance.id()),
+        "map",
+        instance.mapId(),
+        "state",
+        instance.state().name(),
+        "players",
+        Integer.toString(instance.players().size()),
+        "maximum",
+        Integer.toString(instance.maximumPlayers()));
+  }
+
+  private Optional<GameInstanceSnapshot> resolve(String identifier) {
+    String normalized = identifier.toLowerCase(Locale.ROOT);
+    List<GameInstanceSnapshot> matches =
+        coordinator.activeInstances().stream()
+            .filter(instance -> instance.id().toString().startsWith(normalized))
+            .limit(2)
+            .toList();
+    return matches.size() == 1 ? Optional.of(matches.getFirst()) : Optional.empty();
   }
 
   private void showInformation(CommandSender sender) {
@@ -103,23 +285,57 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       sender.sendMessage(messages.render("command.no-permission"));
       return;
     }
-    if (!state.compareAndSet(PluginState.RUNNING, PluginState.RELOADING)) {
+    if (!coordinator.activeInstances().isEmpty()
+        || !state.compareAndSet(PluginState.RUNNING, PluginState.RELOADING)) {
       sender.sendMessage(messages.render("command.reload-busy"));
       return;
     }
     try {
       ReloadResult result = configurations.reload();
-      if (result.successful()) {
-        sender.sendMessage(
-            messages.render(
-                "command.reload-success", "warnings", Integer.toString(result.issues().size())));
-      } else {
-        sender.sendMessage(
-            messages.render(
-                "command.reload-failure", "errors", Integer.toString(result.issues().size())));
-      }
+      sender.sendMessage(
+          messages.render(
+              result.successful() ? "command.reload-success" : "command.reload-failure",
+              result.successful() ? "warnings" : "errors",
+              Integer.toString(result.issues().size())));
     } finally {
       state.compareAndSet(PluginState.RELOADING, PluginState.RUNNING);
     }
+  }
+
+  private void withPlayer(CommandSender sender, java.util.function.Consumer<Player> action) {
+    if (sender instanceof Player player) {
+      if (!player.hasPermission("zombie.play")) {
+        sender.sendMessage(messages.render("command.no-permission"));
+        return;
+      }
+      action.accept(player);
+    } else {
+      sender.sendMessage(messages.render("command.player-only"));
+    }
+  }
+
+  private static boolean isAdministrative(ZombieCommandAction action) {
+    return switch (action) {
+      case INSTANCE_CREATE, INSTANCE_LIST, INSTANCE_STOP, INSTANCE_INFO -> true;
+      default -> false;
+    };
+  }
+
+  private static List<String> filter(List<String> values, String input) {
+    String prefix = input.toLowerCase(Locale.ROOT);
+    return values.stream().filter(value -> value.startsWith(prefix)).toList();
+  }
+
+  private static String shortId(UUID id) {
+    return id.toString().substring(0, 8);
+  }
+
+  private static String safeFailureMessage(Throwable failure) {
+    Throwable cause =
+        failure instanceof CompletionException && failure.getCause() != null
+            ? failure.getCause()
+            : failure;
+    String message = cause.getMessage();
+    return message == null || message.isBlank() ? cause.getClass().getSimpleName() : message;
   }
 }

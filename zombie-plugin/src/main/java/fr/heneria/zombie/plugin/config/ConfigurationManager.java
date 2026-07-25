@@ -3,12 +3,17 @@ package fr.heneria.zombie.plugin.config;
 import fr.heneria.zombie.core.config.ConfigurationIssue;
 import fr.heneria.zombie.core.config.ValidationSeverity;
 import fr.heneria.zombie.core.config.ZombieSettings;
+import fr.heneria.zombie.core.config.ZombieSettings.ChatOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.DocumentationOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.GuiOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.InstanceOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.LobbyOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.LocationOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.PluginOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.ReconnectOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.ServerOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.StorageOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.WorldRuleOptions;
 import fr.heneria.zombie.core.config.ZombieSettingsValidator;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +31,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  * Installs defaults and exposes only validated configuration snapshots.
  *
  * <p>Reload is transactional: parsing and validation happen before the active atomic reference is
- * replaced. Runtime map, world and game state are deliberately outside Ticket 001 reload scope.
+ * replaced. Critical reloads are rejected by the command layer while instances are active.
  */
 public final class ConfigurationManager {
 
@@ -128,17 +133,58 @@ public final class ConfigurationManager {
                 config.getString("server.fallback-world", "")),
             new StorageOptions(
                 config.getString("storage.type", ""), config.getString("storage.sqlite-file", "")),
+            new LobbyOptions(
+                config.getString("lobby.world", config.getString("server.lobby-world", "")),
+                new LocationOptions(
+                    config.getString(
+                        "lobby.spawn.world",
+                        config.getString(
+                            "lobby.world", config.getString("server.lobby-world", ""))),
+                    config.getDouble("lobby.spawn.x", 0.5),
+                    config.getDouble("lobby.spawn.y", 65.0),
+                    config.getDouble("lobby.spawn.z", 0.5),
+                    (float) config.getDouble("lobby.spawn.yaw", 0.0),
+                    (float) config.getDouble("lobby.spawn.pitch", 0.0))),
             new InstanceOptions(
+                config.getString("instances.worlds-directory", "zombie_instances"),
+                config.getString("instances.templates-directory", "zombie_templates"),
+                config.getBoolean("instances.delete-world-after-game", true),
+                config.getBoolean("instances.preserve-failed-worlds", true),
+                config.getInt("instances.unload-delay-seconds", 5),
+                config.getInt("instances.creation-timeout-seconds", 60),
                 config.getInt("instances.maximum-concurrent-games", -1),
-                config.getBoolean("instances.automatic-cleanup", true)),
+                config.getBoolean("instances.prevent-entry-without-session", true)),
+            new ChatOptions(
+                config.getBoolean("chat.isolation-enabled", true),
+                config.getBoolean("chat.lobby-channel-enabled", true),
+                config.getBoolean("chat.instance-channel-enabled", true),
+                config.getBoolean("chat.allow-global-admin-channel", true)),
+            new ReconnectOptions(
+                config.getBoolean("reconnect.enabled", true),
+                config.getInt("reconnect.grace-period-seconds", 180),
+                config.getBoolean("reconnect.reserve-player-slot", true),
+                config.getBoolean("reconnect.return-to-lobby-after-expiration", true)),
+            new WorldRuleOptions(
+                config.getBoolean("world-rules.allow-natural-mob-spawning", false),
+                config.getBoolean("world-rules.allow-weather-cycle", false),
+                config.getBoolean("world-rules.allow-time-cycle", false),
+                config.getBoolean("world-rules.allow-block-breaking", false),
+                config.getBoolean("world-rules.allow-block-placing", false),
+                config.getBoolean("world-rules.allow-item-dropping", false),
+                config.getBoolean("world-rules.allow-item-pickup", true),
+                config.getBoolean("world-rules.allow-pvp", false),
+                config.getBoolean("world-rules.keep-inventory", true),
+                config.getBoolean("world-rules.void-rescue-enabled", true)),
             new GuiOptions(
                 config.getString("gui.default-theme", ""),
                 config.getBoolean("gui.sounds-enabled", true),
                 config.getBoolean("gui.animations-enabled", true)),
             new DocumentationOptions(
                 config.getBoolean("documentation.require-context-update", true)));
+    Map<String, String> mergedMessages = bundledMessages();
+    mergedMessages.putAll(flatten(messages));
     return new Candidate(
-        new ConfigurationSnapshot(settings, flatten(messages)), validator.validate(settings));
+        new ConfigurationSnapshot(settings, mergedMessages), validator.validate(settings));
   }
 
   private void installDefault(String resourceName) throws IOException {
@@ -151,6 +197,20 @@ public final class ConfigurationManager {
         throw new IOException("Missing bundled resource " + resourceName);
       }
       Files.copy(input, target);
+    }
+  }
+
+  private Map<String, String> bundledMessages() {
+    try (InputStream input = resourceLoader.getResourceAsStream("messages.yml")) {
+      if (input == null) {
+        throw new IllegalStateException("Missing bundled resource messages.yml");
+      }
+      return new LinkedHashMap<>(
+          flatten(
+              YamlConfiguration.loadConfiguration(
+                  new java.io.InputStreamReader(input, java.nio.charset.StandardCharsets.UTF_8))));
+    } catch (IOException failure) {
+      throw new IllegalStateException("Could not read bundled messages.yml", failure);
     }
   }
 
