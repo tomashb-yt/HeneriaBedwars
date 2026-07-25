@@ -26,6 +26,18 @@ public final class ZombieCommandParser {
         default -> ZombieCommandAction.UNKNOWN;
       };
     }
+    if (root.equals("map")) {
+      String operation = arguments[1].toLowerCase(Locale.ROOT);
+      return switch (operation) {
+        case "list" ->
+            arguments.length == 2 ? ZombieCommandAction.MAP_LIST : ZombieCommandAction.UNKNOWN;
+        case "preview" ->
+            arguments.length == 3 ? ZombieCommandAction.MAP_PREVIEW : ZombieCommandAction.UNKNOWN;
+        case "leave" ->
+            arguments.length == 2 ? ZombieCommandAction.MAP_LEAVE : ZombieCommandAction.UNKNOWN;
+        default -> ZombieCommandAction.UNKNOWN;
+      };
+    }
     if (!root.equals("instance")) {
       return ZombieCommandAction.UNKNOWN;
     }

@@ -63,6 +63,10 @@ public final class ZombieSettingsValidator {
     if (settings.instances().creationTimeoutSeconds() <= 0) {
       error(issues, "instances.creation-timeout-seconds", "Creation timeout must be positive");
     }
+    if (settings.instances().defaultMapMaximumPlayers() <= 0) {
+      error(
+          issues, "instances.default-map-maximum-players", "Default map capacity must be positive");
+    }
     if (settings.reconnect().gracePeriodSeconds() <= 0) {
       error(issues, "reconnect.grace-period-seconds", "Reconnect grace period must be positive");
     }

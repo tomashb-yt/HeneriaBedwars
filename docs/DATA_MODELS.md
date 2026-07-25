@@ -37,8 +37,13 @@ secondaire, expérience, santé, alimentation, effets, mode, position, vitesses 
 - `maximumPlayers`, strictement positif ;
 - le spawn `x`, `y`, `z`, `yaw`, `pitch`.
 
-Le fichier source porte `schema-version: 1`. Ce modèle technique sert uniquement au clonage du
-Ticket 002 et sera remplacé ou migré lorsque le schéma complet des maps sera défini.
+Sans fichier source, la capacité vient de la configuration globale et le spawn est lu dans le
+`level.dat` vanilla. Un `zombie-map.yml` portant `schema-version: 1` peut encore les surcharger. Ce
+modèle technique sert uniquement au clonage du Ticket 002 et sera remplacé ou migré lorsque le
+schéma complet des maps sera défini.
+
+`MapPreviewService` conserve seulement l'UUID administrateur, le `mapId` et le handle de la copie
+temporaire. Un aperçu n'est ni une instance ni une session de gameplay.
 
 ## Configuration
 

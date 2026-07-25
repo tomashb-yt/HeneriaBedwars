@@ -32,6 +32,7 @@ instances:
   creation-timeout-seconds: 60
   maximum-concurrent-games: -1
   prevent-entry-without-session: true
+  default-map-maximum-players: 4
 
 chat:
   isolation-enabled: true

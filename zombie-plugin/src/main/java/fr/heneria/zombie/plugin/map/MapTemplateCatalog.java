@@ -9,10 +9,11 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 /** Secure, asynchronous catalog for minimal world-template metadata. */
@@ -22,7 +23,7 @@ public final class MapTemplateCatalog {
   private final Path worldContainer;
   private final ConfigurationManager configurations;
   private final Executor ioExecutor;
-  private final AtomicInteger knownTemplates = new AtomicInteger();
+  private final AtomicReference<Set<String>> knownTemplates = new AtomicReference<>(Set.of());
 
   /**
    * Creates the catalog.
@@ -52,23 +53,40 @@ public final class MapTemplateCatalog {
     return CompletableFuture.supplyAsync(() -> load(mapId), ioExecutor);
   }
 
-  /** Refreshes the non-authoritative diagnostic count asynchronously. */
+  /** Refreshes the non-authoritative map snapshot asynchronously. */
   public void refreshCount() {
-    CompletableFuture.runAsync(
+    discover().exceptionally(ignored -> java.util.List.of());
+  }
+
+  /**
+   * Discovers every direct child containing a valid {@code level.dat}.
+   *
+   * @return future sorted map identifiers
+   */
+  public CompletableFuture<java.util.List<String>> discover() {
+    return CompletableFuture.supplyAsync(
         () -> {
           try {
             Path root = templateRoot();
             Files.createDirectories(root);
             try (var entries = Files.list(root)) {
-              knownTemplates.set(
-                  Math.toIntExact(
-                      entries
-                          .filter(path -> Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
-                          .filter(path -> Files.isRegularFile(path.resolve(METADATA_FILE)))
-                          .count()));
+              Set<String> discovered =
+                  entries
+                      .filter(path -> Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
+                      .filter(path -> !Files.isSymbolicLink(path))
+                      .filter(
+                          path -> path.getFileName().toString().matches("[a-z0-9][a-z0-9_-]{0,63}"))
+                      .filter(
+                          path ->
+                              Files.isRegularFile(
+                                  path.resolve("level.dat"), LinkOption.NOFOLLOW_LINKS))
+                      .map(path -> path.getFileName().toString())
+                      .collect(java.util.stream.Collectors.toUnmodifiableSet());
+              knownTemplates.set(discovered);
+              return discovered.stream().sorted().toList();
             }
-          } catch (IOException ignored) {
-            knownTemplates.set(0);
+          } catch (IOException failure) {
+            throw new CompletionException(failure);
           }
         },
         ioExecutor);
@@ -80,6 +98,15 @@ public final class MapTemplateCatalog {
    * @return non-negative count
    */
   public int count() {
+    return knownTemplates.get().size();
+  }
+
+  /**
+   * Returns the last asynchronously discovered identifiers for tab completion.
+   *
+   * @return immutable identifiers
+   */
+  public Set<String> knownMapIds() {
     return knownTemplates.get();
   }
 
@@ -126,9 +153,33 @@ public final class MapTemplateCatalog {
     }
     Path directory = sourceDirectory(mapId);
     Path metadata = directory.resolve(METADATA_FILE);
+    Path levelDat = directory.resolve("level.dat");
     if (!Files.isDirectory(directory, LinkOption.NOFOLLOW_LINKS)
         || Files.isSymbolicLink(directory)
-        || !Files.isRegularFile(metadata, LinkOption.NOFOLLOW_LINKS)
+        || !Files.isRegularFile(levelDat, LinkOption.NOFOLLOW_LINKS)
+        || Files.isSymbolicLink(levelDat)) {
+      return Optional.empty();
+    }
+    if (!Files.exists(metadata, LinkOption.NOFOLLOW_LINKS)) {
+      try {
+        MapTemplateDefinition definition =
+            new MapTemplateDefinition(
+                mapId,
+                configurations.current().settings().instances().defaultMapMaximumPlayers(),
+                LevelDatSpawnReader.read(levelDat));
+        knownTemplates.updateAndGet(
+            current -> {
+              java.util.HashSet<String> updated = new java.util.HashSet<>(current);
+              updated.add(mapId);
+              return Set.copyOf(updated);
+            });
+        return Optional.of(definition);
+      } catch (IOException failure) {
+        throw new CompletionException(
+            new IOException("Could not read world spawn from " + levelDat, failure));
+      }
+    }
+    if (!Files.isRegularFile(metadata, LinkOption.NOFOLLOW_LINKS)
         || Files.isSymbolicLink(metadata)) {
       return Optional.empty();
     }

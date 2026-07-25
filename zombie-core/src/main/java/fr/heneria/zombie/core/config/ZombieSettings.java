@@ -124,6 +124,7 @@ public record ZombieSettings(
    * @param creationTimeoutSeconds maximum creation duration
    * @param maximumConcurrentGames {@code -1} for no functional cap, otherwise a positive cap
    * @param preventEntryWithoutSession whether unmanaged world entry is blocked
+   * @param defaultMapMaximumPlayers capacity used by maps without a metadata file
    */
   public record InstanceOptions(
       String worldsDirectory,
@@ -133,7 +134,8 @@ public record ZombieSettings(
       int unloadDelaySeconds,
       int creationTimeoutSeconds,
       int maximumConcurrentGames,
-      boolean preventEntryWithoutSession) {
+      boolean preventEntryWithoutSession,
+      int defaultMapMaximumPlayers) {
     public InstanceOptions {
       Objects.requireNonNull(worldsDirectory, "worldsDirectory");
       Objects.requireNonNull(templatesDirectory, "templatesDirectory");

@@ -9,6 +9,9 @@ command:
   help: |-
     <red><bold>HeneriaZombie</bold></red> <gray>— Commandes</gray>
     <white>/zombie lobby</white> <dark_gray>:</dark_gray> <gray>retourne au lobby</gray>
+    <white>/zombie map list</white> <dark_gray>:</dark_gray> <gray>détecte les maps déposées</gray>
+    <white>/zombie map preview <map></white> <dark_gray>:</dark_gray> <gray>ouvre une copie de visite</gray>
+    <white>/zombie map leave</white> <dark_gray>:</dark_gray> <gray>quitte la visite et nettoie sa copie</gray>
     <white>/zombie instance join <id></white> <dark_gray>:</dark_gray> <gray>rejoint une instance</gray>
     <white>/zombie instance leave</white> <dark_gray>:</dark_gray> <gray>quitte une instance</gray>
     <white>/zombie instance create <map></white> <dark_gray>:</dark_gray> <gray>crée une instance</gray>
@@ -16,10 +19,16 @@ command:
     <white>/zombie instance info <id></white> <dark_gray>:</dark_gray> <gray>inspecte une instance</gray>
     <white>/zombie instance stop <id></white> <dark_gray>:</dark_gray> <gray>arrête une instance</gray>
     <white>/zombie reload</white> <dark_gray>:</dark_gray> <gray>recharge les options sûres</gray>
-  usage: '<red>Usage : /zombie [help|lobby|reload|instance <create|list|join|leave|stop|info>]</red>'
+  usage: '<red>Usage : /zombie [help|lobby|reload|map <list|preview|leave>|instance <create|list|join|leave|stop|info>]</red>'
   no-permission: '<red>Vous ne possédez pas la permission nécessaire.</red>'
   player-only: '<red>Cette commande doit être exécutée par un joueur.</red>'
   lobby-success: '<green>Vous êtes maintenant dans le lobby Zombies.</green>'
+  map-list-header: '<gray>Maps détectées : <white><count></white></gray>'
+  map-list-entry: '<dark_gray>•</dark_gray> <white><map></white>'
+  map-list-failure: '<red>Détection des maps impossible : <reason>.</red>'
+  map-preview-opened: '<green>Aperçu de <map> ouvert. Utilisez /zombie map leave pour revenir.</green>'
+  map-preview-left: '<green>Aperçu fermé, copie temporaire nettoyée et retour au lobby effectué.</green>'
+  map-preview-failure: '<red>Aperçu impossible : <reason>.</red>'
   instance-created: '<green>Instance <id> créée sur la map <map>.</green>'
   instance-create-failure: '<red>Création impossible : <reason>.</red>'
   instance-list-header: '<gray>Instances actives : <white><count></white></gray>'

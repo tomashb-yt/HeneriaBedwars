@@ -100,6 +100,21 @@ public final class PaperWorldInstanceService implements WorldInstanceGateway {
 
   @Override
   public CompletableFuture<Boolean> destroy(WorldInstanceHandle handle, boolean preserveOnFailure) {
+    return destroyInternal(handle, preserveOnFailure, false);
+  }
+
+  /**
+   * Unloads and always deletes a non-game temporary world.
+   *
+   * @param handle prepared preview world
+   * @return future cleanup confirmation
+   */
+  public CompletableFuture<Boolean> destroyTemporary(WorldInstanceHandle handle) {
+    return destroyInternal(handle, false, true);
+  }
+
+  private CompletableFuture<Boolean> destroyInternal(
+      WorldInstanceHandle handle, boolean preserveOnFailure, boolean forceDelete) {
     InstanceOptions options = configurations.current().settings().instances();
     return delayed(options.unloadDelaySeconds())
         .thenApplyAsync(
@@ -114,7 +129,7 @@ public final class PaperWorldInstanceService implements WorldInstanceGateway {
             mainThread)
         .thenCompose(
             unloaded -> {
-              if (!unloaded || !options.deleteWorldAfterGame()) {
+              if (!unloaded || (!forceDelete && !options.deleteWorldAfterGame())) {
                 return CompletableFuture.completedFuture(unloaded);
               }
               return CompletableFuture.supplyAsync(

@@ -13,6 +13,7 @@ multi-clients à réaliser sur un serveur dédié.
 - unicité de session, réservation et expiration de reconnexion ;
 - sélection d'audience et visibilité de deux instances simulées ;
 - parser de toutes les commandes ;
+- lecture bornée du spawn NBT et détection d'un monde sans manifeste ;
 - validation et reload transactionnel de configuration ;
 - compteurs de l'API publique.
 
@@ -21,17 +22,19 @@ multi-clients à réaliser sur un serveur dédié.
 
 ## Validation Paper
 
-Préparer un modèle dans `zombie_templates/crypt` avec un monde valide et `zombie-map.yml`, puis :
+Préparer un monde valide dans `zombie_templates/crypt` sans manifeste, puis :
 
 1. lancer `.\gradlew.bat :zombie-plugin:runServer` ;
 2. vérifier l'activation sans erreur et `/zombie` ;
-3. créer deux instances avec `/zombie instance create crypt` ;
-4. connecter trois clients, en garder un au lobby et envoyer les autres dans des instances
+3. vérifier `/zombie map list`, ouvrir puis fermer `/zombie map preview crypt` ;
+4. vérifier que la copie d'aperçu est supprimée, puis créer deux instances avec
+   `/zombie instance create crypt` ;
+5. connecter trois clients, en garder un au lobby et envoyer les autres dans des instances
    distinctes ;
-5. vérifier visibilité, tablist, chat, morts, scoreboards et absence de fuite ;
-6. déconnecter/reconnecter un joueur avant puis après le délai ;
-7. arrêter une instance et vérifier retour lobby, déchargement et suppression ;
-8. arrêter le serveur pendant une instance et vérifier que son dossier est préservé.
+6. vérifier visibilité, tablist, chat, morts, scoreboards et absence de fuite ;
+7. déconnecter/reconnecter un joueur avant puis après le délai ;
+8. arrêter une instance et vérifier retour lobby, déchargement et suppression ;
+9. arrêter le serveur pendant une instance et vérifier que son dossier est préservé.
 
 Une exécution locale sans trois comptes ne valide honnêtement que démarrage, création de monde,
 commandes console et arrêt. La validation visuelle multi-clients doit être consignée séparément.

@@ -39,6 +39,21 @@ commande
 de vérité de l'appartenance joueur. Le monde courant d'un joueur ne remplace jamais la session
 logique.
 
+## Flux d'un aperçu de map
+
+```text
+zombie_templates/<mapId>/level.dat
+  -> détection et lecture NBT sur le pool I/O
+  -> copie temporaire par PaperWorldInstanceService
+  -> chargement Paper sur le thread serveur
+  -> téléportation de l'administrateur au spawn vanilla
+  -> déchargement et suppression forcée à la sortie
+```
+
+`MapPreviewService` possède ces copies sans créer de `GameInstance`. Il autorise uniquement leur
+administrateur dans la protection des mondes et nettoie une visite lors de la commande de sortie ou
+d'une déconnexion.
+
 ## Frontière de concurrence
 
 - agrégats `GameInstance` et `PlayerSession` synchronisés pour leurs invariants ;
@@ -67,6 +82,6 @@ active, car modifier les chemins ou règles d'un monde vivant serait ambigu.
 
 ## Extensions futures
 
-Le modèle `zombie-map.yml` du Ticket 002 est un adaptateur minimal. Le futur schéma de map
+Le manifeste facultatif `zombie-map.yml` reste un adaptateur minimal. Le futur schéma de map
 versionné devra s'intégrer derrière le catalogue sans déplacer de logique Paper dans le core.
 Manches, zombies, matchmaking et GUI ne font pas partie de cette architecture livrée.

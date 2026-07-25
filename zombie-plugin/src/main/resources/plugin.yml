@@ -10,7 +10,7 @@ website: https://github.com/tomashb-yt/HeneriaBedwars
 commands:
   zombie:
     description: Manages the HeneriaZombie lobby and isolated instances
-    usage: /zombie [help|lobby|reload|instance]
+    usage: /zombie [help|lobby|reload|map|instance]
     permission: zombie.command.use
 
 permissions:

@@ -14,14 +14,18 @@ Elles exigent `zombie.command.use` et, pour les transitions joueur, `zombie.play
 
 ## Commandes administratives
 
+- `/zombie map list` — rescane les dossiers contenant `level.dat` ;
+- `/zombie map preview <mapId>` — ouvre une copie temporaire sans créer de partie ;
+- `/zombie map leave` — retourne au lobby, décharge et supprime la copie ;
 - `/zombie instance create <mapId>` — copie le modèle et crée une instance publique ;
 - `/zombie instance list` — liste UUID abrégé, map, état et capacité ;
 - `/zombie instance info <id>` — détaille une instance ;
 - `/zombie instance stop <id>` — expulse, décharge et nettoie ;
 - `/zombie reload` — recharge un candidat valide lorsqu'aucune instance n'est active.
 
-Les quatre commandes d'instance exigent `zombie.instance.admin`. Le reload exige en plus
-`zombie.command.reload`. Un préfixe UUID ambigu est refusé.
+Les commandes de map et les quatre commandes d'instance exigent `zombie.instance.admin`. Le reload
+exige en plus `zombie.command.reload`. Un préfixe UUID ambigu est refusé. Le reload est refusé
+pendant une partie ou un aperçu.
 
 ## Permissions
 

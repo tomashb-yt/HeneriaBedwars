@@ -6,7 +6,7 @@
 
 1. **Ticket 001 — Fondation et documentation centrale :** terminé.
 2. **Ticket 002 — Lobby et instances isolées :** lobby, clones, sessions, isolation et commandes
-   terminés ; aucune boucle de jeu.
+   terminés, avec import simple et aperçu administratif des mondes ; aucune boucle de jeu.
 3. **Schéma complet et registre de maps :** remplacer ou migrer le manifeste minimal, valider
    zones et collections.
 4. **Éditeur universel :** sessions administratives, outil et GUI.

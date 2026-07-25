@@ -27,6 +27,7 @@ class ConfigurationManagerTest {
     assertTrue(Files.isRegularFile(dataDirectory.resolve("messages.yml")));
     assertEquals("fr_FR", manager.current().settings().plugin().language());
     assertEquals(-1, manager.current().settings().instances().maximumConcurrentGames());
+    assertEquals(4, manager.current().settings().instances().defaultMapMaximumPlayers());
     assertEquals("data.db", manager.current().settings().storage().sqliteFile());
     assertTrue(manager.current().messages().containsKey("command.instance-created"));
 
@@ -36,6 +37,7 @@ class ConfigurationManagerTest {
     String usage =
         PlainTextComponentSerializer.plainText().serialize(messages.render("command.usage"));
     assertTrue(help.contains("/zombie instance join <id>"));
+    assertTrue(help.contains("/zombie map preview <map>"));
     assertTrue(usage.contains("<create|list|join|leave|stop|info>"));
   }
 

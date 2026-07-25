@@ -2,6 +2,7 @@ package fr.heneria.zombie.plugin.listener;
 
 import fr.heneria.zombie.core.session.PlayerSessionService;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
+import fr.heneria.zombie.plugin.map.MapPreviewService;
 import fr.heneria.zombie.plugin.world.PaperWorldInstanceService;
 import java.util.Objects;
 import org.bukkit.Location;
@@ -24,6 +25,7 @@ public final class InstanceWorldProtectionListener implements Listener {
   private final PaperWorldInstanceService worlds;
   private final PlayerSessionService sessions;
   private final ConfigurationManager configurations;
+  private final MapPreviewService previews;
 
   /**
    * Creates the protection listener.
@@ -31,14 +33,17 @@ public final class InstanceWorldProtectionListener implements Listener {
    * @param worlds runtime world registry
    * @param sessions player sessions
    * @param configurations active settings
+   * @param previews administrative preview ownership
    */
   public InstanceWorldProtectionListener(
       PaperWorldInstanceService worlds,
       PlayerSessionService sessions,
-      ConfigurationManager configurations) {
+      ConfigurationManager configurations,
+      MapPreviewService previews) {
     this.worlds = Objects.requireNonNull(worlds, "worlds");
     this.sessions = Objects.requireNonNull(sessions, "sessions");
     this.configurations = Objects.requireNonNull(configurations, "configurations");
+    this.previews = Objects.requireNonNull(previews, "previews");
   }
 
   @EventHandler(ignoreCancelled = true)
@@ -107,11 +112,13 @@ public final class InstanceWorldProtectionListener implements Listener {
         .ifPresent(
             owner -> {
               boolean authorized =
-                  sessions
-                      .findSession(event.getPlayer().getUniqueId())
-                      .flatMap(session -> session.instanceId())
-                      .filter(owner::equals)
-                      .isPresent();
+                  previews.canEnter(
+                          event.getPlayer().getUniqueId(), destination.getWorld().getName())
+                      || sessions
+                          .findSession(event.getPlayer().getUniqueId())
+                          .flatMap(session -> session.instanceId())
+                          .filter(owner::equals)
+                          .isPresent();
               if (!authorized && !event.getPlayer().hasPermission("zombie.world.bypass")) {
                 event.setCancelled(true);
               }
@@ -130,6 +137,7 @@ public final class InstanceWorldProtectionListener implements Listener {
 
   private boolean protectedPlayer(Player player) {
     return worlds.isInstanceWorld(player.getWorld().getName())
+        && !previews.canEnter(player.getUniqueId(), player.getWorld().getName())
         && !player.hasPermission("zombie.world.bypass");
   }
 }

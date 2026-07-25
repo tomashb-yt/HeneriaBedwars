@@ -21,8 +21,10 @@ import fr.heneria.zombie.plugin.isolation.VisibilityService;
 import fr.heneria.zombie.plugin.listener.ContextDeathListener;
 import fr.heneria.zombie.plugin.listener.InstanceWorldProtectionListener;
 import fr.heneria.zombie.plugin.listener.IsolatedChatListener;
+import fr.heneria.zombie.plugin.listener.MapPreviewListener;
 import fr.heneria.zombie.plugin.listener.PlayerContextListener;
 import fr.heneria.zombie.plugin.lobby.LobbyService;
+import fr.heneria.zombie.plugin.map.MapPreviewService;
 import fr.heneria.zombie.plugin.map.MapTemplateCatalog;
 import fr.heneria.zombie.plugin.message.MessageService;
 import fr.heneria.zombie.plugin.player.PaperPlayerStateService;
@@ -53,6 +55,7 @@ public final class ZombieBootstrap {
   private ZombieApi api;
   private ExecutorService ioExecutor;
   private InstanceCoordinator coordinator;
+  private MapPreviewService previewService;
   private BukkitTask maintenanceTask;
 
   /**
@@ -169,6 +172,7 @@ public final class ZombieBootstrap {
             scoreboards,
             visibility,
             mainThread);
+    previewService = new MapPreviewService(templates, worlds, lobby, mainThread);
 
     api = new PaperZombieApi(state, templates::count, registry::size);
     registerServices(
@@ -183,13 +187,15 @@ public final class ZombieBootstrap {
         scoreboards,
         lobby,
         visibility,
-        audiences);
+        audiences,
+        previewService);
     registerListeners(
         new PlayerContextListener(coordinator, sessions, configurations, audiences, messages),
         new IsolatedChatListener(sessions, visibilityPolicy, configurations, messages),
         new ContextDeathListener(sessions, audiences),
-        new InstanceWorldProtectionListener(worlds, sessions, configurations));
-    registerCommand(configurations, messages, mainThread);
+        new InstanceWorldProtectionListener(worlds, sessions, configurations, previewService),
+        new MapPreviewListener(previewService));
+    registerCommand(configurations, messages, templates, previewService, mainThread);
 
     maintenanceTask =
         plugin
@@ -213,6 +219,10 @@ public final class ZombieBootstrap {
       maintenanceTask = null;
     }
     if (coordinator != null) {
+      if (previewService != null) {
+        previewService.clear();
+        previewService = null;
+      }
       List<String> failures = coordinator.shutdown();
       failures.forEach(
           world -> plugin.getLogger().warning("World could not be unloaded: " + world));
@@ -249,7 +259,8 @@ public final class ZombieBootstrap {
       ContextScoreboardService scoreboards,
       LobbyService lobby,
       VisibilityService visibility,
-      PaperAudienceService audiences) {
+      PaperAudienceService audiences,
+      MapPreviewService previews) {
     services.register(ConfigurationManager.class, configurations);
     services.register(MessageService.class, messages);
     services.register(MapTemplateCatalog.class, templates);
@@ -262,6 +273,7 @@ public final class ZombieBootstrap {
     services.register(LobbyService.class, lobby);
     services.register(VisibilityService.class, visibility);
     services.register(PaperAudienceService.class, audiences);
+    services.register(MapPreviewService.class, previews);
     services.register(InstanceCoordinator.class, coordinator);
     services.register(ZombieApi.class, api);
   }
@@ -275,6 +287,8 @@ public final class ZombieBootstrap {
   private void registerCommand(
       ConfigurationManager configurations,
       MessageService messages,
+      MapTemplateCatalog templates,
+      MapPreviewService previews,
       PaperMainThreadExecutor mainThread) {
     PluginCommand command = plugin.getCommand("zombie");
     if (command == null) {
@@ -288,6 +302,8 @@ public final class ZombieBootstrap {
             configurations,
             messages,
             coordinator,
+            templates,
+            previews,
             mainThread);
     command.setExecutor(executor);
     command.setTabCompleter(executor);

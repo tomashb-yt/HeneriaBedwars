@@ -26,7 +26,7 @@ réussis de son monde.
 
 ## Création et monde
 
-1. le catalogue valide `mapId` et `zombie-map.yml` hors thread serveur ;
+1. le catalogue valide `mapId`, `level.dat` et l'éventuel `zombie-map.yml` hors thread serveur ;
 2. le service réserve atomiquement une place dans la capacité globale ;
 3. un UUID et un dossier `zombie_instances/hz_<uuid>` sont alloués ;
 4. le modèle est copié sur le pool I/O, sans `uid.dat`, `session.lock` ni lien symbolique ;
@@ -34,6 +34,13 @@ réussis de son monde.
 6. les gamerules configurées sont appliquées et l'instance devient joignable.
 
 Deux créations utilisant le même modèle produisent deux UUID et deux dossiers distincts.
+
+## Aperçu administratif
+
+Une map détectée peut être visitée sans `GameInstance`. Le service d'aperçu crée une copie isolée,
+la charge avec le même adaptateur monde, autorise son propriétaire, puis le téléporte au spawn
+vanilla. `/zombie map leave` et la déconnexion renvoient ou libèrent le joueur, déchargent la copie
+et la suppriment même lorsque la suppression des mondes de partie est désactivée.
 
 ## Entrée et sortie joueur
 

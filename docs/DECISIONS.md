@@ -72,3 +72,10 @@ persistance prématurée ; une sauvegarde durable sera ajoutée avant les invent
 
 `zombie-map.yml` v1 fournit seulement capacité et spawn afin de tester les mondes isolés. Il ne
 préjuge pas du futur schéma universel ni de l'éditeur.
+
+## ADR-016 — Import par dossier et aperçu sur copie
+
+Un dossier contenant `level.dat` est une map détectable sans manifeste manuel. Le spawn vanilla est
+lu directement depuis le NBT hors thread serveur et la capacité utilise une valeur globale
+configurable. Un aperçu ne charge jamais le modèle source : il utilise une copie temporaire hors du
+registre des parties, supprimée après déchargement confirmé.

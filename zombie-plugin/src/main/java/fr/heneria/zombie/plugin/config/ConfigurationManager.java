@@ -153,7 +153,8 @@ public final class ConfigurationManager {
                 config.getInt("instances.unload-delay-seconds", 5),
                 config.getInt("instances.creation-timeout-seconds", 60),
                 config.getInt("instances.maximum-concurrent-games", -1),
-                config.getBoolean("instances.prevent-entry-without-session", true)),
+                config.getBoolean("instances.prevent-entry-without-session", true),
+                config.getInt("instances.default-map-maximum-players", 4)),
             new ChatOptions(
                 config.getBoolean("chat.isolation-enabled", true),
                 config.getBoolean("chat.lobby-channel-enabled", true),

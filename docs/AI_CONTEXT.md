@@ -40,6 +40,7 @@ Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 - scoreboards indépendants par contexte ;
 - protections configurables des mondes d'instance ;
 - commandes temporaires de création, inspection, entrée, sortie et arrêt ;
+- détection automatique des dossiers de monde et aperçus administratifs isolés sans partie ;
 - compteurs API réels pour les modèles et instances.
 
 Les états sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`, `CLEANING`, `CLOSED` et
@@ -47,9 +48,11 @@ Les états sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`, `CLEANIN
 
 ## Modèle de map minimal du Ticket 002
 
-Le catalogue lit `<world-container>/zombie_templates/<mapId>/zombie-map.yml`. Ce format ne
-remplace pas le futur registre de maps : il fournit uniquement l'identifiant, la capacité et le
-spawn requis pour valider le clonage d'instances. Le schéma complet et l'éditeur restent à venir.
+Le catalogue détecte tout dossier
+`<world-container>/zombie_templates/<mapId>/` contenant `level.dat`. Le spawn vanilla est lu hors
+thread serveur. `zombie-map.yml` devient une surcharge facultative de capacité et de spawn. Une
+visite administrative charge toujours une copie temporaire : le modèle source n'est jamais chargé
+ni modifié directement.
 
 ## Stratégie joueur
 
@@ -65,6 +68,7 @@ l'introduction d'inventaires de valeur.
 ## Limites connues
 
 - le modèle de map est volontairement minimal et n'a pas encore de GUI ;
+- l'ajout simple accepte un dossier de monde, mais pas encore une archive ZIP ;
 - les instances restent en attente jusqu'à leur arrêt administratif : aucune boucle de jeu ;
 - SQLite est configuré mais aucune donnée métier ne justifie encore l'ouverture d'une connexion ;
 - le test automatisé simule plusieurs sessions, mais une validation visuelle complète exige trois

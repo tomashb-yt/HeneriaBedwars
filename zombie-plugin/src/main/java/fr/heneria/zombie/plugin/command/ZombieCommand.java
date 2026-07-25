@@ -9,6 +9,8 @@ import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.config.ReloadResult;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.instance.PlayerInstanceResult;
+import fr.heneria.zombie.plugin.map.MapPreviewService;
+import fr.heneria.zombie.plugin.map.MapTemplateCatalog;
 import fr.heneria.zombie.plugin.message.MessageService;
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +40,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
   private final ConfigurationManager configurations;
   private final MessageService messages;
   private final InstanceCoordinator coordinator;
+  private final MapTemplateCatalog templates;
+  private final MapPreviewService previews;
   private final Executor mainThread;
 
   /**
@@ -49,6 +53,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
    * @param configurations configuration manager
    * @param messages message renderer
    * @param coordinator instance coordinator
+   * @param templates uploaded map catalog
+   * @param previews map preview lifecycle
    * @param mainThread Paper main-thread executor
    */
   public ZombieCommand(
@@ -58,6 +64,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       ConfigurationManager configurations,
       MessageService messages,
       InstanceCoordinator coordinator,
+      MapTemplateCatalog templates,
+      MapPreviewService previews,
       Executor mainThread) {
     this.version = Objects.requireNonNull(version, "version");
     this.api = Objects.requireNonNull(api, "api");
@@ -65,6 +73,8 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     this.configurations = Objects.requireNonNull(configurations, "configurations");
     this.messages = Objects.requireNonNull(messages, "messages");
     this.coordinator = Objects.requireNonNull(coordinator, "coordinator");
+    this.templates = Objects.requireNonNull(templates, "templates");
+    this.previews = Objects.requireNonNull(previews, "previews");
     this.mainThread = Objects.requireNonNull(mainThread, "mainThread");
   }
 
@@ -87,24 +97,14 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       case INFORMATION -> showInformation(sender);
       case HELP -> sender.sendMessage(messages.render("command.help"));
       case RELOAD -> reload(sender);
-      case LOBBY ->
-          withPlayer(
-              sender,
-              player -> {
-                coordinator.leave(player);
-                sender.sendMessage(messages.render("command.lobby-success"));
-              });
+      case LOBBY -> withPlayer(sender, player -> returnToLobby(sender, player, false));
+      case MAP_LIST -> listMaps(sender);
+      case MAP_PREVIEW -> preview(sender, arguments[2]);
+      case MAP_LEAVE -> withPlayer(sender, player -> returnToLobby(sender, player, true));
       case INSTANCE_CREATE -> create(sender, arguments[2]);
       case INSTANCE_LIST -> list(sender);
       case INSTANCE_JOIN -> join(sender, arguments[2]);
-      case INSTANCE_LEAVE ->
-          withPlayer(
-              sender,
-              player -> {
-                boolean left = coordinator.leave(player);
-                sender.sendMessage(
-                    messages.render(left ? "command.instance-left" : "command.lobby-success"));
-              });
+      case INSTANCE_LEAVE -> withPlayer(sender, player -> returnToLobby(sender, player, false));
       case INSTANCE_STOP -> stop(sender, arguments[2]);
       case INSTANCE_INFO -> info(sender, arguments[2]);
       case UNKNOWN -> sender.sendMessage(messages.render("command.usage"));
@@ -121,9 +121,12 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     if (arguments.length == 1) {
       return filter(
           sender.hasPermission(ADMIN_PERMISSION)
-              ? List.of("help", "lobby", "instance", "reload")
+              ? List.of("help", "lobby", "map", "instance", "reload")
               : List.of("help", "lobby", "instance"),
           arguments[0]);
+    }
+    if (arguments.length == 2 && arguments[0].equalsIgnoreCase("map")) {
+      return filter(List.of("list", "preview", "leave"), arguments[1]);
     }
     if (arguments.length == 2 && arguments[0].equalsIgnoreCase("instance")) {
       return filter(
@@ -131,6 +134,11 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
               ? List.of("create", "list", "join", "leave", "stop", "info")
               : List.of("join", "leave"),
           arguments[1]);
+    }
+    if (arguments.length == 3
+        && arguments[0].equalsIgnoreCase("map")
+        && arguments[1].equalsIgnoreCase("preview")) {
+      return filter(templates.knownMapIds().stream().sorted().toList(), arguments[2]);
     }
     if (arguments.length == 3
         && arguments[0].equalsIgnoreCase("instance")
@@ -164,6 +172,70 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
             mainThread);
   }
 
+  private void listMaps(CommandSender sender) {
+    templates
+        .discover()
+        .whenCompleteAsync(
+            (maps, failure) -> {
+              if (failure != null) {
+                sender.sendMessage(
+                    messages.render(
+                        "command.map-list-failure", "reason", safeFailureMessage(failure)));
+                return;
+              }
+              sender.sendMessage(
+                  messages.render(
+                      "command.map-list-header", "count", Integer.toString(maps.size())));
+              maps.forEach(
+                  mapId ->
+                      sender.sendMessage(messages.render("command.map-list-entry", "map", mapId)));
+            },
+            mainThread);
+  }
+
+  private void preview(CommandSender sender, String mapId) {
+    withPlayer(
+        sender,
+        player -> {
+          coordinator.leave(player);
+          previews
+              .open(player, mapId.toLowerCase(Locale.ROOT))
+              .whenCompleteAsync(
+                  (opened, failure) ->
+                      sender.sendMessage(
+                          failure == null
+                              ? messages.render("command.map-preview-opened", "map", opened)
+                              : messages.render(
+                                  "command.map-preview-failure",
+                                  "reason",
+                                  safeFailureMessage(failure))),
+                  mainThread);
+        });
+  }
+
+  private void returnToLobby(CommandSender sender, Player player, boolean mapCommand) {
+    previews
+        .leave(player)
+        .whenCompleteAsync(
+            (leftPreview, failure) -> {
+              if (failure != null) {
+                sender.sendMessage(
+                    messages.render(
+                        "command.map-preview-failure", "reason", safeFailureMessage(failure)));
+                return;
+              }
+              if (!leftPreview) {
+                coordinator.leave(player);
+              }
+              sender.sendMessage(
+                  messages.render(
+                      mapCommand && leftPreview
+                          ? "command.map-preview-left"
+                          : "command.lobby-success"));
+            },
+            mainThread);
+  }
+
   private void list(CommandSender sender) {
     Collection<GameInstanceSnapshot> active = coordinator.activeInstances();
     sender.sendMessage(
@@ -176,34 +248,47 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
   private void join(CommandSender sender, String identifier) {
     withPlayer(
         sender,
-        player -> {
-          Optional<GameInstanceSnapshot> resolved = resolve(identifier);
-          if (resolved.isEmpty()) {
-            sender.sendMessage(messages.render("command.instance-not-found"));
-            return;
-          }
-          coordinator
-              .join(player, resolved.get().id())
-              .whenCompleteAsync(
-                  (result, failure) -> {
-                    if (failure != null) {
-                      sender.sendMessage(
-                          messages.render(
-                              "command.instance-join-failure",
-                              "reason",
-                              safeFailureMessage(failure)));
-                    } else if (result == PlayerInstanceResult.SUCCESS) {
-                      sender.sendMessage(
-                          messages.render(
-                              "command.instance-joined", "id", shortId(resolved.get().id())));
-                    } else {
-                      sender.sendMessage(
-                          messages.render(
-                              "command.instance-join-refused", "reason", result.name()));
-                    }
-                  },
-                  mainThread);
-        });
+        player ->
+            previews
+                .leave(player)
+                .whenCompleteAsync(
+                    (ignored, previewFailure) -> {
+                      if (previewFailure != null) {
+                        sender.sendMessage(
+                            messages.render(
+                                "command.instance-join-failure",
+                                "reason",
+                                safeFailureMessage(previewFailure)));
+                        return;
+                      }
+                      joinResolved(sender, player, identifier);
+                    },
+                    mainThread));
+  }
+
+  private void joinResolved(CommandSender sender, Player player, String identifier) {
+    Optional<GameInstanceSnapshot> resolved = resolve(identifier);
+    if (resolved.isEmpty()) {
+      sender.sendMessage(messages.render("command.instance-not-found"));
+      return;
+    }
+    coordinator
+        .join(player, resolved.get().id())
+        .whenCompleteAsync(
+            (result, failure) -> {
+              if (failure != null) {
+                sender.sendMessage(
+                    messages.render(
+                        "command.instance-join-failure", "reason", safeFailureMessage(failure)));
+              } else if (result == PlayerInstanceResult.SUCCESS) {
+                sender.sendMessage(
+                    messages.render("command.instance-joined", "id", shortId(resolved.get().id())));
+              } else {
+                sender.sendMessage(
+                    messages.render("command.instance-join-refused", "reason", result.name()));
+              }
+            },
+            mainThread);
   }
 
   private void stop(CommandSender sender, String identifier) {
@@ -286,6 +371,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       return;
     }
     if (!coordinator.activeInstances().isEmpty()
+        || previews.hasActivePreviews()
         || !state.compareAndSet(PluginState.RUNNING, PluginState.RELOADING)) {
       sender.sendMessage(messages.render("command.reload-busy"));
       return;
@@ -317,6 +403,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
   private static boolean isAdministrative(ZombieCommandAction action) {
     return switch (action) {
       case INSTANCE_CREATE, INSTANCE_LIST, INSTANCE_STOP, INSTANCE_INFO -> true;
+      case MAP_LIST, MAP_PREVIEW, MAP_LEAVE -> true;
       default -> false;
     };
   }

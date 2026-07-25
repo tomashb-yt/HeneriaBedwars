@@ -35,14 +35,14 @@ class ZombieSettingsValidatorTest {
             defaults.server(),
             new StorageOptions("mysql", "../outside.db"),
             defaults.lobby(),
-            new InstanceOptions("../games", "maps/sub", true, true, -1, 0, 0, true),
+            new InstanceOptions("../games", "maps/sub", true, true, -1, 0, 0, true, 0),
             defaults.chat(),
             new ReconnectOptions(true, 0, true, true),
             defaults.worldRules(),
             defaults.gui(),
             defaults.documentation());
 
-    assertEquals(8, validator.validate(invalid).size());
+    assertEquals(9, validator.validate(invalid).size());
     assertTrue(
         validator.validate(invalid).stream()
             .allMatch(issue -> issue.severity() == ValidationSeverity.ERROR));
@@ -55,7 +55,7 @@ class ZombieSettingsValidatorTest {
         new ServerOptions("zombie_lobby", "world"),
         new StorageOptions("sqlite", "data.db"),
         new LobbyOptions("zombie_lobby", new LocationOptions("zombie_lobby", 0, 80, 0, 0, 0)),
-        new InstanceOptions("zombie_instances", "zombie_templates", true, true, 2, 30, -1, true),
+        new InstanceOptions("zombie_instances", "zombie_templates", true, true, 2, 30, -1, true, 4),
         new ChatOptions(true, true, true, true),
         new ReconnectOptions(true, 30, true, true),
         new WorldRuleOptions(false, false, false, false, false, false, false, false, true, true),
