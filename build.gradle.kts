@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "fr.heneria.zombie"
-version = "0.2.2-SNAPSHOT"
+version = "0.2.3-SNAPSHOT"
 
 allprojects {
   group = rootProject.group
@@ -99,4 +99,3 @@ tasks.register("qualityGate") {
   dependsOn("spotlessCheck", subprojects.map { it.tasks.named("check") })
   dependsOn(":zombie-plugin:copyDeployableJar")
 }
-

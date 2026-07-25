@@ -307,4 +307,3 @@ public final class PaperWorldInstanceService implements WorldInstanceGateway {
         : failure;
   }
 }
-

@@ -11,4 +11,3 @@ class PaperAttributeResolverTest {
     assertNotNull(PaperAttributeResolver.maxHealth());
   }
 }
-

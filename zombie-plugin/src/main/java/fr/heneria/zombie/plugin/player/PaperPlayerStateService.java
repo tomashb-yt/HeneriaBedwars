@@ -113,4 +113,3 @@ public final class PaperPlayerStateService {
             .getValue());
   }
 }
-

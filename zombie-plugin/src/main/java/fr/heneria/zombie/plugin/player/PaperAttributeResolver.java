@@ -44,4 +44,3 @@ final class PaperAttributeResolver {
         "This Paper build exposes no supported maximum-health attribute");
   }
 }
-

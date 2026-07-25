@@ -142,7 +142,18 @@ public final class ZombieBootstrap {
     PaperPlayerStateService playerStates = new PaperPlayerStateService();
     ContextScoreboardService scoreboards = new ContextScoreboardService();
     LobbyService lobby = new LobbyService(configurations, sessions, playerStates, scoreboards);
-    lobby.initialize();
+    org.bukkit.World activeLobbyWorld = lobby.initialize();
+    String configuredLobbyWorld = configurations.current().settings().lobby().world();
+    if (!activeLobbyWorld.getName().equals(configuredLobbyWorld)) {
+      plugin
+          .getLogger()
+          .warning(
+              "Could not load configured lobby world "
+                  + configuredLobbyWorld
+                  + "; using fallback world "
+                  + activeLobbyWorld.getName()
+                  + '.');
+    }
     VisibilityPolicy visibilityPolicy = new VisibilityPolicy();
     VisibilityService visibility = new VisibilityService(plugin, sessions, visibilityPolicy);
     AudienceSelector audienceSelector = new AudienceSelector(sessions);
@@ -282,4 +293,3 @@ public final class ZombieBootstrap {
     command.setTabCompleter(executor);
   }
 }
-

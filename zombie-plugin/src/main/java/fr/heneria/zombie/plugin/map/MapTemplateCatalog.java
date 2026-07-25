@@ -163,4 +163,3 @@ public final class MapTemplateCatalog {
     return root;
   }
 }
-

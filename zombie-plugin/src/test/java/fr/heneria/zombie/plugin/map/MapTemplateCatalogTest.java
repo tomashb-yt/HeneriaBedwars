@@ -26,4 +26,3 @@ class MapTemplateCatalogTest {
     assertTrue(Files.isDirectory(root.resolve("zombie_templates")));
   }
 }
-

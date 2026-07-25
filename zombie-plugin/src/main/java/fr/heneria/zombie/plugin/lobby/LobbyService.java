@@ -42,16 +42,32 @@ public final class LobbyService {
   }
 
   /**
-   * Loads or creates the configured lobby world.
+   * Loads or creates the configured lobby world, falling back to the safe server world when Paper
+   * refuses it.
    *
-   * @throws IllegalStateException when Paper cannot create it
+   * @return world effectively used as lobby
+   * @throws IllegalStateException when neither configured nor fallback world can be loaded
    */
-  public void initialize() {
+  public World initialize() {
     String worldName = configurations.current().settings().lobby().world();
-    if (Bukkit.getWorld(worldName) == null
-        && Bukkit.createWorld(new WorldCreator(worldName)) == null) {
-      throw new IllegalStateException("Could not load lobby world " + worldName);
+    World configuredWorld = Bukkit.getWorld(worldName);
+    if (configuredWorld == null) {
+      configuredWorld = Bukkit.createWorld(new WorldCreator(worldName));
     }
+    if (configuredWorld != null) {
+      return configuredWorld;
+    }
+
+    String fallbackName = configurations.current().settings().server().fallbackWorld();
+    World fallbackWorld = Bukkit.getWorld(fallbackName);
+    if (fallbackWorld == null && !fallbackName.equals(worldName)) {
+      fallbackWorld = Bukkit.createWorld(new WorldCreator(fallbackName));
+    }
+    if (fallbackWorld == null) {
+      throw new IllegalStateException(
+          "Could not load lobby world " + worldName + " or fallback world " + fallbackName);
+    }
+    return fallbackWorld;
   }
 
   /**

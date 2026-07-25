@@ -72,4 +72,3 @@ class ConfigurationManagerTest {
     assertEquals(-1, manager.current().settings().instances().maximumConcurrentGames());
   }
 }
-

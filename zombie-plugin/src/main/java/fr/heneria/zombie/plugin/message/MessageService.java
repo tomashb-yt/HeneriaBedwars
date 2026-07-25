@@ -70,4 +70,3 @@ public final class MessageService {
     return escaped.toString();
   }
 }
-

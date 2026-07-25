@@ -54,4 +54,3 @@ tasks.runServer {
   systemProperty("com.mojang.eula.agree", "true")
   pluginJars.from(tasks.shadowJar.flatMap { it.archiveFile })
 }
-

@@ -2,6 +2,14 @@
 
 Toutes les Ã©volutions notables de HeneriaZombie sont consignÃ©es ici.
 
+## 0.2.3-SNAPSHOT â€” Repli sÃ»r du lobby
+
+### CorrigÃ©
+
+- un refus de crÃ©ation de `zombie_lobby` par Paper ne dÃ©sactive plus le plugin lorsque le monde de
+  repli configurÃ© est disponible ;
+- le monde de lobby rÃ©ellement utilisÃ© est diagnostiquÃ© clairement au dÃ©marrage.
+
 ## 0.2.2-SNAPSHOT â€” CompatibilitÃ© Paper 1.21
 
 ### CorrigÃ©
@@ -61,4 +69,3 @@ Toutes les Ã©volutions notables de HeneriaZombie sont consignÃ©es ici.
 - cycle de vie avec rollback et registre de services explicitement possÃ©dÃ© ;
 - API publique de diagnostic, tests, formatage et JAR dÃ©ployable ;
 - validation manuelle du dÃ©marrage et de l'arrÃªt sur Paper 1.21.11.
-

@@ -45,6 +45,10 @@ fonctionnelle fixe ; `0` est invalide.
 `world-rules` contrÃ´le apparitions naturelles, cycles, modifications de blocs, objets, PVP,
 conservation d'inventaire et sauvetage du vide.
 
+Si Paper refuse de charger ou crÃ©er `lobby.world`, le plugin utilise `server.fallback-world` et
+journalise un avertissement au lieu de se dÃ©sactiver. Le monde dÃ©diÃ© sera retentÃ© au prochain
+dÃ©marrage.
+
 ## ModÃ¨le de monde
 
 Chaque modÃ¨le se trouve dans :
@@ -78,4 +82,3 @@ underscore et tiret. Les liens symboliques sont refusÃ©s.
 
 Version, champs obligatoires, backend SQLite, chemins, cohÃ©rence du lobby, capacitÃ©s, dÃ©lais et
 thÃ¨me sont validÃ©s. Un avertissement est journalisÃ© ; une erreur bloque l'activation.
-

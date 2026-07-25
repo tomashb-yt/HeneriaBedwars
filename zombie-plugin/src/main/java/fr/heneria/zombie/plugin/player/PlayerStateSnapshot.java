@@ -107,4 +107,3 @@ public record PlayerStateSnapshot(
     return result;
   }
 }
-
