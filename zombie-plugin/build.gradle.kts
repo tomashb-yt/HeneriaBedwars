@@ -9,9 +9,9 @@ dependencies {
   implementation(files(rootProject.project(":zombie-api").tasks.named("jar")))
   implementation(files(rootProject.project(":zombie-core").tasks.named("jar")))
 
-  compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+  compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
   testImplementation(files(tasks.named("jar")))
-  testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+  testImplementation("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
 }
 
 tasks.jar {
@@ -54,3 +54,4 @@ tasks.runServer {
   systemProperty("com.mojang.eula.agree", "true")
   pluginJars.from(tasks.shadowJar.flatMap { it.archiveFile })
 }
+

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -83,6 +84,15 @@ public final class MapTemplateCatalog {
   }
 
   /**
+   * Returns the configured absolute template root for diagnostics.
+   *
+   * @return template root
+   */
+  public Path rootDirectory() {
+    return templateRoot();
+  }
+
+  /**
    * Resolves the secure source directory.
    *
    * @param mapId validated identifier
@@ -97,7 +107,23 @@ public final class MapTemplateCatalog {
     return candidate;
   }
 
+  /**
+   * Returns the expected metadata path for diagnostics.
+   *
+   * @param mapId validated map identifier
+   * @return absolute metadata path
+   */
+  public Path metadataPath(String mapId) {
+    return sourceDirectory(mapId).resolve(METADATA_FILE);
+  }
+
   private Optional<MapTemplateDefinition> load(String mapId) {
+    try {
+      Files.createDirectories(templateRoot());
+    } catch (IOException failure) {
+      throw new CompletionException(
+          new IOException("Could not create template directory " + templateRoot(), failure));
+    }
     Path directory = sourceDirectory(mapId);
     Path metadata = directory.resolve(METADATA_FILE);
     if (!Files.isDirectory(directory, LinkOption.NOFOLLOW_LINKS)
@@ -137,3 +163,4 @@ public final class MapTemplateCatalog {
     return root;
   }
 }
+

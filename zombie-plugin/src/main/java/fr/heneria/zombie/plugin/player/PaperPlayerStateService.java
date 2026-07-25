@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 /** Captures and restores original and lobby states without sharing mutable inventories. */
@@ -109,6 +108,9 @@ public final class PaperPlayerStateService {
     player.setFireTicks(0);
     player.setFallDistance(0.0F);
     player.setHealth(
-        Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH), "max health").getValue());
+        Objects.requireNonNull(
+                player.getAttribute(PaperAttributeResolver.maxHealth()), "max health")
+            .getValue());
   }
 }
+

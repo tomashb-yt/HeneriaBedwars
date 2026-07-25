@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import fr.heneria.zombie.core.config.ZombieSettingsValidator;
+import fr.heneria.zombie.plugin.message.MessageService;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.junit.jupiter.api.Test;
 
 class ConfigurationManagerTest {
@@ -27,6 +29,14 @@ class ConfigurationManagerTest {
     assertEquals(-1, manager.current().settings().instances().maximumConcurrentGames());
     assertEquals("data.db", manager.current().settings().storage().sqliteFile());
     assertTrue(manager.current().messages().containsKey("command.instance-created"));
+
+    MessageService messages = new MessageService(manager);
+    String help =
+        PlainTextComponentSerializer.plainText().serialize(messages.render("command.help"));
+    String usage =
+        PlainTextComponentSerializer.plainText().serialize(messages.render("command.usage"));
+    assertTrue(help.contains("/zombie instance join <id>"));
+    assertTrue(usage.contains("<create|list|join|leave|stop|info>"));
   }
 
   @Test
@@ -62,3 +72,4 @@ class ConfigurationManagerTest {
     assertEquals(-1, manager.current().settings().instances().maximumConcurrentGames());
   }
 }
+

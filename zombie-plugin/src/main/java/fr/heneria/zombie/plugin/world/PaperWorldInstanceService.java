@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRules;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.Plugin;
@@ -204,11 +204,11 @@ public final class PaperWorldInstanceService implements WorldInstanceGateway {
 
   private void applyRules(World world, WorldRuleOptions rules) {
     world.setAutoSave(false);
-    world.setGameRule(GameRules.PVP, rules.allowPvp());
-    world.setGameRule(GameRules.SPAWN_MOBS, rules.allowNaturalMobSpawning());
-    world.setGameRule(GameRules.ADVANCE_WEATHER, rules.allowWeatherCycle());
-    world.setGameRule(GameRules.ADVANCE_TIME, rules.allowTimeCycle());
-    world.setGameRule(GameRules.KEEP_INVENTORY, rules.keepInventory());
+    world.setPVP(rules.allowPvp());
+    world.setGameRule(GameRule.DO_MOB_SPAWNING, rules.allowNaturalMobSpawning());
+    world.setGameRule(GameRule.DO_WEATHER_CYCLE, rules.allowWeatherCycle());
+    world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, rules.allowTimeCycle());
+    world.setGameRule(GameRule.KEEP_INVENTORY, rules.keepInventory());
   }
 
   private String runtimeWorldName(UUID instanceId) {
@@ -307,3 +307,4 @@ public final class PaperWorldInstanceService implements WorldInstanceGateway {
         : failure;
   }
 }
+

@@ -106,6 +106,7 @@ public final class ZombieBootstrap {
         new MapTemplateCatalog(
             plugin.getServer().getWorldContainer().toPath(), configurations, ioExecutor);
     templates.refreshCount();
+    plugin.getLogger().info("Map templates directory: " + templates.rootDirectory());
     PaperWorldInstanceService worlds =
         new PaperWorldInstanceService(
             plugin,
@@ -281,3 +282,4 @@ public final class ZombieBootstrap {
     command.setTabCompleter(executor);
   }
 }
+

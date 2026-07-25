@@ -101,7 +101,11 @@ public final class InstanceCoordinator {
                     .orElseGet(
                         () ->
                             CompletableFuture.failedFuture(
-                                new IllegalArgumentException("Unknown or invalid map " + mapId))));
+                                new IllegalArgumentException(
+                                    "Unknown or invalid map "
+                                        + mapId
+                                        + ". Expected "
+                                        + templates.metadataPath(mapId)))));
   }
 
   /**
@@ -309,3 +313,4 @@ public final class InstanceCoordinator {
     sessions.sendToLobby(playerId);
   }
 }
+

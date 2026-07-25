@@ -82,7 +82,10 @@ public record PlayerStateSnapshot(
     player.setTotalExperience(totalExperience);
     player.setHealth(
         Math.min(
-            health, player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue()));
+            health,
+            Objects.requireNonNull(
+                    player.getAttribute(PaperAttributeResolver.maxHealth()), "max health")
+                .getValue()));
     player.setFoodLevel(food);
     player.setSaturation(saturation);
     player.setExhaustion(exhaustion);
@@ -104,3 +107,4 @@ public record PlayerStateSnapshot(
     return result;
   }
 }
+
