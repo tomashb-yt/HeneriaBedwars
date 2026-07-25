@@ -27,7 +27,7 @@ mécaniques originales optionnelles par map.
 - fichiers hors thread serveur, appels Bukkit sur le thread serveur ;
 - snapshots de configuration validés puis activés atomiquement.
 
-## État réel — Ticket 003
+## État réel — Ticket 004
 
 Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 
@@ -42,6 +42,10 @@ Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 - commandes temporaires de création, inspection, entrée, sortie et arrêt ;
 - détection automatique des dossiers de monde et aperçus administratifs isolés sans partie ;
 - compteurs API réels pour les modèles et instances.
+
+Le Ticket 004 ajoute un schéma éditorial v2, un registre asynchrone, des sessions d'administration,
+les commandes `/zmap`, l'outil protégé, les GUI de placement et un validateur structurel. Les
+définitions sont auto-sauvegardées sous `plugins/HeneriaZombie/maps`.
 
 Les états sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`, `CLEANING`, `CLOSED` et
 `ERROR`. Aucune manche, aucun zombie et aucun matchmaking ne sont implémentés.
@@ -67,7 +71,7 @@ l'introduction d'inventaires de valeur.
 
 ## Limites connues
 
-- le modèle de map est volontairement minimal et n'a pas encore de GUI ;
+- le catalogue de clonage utilise encore son manifeste technique minimal distinct de l'éditeur ;
 - l'ajout simple accepte un dossier de monde, mais pas encore une archive ZIP ;
 - les instances restent en attente jusqu'à leur arrêt administratif : aucune boucle de jeu ;
 - SQLite est configuré mais aucune donnée métier ne justifie encore l'ouverture d'une connexion ;
@@ -76,16 +80,15 @@ l'introduction d'inventaires de valeur.
 - un arrêt serveur conserve les dossiers d'instance, car leur suppression serait incertaine ;
 - `-1` retire le plafond fonctionnel, sans supprimer les limites matérielles.
 
-## Interfaces livrées au Ticket 003
+## Interfaces livrées aux Tickets 003–004
 
 Le moteur GUI configurable fournit des sessions isolées, navigation, pagination sans plafond,
 recherche privée par chat, permissions, confirmations, rafraîchissement partagé et activation
 atomique de `guis.yml`. Les menus disponibles sont joueur, administration, maps, instances,
 diagnostics et confirmation. Ils réutilisent les services du Ticket 002.
 
-Le modèle de map reste minimal. Groupe, profil, statistiques, paramètres, éditeurs, export et
-suppression restent explicitement désactivés. Le rendu multi-clients doit encore être validé
-manuellement sur Paper.
+L'éditeur configure les informations, zones, portes, spawns et objets sans YAML manuel. Groupe,
+profil, statistiques et export restent désactivés. Le rendu doit encore être validé manuellement.
 
 ## Reprise
 

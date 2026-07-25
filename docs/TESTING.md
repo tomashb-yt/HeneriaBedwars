@@ -21,6 +21,9 @@ multi-clients à réaliser sur un serveur dédié.
 - permissions visibles, verrouillées ou masquées ;
 - délai de confirmation et expiration/validation de saisie ;
 - valeurs GUI par défaut, thème, tailles, collisions, actions inconnues et snapshot atomique.
+- création de définition, session exclusive, mutations et auto-save ;
+- zones, portes, spawns, validation des références et navigation ;
+- undo/redo, sauvegarde YAML, backup atomique et rechargement intégral.
 
 `.\gradlew.bat clean qualityGate` ajoute Spotless, Checkstyle implicite du compilateur avec
 `-Xlint:all`, Javadoc, checks, JAR ombré et `git diff --check`.
@@ -43,6 +46,9 @@ Préparer un monde valide dans `zombie_templates/crypt` sans manifeste, puis :
 10. avec deux joueurs, ouvrir `/zombies` et `/zombie admin`, puis tester navigation, recherche,
     pages, permissions, clics spéciaux et confirmation ;
 11. rendre `guis.yml` invalide, vérifier son refus, puis le corriger.
+12. exécuter `/zmap create crypt_edit`, placer spawn, zones, porte et spawn zombie ;
+13. déplacer, dupliquer, supprimer, tester undo/redo puis valider ;
+14. quitter, redémarrer Paper, rouvrir la map et vérifier la restauration.
 
 Une exécution locale sans trois comptes ne valide honnêtement que démarrage, création de monde,
 commandes console et arrêt. La validation visuelle multi-clients doit être consignée séparément.
@@ -63,6 +69,9 @@ exécuté dans cet environnement.
 
 Les interactions d'inventaire Ticket 003 n'ont pas été exécutées avec plusieurs clients dans cet
 environnement. Cette vérification manuelle reste obligatoire avant production.
+
+Les clics de placement et protections de l'outil Ticket 004 n'ont pas été exécutés dans un client
+Minecraft dans cet environnement. Le domaine et le stockage sont couverts automatiquement.
 
 ## Critères de non-régression
 

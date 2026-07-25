@@ -5,6 +5,9 @@ import fr.heneria.zombie.api.ZombieApi;
 import fr.heneria.zombie.core.bootstrap.ServiceRegistry;
 import fr.heneria.zombie.core.config.ConfigurationIssue;
 import fr.heneria.zombie.core.config.ZombieSettingsValidator;
+import fr.heneria.zombie.core.editor.MapEditorService;
+import fr.heneria.zombie.core.editor.MapRegistry;
+import fr.heneria.zombie.core.editor.MapValidator;
 import fr.heneria.zombie.core.instance.GameInstanceRegistry;
 import fr.heneria.zombie.core.instance.GameInstanceService;
 import fr.heneria.zombie.core.isolation.AudienceSelector;
@@ -15,6 +18,12 @@ import fr.heneria.zombie.plugin.api.PaperZombieApi;
 import fr.heneria.zombie.plugin.command.ZombieCommand;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.display.ContextScoreboardService;
+import fr.heneria.zombie.plugin.editor.EditorGuiModule;
+import fr.heneria.zombie.plugin.editor.EditorItemService;
+import fr.heneria.zombie.plugin.editor.EditorPlacementListener;
+import fr.heneria.zombie.plugin.editor.EditorSessionListener;
+import fr.heneria.zombie.plugin.editor.YamlMapPersistence;
+import fr.heneria.zombie.plugin.editor.ZMapCommand;
 import fr.heneria.zombie.plugin.gui.GuiActionRegistry;
 import fr.heneria.zombie.plugin.gui.GuiChatInputListener;
 import fr.heneria.zombie.plugin.gui.GuiConfigurationService;
@@ -64,6 +73,8 @@ public final class ZombieBootstrap {
   private InstanceCoordinator coordinator;
   private MapPreviewService previewService;
   private GuiService guiService;
+  private MapEditorService editorService;
+  private EditorItemService editorItems;
   private BukkitTask maintenanceTask;
 
   /**
@@ -184,6 +195,21 @@ public final class ZombieBootstrap {
     api = new PaperZombieApi(state, templates::count, registry::size);
     GuiRegistry guiRegistry = new GuiRegistry();
     GuiActionRegistry guiActions = new GuiActionRegistry();
+    YamlMapPersistence mapPersistence =
+        new YamlMapPersistence(plugin.getDataFolder().toPath(), ioExecutor);
+    editorService = new MapEditorService(new MapRegistry(), mapPersistence, Clock.systemUTC());
+    MapValidator mapValidator = new MapValidator();
+    editorItems = new EditorItemService(plugin);
+    editorService
+        .initialize()
+        .whenComplete(
+            (count, failure) -> {
+              if (failure == null) {
+                plugin.getLogger().info("Loaded " + count + " editable map definition(s).");
+              } else {
+                plugin.getLogger().severe("Could not load editable maps: " + failure.getMessage());
+              }
+            });
     GuiConfigurationService guiConfigurations =
         new GuiConfigurationService(
             plugin.getDataFolder().toPath(),
@@ -191,6 +217,7 @@ public final class ZombieBootstrap {
             ioExecutor,
             () -> {
               java.util.HashSet<String> known = new java.util.HashSet<>(GuiScreens.ACTION_IDS);
+              known.addAll(EditorGuiModule.ACTION_IDS);
               known.addAll(guiActions.ids());
               return java.util.Set.copyOf(known);
             },
@@ -219,6 +246,17 @@ public final class ZombieBootstrap {
             coordinator,
             sessions,
             api,
+            mainThread,
+            Clock.systemUTC())
+        .register();
+    new EditorGuiModule(
+            guiRegistry,
+            guiActions,
+            guiConfigurations,
+            guiService,
+            editorService,
+            mapValidator,
+            editorItems,
             mainThread,
             Clock.systemUTC())
         .register();
@@ -256,7 +294,9 @@ public final class ZombieBootstrap {
         new InstanceWorldProtectionListener(worlds, sessions, configurations, previewService),
         new MapPreviewListener(previewService),
         new GuiListener(guiService),
-        new GuiChatInputListener(plugin, guiService));
+        new GuiChatInputListener(plugin, guiService),
+        new EditorPlacementListener(editorService, editorItems, Clock.systemUTC(), mainThread),
+        new EditorSessionListener(editorService, editorItems));
     registerCommand(
         configurations,
         messages,
@@ -266,6 +306,7 @@ public final class ZombieBootstrap {
         guiService,
         mainThread);
     registerPlayerGuiCommand(guiService);
+    registerMapEditorCommand(mapValidator, mainThread);
 
     maintenanceTask =
         plugin
@@ -284,6 +325,16 @@ public final class ZombieBootstrap {
 
   /** Releases tasks, players, worlds, API registration and executor threads. */
   public void stop() {
+    if (editorService != null) {
+      for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
+        editorService.leave(player.getUniqueId());
+        if (editorItems != null) {
+          editorItems.remove(player);
+        }
+      }
+      editorService = null;
+      editorItems = null;
+    }
     if (guiService != null) {
       guiService.shutdown();
       guiService = null;
@@ -405,5 +456,17 @@ public final class ZombieBootstrap {
           }
           return true;
         });
+  }
+
+  private void registerMapEditorCommand(
+      MapValidator validator, PaperMainThreadExecutor mainThread) {
+    PluginCommand command = plugin.getCommand("zmap");
+    if (command == null) {
+      throw new IllegalStateException("Command zmap is missing from plugin.yml");
+    }
+    ZMapCommand executor =
+        new ZMapCommand(editorService, validator, editorItems, guiService, mainThread);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
   }
 }

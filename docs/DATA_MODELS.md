@@ -1,6 +1,6 @@
 # Modèles de données
 
-**Statut :** modèles runtime et sessions GUI opérationnels ; gameplay à venir.
+**Statut :** modèles runtime, GUI et éditeur universel opérationnels ; gameplay à venir.
 
 ## Instance
 
@@ -29,7 +29,18 @@ interdisent un contexte instance sans identifiant et un contexte lobby avec iden
 `PlayerStateSnapshot`, limité au module Paper, copie défensivement inventaire, armure, main
 secondaire, expérience, santé, alimentation, effets, mode, position, vitesses et vol.
 
-## Modèle de map minimal
+## Définitions de map
+
+`MapDefinition` est le schéma éditorial immuable en version 2. Il contient identité, auteur, dates,
+monde, présentation, capacité, difficulté, mode, spawn joueur et quatre collections extensibles :
+zones, portes, spawns zombies et objets typés. Les coordonnées utilisent `MapPoint`, sans Bukkit.
+
+Une zone possède couleur, musique, ambiance, volume et ancre. Une porte possède prix, deux zones,
+type, prérequis, animation et son. Un spawn possède poids, capacité, bornes de manche et distance,
+visibilité, types autorisés et cooldown. Les objets utilisent un type stable et des propriétés
+extensibles. `MapEditorSession` conserve outil, sélection, presse-papiers et historique borné.
+
+## Modèle de monde technique
 
 `MapTemplateDefinition` contient :
 
@@ -39,8 +50,8 @@ secondaire, expérience, santé, alimentation, effets, mode, position, vitesses 
 
 Sans fichier source, la capacité vient de la configuration globale et le spawn est lu dans le
 `level.dat` vanilla. Un `zombie-map.yml` portant `schema-version: 1` peut encore les surcharger. Ce
-modèle technique sert uniquement au clonage du Ticket 002 et sera remplacé ou migré lorsque le
-schéma complet des maps sera défini.
+modèle technique sert uniquement au clonage du Ticket 002. Le branchement d'une définition
+éditoriale validée sur le catalogue de clones sera réalisé avec la boucle de jeu.
 
 `MapPreviewService` conserve seulement l'UUID administrateur, le `mapId` et le handle de la copie
 temporaire. Un aperçu n'est ni une instance ni une session de gameplay.
@@ -60,5 +71,5 @@ expose tranche, index, nombre de pages et total sans plafond global.
 
 ## Persistance
 
-Les instances et sessions sont runtime. Elles ne sont pas écrites dans YAML ou SQLite. SQLite
-reste réservé aux futures données réellement persistantes avec migrations et accès asynchrones.
+Les définitions éditoriales sont écrites en YAML versionné et atomique. Instances et sessions
+restent runtime. SQLite reste réservé aux futures données de profil.

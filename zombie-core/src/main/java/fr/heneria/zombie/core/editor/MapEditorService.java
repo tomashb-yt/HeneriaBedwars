@@ -1,0 +1,113 @@
+package fr.heneria.zombie.core.editor;
+
+import java.time.Clock;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.UnaryOperator;
+
+/** Application service for creation, sessions, mutations, autosave and undo/redo. */
+public final class MapEditorService {
+  private final MapRegistry registry;
+  private final MapPersistence persistence;
+  private final Clock clock;
+  private final ConcurrentHashMap<UUID, MapEditorSession> sessions = new ConcurrentHashMap<>();
+
+  public MapEditorService(MapRegistry registry, MapPersistence persistence, Clock clock) {
+    this.registry = Objects.requireNonNull(registry, "registry");
+    this.persistence = Objects.requireNonNull(persistence, "persistence");
+    this.clock = Objects.requireNonNull(clock, "clock");
+  }
+
+  public CompletableFuture<Integer> initialize() {
+    return persistence
+        .loadAll()
+        .thenApply(
+            definitions -> {
+              definitions.forEach(registry::register);
+              return definitions.size();
+            });
+  }
+
+  public CompletableFuture<MapDefinition> create(
+      String id, String displayName, UUID creator, String world) {
+    MapDefinition definition =
+        MapDefinition.create(id, displayName, creator, clock.instant(), world);
+    if (!registry.register(definition)) {
+      return CompletableFuture.failedFuture(new IllegalArgumentException("Map already exists"));
+    }
+    return persistence.save(definition).thenApply(ignored -> definition);
+  }
+
+  public Optional<MapEditorSession> open(UUID playerId, String mapId) {
+    MapDefinition definition = registry.find(mapId).orElse(null);
+    if (definition == null || sessions.containsKey(playerId)) {
+      return Optional.empty();
+    }
+    MapEditorSession session = new MapEditorSession(playerId, definition, clock.instant());
+    return sessions.putIfAbsent(playerId, session) == null
+        ? Optional.of(session)
+        : Optional.empty();
+  }
+
+  public Optional<MapEditorSession> session(UUID playerId) {
+    return Optional.ofNullable(sessions.get(playerId));
+  }
+
+  public CompletableFuture<Boolean> leave(UUID playerId) {
+    MapEditorSession removed = sessions.remove(playerId);
+    return removed == null
+        ? CompletableFuture.completedFuture(false)
+        : saveWorkingCopy(removed).thenApply(ignored -> true);
+  }
+
+  public CompletableFuture<MapDefinition> mutate(
+      UUID playerId, UnaryOperator<MapDefinition> mutation) {
+    MapEditorSession session =
+        session(playerId).orElseThrow(() -> new IllegalStateException("No editor session"));
+    MapDefinition changed = mutation.apply(session.definition());
+    session.change(changed, clock.instant());
+    registry.update(changed);
+    return persistence.save(changed).thenApply(ignored -> changed);
+  }
+
+  public CompletableFuture<Boolean> undo(UUID playerId) {
+    MapEditorSession session =
+        session(playerId).orElseThrow(() -> new IllegalStateException("No editor session"));
+    if (!session.undo(clock.instant())) {
+      return CompletableFuture.completedFuture(false);
+    }
+    registry.update(session.definition());
+    return saveWorkingCopy(session).thenApply(ignored -> true);
+  }
+
+  public CompletableFuture<Boolean> redo(UUID playerId) {
+    MapEditorSession session =
+        session(playerId).orElseThrow(() -> new IllegalStateException("No editor session"));
+    if (!session.redo(clock.instant())) {
+      return CompletableFuture.completedFuture(false);
+    }
+    registry.update(session.definition());
+    return saveWorkingCopy(session).thenApply(ignored -> true);
+  }
+
+  public CompletableFuture<Void> save(UUID playerId) {
+    return saveWorkingCopy(
+        session(playerId).orElseThrow(() -> new IllegalStateException("No editor session")));
+  }
+
+  public MapRegistry registry() {
+    return registry;
+  }
+
+  public Map<UUID, MapEditorSession> sessions() {
+    return Map.copyOf(sessions);
+  }
+
+  private CompletableFuture<Void> saveWorkingCopy(MapEditorSession session) {
+    return persistence.save(session.definition());
+  }
+}

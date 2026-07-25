@@ -2,6 +2,25 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.5.0-SNAPSHOT — Éditeur universel de maps
+
+### Ajouté
+
+- schéma éditorial v2 immuable, registre et collections extensibles ;
+- commandes `/zmap`, sessions exclusives, outil protégé, sélection et presse-papiers ;
+- GUI de toutes les catégories, placement, déplacement, duplication et suppression confirmée ;
+- informations générales configurables par saisie privée ;
+- auto-save YAML asynchrone sérialisé, remplacement atomique et backup ;
+- historique undo/redo et validation structurelle avec graphe de zones ;
+- tests du service, du validateur et du cycle complet de persistance.
+
+### Sécurité et limites
+
+- aucun accès disque sur le thread Paper et aucun type Bukkit dans le core ;
+- nettoyage de session et d'outil à la sortie, déconnexion et arrêt ;
+- l'activation d'une définition dans une partie attend le ticket de boucle de jeu ;
+- les interactions visuelles doivent encore être validées manuellement dans Minecraft.
+
 ## 0.4.0-SNAPSHOT — Framework GUI configurable
 
 ### Ajouté

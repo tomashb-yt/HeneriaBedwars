@@ -67,6 +67,10 @@ public final class GuiService implements GuiInputProvider {
     open(player, id, GuiContext.EMPTY, false, true);
   }
 
+  public void open(Player player, GuiId id, GuiContext context) {
+    open(player, id, context, false, true);
+  }
+
   public void back(Player player) {
     GuiSession session = sessions.get(player.getUniqueId());
     if (session == null) {

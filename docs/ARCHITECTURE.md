@@ -1,6 +1,6 @@
 # Architecture
 
-**Statut :** fondation, instances isolées et framework GUI opérationnels au Ticket 003.
+**Statut :** fondation, instances, GUI et éditeur opérationnels au Ticket 004.
 
 ## Modules
 
@@ -87,8 +87,15 @@ d'écrans et d'actions rendent les modules extensibles. `GuiListener` ne contien
 métier. `GuiConfigurationService` installe et valide `guis.yml` sur le pool I/O, puis échange son
 snapshot atomiquement. Les écrans délèguent les mutations aux services existants.
 
+## Frontière éditeur
+
+Le core possède définition immuable, registre, sessions, historique et validation.
+`MapPersistence` est son port asynchrone. Le plugin adapte ce port en YAML, traduit les clics Paper
+en `MapPoint` et compose les écrans avec le framework GUI. Une mutation remplace d'abord le
+snapshot mémoire puis sérialise les écritures de la map sur le pool I/O.
+
 ## Extensions futures
 
-Le manifeste facultatif `zombie-map.yml` reste un adaptateur minimal. Le futur schéma de map
-versionné devra s'intégrer derrière le catalogue sans déplacer de logique Paper dans le core.
-Manches, zombies, matchmaking et éditeurs métier ne font pas partie de cette architecture livrée.
+Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une prochaine
+étape reliera les définitions éditoriales validées au catalogue. Manches, zombies et matchmaking ne
+font pas partie de cette architecture livrée.

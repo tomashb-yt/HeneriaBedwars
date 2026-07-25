@@ -1,6 +1,6 @@
 # Roadmap
 
-**Statut :** Tickets 001, 002 et 003 terminés dans le code.
+**Statut :** Tickets 001 à 004 terminés dans le code.
 
 ## Étapes
 
@@ -9,9 +9,9 @@
    terminés, avec import simple et aperçu administratif des mondes ; aucune boucle de jeu.
 3. **Ticket 003 — Framework GUI configurable :** moteur, menus joueur/admin, maps, instances,
    diagnostics, recherche et confirmations terminés.
-4. **Schéma complet et registre de maps :** remplacer ou migrer le manifeste minimal, valider
-   zones et collections.
-5. **Éditeur universel :** sessions administratives, outil et GUI.
+4. **Ticket 004 — Schéma et éditeur universel :** registre, sessions, outil, GUI, sauvegarde,
+   historique et validation terminés.
+5. **Activation des maps :** relier une définition éditoriale validée au catalogue de clones.
 6. **Lobby enrichi et matchmaking :** sélection de map, files et groupes.
 7. **Boucle classique minimale :** manches, zombies, points, mort et réanimation.
 8. **Économie de map :** portes, barricades, armes, boîte, courant, atouts et Pack-a-Punch.

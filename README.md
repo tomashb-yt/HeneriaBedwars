@@ -5,9 +5,8 @@ classique de Black Ops 2 et enrichi de mécaniques originales facultatives par m
 
 ## État
 
-Le Ticket 001 fournit uniquement une fondation exécutable : architecture en trois modules,
-configuration versionnée, cycle de vie, API de diagnostic, commande `/zombie`, tests et
-documentation centrale. Aucun gameplay, aucune map et aucune instance ne sont encore jouables.
+Les Tickets 001 à 004 fournissent la fondation, le lobby, les instances isolées, le framework GUI
+et l'éditeur universel. La boucle de manches et les zombies ne sont pas encore implémentés.
 
 ## Prérequis
 
@@ -25,7 +24,7 @@ documentation centrale. Aucun gameplay, aucune map et aucune instance ne sont en
 .\gradlew.bat qualityGate
 ```
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.1.0-SNAPSHOT.jar`.
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.5.0-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire

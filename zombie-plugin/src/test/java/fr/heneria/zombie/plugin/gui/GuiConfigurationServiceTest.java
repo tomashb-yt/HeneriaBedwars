@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,7 +88,11 @@ class GuiConfigurationServiceTest {
         directory,
         getClass().getClassLoader(),
         Runnable::run,
-        () -> GuiScreens.ACTION_IDS,
+        () -> {
+          HashSet<String> actions = new HashSet<>(GuiScreens.ACTION_IDS);
+          actions.addAll(fr.heneria.zombie.plugin.editor.EditorGuiModule.ACTION_IDS);
+          return Set.copyOf(actions);
+        },
         ignored -> {});
   }
 }

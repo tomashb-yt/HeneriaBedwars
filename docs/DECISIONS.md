@@ -95,3 +95,14 @@ erreur conserve le snapshot précédent. Les rendus ne lisent jamais le disque.
 
 Chaque ouverture tourne un jeton empêchant un clic obsolète. Une seule tâche entretient toutes les
 sessions et rafraîchit les inventaires en place selon leur intervalle.
+
+## ADR-020 — Définition éditoriale immuable distincte du monde source
+
+`MapDefinition` est un snapshot core versionné, sans Bukkit, distinct du manifeste technique de
+clonage. L'éditeur remplace atomiquement le snapshot du registre ; une partie ne modifiera jamais
+le modèle source.
+
+## ADR-021 — Auto-save sérialisé avec backup
+
+Chaque mutation déclenche une sauvegarde. Les écritures d'une même map sont ordonnées sur le pool
+I/O, utilisent un fichier temporaire et conservent `map.yml.bak`.

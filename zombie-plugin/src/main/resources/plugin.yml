@@ -16,6 +16,10 @@ commands:
     description: Opens the HeneriaZombie player menu
     usage: /zombies
     permission: zombie.gui.player
+  zmap:
+    description: Creates and edits versioned Zombies maps in game
+    usage: /zmap [create|edit|leave|validate|save|undo|redo]
+    permission: zombie.editor
 
 permissions:
   zombie.admin:
@@ -52,7 +56,7 @@ permissions:
     description: Bypasses runtime-world interaction protections
     default: op
   zombie.editor:
-    description: Reserves access to the future universal map editor
+    description: Allows use of the universal map editor
     default: op
   zombie.play:
     description: Allows lobby and instance player commands

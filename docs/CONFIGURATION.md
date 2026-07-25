@@ -1,6 +1,6 @@
 # Configuration
 
-**Statut :** configuration globale v1 et configuration GUI opérationnelles au Ticket 003.
+**Statut :** configuration globale v1, GUI et maps éditoriales opérationnelles.
 
 ## Chargement
 
@@ -116,3 +116,10 @@ Les liens symboliques sont refusés. `/zombie map list` rescane immédiatement l
 
 Version, champs obligatoires, backend SQLite, chemins, cohérence du lobby, capacités, délais et
 thème sont validés. Un avertissement est journalisé ; une erreur bloque l'activation.
+
+## Définitions éditoriales
+
+L'éditeur gère automatiquement `plugins/HeneriaZombie/maps/<mapId>/map.yml` et son
+`map.yml.bak`. Le schéma est en version 2 et n'est pas destiné à l'édition manuelle. Écriture
+temporaire, backup et remplacement atomique s'exécutent hors thread serveur. Ce dossier est
+distinct de `zombie_templates`, qui contient les mondes sources clonables.

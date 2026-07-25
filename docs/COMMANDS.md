@@ -1,6 +1,6 @@
 # Commandes et permissions
 
-**Statut :** commandes Ticket 002 et accès GUI Ticket 003 opérationnels.
+**Statut :** commandes runtime, GUI et éditeur opérationnelles.
 
 ## Commandes joueur
 
@@ -24,6 +24,11 @@ Elles exigent `zombie.command.use` et, pour les transitions joueur, `zombie.play
 - `/zombie instance info <id>` — détaille une instance ;
 - `/zombie instance stop <id>` — expulse, décharge et nettoie ;
 - `/zombie reload` — recharge un candidat valide lorsqu'aucune instance n'est active.
+- `/zmap create <id>` — crée une définition dans le monde courant et ouvre l'éditeur ;
+- `/zmap edit <id>` — ouvre une session existante ;
+- `/zmap leave` — sauvegarde et ferme proprement la session ;
+- `/zmap validate` — affiche erreurs, avertissements et conseils ;
+- `/zmap save`, `/zmap undo`, `/zmap redo` — sauvegarde et historique.
 
 Les commandes de map et les quatre commandes d'instance exigent `zombie.instance.admin`. Le reload
 exige en plus `zombie.command.reload`. Un préfixe UUID ambigu est refusé. Le reload est refusé
@@ -34,7 +39,7 @@ pendant une partie ou un aperçu.
 - `zombie.admin` regroupe tous les droits administratifs ;
 - `zombie.chat.global` permet le canal global explicite avec le préfixe `!` ;
 - `zombie.world.bypass` contourne les protections des mondes d'instance ;
-- `zombie.editor` réserve le futur éditeur ;
+- `zombie.editor` autorise l'éditeur universel et ses GUI ;
 - `zombie.play` autorise les commandes joueur.
 
 Les valeurs par défaut et la hiérarchie exacte figurent dans `plugin.yml`.
