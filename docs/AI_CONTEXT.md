@@ -95,6 +95,18 @@ profil, statistiques et export restent désactivés. Le rendu doit encore être 
 
 ## Reprise
 
+Le Ticket 005 est terminé dans le code. `ZombieGame`, `RoundState`, `GamePlayer`,
+`ZombieGameService`, `RoundDifficultyCalculator` et `GameEvent` forment le domaine indépendant de
+Paper. `PaperGameRuntime`, `PaperZombieSpawner`, `GameCombatListener` et `ZGameCommand` réalisent
+l'intégration. Une map validée se teste avec `/zmap edit <map>`, puis `/zmap test`; `/zgame list`,
+`info`, `stop`, `nextround`, `setround` et `debug` servent au diagnostic.
+
+La boucle disponible comprend les manches FORMULA, le plafond vivant, les zombies vanilla
+temporaires, points, mise à terre, réanimation accroupie, reconnexion, défaite et nettoyage. Armes,
+IA spécialisée, économie et persistance des résultats restent à livrer. Le
+`GameResultRepository` actif est volontairement sans stockage. Le prochain ticket recommandé est
+le moteur de zombies et de combat. Les scénarios multi-clients restent à valider sur Paper.
+
 Le prochain incrément doit suivre `ROADMAP.md`, utiliser les services existants au lieu de créer un
 second registre de sessions ou d'instances, et préserver la frontière Paper. Ne jamais annoncer
 les fonctionnalités de gameplay planifiées comme déjà livrées.

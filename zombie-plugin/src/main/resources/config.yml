@@ -70,5 +70,45 @@ gui:
     instances-menu-ticks: 20
     diagnostics-menu-ticks: 40
 
+game:
+  minimum-players: 1
+  countdown-seconds: 15
+  cancel-countdown-if-not-enough-players: true
+  join-in-progress: false
+  end-screen-duration-seconds: 8
+
+players:
+  starting-points: 500
+  points-per-kill: 100
+  downed-system:
+    enabled: true
+    bleed-out-seconds: 30
+    revive-duration-seconds: 5
+    revive-health: 8.0
+
+rounds:
+  maximum-round: -1
+  first-round-delay-seconds: 3
+  transition:
+    duration-seconds: 8
+  enemy-count:
+    base: 6
+    per-round: 2
+    player-multiplier: 0.75
+    minimum: 1
+    maximum-per-round: -1
+  zombie-health:
+    base-health: 20.0
+    exponential-multiplier: 1.10
+    maximum-health: -1
+  spawning:
+    maximum-alive:
+      base: 24
+      per-player: 6
+    initial-delay-ticks: 40
+    spawn-delay-ticks: 20
+    minimum-spawn-delay-ticks: 5
+    batch-size: 1
+
 documentation:
   require-context-update: true

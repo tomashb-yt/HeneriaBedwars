@@ -5,7 +5,7 @@ classique de Black Ops 2 et enrichi de mécaniques originales facultatives par m
 
 ## État
 
-Les Tickets 001 à 004 fournissent la fondation, le lobby, les instances isolées, le framework GUI
+Les Tickets 001 à 005 fournissent la fondation, le lobby, les instances isolées, le framework GUI
 et l'éditeur universel. La boucle de manches et les zombies ne sont pas encore implémentés.
 
 ## Prérequis
@@ -24,7 +24,10 @@ et l'éditeur universel. La boucle de manches et les zombies ne sont pas encore 
 .\gradlew.bat qualityGate
 ```
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.5.3-SNAPSHOT.jar`.
+Le Ticket 005 ajoute compte à rebours, manches configurables, zombies standards temporaires,
+points, mise à terre, réanimation, défaite et retour au lobby.
+
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.6.0-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire

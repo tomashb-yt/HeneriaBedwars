@@ -20,6 +20,10 @@ commands:
     description: Creates and edits versioned Zombies maps in game
     usage: /zmap [create|edit|leave|validate|test|save|undo|redo]
     permission: zombie.editor
+  zgame:
+    description: Administers active Zombies games and rounds
+    usage: /zgame [list|info|start|stop|nextround|setround|debug]
+    permission: zombies.admin.game.list
 
 permissions:
   zombie.admin:
@@ -40,6 +44,11 @@ permissions:
       zombie.gui.settings: true
       zombie.gui.diagnostics: true
       zombie.gui.dangerous-actions: true
+      zombies.admin.game.start: true
+      zombies.admin.game.stop: true
+      zombies.admin.game.round: true
+      zombies.admin.game.list: true
+      zombies.admin.game.debug: true
   zombie.command.use:
     description: Allows use of the base /zombie command
     default: true
@@ -81,4 +90,19 @@ permissions:
     default: op
   zombie.gui.dangerous-actions:
     description: Confirms destructive GUI actions
+    default: op
+  zombies.admin.game.start:
+    description: Starts a game in an existing instance
+    default: op
+  zombies.admin.game.stop:
+    description: Stops an active game
+    default: op
+  zombies.admin.game.round:
+    description: Changes the current game round
+    default: op
+  zombies.admin.game.list:
+    description: Lists and inspects active games
+    default: op
+  zombies.admin.game.debug:
+    description: Shows detailed game diagnostics
     default: op

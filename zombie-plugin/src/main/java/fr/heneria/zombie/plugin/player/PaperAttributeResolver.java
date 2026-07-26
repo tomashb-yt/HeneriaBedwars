@@ -10,7 +10,7 @@ import org.bukkit.attribute.Attribute;
  * reference to either renamed field so the same plugin JAR can run on the complete Paper 1.21
  * series.
  */
-final class PaperAttributeResolver {
+public final class PaperAttributeResolver {
 
   private static final Attribute MAX_HEALTH = resolveAttribute("MAX_HEALTH", "GENERIC_MAX_HEALTH");
 
@@ -21,7 +21,7 @@ final class PaperAttributeResolver {
    *
    * @return compatible maximum-health attribute
    */
-  static Attribute maxHealth() {
+  public static Attribute maxHealth() {
     return MAX_HEALTH;
   }
 

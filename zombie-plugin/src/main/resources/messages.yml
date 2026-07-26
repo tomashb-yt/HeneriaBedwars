@@ -54,3 +54,10 @@ context:
   player-left: '<dark_gray>-</dark_gray> <gray><player> a quitté le lobby.</gray>'
   player-disconnected: '<yellow><player> est déconnecté ; sa place est temporairement réservée.</yellow>'
   chat-disabled: '<red>Le chat est désactivé dans ce contexte.</red>'
+
+game:
+  preparing: '<yellow>Partie en préparation</yellow>'
+  round-start: '<gold><bold>Manche <round></bold></gold>'
+  player-downed: '<red>Vous êtes à terre. Un allié peut vous réanimer.</red>'
+  revive-started: '<green>Réanimation en cours, restez accroupi à proximité.</green>'
+  ended: '<dark_red><bold>Partie terminée</bold></dark_red> <gray>• <reason></gray>'

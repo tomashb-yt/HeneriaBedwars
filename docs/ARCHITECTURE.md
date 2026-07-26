@@ -1,6 +1,6 @@
 # Architecture
 
-**Statut :** fondation, instances, GUI et Ã©diteur opÃ©rationnels au Ticket 004.
+**Statut :** fondation, instances, GUI, Ã©diteur et boucle de manches opÃ©rationnels au Ticket 005.
 
 ## Modules
 
@@ -96,6 +96,61 @@ snapshot mÃ©moire puis sÃ©rialise les Ã©critures de la map sur le pool I/O.
 
 ## Extensions futures
 
-Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une prochaine
-Ã©tape reliera les dÃ©finitions Ã©ditoriales validÃ©es au catalogue. Manches, zombies et matchmaking ne
-font pas partie de cette architecture livrÃ©e.
+Le domaine de partie eszç]õ¶‰žËkºwµçthis.coordinator = Objects.requireNonNull(coordinator, "coordinator");
+    this.sessions = Objects.requireNonNull(sessions, "sessions");
+    this.configurations = Objects.requireNonNull(configurations, "configurations");
+    this.audiences = Objects.requireNonNull(audiences, "audiences");
+    this.messages = Objects.requireNonNull(messages, "messages");
+    this.games = Objects.requireNonNull(games, "games");
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onJoin(PlayerJoinEvent event) {
+    event.joinMessage(null);
+    coordinator
+        .connect(event.getPlayer())
+        .thenAccept(
+            context -> {
+              var message =
+                  messages.render("context.player-joined", "player", event.getPlayer().getName());
+              if (context == fr.heneria.zombie.core.session.PlayerContext.INSTANCE) {
+                sessions
+                    .findSession(event.getPlayer().getUniqueId())
+                    .flatMap(session -> session.instanceId())
+                    .ifPresent(
+                        instanceId -> {
+                          games.reconnected(instanceId, event.getPlayer().getUniqueId());
+                          audiences.instance(instanceId).sendMessage(message);
+                        });
+              } else {
+                audiences.lobby().sendMessage(message);
+              }
+            });
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onQuit(PlayerQuitEvent event) {
+    event.quitMessage(null);
+    sessions
+        .findSession(event.getPlayer().getUniqueId())
+        .flatMap(session -> session.instanceId())
+        .ifPresentOrElse(
+            instanceId -> {
+              games.disconnected(instanceId, event.getPlayer().getUniqueId());
+              audiences
+                  .instance(instanceId)
+                  .sendMessage(
+                      messages.render(
+                          "context.player-disconnected", "player", event.getPlayer().getName()));
+            },
+            () ->
+                audiences
+                    .lobby()
+                    .sendMessage(
+                        messages.render(
+                            "context.player-left", "player", event.getPlayer().getName())));
+    coordinator.disconnect(
+        event.getPlayer().getUniqueId(),
+        configurations.current().settings().reconnect().reservePlayerSlot());
+  }
+}
