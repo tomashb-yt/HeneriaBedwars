@@ -36,6 +36,7 @@ public final class EditorGuiModule {
           "editor.doors",
           "editor.spawns",
           "editor.barricades",
+          "editor.weapon-walls",
           "editor.mystery-box",
           "editor.pack-a-punch",
           "editor.perks",
@@ -95,6 +96,7 @@ public final class EditorGuiModule {
     actions.register("editor.doors", context -> open(context.player(), "doors"));
     actions.register("editor.spawns", context -> open(context.player(), "spawns"));
     actions.register("editor.barricades", context -> open(context.player(), "BARRICADE"));
+    actions.register("editor.weapon-walls", context -> open(context.player(), "WEAPON_WALL"));
     actions.register("editor.mystery-box", context -> open(context.player(), "MYSTERY_BOX"));
     actions.register("editor.pack-a-punch", context -> open(context.player(), "PACK_A_PUNCH"));
     actions.register("editor.perks", context -> open(context.player(), "PERK"));
@@ -137,6 +139,7 @@ public final class EditorGuiModule {
             "doors",
             "spawns",
             "barricades",
+            "weapon-walls",
             "mystery-box",
             "pack-a-punch",
             "perks",
@@ -425,6 +428,7 @@ public final class EditorGuiModule {
   private static Material material(MapObjectType type) {
     return switch (type) {
       case BARRICADE -> Material.OAK_TRAPDOOR;
+      case WEAPON_WALL -> Material.CROSSBOW;
       case MYSTERY_BOX -> Material.ENDER_CHEST;
       case PACK_A_PUNCH -> Material.ANVIL;
       case PERK -> Material.POTION;

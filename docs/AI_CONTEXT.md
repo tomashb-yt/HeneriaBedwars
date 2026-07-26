@@ -97,17 +97,19 @@ profil, statistiques et export restent désactivés. Le rendu doit encore être 
 
 ## Reprise
 
-Les Tickets 001 à 006 sont terminés dans le code. Une map validée se teste avec
+Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec
 `/zmap edit <map>`, puis `/zmap test`. `/zgame` diagnostique le cycle de partie et `/zzombie`
 diagnostique les définitions et ennemis actifs.
 
 La boucle comprend les manches FORMULA, plafonds vivants, types pondérés, IA de mêlée, points,
-mise à terre, réanimation, reconnexion, défaite et nettoyage. Armes, économie de map et persistance
-des résultats restent à livrer. Le `GameResultRepository` actif est toujours sans stockage. Les
+mise à terre, réanimation, reconnexion, défaite et nettoyage. Le Ticket 007 ajoute armes,
+munitions, achats muraux, Mystery Box et Pack-a-Punch. Portes, barricades, courant, atouts et
+persistance des résultats restent à livrer. Le `GameResultRepository` actif est toujours sans
+stockage. Les
 scénarios multi-clients et mesures 25/50/100/200 ennemis restent à valider sur un serveur Paper.
 
 Le spawn joueur éditorial est appliqué au lancement, à une arrivée et à une reconnexion. Portes,
-barricades, Pack-a-Punch, atouts et pièges restent configurés et validés sans gameplay actif.
+barricades, atouts et pièges restent configurés et validés sans gameplay actif.
 
 ## Ticket 006
 
@@ -119,6 +121,12 @@ Les types inclus sont `classic_zombie`, `sprinter_zombie`, `armored_zombie` et `
 Le comportement complet est `MELEE`/`GROUND`; `poison_hit` et `explode_on_death` valident le
 registre de capacités. Vol, distance, portes et barricades restent des extensions préparées.
 
-Le prochain ticket recommandé est le système d'armes, munitions, dégâts balistiques, armes murales
-et progression Pack-a-Punch. Il doit réutiliser `ZombieDamageService` et fournir explicitement les
-tirs à la tête. Ne pas créer un second registre d'ennemis, de sessions ou d'instances.
+## Ticket 007
+
+Le moteur data-driven réside dans `core.weapon` et `plugin.weapon`. Cinq armes YAML sont livrées.
+Les joueurs commencent avec `starter_pistol`; clic droit tire, `F` ou la tentative de jet recharge.
+Les objets `WEAPON_WALL`, `MYSTERY_BOX` et `PACK_A_PUNCH` débitent les points et opèrent pendant
+une manche. `/zweapon` et le catalogue GUI fournissent diagnostic, distribution de test et reload.
+Voir `WEAPON_SYSTEM.md`.
+
+Le prochain ticket recommandé est l'économie complète : portes, achats partagés et transactions.

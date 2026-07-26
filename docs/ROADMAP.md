@@ -1,6 +1,6 @@
 # Roadmap
 
-**Statut :** Tickets 001 à 006 terminés dans le code.
+**Statut :** Tickets 001 à 007 terminés dans le code.
 
 ## Étapes
 
@@ -17,11 +17,12 @@
    mort, réanimation et fin contrôlée.
 8. **Moteur d'ennemis :** terminé au Ticket 006 : définitions, IA de mêlée, dégâts, capacités,
    isolation, diagnostic et nettoyage.
-9. **Armes et économie de map :** armes, munitions, dégâts balistiques, armes murales, portes,
-   barricades, boîte, courant, atouts et Pack-a-Punch.
-10. **Contenu avancé :** bonus, spéciaux, boss, pièges et quêtes.
-11. **Fonctions originales :** modules indépendants après stabilisation du socle classique.
-12. **Persistance et exploitation :** profils nécessaires, migrations, métriques et outils admin.
+9. **Moteur d'armes :** terminé au Ticket 007 : munitions, dégâts balistiques, armes murales,
+   Mystery Box, Pack-a-Punch, GUI, événements et définitions data-driven.
+10. **Économie :** points avancés, portes, achats partagés et règles transactionnelles.
+11. **Contenu avancé :** bonus, spéciaux, boss, pièges et quêtes.
+12. **Fonctions originales :** modules indépendants après stabilisation du socle classique.
+13. **Persistance et exploitation :** profils nécessaires, migrations, métriques et outils admin.
 
 Chaque étape devient un ticket borné, compilé, testé, documenté et publié. SQLite ne sera activé
 qu'avec un modèle persistant défini.

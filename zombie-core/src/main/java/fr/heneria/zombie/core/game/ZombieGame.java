@@ -146,6 +146,26 @@ public final class ZombieGame {
     return true;
   }
 
+  public synchronized boolean spendPoints(UUID playerId, int amount) {
+    GamePlayer player = players.get(playerId);
+    return state == GameState.ROUND_ACTIVE
+        && player != null
+        && player.snapshot().state() == GamePlayerState.ALIVE
+        && player.spend(amount);
+  }
+
+  public synchronized boolean weaponHit(
+      UUID playerId, int reward, double appliedDamage, boolean headshot) {
+    GamePlayer player = players.get(playerId);
+    if (state != GameState.ROUND_ACTIVE
+        || player == null
+        || player.snapshot().state() != GamePlayerState.ALIVE) {
+      return false;
+    }
+    player.weaponHit(reward, appliedDamage, headshot);
+    return true;
+  }
+
   public synchronized boolean completeRound() {
     if (state != GameState.ROUND_ACTIVE || !round.complete()) {
       return false;

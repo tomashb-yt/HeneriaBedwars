@@ -28,6 +28,10 @@ commands:
     description: Inspects and administers the HeneriaZombie enemy engine
     usage: /zzombie [list|types|info|spawn|kill|removeall|debug|reload]
     permission: zombies.admin.zombie.list
+  zweapon:
+    description: Inspects and administers the HeneriaZombie weapon engine
+    usage: /zweapon [types|info|give|reload|stats|gui]
+    permission: zombies.admin.weapon.types
 
 permissions:
   zombie.admin:
@@ -61,6 +65,11 @@ permissions:
       zombies.admin.zombie.remove: true
       zombies.admin.zombie.debug: true
       zombies.admin.zombie.reload: true
+      zombies.admin.weapon.types: true
+      zombies.admin.weapon.info: true
+      zombies.admin.weapon.give: true
+      zombies.admin.weapon.reload: true
+      zombies.admin.weapon.stats: true
   zombie.command.use:
     description: Allows use of the base /zombie command
     default: true
@@ -141,4 +150,19 @@ permissions:
     default: op
   zombies.admin.zombie.reload:
     description: Atomically reloads future-spawn zombie definitions
+    default: op
+  zombies.admin.weapon.types:
+    description: Lists configured weapons and opens the weapon GUI
+    default: op
+  zombies.admin.weapon.info:
+    description: Inspects one configured weapon
+    default: op
+  zombies.admin.weapon.give:
+    description: Gives a weapon to a player in an active game
+    default: op
+  zombies.admin.weapon.reload:
+    description: Atomically reloads weapon definitions
+    default: op
+  zombies.admin.weapon.stats:
+    description: Displays current per-weapon statistics
     default: op

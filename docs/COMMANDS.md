@@ -72,3 +72,14 @@ Les GUI ajoutent `zombie.gui.player`, `zombie.gui.admin`, `zombie.gui.maps`,
 
 Chaque action possède une permission `zombies.admin.zombie.<action>`, regroupée sous
 `zombie.admin`.
+
+## Diagnostic des armes
+
+- `/zweapon types` et `/zweapon info <id>` inspectent le catalogue ;
+- `/zweapon give <joueur> <id>` distribue une arme uniquement dans une partie active ;
+- `/zweapon stats [joueur]` affiche munitions, tirs, touches et headshots runtime ;
+- `/zweapon gui` ouvre le catalogue configurable ;
+- `/zweapon reload` active atomiquement les définitions valides.
+
+Chaque action possède une permission `zombies.admin.weapon.<action>`, regroupée sous
+`zombie.admin`.

@@ -1,0 +1,23 @@
+schema-version: 1
+id: starter_pistol
+display-name: "<gray>Pistolet M1911"
+category: PISTOL
+rarity: COMMON
+presentation: {material: IRON_HORSE_ARMOR, custom-model-data: 1001, upgraded-material: GOLDEN_HORSE_ARMOR}
+fire: {mode: SEMI_AUTOMATIC, cooldown-ticks: 5, burst-size: 1, burst-interval-ticks: 1, charge-ticks: 0, pellets: 1, consumes-ammo: true}
+damage: {base: 12.0, minimum-distance: 0.0, maximum-distance: 42.0, minimum-multiplier: 0.55, headshot-multiplier: 2.0, type: BULLET}
+ammo: {magazine-size: 8, starting-reserve: 32, maximum-reserve: 80, infinite: false, overload-capacity: 0}
+reload: {duration-ticks: 36, interruptible: true}
+spread: {standing: 0.35, walking: 0.75, sprinting: 1.8, airborne: 3.0, aiming: 0.12}
+recoil: {vertical: 1.1, horizontal: 0.35, recovery-ticks: 5}
+penetration:
+  maximum-targets: 1
+  damage-retention: 0.7
+  materials: [GLASS, GLASS_PANE, OAK_LEAVES]
+economy: {wall-cost: 500, ammo-cost: 250, mystery-cost: 950}
+mystery-box: {weight: 40}
+sounds: {fire: ENTITY_FIREWORK_ROCKET_BLAST, reload: BLOCK_IRON_TRAPDOOR_CLOSE, empty: BLOCK_DISPENSER_FAIL, switch: ITEM_ARMOR_EQUIP_IRON}
+effects: []
+upgrades:
+  - {level: 1, display-name: "<gold>Mustang", cost: 5000, damage-multiplier: 2.0, magazine-bonus: 4, custom-model-data: 1101, effects: [FIRE]}
+  - {level: 2, display-name: "<light_purple>Mustang II", cost: 10000, damage-multiplier: 3.0, magazine-bonus: 8, custom-model-data: 1201, effects: [FIRE, EXPLOSIVE]}

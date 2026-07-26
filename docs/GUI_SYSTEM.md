@@ -114,3 +114,10 @@ exception d'action est journalisée et signalée au joueur sans casser le moteur
 Avec deux clients Paper, tester isolation, retour/accueil, recherche, longues listes, permissions,
 clics gauche/droit/Maj, touches numériques, double clic, collecte au curseur, glisser-déposer,
 reload invalide puis valide et disparition d'une instance avant confirmation.
+
+## Catalogue des armes
+
+`weapon-browser` pagine toutes les définitions actives et affiche catégorie, rareté, dégâts et
+chargeur. Un clic ouvre `weapon-detail`; un Maj-clic administrateur distribue l'arme uniquement si
+le joueur est dans une partie. Le bouton du menu administrateur et tous les slots restent
+configurables dans `guis.yml`.

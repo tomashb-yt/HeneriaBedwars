@@ -5,8 +5,8 @@ classique de Black Ops 2 et enrichi de mécaniques originales facultatives par m
 
 ## État
 
-Les Tickets 001 à 006 fournissent la fondation, le lobby, les instances isolées, le framework GUI,
-l'éditeur universel, les manches et le moteur d'ennemis configurable.
+Les Tickets 001 à 007 fournissent la fondation, le lobby, les instances isolées, le framework GUI,
+l'éditeur universel, les manches, le moteur d'ennemis et le moteur d'armes configurable.
 
 ## Prérequis
 
@@ -28,7 +28,10 @@ Le Ticket 006 remplace les zombies temporaires par quatre types YAML, une fabriq
 sélection pondérée, une IA de mêlée isolée, les dégâts centralisés, le secours anti-blocage et
 deux capacités. Les commandes de diagnostic sont regroupées sous `/zzombie`.
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.7.0-SNAPSHOT.jar`.
+Le Ticket 007 ajoute cinq armes YAML, munitions, rechargement, dégâts balistiques, achats muraux,
+Mystery Box, Pack-a-Punch et `/zweapon`.
+
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.8.0-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire

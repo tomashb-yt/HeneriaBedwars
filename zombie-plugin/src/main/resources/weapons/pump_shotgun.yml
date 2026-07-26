@@ -1,0 +1,20 @@
+schema-version: 1
+id: pump_shotgun
+display-name: "<yellow>Fusil à pompe"
+category: SHOTGUN
+rarity: RARE
+presentation: {material: NETHERITE_HOE, custom-model-data: 4001, upgraded-material: NETHERITE_HOE}
+fire: {mode: SEMI_AUTOMATIC, cooldown-ticks: 18, burst-size: 1, burst-interval-ticks: 1, charge-ticks: 0, pellets: 8, consumes-ammo: true}
+damage: {base: 8.0, minimum-distance: 0.0, maximum-distance: 26.0, minimum-multiplier: 0.25, headshot-multiplier: 1.5, type: BULLET}
+ammo: {magazine-size: 6, starting-reserve: 36, maximum-reserve: 72, infinite: false, overload-capacity: 0}
+reload: {duration-ticks: 52, interruptible: true}
+spread: {standing: 3.0, walking: 4.0, sprinting: 6.0, airborne: 8.0, aiming: 1.5}
+recoil: {vertical: 3.2, horizontal: 1.0, recovery-ticks: 12}
+penetration: {maximum-targets: 2, damage-retention: 0.55, materials: [GLASS, GLASS_PANE, OAK_LEAVES]}
+economy: {wall-cost: 1200, ammo-cost: 600, mystery-cost: 950}
+mystery-box: {weight: 85}
+sounds: {fire: ENTITY_GENERIC_EXPLODE, reload: BLOCK_IRON_TRAPDOOR_CLOSE, empty: BLOCK_DISPENSER_FAIL, switch: ITEM_ARMOR_EQUIP_IRON}
+effects: []
+upgrades:
+  - {level: 1, display-name: "<gold>Gut Shot", cost: 5000, damage-multiplier: 2.0, magazine-bonus: 4, custom-model-data: 4101, effects: [KNOCKBACK]}
+  - {level: 2, display-name: "<light_purple>Gut Shot II", cost: 10000, damage-multiplier: 3.0, magazine-bonus: 8, custom-model-data: 4201, effects: [KNOCKBACK, FIRE]}

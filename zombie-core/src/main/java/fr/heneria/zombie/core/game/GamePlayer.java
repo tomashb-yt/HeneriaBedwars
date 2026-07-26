@@ -64,6 +64,28 @@ public final class GamePlayer {
     points = Math.addExact(points, reward);
   }
 
+  public boolean spend(int amount) {
+    if (amount < 0) {
+      throw new IllegalArgumentException("amount cannot be negative");
+    }
+    if (points < amount) {
+      return false;
+    }
+    points -= amount;
+    return true;
+  }
+
+  public void weaponHit(int reward, double appliedDamage, boolean headshot) {
+    if (reward < 0 || appliedDamage < 0 || !Double.isFinite(appliedDamage)) {
+      throw new IllegalArgumentException("Invalid weapon hit");
+    }
+    points = Math.addExact(points, reward);
+    damage = Math.addExact(damage, Math.round(appliedDamage));
+    if (headshot) {
+      headshots++;
+    }
+  }
+
   public void downed() {
     downs++;
     state(GamePlayerState.DOWNED);

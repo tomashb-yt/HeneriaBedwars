@@ -178,6 +178,7 @@ public final class EditorPlacementListener implements Listener {
   private static Map<String, String> defaults(fr.heneria.zombie.core.editor.MapObjectType type) {
     return switch (type) {
       case BARRICADE -> Map.of("kind", "WINDOW", "hp", "100", "boards", "6");
+      case WEAPON_WALL -> Map.of("weapon-id", "starter_pistol", "cost", "500", "ammo-cost", "250");
       case MYSTERY_BOX -> Map.of("cost", "950", "rotation", "0");
       case PACK_A_PUNCH -> Map.of("cost", "5000", "levels", "3");
       case PERK -> Map.of("perk-id", "unassigned", "cost", "2000");

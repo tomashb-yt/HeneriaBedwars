@@ -25,3 +25,9 @@ refusent explicitement `cancel()`. `ZombieEventDispatcher` est synchrone, isole 
 d'abonnés et retourne le résultat d'annulation. Il doit être appelé sur le thread propriétaire du
 moteur. Aucune traduction Bukkit publique n'est livrée dans ce ticket afin d'éviter un volume
 d'événements public prématuré.
+
+`WeaponEvent` ajoute `PRE_FIRE`, `FIRED`, `PRE_RELOAD`, `RELOAD_STARTED`, `RELOAD_COMPLETED`,
+`PRE_UPGRADE`, `UPGRADED`, `PURCHASED` et `DAMAGE`. Les événements `PRE_*` sont annulables.
+`WeaponEventDispatcher` isole les erreurs d'abonnés et reste synchrone sur le thread propriétaire
+du gameplay. Il est accessible depuis le service d'armes injecté, sans dépendance Bukkit dans le
+modèle d'événement.

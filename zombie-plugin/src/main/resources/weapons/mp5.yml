@@ -1,0 +1,20 @@
+schema-version: 1
+id: mp5
+display-name: "<aqua>MP5"
+category: SMG
+rarity: UNCOMMON
+presentation: {material: IRON_HORSE_ARMOR, custom-model-data: 3001, upgraded-material: GOLDEN_HORSE_ARMOR}
+fire: {mode: BURST, cooldown-ticks: 7, burst-size: 3, burst-interval-ticks: 2, charge-ticks: 0, pellets: 1, consumes-ammo: true}
+damage: {base: 16.0, minimum-distance: 0.0, maximum-distance: 38.0, minimum-multiplier: 0.45, headshot-multiplier: 1.75, type: BULLET}
+ammo: {magazine-size: 30, starting-reserve: 150, maximum-reserve: 300, infinite: false, overload-capacity: 0}
+reload: {duration-ticks: 38, interruptible: true}
+spread: {standing: 0.45, walking: 0.85, sprinting: 1.7, airborne: 3.2, aiming: 0.15}
+recoil: {vertical: 0.8, horizontal: 0.4, recovery-ticks: 4}
+penetration: {maximum-targets: 2, damage-retention: 0.68, materials: [GLASS, GLASS_PANE, OAK_LEAVES]}
+economy: {wall-cost: 1000, ammo-cost: 500, mystery-cost: 950}
+mystery-box: {weight: 120}
+sounds: {fire: ENTITY_FIREWORK_ROCKET_BLAST, reload: BLOCK_IRON_TRAPDOOR_CLOSE, empty: BLOCK_DISPENSER_FAIL, switch: ITEM_ARMOR_EQUIP_IRON}
+effects: []
+upgrades:
+  - {level: 1, display-name: "<gold>MP115 Kollider", cost: 5000, damage-multiplier: 1.9, magazine-bonus: 15, custom-model-data: 3101, effects: [ICE]}
+  - {level: 2, display-name: "<light_purple>MP115 Kollider II", cost: 10000, damage-multiplier: 2.7, magazine-bonus: 30, custom-model-data: 3201, effects: [ICE, ELECTRIC]}

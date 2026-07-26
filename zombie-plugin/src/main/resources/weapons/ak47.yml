@@ -1,0 +1,23 @@
+schema-version: 1
+id: ak47
+display-name: "<gold>AK-47"
+category: ASSAULT_RIFLE
+rarity: RARE
+presentation: {material: DIAMOND_HORSE_ARMOR, custom-model-data: 2001, upgraded-material: DIAMOND_HORSE_ARMOR}
+fire: {mode: AUTOMATIC, cooldown-ticks: 2, burst-size: 1, burst-interval-ticks: 1, charge-ticks: 0, pellets: 1, consumes-ammo: true}
+damage: {base: 24.0, minimum-distance: 0.0, maximum-distance: 58.0, minimum-multiplier: 0.62, headshot-multiplier: 1.8, type: BULLET}
+ammo: {magazine-size: 30, starting-reserve: 120, maximum-reserve: 240, infinite: false, overload-capacity: 0}
+reload: {duration-ticks: 48, interruptible: true}
+spread: {standing: 0.55, walking: 1.0, sprinting: 2.2, airborne: 3.8, aiming: 0.2}
+recoil: {vertical: 1.5, horizontal: 0.65, recovery-ticks: 7}
+penetration:
+  maximum-targets: 3
+  damage-retention: 0.72
+  materials: [GLASS, GLASS_PANE, OAK_LEAVES, WHITE_WOOL]
+economy: {wall-cost: 1500, ammo-cost: 750, mystery-cost: 950}
+mystery-box: {weight: 100}
+sounds: {fire: ENTITY_GENERIC_EXPLODE, reload: BLOCK_IRON_TRAPDOOR_CLOSE, empty: BLOCK_DISPENSER_FAIL, switch: ITEM_ARMOR_EQUIP_IRON}
+effects: []
+upgrades:
+  - {level: 1, display-name: "<gold>Red Army", cost: 5000, damage-multiplier: 1.8, magazine-bonus: 15, custom-model-data: 2101, effects: [FIRE]}
+  - {level: 2, display-name: "<light_purple>Red Army II", cost: 10000, damage-multiplier: 2.6, magazine-bonus: 30, custom-model-data: 2201, effects: [FIRE, ELECTRIC]}

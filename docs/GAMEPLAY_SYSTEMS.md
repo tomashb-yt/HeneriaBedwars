@@ -1,6 +1,6 @@
 # Systèmes de gameplay
 
-**Statut :** boucle classique minimale livrée au Ticket 005 ; contenu avancé planifié.
+**Statut :** boucle, ennemis et moteur d'armes classique opérationnels.
 
 ## Objectif et périmètre
 
@@ -26,5 +26,6 @@ transitions, défaite et retour lobby sont actifs. Le Ticket 006 ajoute les type
 manche, le ciblage isolé, l'attaque de mêlée, résistances, tirs à la tête explicites, mort
 idempotente et secours anti-blocage.
 
-L'économie des portes, barricades, armes, boîte, courant, atouts et Pack-a-Punch n'est pas encore
-active. Le moteur expose les contrats nécessaires sans simuler ces systèmes.
+Les armes de départ, armes murales, munitions, Mystery Box et Pack-a-Punch sont actifs depuis le
+Ticket 007. Les coûts débitent les points de la partie et les dégâts passent par le moteur
+d'ennemis. Portes, barricades, courant et atouts restent réservés aux tickets suivants.

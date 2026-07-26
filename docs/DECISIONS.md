@@ -137,3 +137,15 @@ n'est utilisé.
 
 `ZombieInstance.claimDeath` garantit une attribution unique. `ZombieTracker` maintient les index
 interne, Bukkit et partie ; aucun scan global de mondes ne participe au tick.
+
+## ADR-028 — Snapshot et tick groupé par arme
+
+Chaque `WeaponInstance` capture sa définition au moment de la distribution. Un reload affecte
+uniquement les futures armes. Cadence, rafales, charges et rechargements utilisent le tick groupé
+de la partie, sans tâche par joueur ou par item.
+
+## ADR-029 — Mort exclusivement détenue par le moteur d'ennemis
+
+Le moteur d'armes calcule un dégât et le transmet à `PaperZombieEngine.damageFromWeapon`. Seuls
+`ZombieDamageService` et la procédure idempotente de retrait attribuent mort et récompense. Une
+arme ne supprime jamais directement une entité.

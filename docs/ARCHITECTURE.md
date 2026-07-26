@@ -1,6 +1,6 @@
 # Architecture
 
-**Statut :** fondation, instances, GUI, éditeur et boucle de manches opérationnels au Ticket 005.
+**Statut :** fondation, instances, GUI, éditeur, manches, ennemis et armes opérationnels.
 
 ## Modules
 
@@ -93,6 +93,18 @@ Le core possède définition immuable, registre, sessions, historique et validat
 `MapPersistence` est son port asynchrone. Le plugin adapte ce port en YAML, traduit les clics Paper
 en `MapPoint` et compose les écrans avec le framework GUI. Une mutation remplace d'abord le
 snapshot mémoire puis sérialise les écritures de la map sur le pool I/O.
+
+## Moteur d'armes
+
+`WeaponRegistry`, `WeaponDefinition`, `WeaponInstance`, `WeaponService`,
+`WeaponDamageCalculator`, `WeaponSpreadCalculator`, `MysteryBoxSelector` et
+`WeaponEventDispatcher` résident dans le core. `PaperWeaponService` est la seule frontière pour
+les items, raycasts et effets Paper. `WeaponDefinitionLoader` remplace atomiquement un registre
+chargé hors thread serveur.
+
+`PaperGameRuntime` fournit uniquement les ports de contexte de partie, map et points. Son tick
+groupé termine les rechargements, rafales et tirs chargés. La mort reste la responsabilité
+exclusive de `PaperZombieEngine` et `ZombieDamageService`. Voir `WEAPON_SYSTEM.md`.
 
 ## Moteur d'ennemis
 

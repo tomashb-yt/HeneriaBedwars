@@ -142,3 +142,13 @@ identifiant, type Bukkit vivant, attributs finis, manches, poids et multiplicate
 
 `/zzombie reload` analyse hors thread puis remplace le registre en une opération. Les nouvelles
 valeurs concernent uniquement les apparitions futures. Voir `ZOMBIE_DEFINITIONS.md`.
+
+## Définitions d'armes
+
+`plugins/HeneriaZombie/weapons/*.yml` contient les armes de schéma 1. Chaque fichier configure
+présentation, catégorie, rareté, mode de tir, cadence, dégâts et distance, munitions, rechargement,
+dispersion, recul, pénétration, prix, poids Mystery Box, sons, effets et niveaux Pack-a-Punch.
+
+Les cinq exemples embarqués sont installés sans écraser les fichiers existants. `/zweapon reload`
+charge et valide hors thread serveur, puis active le registre en une opération. Un candidat
+invalide conserve le snapshot précédent ; les armes runtime existantes ne changent pas.

@@ -1,0 +1,50 @@
+# Système d'armes
+
+**Statut :** moteur classique livré au Ticket 007.
+
+## Architecture
+
+`core.weapon` contient les définitions immuables, le registre, les instances runtime, les calculs
+de dégâts et de dispersion, la sélection pondérée de la Mystery Box et les événements internes.
+Il ne dépend pas de Paper. `plugin.weapon` charge les YAML hors thread serveur et adapte les items,
+le hitscan, les interactions de map, les sons, les commandes et les GUI.
+
+Une arme ne retire jamais directement un zombie. Le chemin obligatoire est :
+
+```text
+PaperWeaponService
+  -> WeaponDamageCalculator
+  -> PaperZombieEngine.damageFromWeapon
+  -> ZombieDamageService
+  -> retrait/mort idempotente et récompense
+```
+
+## Exécution
+
+Chaque instance d'arme possède son chargeur, sa réserve, sa cadence, son rechargement, son niveau
+Pack-a-Punch et ses statistiques. Les rafales, charges et rechargements sont traités dans le tick
+groupé de `PaperGameRuntime`; aucune tâche Paper n'est créée par arme ou joueur. Les index par UUID,
+joueur et partie permettent un nettoyage complet à la fin de l'instance.
+
+Les modes `SEMI_AUTOMATIC`, `AUTOMATIC`, `BURST`, `CHARGE` et `MELEE` partagent le même pipeline.
+Le hitscan tient compte des blocs, matériaux pénétrables, cibles successives, distance, dispersion,
+recul, multiplicateur de headshot et améliorations.
+
+## Stations de map
+
+- `WEAPON_WALL` achète l'arme définie par `weapon-id`, puis ses munitions si elle est déjà possédée ;
+- `MYSTERY_BOX` sélectionne une définition pondérée, avec blacklist et contrôle des Wonder Weapons ;
+- `PACK_A_PUNCH` applique le prochain niveau déclaré par l'arme et son coût.
+
+L'éditeur place une arme murale initiale `starter_pistol`. Les propriétés persistées sont
+`weapon-id`, `cost` et `ammo-cost`. Les Mystery Box et Pack-a-Punch existants deviennent
+interactifs pendant une manche active.
+
+## Contenu livré
+
+Les exemples `starter_pistol`, `ak47`, `mp5`, `pump_shotgun` et `raygun` couvrent pistolet,
+fusil d'assaut, SMG, fusil à pompe et Wonder Weapon. Ajouter une arme ne nécessite aucun code :
+copier un YAML valide dans `plugins/HeneriaZombie/weapons`, puis exécuter `/zweapon reload`.
+
+Les armes déjà distribuées conservent leur snapshot après reload. Les nouvelles distributions
+utilisent le registre validé le plus récent.

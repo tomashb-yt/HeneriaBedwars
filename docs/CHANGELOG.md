@@ -2,6 +2,22 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.8.0-SNAPSHOT — Ticket 007
+
+### Ajouté
+
+- moteur d'armes data-driven, munitions, cadence, rechargement, dispersion, recul et pénétration ;
+- dégâts balistiques reliés au moteur de zombies sans suppression directe d'entité ;
+- armes murales, Mystery Box pondérée et Pack-a-Punch multi-niveaux ;
+- cinq définitions YAML installées et recharge atomique asynchrone ;
+- items PDC, statistiques par arme, sons, modèles, commande `/zweapon` et GUI de catalogue ;
+- événements internes annulables, placement d'armes murales et tests du domaine.
+
+### Modifié
+
+- les joueurs reçoivent `starter_pistol` au lancement et après une arrivée en partie ;
+- version portée à `0.8.0-SNAPSHOT`.
+
 ## 0.7.0-SNAPSHOT — Ticket 006
 
 ### Ajouté

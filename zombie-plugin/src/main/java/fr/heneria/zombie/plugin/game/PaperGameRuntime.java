@@ -19,6 +19,7 @@ import fr.heneria.zombie.plugin.enemy.PaperZombieEngine;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.message.MessageService;
 import fr.heneria.zombie.plugin.player.PaperAttributeResolver;
+import fr.heneria.zombie.plugin.weapon.PaperWeaponService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -43,6 +44,7 @@ public final class PaperGameRuntime {
   private final InstanceCoordinator coordinator;
   private final ContextScoreboardService scoreboards;
   private final PaperZombieEngine spawner;
+  private final PaperWeaponService weapons;
   private final GameResultRepository results;
   private final RoundDifficultyCalculator difficulty = new RoundDifficultyCalculator();
   private final Logger logger;
@@ -58,6 +60,7 @@ public final class PaperGameRuntime {
       InstanceCoordinator coordinator,
       ContextScoreboardService scoreboards,
       PaperZombieEngine spawner,
+      PaperWeaponService weapons,
       GameResultRepository results,
       MessageService messages,
       Logger logger) {
@@ -67,6 +70,7 @@ public final class PaperGameRuntime {
     this.coordinator = coordinator;
     this.scoreboards = scoreboards;
     this.spawner = spawner;
+    this.weapons = weapons;
     this.results = results;
     this.messages = messages;
     this.logger = logger;
@@ -95,14 +99,18 @@ public final class PaperGameRuntime {
             map,
             instance.worldName().orElseThrow(),
             tick + game.configuration().countdownSeconds() * 20L);
+    runtimes.put(instanceId, runtime);
     for (UUID playerId : instance.players()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player != null && !teleportToPlayerSpawn(runtime, player)) {
+        runtimes.remove(instanceId);
         games.remove(instanceId);
         throw new IllegalStateException("Téléportation impossible vers le spawn joueur configuré");
       }
+      if (player != null) {
+        weapons.equipStarter(instanceId, player, tick);
+      }
     }
-    runtimes.put(instanceId, runtime);
     announce(instance.players(), "game.preparing");
     return true;
   }
@@ -116,6 +124,9 @@ public final class PaperGameRuntime {
     if (player != null && !teleportToPlayerSpawn(runtime, player)) {
       runtime.game.leave(playerId);
       logger.warning("Could not teleport joining player " + playerId + " to configured spawn");
+    }
+    if (player != null) {
+      weapons.equipStarter(instanceId, player, tick);
     }
   }
 
@@ -160,11 +171,15 @@ public final class PaperGameRuntime {
     if (player != null && !teleportToPlayerSpawn(runtime, player)) {
       logger.warning("Could not teleport reconnecting player " + playerId + " to configured spawn");
     }
+    if (player != null) {
+      weapons.synchronizeInventory(player);
+    }
   }
 
   public void tick() {
     tick++;
     spawner.tick(tick);
+    weapons.tick(tick);
     for (RuntimeState runtime : new ArrayList<>(runtimes.values())) {
       try {
         drive(runtime);
@@ -212,6 +227,24 @@ public final class PaperGameRuntime {
 
   public Optional<UUID> gameFor(UUID playerId) {
     return gameIdFor(playerId);
+  }
+
+  public Optional<MapDefinition> mapFor(UUID gameId) {
+    RuntimeState runtime = runtimes.get(gameId);
+    return runtime == null ? Optional.empty() : Optional.of(runtime.map);
+  }
+
+  public boolean spendPoints(UUID gameId, UUID playerId, int amount) {
+    RuntimeState runtime = runtimes.get(gameId);
+    return runtime != null && runtime.game.spendPoints(playerId, amount);
+  }
+
+  public void weaponHit(
+      UUID gameId, UUID playerId, int reward, double appliedDamage, boolean headshot) {
+    RuntimeState runtime = runtimes.get(gameId);
+    if (runtime != null) {
+      runtime.game.weaponHit(playerId, reward, appliedDamage, headshot);
+    }
   }
 
   public boolean isTargetable(UUID gameId, UUID playerId) {
@@ -299,6 +332,7 @@ public final class PaperGameRuntime {
     runtime.revives.clear();
     announce(runtime.game.snapshot().players().keySet(), "game.ended", "reason", reason.name());
     spawner.removeAll(gameId, fr.heneria.zombie.core.enemy.ZombieRemovalReason.GAME_ENDED);
+    weapons.removeGame(gameId);
     runtime.entities.clear();
   }
 

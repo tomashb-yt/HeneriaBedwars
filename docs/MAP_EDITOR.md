@@ -67,5 +67,7 @@ L'outil ne peut ni être jeté, ni déplacé dans un inventaire, ni utilisé san
 
 Le moteur utilise le spawn joueur éditorial et les `ZombieSpawn` validés. Pour chaque spawn, zone,
 poids, capacité, manches, distances, types autorisés et cooldown alimentent la sélection runtime.
-Portes et barricades restent des données d'édition jusqu'à leur ticket gameplay ; le moteur
+Les objets `WEAPON_WALL`, `MYSTERY_BOX` et `PACK_A_PUNCH` sont consommés par le moteur d'armes.
+Une arme murale placée en jeu reçoit `starter_pistol`, un coût d'achat et un coût de munitions par
+défaut. Portes et barricades restent des données d'édition jusqu'à leur ticket gameplay ; le moteur
 d'ennemis ne les modifie pas directement.

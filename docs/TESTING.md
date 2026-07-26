@@ -7,6 +7,12 @@ multi-clients à réaliser sur un serveur dédié.
 
 `.\gradlew.bat test` couvre :
 
+- validation et doublons de définitions d'armes ;
+- cadence, munitions, rechargement et interruption sans ordonnanceur ;
+- dégâts par distance, headshot, pénétration et Pack-a-Punch ;
+- sélection Mystery Box, blacklist, Wonder Weapons et isolation/nettoyage par partie ;
+- parsing YAML valide et refus des matériaux, modes ou dégâts invalides ;
+
 - calculs bornés de population, santé, plafond vivant et délai ;
 - réservations et comptage idempotent d'une manche ;
 - transitions, isolation de deux parties, mise à terre, réanimation et défaite ;
@@ -104,6 +110,21 @@ Elle n'a pas été exécutée ici faute de serveur et clients Minecraft disponib
 Ces scénarios avec clients Minecraft n'ont pas été exécutés dans cet environnement. Les tests
 automatiques couvrent validation, doublons, attributs, sélection, isolation des cibles, dégâts,
 headshots, mort idempotente, cooldowns, blocage et nettoyage des index.
+
+## Ticket 007 — validation manuelle
+
+1. Démarrer Paper et vérifier `plugins/HeneriaZombie/weapons` et les cinq YAML.
+2. Lancer `/zmap test` et vérifier le pistolet de départ, son lore et l'absence de duplication.
+3. Tirer au corps puis à la tête, recharger avec `F` et une tentative de jet, puis vérifier les
+   statistiques avec `/zweapon stats`.
+4. Placer une arme murale, une Mystery Box et un Pack-a-Punch dans l'éditeur, sauvegarder, relancer
+   le test puis vérifier achats, munitions et améliorations.
+5. Tester fusil à pompe, rafale, arme automatique et Ray Gun, ainsi que pénétration et distance.
+6. Ouvrir `/zweapon gui`, inspecter toutes les armes et tester la distribution administrateur.
+7. Modifier un YAML, tester un reload valide puis invalide et vérifier la conservation du registre.
+8. Lancer deux parties, puis les arrêter et vérifier l'absence d'items, instances et tirs différés.
+
+Ces interactions nécessitent un client Minecraft et n'ont pas été exécutées dans cet environnement.
 
 ## Charge à mesurer
 

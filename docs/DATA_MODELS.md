@@ -88,3 +88,10 @@ navigation, des dégâts, règles d'apparition, récompenses, capacités et appa
 `ZombieInstance` relie UUID interne, UUID Bukkit, partie, manche, spawn, snapshot de définition,
 attributs calculés, état, santé, cible, cooldowns et cause de retrait. `ZombieTracker` indexe ces
 instances sans exposer de collection mutable.
+
+## Arme
+
+`WeaponDefinition` est le snapshot immuable d'un type chargé depuis YAML. `WeaponInstance` relie
+UUID runtime, partie, propriétaire, snapshot de définition, chargeur, réserve, cooldown,
+rechargement, niveau Pack-a-Punch et statistiques. `WeaponService` indexe les instances par UUID,
+joueur et partie, puis supprime tous les index lors du nettoyage d'une partie.

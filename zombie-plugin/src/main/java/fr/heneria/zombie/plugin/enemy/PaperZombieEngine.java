@@ -189,18 +189,33 @@ public final class PaperZombieEngine implements ZombieSpawner {
 
   public boolean damage(
       UUID entityId, UUID attackerId, ZombieDamageType type, double baseDamage, boolean headshot) {
+    return damageFromWeapon(entityId, attackerId, type, baseDamage, headshot, null).handled();
+  }
+
+  public WeaponDamageResult damageFromWeapon(
+      UUID entityId,
+      UUID attackerId,
+      ZombieDamageType type,
+      double baseDamage,
+      boolean headshot,
+      String weaponId) {
     ZombieInstance zombie = tracker.findByEntity(entityId).orElse(null);
     if (zombie == null) {
-      return false;
+      return new WeaponDamageResult(false, 0, false, 0);
     }
     if (attackerId != null && !Boolean.TRUE.equals(targetable.apply(zombie.gameId(), attackerId))) {
-      return true;
+      return new WeaponDamageResult(true, 0, false, 0);
     }
     ZombieDamageService.Result result =
         damageService.damage(
             zombie,
             new ZombieDamageService.Request(
-                attackerId, type, baseDamage, headshot, Optional.empty(), Optional.empty()));
+                attackerId,
+                type,
+                baseDamage,
+                headshot,
+                Optional.ofNullable(weaponId),
+                Optional.empty()));
     Entity entity = Bukkit.getEntity(entityId);
     if (entity instanceof LivingEntity living && result.appliedDamage() > 0) {
       living.setHealth(Math.max(0.01, Math.min(living.getHealth(), result.remainingHealth())));
@@ -219,7 +234,11 @@ public final class PaperZombieEngine implements ZombieSpawner {
               : zombie.definition().rewards().pointsOnKill();
       remove(zombie, reason, attackerId, true, reward);
     }
-    return true;
+    return new WeaponDamageResult(
+        true,
+        result.appliedDamage(),
+        result.lethal(),
+        result.appliedDamage() > 0 ? zombie.definition().rewards().pointsOnHit() : 0);
   }
 
   public void tick(long tick) {
@@ -500,4 +519,7 @@ public final class PaperZombieEngine implements ZombieSpawner {
     void removed(
         ZombieInstance zombie, ZombieRemovalReason reason, UUID killerId, int pointsReward);
   }
+
+  public record WeaponDamageResult(
+      boolean handled, double appliedDamage, boolean lethal, int hitPointsReward) {}
 }

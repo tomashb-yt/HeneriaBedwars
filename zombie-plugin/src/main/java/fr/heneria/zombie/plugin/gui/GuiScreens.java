@@ -31,6 +31,7 @@ public final class GuiScreens {
           "nav.maps",
           "nav.instances",
           "nav.diagnostics",
+          "nav.weapons",
           "nav.back",
           "nav.home",
           "page.previous",

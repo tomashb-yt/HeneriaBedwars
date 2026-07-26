@@ -1,0 +1,20 @@
+schema-version: 1
+id: raygun
+display-name: "<green>Ray Gun"
+category: WONDER_WEAPON
+rarity: WONDER
+presentation: {material: BLAZE_ROD, custom-model-data: 9001, upgraded-material: BREEZE_ROD}
+fire: {mode: CHARGE, cooldown-ticks: 12, burst-size: 1, burst-interval-ticks: 1, charge-ticks: 8, pellets: 1, consumes-ammo: true}
+damage: {base: 85.0, minimum-distance: 0.0, maximum-distance: 52.0, minimum-multiplier: 0.8, headshot-multiplier: 1.25, type: ELECTRIC}
+ammo: {magazine-size: 20, starting-reserve: 80, maximum-reserve: 160, infinite: false, overload-capacity: 0}
+reload: {duration-ticks: 60, interruptible: false}
+spread: {standing: 0.1, walking: 0.2, sprinting: 0.6, airborne: 1.0, aiming: 0.05}
+recoil: {vertical: 0.4, horizontal: 0.1, recovery-ticks: 3}
+penetration: {maximum-targets: 5, damage-retention: 0.82, materials: [GLASS, GLASS_PANE, OAK_LEAVES, WHITE_WOOL]}
+economy: {wall-cost: 10000, ammo-cost: 5000, mystery-cost: 950}
+mystery-box: {weight: 8}
+sounds: {fire: ENTITY_BREEZE_SHOOT, reload: BLOCK_BEACON_ACTIVATE, empty: BLOCK_DISPENSER_FAIL, switch: BLOCK_RESPAWN_ANCHOR_CHARGE}
+effects: [ELECTRIC, EXPLOSIVE]
+upgrades:
+  - {level: 1, display-name: "<gold>Porter's X2", cost: 5000, damage-multiplier: 2.2, magazine-bonus: 10, custom-model-data: 9101, effects: [ELECTRIC, EXPLOSIVE]}
+  - {level: 2, display-name: "<light_purple>Porter's X3", cost: 10000, damage-multiplier: 3.4, magazine-bonus: 20, custom-model-data: 9201, effects: [ELECTRIC, EXPLOSIVE, FIRE]}

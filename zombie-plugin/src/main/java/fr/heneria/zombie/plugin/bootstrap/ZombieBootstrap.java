@@ -52,6 +52,11 @@ import fr.heneria.zombie.plugin.map.MapPreviewService;
 import fr.heneria.zombie.plugin.map.MapTemplateCatalog;
 import fr.heneria.zombie.plugin.message.MessageService;
 import fr.heneria.zombie.plugin.player.PaperPlayerStateService;
+import fr.heneria.zombie.plugin.weapon.PaperWeaponService;
+import fr.heneria.zombie.plugin.weapon.WeaponDefinitionLoader;
+import fr.heneria.zombie.plugin.weapon.WeaponGuiModule;
+import fr.heneria.zombie.plugin.weapon.WeaponListener;
+import fr.heneria.zombie.plugin.weapon.ZWeaponCommand;
 import fr.heneria.zombie.plugin.world.PaperMainThreadExecutor;
 import fr.heneria.zombie.plugin.world.PaperWorldInstanceService;
 import java.time.Clock;
@@ -271,19 +276,6 @@ public final class ZombieBootstrap {
             mainThread,
             Clock.systemUTC())
         .register();
-    guiConfigurations
-        .initializeAsync()
-        .whenComplete(
-            (ignored, failure) -> {
-              if (failure != null) {
-                plugin
-                    .getLogger()
-                    .severe(
-                        "guis.yml rejected; bundled defaults remain active: "
-                            + failure.getMessage());
-              }
-            });
-
     ZombieGameService gameService =
         new ZombieGameService(
             Clock.systemUTC(),
@@ -341,6 +333,56 @@ public final class ZombieBootstrap {
                 runtime.zombieRemoved(zombie.entityId(), killerId, reward);
               }
             });
+    WeaponDefinitionLoader weaponDefinitions = new WeaponDefinitionLoader(plugin, ioExecutor);
+    weaponDefinitions
+        .initializeAsync()
+        .whenComplete(
+            (loaded, failure) -> {
+              if (failure == null) {
+                plugin
+                    .getLogger()
+                    .info(
+                        "Loaded "
+                            + loaded.size()
+                            + " weapon definition(s) from "
+                            + weaponDefinitions.directory());
+              } else {
+                plugin
+                    .getLogger()
+                    .severe(
+                        "External weapon definitions rejected; last valid snapshot remains active: "
+                            + failure.getMessage());
+              }
+            });
+    PaperWeaponService weaponService =
+        new PaperWeaponService(
+            plugin,
+            weaponDefinitions,
+            zombieEngine,
+            playerId -> {
+              PaperGameRuntime runtime = gameReference.get();
+              return runtime == null ? java.util.Optional.empty() : runtime.gameFor(playerId);
+            },
+            gameId -> {
+              PaperGameRuntime runtime = gameReference.get();
+              return runtime == null ? java.util.Optional.empty() : runtime.mapFor(gameId);
+            },
+            new PaperWeaponService.PointGateway() {
+              @Override
+              public boolean spend(UUID gameId, UUID playerId, int amount) {
+                PaperGameRuntime runtime = gameReference.get();
+                return runtime != null && runtime.spendPoints(gameId, playerId, amount);
+              }
+
+              @Override
+              public void weaponHit(
+                  UUID gameId, UUID playerId, int reward, double appliedDamage, boolean headshot) {
+                PaperGameRuntime runtime = gameReference.get();
+                if (runtime != null) {
+                  runtime.weaponHit(gameId, playerId, reward, appliedDamage, headshot);
+                }
+              }
+            });
     gameRuntime =
         new PaperGameRuntime(
             gameService,
@@ -349,10 +391,26 @@ public final class ZombieBootstrap {
             coordinator,
             scoreboards,
             zombieEngine,
+            weaponService,
             result -> java.util.concurrent.CompletableFuture.completedFuture(null),
             messages,
             plugin.getLogger());
     gameReference.set(gameRuntime);
+    new WeaponGuiModule(
+            guiRegistry, guiActions, guiConfigurations, guiService, weaponService, gameRuntime)
+        .register();
+    guiConfigurations
+        .initializeAsync()
+        .whenComplete(
+            (ignored, failure) -> {
+              if (failure != null) {
+                plugin
+                    .getLogger()
+                    .severe(
+                        "guis.yml rejected; bundled defaults remain active: "
+                            + failure.getMessage());
+              }
+            });
 
     registerServices(
         configurations,
@@ -379,6 +437,7 @@ public final class ZombieBootstrap {
         new GuiChatInputListener(plugin, guiService),
         new GameCombatListener(gameRuntime, zombieEngine, messages),
         new ZombieProtectionListener(zombieEngine),
+        new WeaponListener(weaponService),
         new EditorPlacementListener(
             editorService, editorItems, guiService, Clock.systemUTC(), mainThread),
         new EditorSessionListener(editorService, editorItems));
@@ -394,6 +453,7 @@ public final class ZombieBootstrap {
     registerMapEditorCommand(mapValidator, mainThread);
     registerGameCommand(gameRuntime);
     registerZombieEngineCommand(zombieEngine, zombieDefinitions);
+    registerWeaponCommand(weaponService, weaponDefinitions);
 
     maintenanceTask =
         plugin
@@ -593,6 +653,18 @@ public final class ZombieBootstrap {
     }
     ZZombieCommand executor =
         new ZZombieCommand(engine, definitions, coordinator, gameRuntime, plugin);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+
+  private void registerWeaponCommand(
+      PaperWeaponService weapons, WeaponDefinitionLoader definitions) {
+    PluginCommand command = plugin.getCommand("zweapon");
+    if (command == null) {
+      throw new IllegalStateException("Command zweapon is missing from plugin.yml");
+    }
+    ZWeaponCommand executor =
+        new ZWeaponCommand(plugin, weapons, definitions, gameRuntime, guiService);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }
