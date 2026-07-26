@@ -1,6 +1,6 @@
 # API d'événements
 
-**Statut :** principes seulement ; aucun événement public ou métier défini.
+**Statut :** événements métier internes livrés ; API Bukkit publique différée.
 
 ## Objectif et périmètre
 
@@ -14,5 +14,10 @@ aux extensions seront traduits en événements Bukkit publics, documentés et d�
 thread approprié.
 
 ## À compléter
+
+`GameEvent` publie création, préparation, démarrage, début/fin de manche, enregistrement et
+élimination de zombie, mise à terre, réanimation, élimination de joueur et fin. Son
+`GameEventDispatcher` est synchrone, non annulable et indépendant de Paper. Les invariants sont
+appliqués avant publication.
 
 Contrat du bus, ordre, erreurs d'abonnés, événements annulables et catalogue versionné.

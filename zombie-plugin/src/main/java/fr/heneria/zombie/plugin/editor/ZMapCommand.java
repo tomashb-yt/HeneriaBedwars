@@ -3,6 +3,7 @@ package fr.heneria.zombie.plugin.editor;
 import fr.heneria.zombie.core.editor.MapDefinition;
 import fr.heneria.zombie.core.editor.MapEditorService;
 import fr.heneria.zombie.core.editor.MapValidator;
+import fr.heneria.zombie.plugin.game.PaperGameRuntime;
 import fr.heneria.zombie.plugin.gui.GuiId;
 import fr.heneria.zombie.plugin.gui.GuiService;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
@@ -31,6 +32,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   private final GuiService guis;
   private final InstanceCoordinator coordinator;
   private final MapPreviewService previews;
+  private final PaperGameRuntime games;
   private final Executor mainThread;
 
   public ZMapCommand(
@@ -40,6 +42,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       GuiService guis,
       InstanceCoordinator coordinator,
       MapPreviewService previews,
+      PaperGameRuntime games,
       Executor mainThread) {
     this.editors = editors;
     this.validator = validator;
@@ -47,6 +50,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
     this.guis = guis;
     this.coordinator = coordinator;
     this.previews = previews;
+    this.games = games;
     this.mainThread = mainThread;
   }
 
@@ -217,6 +221,10 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
                     .thenCompose(
                         result -> {
                           if (result == PlayerInstanceResult.SUCCESS) {
+                            if (!games.start(created.id())) {
+                              return java.util.concurrent.CompletableFuture.failedFuture(
+                                  new IllegalStateException("La partie est déjà démarrée"));
+                            }
                             return java.util.concurrent.CompletableFuture.completedFuture(created);
                           }
                           return coordinator

@@ -1,6 +1,6 @@
 # Roadmap
 
-**Statut :** Tickets 001 à 004 terminés dans le code.
+**Statut :** Tickets 001 à 005 terminés dans le code.
 
 ## Étapes
 
@@ -13,7 +13,8 @@
    historique et validation terminés.
 5. **Activation des maps :** relier une définition éditoriale validée au catalogue de clones.
 6. **Lobby enrichi et matchmaking :** sélection de map, files et groupes.
-7. **Boucle classique minimale :** manches, zombies, points, mort et réanimation.
+7. **Boucle classique minimale :** terminée au Ticket 005 : manches, zombies temporaires, points,
+   mort, réanimation et fin contrôlée.
 8. **Économie de map :** portes, barricades, armes, boîte, courant, atouts et Pack-a-Punch.
 9. **Contenu avancé :** bonus, spéciaux, boss, pièges et quêtes.
 10. **Fonctions originales :** modules indépendants après stabilisation du socle classique.

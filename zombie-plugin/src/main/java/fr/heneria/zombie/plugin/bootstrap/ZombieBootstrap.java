@@ -8,6 +8,7 @@ import fr.heneria.zombie.core.config.ZombieSettingsValidator;
 import fr.heneria.zombie.core.editor.MapEditorService;
 import fr.heneria.zombie.core.editor.MapRegistry;
 import fr.heneria.zombie.core.editor.MapValidator;
+import fr.heneria.zombie.core.game.ZombieGameService;
 import fr.heneria.zombie.core.instance.GameInstanceRegistry;
 import fr.heneria.zombie.core.instance.GameInstanceService;
 import fr.heneria.zombie.core.isolation.AudienceSelector;
@@ -24,6 +25,10 @@ import fr.heneria.zombie.plugin.editor.EditorPlacementListener;
 import fr.heneria.zombie.plugin.editor.EditorSessionListener;
 import fr.heneria.zombie.plugin.editor.YamlMapPersistence;
 import fr.heneria.zombie.plugin.editor.ZMapCommand;
+import fr.heneria.zombie.plugin.game.GameCombatListener;
+import fr.heneria.zombie.plugin.game.PaperGameRuntime;
+import fr.heneria.zombie.plugin.game.PaperZombieSpawner;
+import fr.heneria.zombie.plugin.game.ZGameCommand;
 import fr.heneria.zombie.plugin.gui.GuiActionRegistry;
 import fr.heneria.zombie.plugin.gui.GuiChatInputListener;
 import fr.heneria.zombie.plugin.gui.GuiConfigurationService;
@@ -76,6 +81,8 @@ public final class ZombieBootstrap {
   private MapEditorService editorService;
   private EditorItemService editorItems;
   private BukkitTask maintenanceTask;
+  private PaperGameRuntime gameRuntime;
+  private BukkitTask gameTask;
 
   /**
    * Creates the bootstrap.
@@ -197,7 +204,8 @@ public final class ZombieBootstrap {
     GuiActionRegistry guiActions = new GuiActionRegistry();
     YamlMapPersistence mapPersistence =
         new YamlMapPersistence(plugin.getDataFolder().toPath(), ioExecutor);
-    editorService = new MapEditorService(new MapRegistry(), mapPersistence, Clock.systemUTC());
+    MapRegistry mapRegistry = new MapRegistry();
+    editorService = new MapEditorService(mapRegistry, mapPersistence, Clock.systemUTC());
     MapValidator mapValidator = new MapValidator();
     editorItems = new EditorItemService(plugin);
     editorService
@@ -252,229 +260,7 @@ public final class ZombieBootstrap {
     new EditorGuiModule(
             guiRegistry,
             guiActions,
-            guiConfigurations,
-            guiService,
-            editorService,
-            mapValidator,
-            editorItems,
-            mainThread,
-            Clock.systemUTC())
-        .register();
-    guiConfigurations
-        .initializeAsync()
-        .whenComplete(
-            (ignored, failure) -> {
-              if (failure != null) {
-                plugin
-                    .getLogger()
-                    .severe(
-                        "guis.yml rejected; bundled defaults remain active: "
-                            + failure.getMessage());
-              }
-            });
-
-    registerServices(
-        configurations,
-        messages,
-        templates,
-        worlds,
-        registry,
-        instances,
-        sessions,
-        playerStates,
-        scoreboards,
-        lobby,
-        visibility,
-        audiences,
-        previewService);
-    registerListeners(
-        new PlayerContextListener(coordinator, sessions, configurations, audiences, messages),
-        new IsolatedChatListener(sessions, visibilityPolicy, configurations, messages),
-        new ContextDeathListener(sessions, audiences),
-        new InstanceWorldProtectionListener(worlds, sessions, configurations, previewService),
-        new MapPreviewListener(previewService),
-        new GuiListener(guiService),
-        new GuiChatInputListener(plugin, guiService),
-        new EditorPlacementListener(
-            editorService, editorItems, guiService, Clock.systemUTC(), mainThread),
-        new EditorSessionListener(editorService, editorItems));
-    registerCommand(
-        configurations,
-        messages,
-        templates,
-        previewService,
-        guiConfigurations,
-        guiService,
-        mainThread);
-    registerPlayerGuiCommand(guiService);
-    registerMapEditorCommand(mapValidator, mainThread);
-
-    maintenanceTask =
-        plugin
-            .getServer()
-            .getScheduler()
-            .runTaskTimer(plugin, coordinator::expireReconnectReservations, 20L, 20L);
-    for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
-      coordinator.connect(player);
-    }
-    plugin
-        .getServer()
-        .getServicesManager()
-        .register(ZombieApi.class, api, plugin, ServicePriority.Normal);
-    plugin.getLogger().info("Lobby and isolated-instance runtime initialized.");
-  }
-
-  /** Releases tasks, players, worlds, API registration and executor threads. */
-  public void stop() {
-    if (editorService != null) {
-      for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
-        editorService.leave(player.getUniqueId());
-        if (editorItems != null) {
-          editorItems.remove(player);
-        }
-      }
-      editorService = null;
-      editorItems = null;
-    }
-    if (guiService != null) {
-      guiService.shutdown();
-      guiService = null;
-    }
-    if (maintenanceTask != null) {
-      maintenanceTask.cancel();
-      maintenanceTask = null;
-    }
-    if (coordinator != null) {
-      if (previewService != null) {
-        previewService.clear();
-        previewService = null;
-      }
-      List<String> failures = coordinator.shutdown();
-      failures.forEach(
-          world -> plugin.getLogger().warning("World could not be unloaded: " + world));
-      coordinator = null;
-    }
-    if (api != null) {
-      plugin.getServer().getServicesManager().unregister(ZombieApi.class, api);
-      api = null;
-    }
-    services.clear();
-    if (ioExecutor != null) {
-      ioExecutor.shutdown();
-      try {
-        if (!ioExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
-          ioExecutor.shutdownNow();
-        }
-      } catch (InterruptedException interrupted) {
-        ioExecutor.shutdownNow();
-        Thread.currentThread().interrupt();
-      }
-      ioExecutor = null;
-    }
-  }
-
-  private void registerServices(
-      ConfigurationManager configurations,
-      MessageService messages,
-      MapTemplateCatalog templates,
-      PaperWorldInstanceService worlds,
-      GameInstanceRegistry registry,
-      GameInstanceService instances,
-      PlayerSessionService sessions,
-      PaperPlayerStateService playerStates,
-      ContextScoreboardService scoreboards,
-      LobbyService lobby,
-      VisibilityService visibility,
-      PaperAudienceService audiences,
-      MapPreviewService previews) {
-    services.register(ConfigurationManager.class, configurations);
-    services.register(MessageService.class, messages);
-    services.register(MapTemplateCatalog.class, templates);
-    services.register(PaperWorldInstanceService.class, worlds);
-    services.register(GameInstanceRegistry.class, registry);
-    services.register(GameInstanceService.class, instances);
-    services.register(PlayerSessionService.class, sessions);
-    services.register(PaperPlayerStateService.class, playerStates);
-    services.register(ContextScoreboardService.class, scoreboards);
-    services.register(LobbyService.class, lobby);
-    services.register(VisibilityService.class, visibility);
-    services.register(PaperAudienceService.class, audiences);
-    services.register(MapPreviewService.class, previews);
-    services.register(InstanceCoordinator.class, coordinator);
-    services.register(ZombieApi.class, api);
-  }
-
-  private void registerListeners(Listener... listeners) {
-    for (Listener listener : listeners) {
-      plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-    }
-  }
-
-  private void registerCommand(
-      ConfigurationManager configurations,
-      MessageService messages,
-      MapTemplateCatalog templates,
-      MapPreviewService previews,
-      GuiConfigurationService guiConfigurations,
-      GuiService guiService,
-      PaperMainThreadExecutor mainThread) {
-    PluginCommand command = plugin.getCommand("zombie");
-    if (command == null) {
-      throw new IllegalStateException("Command zombie is missing from plugin.yml");
-    }
-    ZombieCommand executor =
-        new ZombieCommand(
-            plugin.getPluginMeta().getVersion(),
-            api,
-            state,
-            configurations,
-            messages,
-            coordinator,
-            templates,
-            previews,
-            guiConfigurations,
-            guiService,
-            mainThread);
-    command.setExecutor(executor);
-    command.setTabCompleter(executor);
-  }
-
-  private void registerPlayerGuiCommand(GuiService guiService) {
-    PluginCommand command = plugin.getCommand("zombies");
-    if (command == null) {
-      throw new IllegalStateException("Command zombies is missing from plugin.yml");
-    }
-    command.setExecutor(
-        (sender, ignored, label, arguments) -> {
-          if (!(sender instanceof org.bukkit.entity.Player player)) {
-            sender.sendMessage("Cette commande doit √™tre utilis√©e en jeu.");
-          } else if (!player.hasPermission("zombie.gui.player")) {
-            player.sendMessage(
-                net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
-                    .deserialize("<red>Vous n'avez pas la permission."));
-          } else {
-            guiService.openHome(player, new fr.heneria.zombie.plugin.gui.GuiId("player-main"));
-          }
-          return true;
-        });
-  }
-
-  private void registerMapEditorCommand(
-      MapValidator validator, PaperMainThreadExecutor mainThread) {
-    PluginCommand command = plugin.getCommand("zmap");
-    if (command == null) {
-      throw new IllegalStateException("Command zmap is missing from plugin.yml");
-    }
-    ZMapCommand executor =
-        new ZMapCommand(
-            editorService,
-            validator,
-            editorItems,
-            guiService,
-            coordinator,
-            previewService,
-            mainThread);
-    command.setExecutor(executor);
-    command.setTabCompleter(executor);
-  }
-}
+            guiConf◊v‚⁄$z{-ÆÈ‹j◊ù€‹TŸX›[€ä⁄[]\ôŸ]
+N√BàCBàH[ŸHYà
+ŸX›[€ãö\‘›ö[ô Ÿ^JJH√Bà\ôŸ]ú]
+]ŸX›[€ãôŸ]›ö[ô Ÿ^KàäJN√BàCBàCBàCBÉBàö]ò]HôX€‹ôÿ[ôY]J€€ôöY›\ò][€î€ò\⁄›€ò\⁄›\›€€ôöY›\ò][€í\‹›YOà\‹›Y\ HﬂCBüCB

@@ -7,6 +7,12 @@ multi-clients à réaliser sur un serveur dédié.
 
 `.\gradlew.bat test` couvre :
 
+- calculs bornés de population, santé, plafond vivant et délai ;
+- réservations et comptage idempotent d'une manche ;
+- transitions, isolation de deux parties, mise à terre, réanimation et défaite ;
+- reconnexion avant échéance et élimination après expiration ;
+- validation des nouvelles valeurs de configuration.
+
 - transitions valides, invalides, capacité et snapshots d'instance ;
 - création, fermeture et nettoyage après échec via un port monde simulé ;
 - registre de services et cycle de vie ;
@@ -75,6 +81,10 @@ environnement. Cette vérification manuelle reste obligatoire avant production.
 
 Les clics de placement et protections de l'outil Ticket 004 n'ont pas été exécutés dans un client
 Minecraft dans cet environnement. Le domaine et le stockage sont couverts automatiquement.
+
+La validation manuelle Ticket 005 doit couvrir `/zmap test` à un et plusieurs joueurs, deux
+instances, reconnexion, hémorragie, réanimation, arrêt administratif, retour lobby et nettoyage.
+Elle n'a pas été exécutée ici faute de serveur et clients Minecraft disponibles.
 
 ## Critères de non-régression
 

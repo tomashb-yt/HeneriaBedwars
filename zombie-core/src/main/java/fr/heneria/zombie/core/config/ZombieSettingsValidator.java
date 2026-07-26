@@ -81,6 +81,40 @@ public final class ZombieSettingsValidator {
         || settings.gui().diagnosticsMenuTicks() <= 0) {
       error(issues, "gui", "GUI timeouts and refresh intervals must be positive");
     }
+    try {
+      var game = settings.gameplay();
+      new fr.heneria.zombie.core.game.RoundConfiguration(
+          game.minimumPlayers(),
+          game.countdownSeconds(),
+          game.cancelCountdownWhenInsufficient(),
+          game.joinInProgress(),
+          game.endScreenSeconds(),
+          game.startingPoints(),
+          game.maximumRound(),
+          game.firstRoundDelaySeconds(),
+          game.transitionSeconds(),
+          game.enemyBase(),
+          game.enemiesPerRound(),
+          game.playerMultiplier(),
+          game.minimumEnemies(),
+          game.maximumEnemies(),
+          game.baseHealth(),
+          game.healthMultiplier(),
+          game.maximumHealth(),
+          game.maximumAliveBase(),
+          game.maximumAlivePerPlayer(),
+          game.initialSpawnDelayTicks(),
+          game.spawnDelayTicks(),
+          game.minimumSpawnDelayTicks(),
+          game.batchSize(),
+          game.downedEnabled(),
+          game.bleedOutSeconds(),
+          game.reviveSeconds(),
+          game.reviveHealth(),
+          game.pointsPerKill());
+    } catch (IllegalArgumentException invalid) {
+      error(issues, "game/players/rounds", invalid.getMessage());
+    }
     if (!settings.documentation().requireContextUpdate()) {
       issues.add(
           new ConfigurationIssue(

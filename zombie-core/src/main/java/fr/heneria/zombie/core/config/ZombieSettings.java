@@ -28,6 +28,7 @@ public record ZombieSettings(
     ReconnectOptions reconnect,
     WorldRuleOptions worldRules,
     GuiOptions gui,
+    GameplayOptions gameplay,
     DocumentationOptions documentation) {
 
   /** Validates mandatory nested records. */
@@ -41,6 +42,7 @@ public record ZombieSettings(
     Objects.requireNonNull(reconnect, "reconnect");
     Objects.requireNonNull(worldRules, "worldRules");
     Objects.requireNonNull(gui, "gui");
+    Objects.requireNonNull(gameplay, "gameplay");
     Objects.requireNonNull(documentation, "documentation");
   }
 
@@ -223,6 +225,37 @@ public record ZombieSettings(
       Objects.requireNonNull(defaultTheme, "defaultTheme");
     }
   }
+
+  /** Complete immutable baseline for the minimal game and round loop. */
+  public record GameplayOptions(
+      int minimumPlayers,
+      int countdownSeconds,
+      boolean cancelCountdownWhenInsufficient,
+      boolean joinInProgress,
+      int endScreenSeconds,
+      int startingPoints,
+      int maximumRound,
+      int firstRoundDelaySeconds,
+      int transitionSeconds,
+      int enemyBase,
+      int enemiesPerRound,
+      double playerMultiplier,
+      int minimumEnemies,
+      int maximumEnemies,
+      double baseHealth,
+      double healthMultiplier,
+      double maximumHealth,
+      int maximumAliveBase,
+      int maximumAlivePerPlayer,
+      int initialSpawnDelayTicks,
+      int spawnDelayTicks,
+      int minimumSpawnDelayTicks,
+      int batchSize,
+      boolean downedEnabled,
+      int bleedOutSeconds,
+      int reviveSeconds,
+      double reviveHealth,
+      int pointsPerKill) {}
 
   /**
    * Documentation policy.

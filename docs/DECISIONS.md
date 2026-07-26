@@ -106,3 +106,18 @@ le modèle source.
 
 Chaque mutation déclenche une sauvegarde. Les écritures d'une même map sont ordonnées sur le pool
 I/O, utilisent un fichier temporaire et conservent `map.yml.bak`.
+
+## ADR-022 — Machines d'état instance et partie séparées
+
+L'instance possède le cycle technique du monde ; `ZombieGame` possède le cycle métier. Elles
+partagent un UUID, jamais un enum ni un état mutable.
+
+## ADR-023 — Un ordonnanceur groupé
+
+`PaperGameRuntime` exécute toutes les parties dans une tâche Paper unique. Aucun zombie, compte à
+rebours, délai d'hémorragie ou réanimation ne crée sa propre tâche.
+
+## ADR-024 — Apparition derrière un port
+
+Le domaine dépend de `ZombieSpawner`, pas de Bukkit. Ticket 005 fournit un adaptateur vanilla
+marqué PDC que le futur moteur spécialisé pourra remplacer.

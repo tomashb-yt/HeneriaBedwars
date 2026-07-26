@@ -1,6 +1,6 @@
 # Systèmes de gameplay
 
-**Statut :** catalogue de conception uniquement ; aucun gameplay livré.
+**Statut :** boucle classique minimale livrée au Ticket 005 ; contenu avancé planifié.
 
 ## Objectif et périmètre
 
@@ -20,6 +20,10 @@ contrats, quêtes modulaires, arbres d'amélioration des armes, extraction, plus
 requise pour exécuter le mode classique.
 
 ## À compléter
+
+Compte à rebours, difficulté par formule, budgets d'apparition, santé croissante, points, mise à
+terre, réanimation, spectateur après hémorragie, transitions, défaite et retour lobby sont actifs.
+Les zombies actuels sont des zombies Paper standards marqués par PDC et rattachés à leur instance.
 
 Économie, formules de difficulté, catalogue d'armes, intelligence des zombies, objectifs,
 équilibrage, états de victoire/défaite et budgets de performance.

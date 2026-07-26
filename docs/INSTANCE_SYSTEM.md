@@ -1,6 +1,6 @@
 # Système d'instances
 
-**Statut :** opérationnel sans gameplay au Ticket 002.
+**Statut :** opérationnel et relié à la boucle de jeu au Ticket 005.
 
 ## Agrégat et cycle de vie
 
@@ -96,6 +96,10 @@ supprimés seulement si `preserve-failed-worlds` est désactivé et si le monde 
 sont déchargés sur le thread serveur, mais leurs dossiers sont conservés par prudence.
 
 ## Protections
+
+L'UUID technique de l'instance est aussi celui du `ZombieGame`. Les deux machines restent
+distinctes : l'instance possède le monde et les joueurs, la partie possède manches et résultats.
+À la fin, le runtime retire ses zombies, renvoie les joueurs, puis demande l'arrêt sûr du monde.
 
 Les gamerules et listeners contrôlent apparition naturelle, météo, temps, blocs, objets, PVP,
 inventaire et sauvetage du vide. `zombie.world.bypass` fournit l'exception administrative

@@ -1,5 +1,6 @@
 package fr.heneria.zombie.plugin.display;
 
+import fr.heneria.zombie.core.game.ZombieGame;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -37,6 +38,32 @@ public final class ContextScoreboardService {
     player.setScoreboard(
         instances.computeIfAbsent(
             instanceId, ignored -> create("hz_game", Component.text("Zombies • En attente"))));
+  }
+
+  /** Updates the existing instance board without allocating a new scoreboard. */
+  public void updateGame(Player player, ZombieGame.Snapshot game) {
+    Scoreboard scoreboard = instances.get(game.gameId());
+    if (scoreboard == null) {
+      return;
+    }
+    Objective objective = scoreboard.getObjective("hz_game");
+    if (objective == null) {
+      return;
+    }
+    objective.displayName(Component.text("Zombies • " + game.mapId()));
+    scoreboard.getEntries().forEach(scoreboard::resetScores);
+    int round = game.round().map(value -> value.number()).orElse(0);
+    int remaining =
+        game.round()
+            .map(value -> value.waitingEnemies() + value.aliveEnemies() + value.pendingSpawns())
+            .orElse(0);
+    int points =
+        java.util.Optional.ofNullable(game.players().get(player.getUniqueId()))
+            .map(value -> value.points())
+            .orElse(0);
+    objective.getScore("§6Manche : §f" + round).setScore(3);
+    objective.getScore("§cZombies : §f" + remaining).setScore(2);
+    objective.getScore("§aPoints : §f" + points).setScore(1);
   }
 
   /**

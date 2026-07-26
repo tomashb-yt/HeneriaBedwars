@@ -2,6 +2,7 @@ package fr.heneria.zombie.plugin.listener;
 
 import fr.heneria.zombie.core.session.PlayerSessionService;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
+import fr.heneria.zombie.plugin.game.PaperGameRuntime;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.isolation.PaperAudienceService;
 import fr.heneria.zombie.plugin.message.MessageService;
@@ -20,6 +21,7 @@ public final class PlayerContextListener implements Listener {
   private final ConfigurationManager configurations;
   private final PaperAudienceService audiences;
   private final MessageService messages;
+  private final PaperGameRuntime games;
 
   /**
    * Creates the listener.
@@ -35,12 +37,14 @@ public final class PlayerContextListener implements Listener {
       PlayerSessionService sessions,
       ConfigurationManager configurations,
       PaperAudienceService audiences,
-      MessageService messages) {
+      MessageService messages,
+      PaperGameRuntime games) {
     this.coordinator = Objects.requireNonNull(coordinator, "coordinator");
     this.sessions = Objects.requireNonNull(sessions, "sessions");
     this.configurations = Objects.requireNonNull(configurations, "configurations");
     this.audiences = Objects.requireNonNull(audiences, "audiences");
     this.messages = Objects.requireNonNull(messages, "messages");
+    this.games = Objects.requireNonNull(games, "games");
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -56,7 +60,11 @@ public final class PlayerContextListener implements Listener {
                 sessions
                     .findSession(event.getPlayer().getUniqueId())
                     .flatMap(session -> session.instanceId())
-                    .ifPresent(instanceId -> audiences.instance(instanceId).sendMessage(message));
+                    .ifPresent(
+                        instanceId -> {
+                          games.reconnected(instanceId, event.getPlayer().getUniqueId());
+                          audiences.instance(instanceId).sendMessage(message);
+                        });
               } else {
                 audiences.lobby().sendMessage(message);
               }
@@ -70,12 +78,14 @@ public final class PlayerContextListener implements Listener {
         .findSession(event.getPlayer().getUniqueId())
         .flatMap(session -> session.instanceId())
         .ifPresentOrElse(
-            instanceId ->
-                audiences
-                    .instance(instanceId)
-                    .sendMessage(
-                        messages.render(
-                            "context.player-disconnected", "player", event.getPlayer().getName())),
+            instanceId -> {
+              games.disconnected(instanceId, event.getPlayer().getUniqueId());
+              audiences
+                  .instance(instanceId)
+                  .sendMessage(
+                      messages.render(
+                          "context.player-disconnected", "player", event.getPlayer().getName()));
+            },
             () ->
                 audiences
                     .lobby()
