@@ -101,6 +101,10 @@ L'UUID technique de l'instance est aussi celui du `ZombieGame`. Les deux machine
 distinctes : l'instance possède le monde et les joueurs, la partie possède manches et résultats.
 À la fin, le runtime retire ses zombies, renvoie les joueurs, puis demande l'arrêt sûr du monde.
 
+L'entrée technique utilise d'abord le spawn du modèle pour garantir une destination sûre. Dès
+qu'une partie démarre, `PaperGameRuntime` traduit les coordonnées du spawn joueur éditorial vers
+le monde cloné. La même destination est réappliquée à une arrivée en cours ou une reconnexion.
+
 Les gamerules et listeners contrôlent apparition naturelle, météo, temps, blocs, objets, PVP,
 inventaire et sauvetage du vide. `zombie.world.bypass` fournit l'exception administrative
 explicite. Une téléportation vers un monde d'instance est refusée si la session ne correspond pas

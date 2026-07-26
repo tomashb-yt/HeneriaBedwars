@@ -58,6 +58,8 @@ Préparer un monde valide dans `zombie_templates/crypt` sans manifeste, puis :
 15. avec un modèle homonyme dans `zombie_templates`, exécuter `/zmap test`, vérifier le clone privé
     et la téléportation, puis quitter et arrêter l'instance ;
 16. cliquer sur des cases vides et items sans métadonnées dans les GUI sans exception console.
+17. lancer `/zmap test` et vérifier le spawn joueur éditorial dans le clone ainsi que l'absence de
+    combustion solaire des zombies.
 
 Une exécution locale sans trois comptes ne valide honnêtement que démarrage, création de monde,
 commandes console et arrêt. La validation visuelle multi-clients doit être consignée séparément.

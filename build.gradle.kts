@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "fr.heneria.zombie"
-version = "0.6.1-SNAPSHOT"
+version = "0.6.2-SNAPSHOT"
 
 allprojects {
   group = rootProject.group

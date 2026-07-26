@@ -2,6 +2,19 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.6.2-SNAPSHOT — Spawn éditorial et zombies diurnes
+
+### Corrigé
+
+- le lancement place les joueurs au spawn configuré par l'éditeur dans le monde cloné ;
+- les arrivées en cours et reconnexions réutilisent ce spawn éditorial ;
+- les zombies temporaires du système de manches ne brûlent plus au soleil.
+
+### Précisé
+
+- portes, barricades, Pack-a-Punch et objets similaires restent des données éditoriales jusqu'au
+  ticket d'économie de map.
+
 ## 0.6.1-SNAPSHOT — Compatibilité des anciennes GUI
 
 ### Corrigé

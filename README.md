@@ -27,7 +27,7 @@ l'éditeur universel et une boucle de manches jouable avec zombies vanilla tempo
 Le Ticket 005 ajoute compte à rebours, manches configurables, zombies standards temporaires,
 points, mise à terre, réanimation, défaite et retour au lobby.
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.6.1-SNAPSHOT.jar`.
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.6.2-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire

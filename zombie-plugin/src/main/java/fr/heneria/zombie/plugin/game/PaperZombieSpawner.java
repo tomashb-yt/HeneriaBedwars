@@ -37,6 +37,8 @@ public final class PaperZombieSpawner implements ZombieSpawner {
             entity -> {
               entity.setRemoveWhenFarAway(false);
               entity.setCanPickupItems(false);
+              entity.setShouldBurnInDay(false);
+              entity.setFireTicks(0);
               entity
                   .getPersistentDataContainer()
                   .set(gameKey, PersistentDataType.STRING, request.gameId().toString());

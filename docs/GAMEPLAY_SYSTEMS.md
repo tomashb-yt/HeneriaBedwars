@@ -24,6 +24,8 @@ requise pour exécuter le mode classique.
 Compte à rebours, difficulté par formule, budgets d'apparition, santé croissante, points, mise à
 terre, réanimation, spectateur après hémorragie, transitions, défaite et retour lobby sont actifs.
 Les zombies actuels sont des zombies Paper standards marqués par PDC et rattachés à leur instance.
+Ils ne brûlent pas au soleil. Le spawn joueur éditorial est traduit vers le monde cloné lors du
+lancement et des reconnexions.
 
 Économie, formules de difficulté, catalogue d'armes, intelligence des zombies, objectifs,
 équilibrage, états de victoire/défaite et budgets de performance.

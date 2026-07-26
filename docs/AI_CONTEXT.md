@@ -109,6 +109,11 @@ IA spécialisée, économie et persistance des résultats restent à livrer. Le
 `GameResultRepository` actif est volontairement sans stockage. Le prochain ticket recommandé est
 le moteur de zombies et de combat. Les scénarios multi-clients restent à valider sur Paper.
 
+Le spawn joueur de la définition éditoriale est appliqué dans la copie d'instance au lancement,
+à une arrivée en cours et à une reconnexion. Les zombies vanilla temporaires ne brûlent pas au
+soleil. Portes, barricades, Pack-a-Punch, atouts, pièges et autres objets sont uniquement
+configurés et validés : leur comportement appartient au ticket d'économie de map.
+
 Le prochain incrément doit suivre `ROADMAP.md`, utiliser les services existants au lieu de créer un
 second registre de sessions ou d'instances, et préserver la frontière Paper. Ne jamais annoncer
 les fonctionnalités de gameplay planifiées comme déjà livrées.

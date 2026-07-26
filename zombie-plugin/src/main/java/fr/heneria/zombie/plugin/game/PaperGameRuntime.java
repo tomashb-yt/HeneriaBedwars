@@ -30,6 +30,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 /** One grouped Paper tick driving every isolated game without per-zombie tasks. */
@@ -92,13 +94,28 @@ public final class PaperGameRuntime {
             map,
             instance.worldName().orElseThrow(),
             tick + game.configuration().countdownSeconds() * 20L);
+    for (UUID playerId : instance.players()) {
+      Player player = Bukkit.getPlayer(playerId);
+      if (player != null && !teleportToPlayerSpawn(runtime, player)) {
+        games.remove(instanceId);
+        throw new IllegalStateException("Téléportation impossible vers le spawn joueur configuré");
+      }
+    }
     runtimes.put(instanceId, runtime);
     announce(instance.players(), "game.preparing");
     return true;
   }
 
   public void joined(UUID instanceId, UUID playerId) {
-    games.find(instanceId).ifPresent(game -> game.addPlayer(playerId));
+    RuntimeState runtime = runtimes.get(instanceId);
+    if (runtime == null || !runtime.game.addPlayer(playerId)) {
+      return;
+    }
+    Player player = Bukkit.getPlayer(playerId);
+    if (player != null && !teleportToPlayerSpawn(runtime, player)) {
+      runtime.game.leave(playerId);
+      logger.warning("Could not teleport joining player " + playerId + " to configured spawn");
+    }
   }
 
   public void left(UUID instanceId, UUID playerId) {
@@ -135,8 +152,12 @@ public final class PaperGameRuntime {
 
   public void reconnected(UUID instanceId, UUID playerId) {
     RuntimeState runtime = runtimes.get(instanceId);
-    if (runtime != null) {
-      runtime.game.reconnect(playerId);
+    if (runtime == null || !runtime.game.reconnect(playerId)) {
+      return;
+    }
+    Player player = Bukkit.getPlayer(playerId);
+    if (player != null && !teleportToPlayerSpawn(runtime, player)) {
+      logger.warning("Could not teleport reconnecting player " + playerId + " to configured spawn");
     }
   }
 
@@ -522,6 +543,16 @@ public final class PaperGameRuntime {
   private static double maximumHealth(Player player) {
     var attribute = player.getAttribute(PaperAttributeResolver.maxHealth());
     return attribute == null ? 20.0 : attribute.getValue();
+  }
+
+  private static boolean teleportToPlayerSpawn(RuntimeState runtime, Player player) {
+    World world = Bukkit.getWorld(runtime.worldName);
+    if (world == null) {
+      return false;
+    }
+    var point = runtime.map.playerSpawn().orElseThrow();
+    return player.teleport(
+        new Location(world, point.x(), point.y(), point.z(), point.yaw(), point.pitch()));
   }
 
   private void announce(Collection<UUID> players, String key, String... placeholders) {
