@@ -56,7 +56,9 @@ observation et nettoyage forcé sont explicitement indiqués comme futurs.
 `themes` et `menus`. Un bouton configure slot, matériau, nom MiniMessage, lore, permission,
 visibilité verrouillée, son et actions.
 
-Le candidat est complété en mémoire par les valeurs embarquées, puis valide :
+Le candidat est complété récursivement en mémoire par chaque valeur feuille embarquée manquante,
+puis validé. Cette fusion permet à un `guis.yml` d'une ancienne version de recevoir de nouveaux
+menus sans perdre ses personnalisations :
 
 - taille multiple de neuf entre 9 et 54 ;
 - slots et collisions ;

@@ -56,6 +56,9 @@ démarrage.
 embarquées. Il configure thèmes, titres, tailles, matériaux, textes, lore, slots, permissions,
 sons et actions. Un candidat invalide conserve le snapshot précédent.
 
+La fusion est récursive au niveau des valeurs finales : un ancien fichier reçoit automatiquement
+les nouveaux menus et boutons embarqués sans être supprimé ni réécrit et sans écraser ses valeurs.
+
 ```yaml
 gui:
   session-timeout-seconds: 300

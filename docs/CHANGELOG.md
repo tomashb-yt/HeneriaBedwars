@@ -2,6 +2,15 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.6.1-SNAPSHOT — Compatibilité des anciennes GUI
+
+### Corrigé
+
+- fusion récursive des nouveaux menus dans un ancien `guis.yml` ;
+- les menus d'éditeur ne perdent plus thème, slots et matériaux pendant cette migration ;
+- les personnalisations déjà présentes restent prioritaires et le fichier utilisateur n'est pas
+  réécrit.
+
 ## 0.6.0-SNAPSHOT — Boucle de jeu et manches
 
 ### Ajouté

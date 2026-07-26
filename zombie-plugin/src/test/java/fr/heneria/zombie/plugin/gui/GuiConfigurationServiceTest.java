@@ -83,6 +83,36 @@ class GuiConfigurationServiceTest {
     assertTrue(failure.getCause().getMessage().contains("unknown action"));
   }
 
+  @Test
+  void deeplyMergesEditorMenusIntoAPreEditorConfiguration() throws Exception {
+    Files.writeString(
+        directory.resolve("guis.yml"),
+        """
+        default-theme: custom
+        themes:
+          custom:
+            background: {material: GRAY_STAINED_GLASS_PANE, name: " "}
+        menus:
+          admin-main:
+            title: "<red>Administration personnalisée"
+            size: 54
+            theme: custom
+            buttons:
+              maps: {slot: 20, material: FILLED_MAP, name: "<aqua>Maps", actions: {left: nav.maps}}
+        """);
+
+    GuiConfigurationSnapshot snapshot = service().initializeAsync().join();
+    GuiMenuTemplate editor = snapshot.menu(new GuiId("editor-main")).orElseThrow();
+    GuiButtonTemplate information = editor.buttons().get("info");
+
+    assertEquals(
+        "<red>Administration personnalisée",
+        snapshot.menu(new GuiId("admin-main")).orElseThrow().title());
+    assertEquals("dark", editor.theme());
+    assertEquals(10, information.slot());
+    assertEquals(org.bukkit.Material.BOOK, information.material());
+  }
+
   private GuiConfigurationService service() {
     return new GuiConfigurationService(
         directory,

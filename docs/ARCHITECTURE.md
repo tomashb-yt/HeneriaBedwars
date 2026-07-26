@@ -101,6 +101,6 @@ isole les agrégats ; `PaperGameRuntime` exécute un tick groupé et adapte mond
 scoreboards et entités Paper. `ZombieSpawner` permet de remplacer les zombies vanilla temporaires
 sans modifier le moteur. Voir `GAME_LIFECYCLE.md` et `ROUND_SYSTEM.md`.
 
-Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une prochaine
-étape reliera les définitions éditoriales validées au catalogue. Manches, zombies et matchmaking ne
-font pas partie de cette architecture livrée.
+Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une définition
+éditoriale validée et un monde source homonyme alimentent désormais une partie de test. Le
+matchmaking et l'activation publique des maps restent à livrer.

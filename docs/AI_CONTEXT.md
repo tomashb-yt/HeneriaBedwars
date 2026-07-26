@@ -47,11 +47,12 @@ Le Ticket 004 ajoute un schéma éditorial v2, un registre asynchrone, des sessi
 les commandes `/zmap`, l'outil protégé, les GUI de placement et un validateur structurel. Les
 définitions sont auto-sauvegardées sous `plugins/HeneriaZombie/maps`.
 
-Le correctif 0.5.3 transforme une définition valide en instance privée de test lorsque le
-catalogue contient un monde source homonyme. Il ne constitue pas encore une boucle de gameplay.
+Le correctif 0.5.3 a relié une définition valide à une instance privée de test. Depuis le Ticket
+005, cette instance démarre également la boucle de gameplay minimale.
 
-Les états sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`, `CLEANING`, `CLOSED` et
-`ERROR`. Aucune manche, aucun zombie et aucun matchmaking ne sont implémentés.
+Les états techniques d'instance sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`,
+`CLEANING`, `CLOSED` et `ERROR`. Les états métier de partie sont documentés dans
+`GAME_LIFECYCLE.md`. Le matchmaking reste à implémenter.
 
 ## Modèle de map minimal du Ticket 002
 
@@ -76,7 +77,8 @@ l'introduction d'inventaires de valeur.
 
 - le catalogue de clonage utilise encore son manifeste technique minimal distinct de l'éditeur ;
 - l'ajout simple accepte un dossier de monde, mais pas encore une archive ZIP ;
-- les instances restent en attente jusqu'à leur arrêt administratif : aucune boucle de jeu ;
+- une instance créée manuellement reste en attente jusqu'à `/zgame start`; `/zmap test` démarre
+  automatiquement sa boucle de jeu ;
 - SQLite est configuré mais aucune donnée métier ne justifie encore l'ouverture d'une connexion ;
 - le test automatisé simule plusieurs sessions, mais une validation visuelle complète exige trois
   clients Minecraft ;

@@ -118,8 +118,7 @@ public final class GuiConfigurationService {
             }
             YamlConfiguration candidate = YamlConfiguration.loadConfiguration(target.toFile());
             YamlConfiguration defaults = bundledYaml();
-            candidate.setDefaults(defaults);
-            candidate.options().copyDefaults(true);
+            mergeMissingLeaves(candidate, defaults);
             GuiConfigurationSnapshot snapshot = parse(candidate);
             active.set(snapshot);
             reloadListeners.forEach(Runnable::run);
@@ -139,6 +138,23 @@ public final class GuiConfigurationService {
       }
       return YamlConfiguration.loadConfiguration(
           new InputStreamReader(input, StandardCharsets.UTF_8));
+    }
+  }
+
+  /**
+   * Adds every missing scalar or list from the bundled configuration.
+   *
+   * <p>Bukkit's defaults view does not deeply materialize newly introduced configuration sections.
+   * A pre-editor {@code guis.yml}, for example, exposed the new button identifiers while leaving
+   * their slot and material absent. Explicit leaf merging preserves every user value and provides
+   * complete new menus in memory.
+   */
+  private static void mergeMissingLeaves(YamlConfiguration candidate, YamlConfiguration defaults) {
+    for (String path : defaults.getKeys(true)) {
+      Object value = defaults.get(path);
+      if (!(value instanceof ConfigurationSection) && !candidate.isSet(path)) {
+        candidate.set(path, value);
+      }
     }
   }
 
