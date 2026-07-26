@@ -126,12 +126,19 @@ public final class ZombieGame {
   }
 
   public synchronized boolean zombieDefeated(UUID killer) {
+    return zombieDefeated(killer, configuration.pointsPerKill());
+  }
+
+  public synchronized boolean zombieDefeated(UUID killer, int reward) {
+    if (reward < 0) {
+      throw new IllegalArgumentException("reward cannot be negative");
+    }
     if (state != GameState.ROUND_ACTIVE || !round.defeated()) {
       return false;
     }
     Optional.ofNullable(players.get(killer))
         .filter(player -> player.snapshot().state() == GamePlayerState.ALIVE)
-        .ifPresent(player -> player.killed(configuration.pointsPerKill()));
+        .ifPresent(player -> player.killed(reward));
     emit(GameEvent.Type.ZOMBIE_DEFEATED);
     if (round.canComplete()) {
       completeRound();

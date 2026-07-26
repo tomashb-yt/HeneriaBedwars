@@ -2,6 +2,23 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.7.0-SNAPSHOT — Ticket 006
+
+### Ajouté
+
+- quatre définitions YAML versionnées et recharge atomique asynchrone ;
+- registre immuable, attributs par manche, sélection pondérée et suivi O(1) ;
+- IA de mêlée isolée, navigation terrestre Paper et secours anti-blocage ;
+- dégâts typés, immunités, résistances, vulnérabilités et tirs à la tête explicites ;
+- mort idempotente, récompenses uniques et nettoyage complet par partie ;
+- capacités `poison_hit` et `explode_on_death` dans un registre extensible ;
+- protections PDC, commandes `/zzombie`, événements internes et tests du domaine.
+
+### Modifié
+
+- suppression de `PaperZombieSpawner`, l'adaptateur temporaire du Ticket 005 ;
+- version portée à `0.7.0-SNAPSHOT`.
+
 ## 0.6.2-SNAPSHOT — Spawn éditorial et zombies diurnes
 
 ### Corrigé

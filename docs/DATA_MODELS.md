@@ -80,3 +80,11 @@ expose tranche, index, nombre de pages et total sans plafond global.
 
 Les définitions éditoriales sont écrites en YAML versionné et atomique. Instances et sessions
 restent runtime. SQLite reste réservé aux futures données de profil.
+
+## Ennemi
+
+`ZombieDefinition` est un snapshot immuable du type, des attributs, du comportement, de la
+navigation, des dégâts, règles d'apparition, récompenses, capacités et apparence.
+`ZombieInstance` relie UUID interne, UUID Bukkit, partie, manche, spawn, snapshot de définition,
+attributs calculés, état, santé, cible, cooldowns et cause de retrait. `ZombieTracker` indexe ces
+instances sans exposer de collection mutable.

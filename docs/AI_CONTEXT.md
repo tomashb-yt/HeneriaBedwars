@@ -27,7 +27,7 @@ mécaniques originales optionnelles par map.
 - fichiers hors thread serveur, appels Bukkit sur le thread serveur ;
 - snapshots de configuration validés puis activés atomiquement.
 
-## État réel — Tickets 004 et 005
+## État réel — Tickets 004 à 006
 
 Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 
@@ -97,23 +97,28 @@ profil, statistiques et export restent désactivés. Le rendu doit encore être 
 
 ## Reprise
 
-Le Ticket 005 est terminé dans le code. `ZombieGame`, `RoundState`, `GamePlayer`,
-`ZombieGameService`, `RoundDifficultyCalculator` et `GameEvent` forment le domaine indépendant de
-Paper. `PaperGameRuntime`, `PaperZombieSpawner`, `GameCombatListener` et `ZGameCommand` réalisent
-l'intégration. Une map validée se teste avec `/zmap edit <map>`, puis `/zmap test`; `/zgame list`,
-`info`, `stop`, `nextround`, `setround` et `debug` servent au diagnostic.
+Les Tickets 001 à 006 sont terminés dans le code. Une map validée se teste avec
+`/zmap edit <map>`, puis `/zmap test`. `/zgame` diagnostique le cycle de partie et `/zzombie`
+diagnostique les définitions et ennemis actifs.
 
-La boucle disponible comprend les manches FORMULA, le plafond vivant, les zombies vanilla
-temporaires, points, mise à terre, réanimation accroupie, reconnexion, défaite et nettoyage. Armes,
-IA spécialisée, économie et persistance des résultats restent à livrer. Le
-`GameResultRepository` actif est volontairement sans stockage. Le prochain ticket recommandé est
-le moteur de zombies et de combat. Les scénarios multi-clients restent à valider sur Paper.
+La boucle comprend les manches FORMULA, plafonds vivants, types pondérés, IA de mêlée, points,
+mise à terre, réanimation, reconnexion, défaite et nettoyage. Armes, économie de map et persistance
+des résultats restent à livrer. Le `GameResultRepository` actif est toujours sans stockage. Les
+scénarios multi-clients et mesures 25/50/100/200 ennemis restent à valider sur un serveur Paper.
 
-Le spawn joueur de la définition éditoriale est appliqué dans la copie d'instance au lancement,
-à une arrivée en cours et à une reconnexion. Les zombies vanilla temporaires ne brûlent pas au
-soleil. Portes, barricades, Pack-a-Punch, atouts, pièges et autres objets sont uniquement
-configurés et validés : leur comportement appartient au ticket d'économie de map.
+Le spawn joueur éditorial est appliqué au lancement, à une arrivée et à une reconnexion. Portes,
+barricades, Pack-a-Punch, atouts et pièges restent configurés et validés sans gameplay actif.
 
-Le prochain incrément doit suivre `ROADMAP.md`, utiliser les services existants au lieu de créer un
-second registre de sessions ou d'instances, et préserver la frontière Paper. Ne jamais annoncer
-les fonctionnalités de gameplay planifiées comme déjà livrées.
+## Ticket 006
+
+Le moteur spécialisé est livré dans `core.enemy` et `plugin.enemy`. Les définitions, attributs,
+sélection, dégâts, ciblage, états, suivi et événements internes restent sans Paper. La fabrique,
+l'IA native, les protections et `/zzombie` sont dans l'adaptateur Paper. Aucun NMS n'est utilisé.
+
+Les types inclus sont `classic_zombie`, `sprinter_zombie`, `armored_zombie` et `toxic_zombie`.
+Le comportement complet est `MELEE`/`GROUND`; `poison_hit` et `explode_on_death` valident le
+registre de capacités. Vol, distance, portes et barricades restent des extensions préparées.
+
+Le prochain ticket recommandé est le système d'armes, munitions, dégâts balistiques, armes murales
+et progression Pack-a-Punch. Il doit réutiliser `ZombieDamageService` et fournir explicitement les
+tirs à la tête. Ne pas créer un second registre d'ennemis, de sessions ou d'instances.

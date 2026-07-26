@@ -133,3 +133,12 @@ L'éditeur gère automatiquement `plugins/HeneriaZombie/maps/<mapId>/map.yml` et
 `map.yml.bak`. Le schéma est en version 2 et n'est pas destiné à l'édition manuelle. Écriture
 temporaire, backup et remplacement atomique s'exécutent hors thread serveur. Ce dossier est
 distinct de `zombie_templates`, qui contient les mondes sources clonables.
+
+## Types de zombies
+
+Les fichiers `plugins/HeneriaZombie/zombies/*.yml` utilisent le schéma 1. Les quatre exemples
+embarqués sont installés sans écraser les fichiers existants. Le chargement valide notamment
+identifiant, type Bukkit vivant, attributs finis, manches, poids et multiplicateurs.
+
+`/zzombie reload` analyse hors thread puis remplace le registre en une opération. Les nouvelles
+valeurs concernent uniquement les apparitions futures. Voir `ZOMBIE_DEFINITIONS.md`.

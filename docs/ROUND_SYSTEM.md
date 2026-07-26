@@ -11,5 +11,7 @@ qu'aucun n'est vivant et qu'aucune réservation n'est en vol.
 La population part de `base + per-round × (round - 1)`, applique le multiplicateur de joueurs et
 les bornes. La santé est exponentielle et plafonnable. Les valeurs sont figées à la création.
 
-Ticket 005 crée seulement des zombies vanilla. Types avancés, navigation et conditions de zone
-dynamiques appartiennent au prochain moteur.
+Ticket 006 remplace l'adaptateur temporaire. Une apparition réussie est enregistrée par type,
+spawn, partie et manche. Une mort ou disparition anormale retire exactement un vivant ; les causes
+de fin/annulation nettoient sans fausser les compteurs. La sélection respecte poids, manches,
+zones, pools, plafond par type, capacité et cooldown du spawn.

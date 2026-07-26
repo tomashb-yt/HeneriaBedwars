@@ -62,3 +62,10 @@ pas être activée par la future boucle de jeu.
 - l'outil est identifié par Persistent Data Container, jamais par son nom.
 
 L'outil ne peut ni être jeté, ni déplacé dans un inventaire, ni utilisé sans session et permission.
+
+## Consommation par le moteur
+
+Le moteur utilise le spawn joueur éditorial et les `ZombieSpawn` validés. Pour chaque spawn, zone,
+poids, capacité, manches, distances, types autorisés et cooldown alimentent la sélection runtime.
+Portes et barricades restent des données d'édition jusqu'à leur ticket gameplay ; le moteur
+d'ennemis ne les modifie pas directement.

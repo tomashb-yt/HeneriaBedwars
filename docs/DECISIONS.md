@@ -119,5 +119,21 @@ rebours, délai d'hémorragie ou réanimation ne crée sa propre tâche.
 
 ## ADR-024 — Apparition derrière un port
 
-Le domaine dépend de `ZombieSpawner`, pas de Bukkit. Ticket 005 fournit un adaptateur vanilla
-marqué PDC que le futur moteur spécialisé pourra remplacer.
+Le domaine dépend de `ZombieSpawner`, pas de Bukkit. Le Ticket 006 remplace définitivement
+l'adaptateur temporaire par `PaperZombieEngine`.
+
+## ADR-025 — Snapshot de définition par ennemi
+
+Le registre YAML est remplacé atomiquement. Chaque apparition capture sa définition : un reload
+n'altère jamais santé, IA, récompenses ou capacités d'un zombie déjà actif.
+
+## ADR-026 — IA native sans NMS
+
+La navigation terrestre délègue le chemin physique à Paper/Minecraft, tandis que ciblage,
+cooldowns, dégâts, capacités, isolation et secours restent sous contrôle du moteur. Aucun NMS
+n'est utilisé.
+
+## ADR-027 — Mort idempotente et suivi indexé
+
+`ZombieInstance.claimDeath` garantit une attribution unique. `ZombieTracker` maintient les index
+interne, Bukkit et partie ; aucun scan global de mondes ne participe au tick.

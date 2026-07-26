@@ -25,9 +25,12 @@ import fr.heneria.zombie.plugin.editor.EditorPlacementListener;
 import fr.heneria.zombie.plugin.editor.EditorSessionListener;
 import fr.heneria.zombie.plugin.editor.YamlMapPersistence;
 import fr.heneria.zombie.plugin.editor.ZMapCommand;
+import fr.heneria.zombie.plugin.enemy.PaperZombieEngine;
+import fr.heneria.zombie.plugin.enemy.ZZombieCommand;
+import fr.heneria.zombie.plugin.enemy.ZombieDefinitionLoader;
+import fr.heneria.zombie.plugin.enemy.ZombieProtectionListener;
 import fr.heneria.zombie.plugin.game.GameCombatListener;
 import fr.heneria.zombie.plugin.game.PaperGameRuntime;
-import fr.heneria.zombie.plugin.game.PaperZombieSpawner;
 import fr.heneria.zombie.plugin.game.ZGameCommand;
 import fr.heneria.zombie.plugin.gui.GuiActionRegistry;
 import fr.heneria.zombie.plugin.gui.GuiChatInputListener;
@@ -292,6 +295,52 @@ public final class ZombieBootstrap {
                             + event.getClass().getSimpleName()
                             + " for "
                             + event.gameId()));
+    ZombieDefinitionLoader zombieDefinitions = new ZombieDefinitionLoader(plugin, ioExecutor);
+    zombieDefinitions
+        .initializeAsync()
+        .whenComplete(
+            (loaded, failure) -> {
+              if (failure == null) {
+                plugin
+                    .getLogger()
+                    .info(
+                        "Loaded "
+                            + loaded.size()
+                            + " zombie type definition(s) from "
+                            + zombieDefinitions.directory());
+              } else {
+                plugin
+                    .getLogger()
+                    .severe(
+                        "External zombie definitions rejected; last valid snapshot remains active: "
+                            + failure.getMessage());
+              }
+            });
+    AtomicReference<PaperGameRuntime> gameReference = new AtomicReference<>();
+    PaperZombieEngine zombieEngine =
+        new PaperZombieEngine(
+            plugin,
+            zombieDefinitions,
+            gameId -> {
+              PaperGameRuntime runtime = gameReference.get();
+              return runtime == null ? List.of() : runtime.playerIds(gameId);
+            },
+            (gameId, playerId) -> {
+              PaperGameRuntime runtime = gameReference.get();
+              return runtime != null && runtime.isTargetable(gameId, playerId);
+            },
+            (source, target, amount) -> {
+              PaperGameRuntime runtime = gameReference.get();
+              if (runtime != null) {
+                runtime.damagePlayer(source.gameId(), target, amount);
+              }
+            },
+            (zombie, reason, killerId, reward) -> {
+              PaperGameRuntime runtime = gameReference.get();
+              if (runtime != null && reason.completesRoundSlot()) {
+                runtime.zombieRemoved(zombie.entityId(), killerId, reward);
+              }
+            });
     gameRuntime =
         new PaperGameRuntime(
             gameService,
@@ -299,10 +348,11 @@ public final class ZombieBootstrap {
             configurations,
             coordinator,
             scoreboards,
-            new PaperZombieSpawner(plugin),
+            zombieEngine,
             result -> java.util.concurrent.CompletableFuture.completedFuture(null),
             messages,
             plugin.getLogger());
+    gameReference.set(gameRuntime);
 
     registerServices(
         configurations,
@@ -327,7 +377,8 @@ public final class ZombieBootstrap {
         new MapPreviewListener(previewService),
         new GuiListener(guiService),
         new GuiChatInputListener(plugin, guiService),
-        new GameCombatListener(gameRuntime, messages),
+        new GameCombatListener(gameRuntime, zombieEngine, messages),
+        new ZombieProtectionListener(zombieEngine),
         new EditorPlacementListener(
             editorService, editorItems, guiService, Clock.systemUTC(), mainThread),
         new EditorSessionListener(editorService, editorItems));
@@ -342,6 +393,7 @@ public final class ZombieBootstrap {
     registerPlayerGuiCommand(guiService);
     registerMapEditorCommand(mapValidator, mainThread);
     registerGameCommand(gameRuntime);
+    registerZombieEngineCommand(zombieEngine, zombieDefinitions);
 
     maintenanceTask =
         plugin
@@ -529,6 +581,18 @@ public final class ZombieBootstrap {
       throw new IllegalStateException("Command zgame is missing from plugin.yml");
     }
     ZGameCommand executor = new ZGameCommand(games, coordinator);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+
+  private void registerZombieEngineCommand(
+      PaperZombieEngine engine, ZombieDefinitionLoader definitions) {
+    PluginCommand command = plugin.getCommand("zzombie");
+    if (command == null) {
+      throw new IllegalStateException("Command zzombie is missing from plugin.yml");
+    }
+    ZZombieCommand executor =
+        new ZZombieCommand(engine, definitions, coordinator, gameRuntime, plugin);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }

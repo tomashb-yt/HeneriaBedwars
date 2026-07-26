@@ -24,6 +24,10 @@ commands:
     description: Administers active Zombies games and rounds
     usage: /zgame [list|info|start|stop|nextround|setround|debug]
     permission: zombies.admin.game.list
+  zzombie:
+    description: Inspects and administers the HeneriaZombie enemy engine
+    usage: /zzombie [list|types|info|spawn|kill|removeall|debug|reload]
+    permission: zombies.admin.zombie.list
 
 permissions:
   zombie.admin:
@@ -49,6 +53,14 @@ permissions:
       zombies.admin.game.round: true
       zombies.admin.game.list: true
       zombies.admin.game.debug: true
+      zombies.admin.zombie.list: true
+      zombies.admin.zombie.types: true
+      zombies.admin.zombie.info: true
+      zombies.admin.zombie.spawn: true
+      zombies.admin.zombie.kill: true
+      zombies.admin.zombie.remove: true
+      zombies.admin.zombie.debug: true
+      zombies.admin.zombie.reload: true
   zombie.command.use:
     description: Allows use of the base /zombie command
     default: true
@@ -105,4 +117,28 @@ permissions:
     default: op
   zombies.admin.game.debug:
     description: Shows detailed game diagnostics
+    default: op
+  zombies.admin.zombie.list:
+    description: Lists active engine zombies
+    default: op
+  zombies.admin.zombie.types:
+    description: Lists loaded zombie definitions
+    default: op
+  zombies.admin.zombie.info:
+    description: Inspects a registered zombie
+    default: op
+  zombies.admin.zombie.spawn:
+    description: Spawns a configured zombie for diagnostics
+    default: op
+  zombies.admin.zombie.kill:
+    description: Kills a registered zombie through the damage service
+    default: op
+  zombies.admin.zombie.remove:
+    description: Removes all zombies of a game without rewards
+    default: op
+  zombies.admin.zombie.debug:
+    description: Displays detailed runtime enemy diagnostics
+    default: op
+  zombies.admin.zombie.reload:
+    description: Atomically reloads future-spawn zombie definitions
     default: op

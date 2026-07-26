@@ -1,0 +1,67 @@
+schema-version: 1
+id: armored_zombie
+display-name: "<gray>Zombie blindé"
+entity:
+  type: HUSK
+category: HEAVY
+attributes:
+  health:
+    base: 36.0
+    use-round-scaling: true
+    round-multiplier: 1.12
+    maximum: 4096.0
+  damage:
+    base: 5.0
+    use-round-scaling: true
+    round-multiplier: 1.03
+  speed:
+    base: 0.19
+  follow-range: 40.0
+  knockback-resistance: 0.45
+behavior:
+  type: MELEE
+  target-strategy: NEAREST_VALID_PLAYER
+  attack-range: 2.0
+  attack-cooldown-ticks: 28
+  target-update-interval-ticks: 20
+  lose-target-distance: 48.0
+navigation:
+  mode: GROUND
+  stuck-detection:
+    enabled: true
+    check-interval-ticks: 40
+    minimum-movement-distance: 0.25
+    timeout-ticks: 180
+    maximum-repath-attempts: 3
+    fallback-action: TELEPORT_TO_VALID_SPAWN
+damage:
+  multipliers:
+    EXPLOSIVE: 0.75
+    MELEE: 0.80
+  headshot:
+    enabled: true
+    multiplier: 1.5
+abilities: []
+spawn-rules:
+  minimum-round: 6
+  maximum-round: 2147483647
+  weight: 18
+  maximum-alive: 6
+  pools:
+    - default
+rewards:
+  points-on-hit: 10
+  points-on-kill: 100
+  points-on-headshot-kill: 140
+  experience: 0
+environment:
+  burn-in-daylight: false
+  remove-when-far-away: false
+appearance:
+  custom-name-visible: false
+  glowing: false
+  equipment:
+    head:
+      material: IRON_HELMET
+    chest:
+      material: IRON_CHESTPLATE

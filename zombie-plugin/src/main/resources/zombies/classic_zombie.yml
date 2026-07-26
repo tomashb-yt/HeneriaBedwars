@@ -1,0 +1,69 @@
+schema-version: 1
+id: classic_zombie
+display-name: "<green>Zombie"
+entity:
+  type: ZOMBIE
+  baby: false
+  silent: false
+category: NORMAL
+attributes:
+  health:
+    base: 20.0
+    use-round-scaling: true
+    round-multiplier: 1.10
+    maximum: 2048.0
+  damage:
+    base: 3.0
+    use-round-scaling: true
+    round-multiplier: 1.025
+  speed:
+    base: 0.23
+  follow-range: 40.0
+  knockback-resistance: 0.0
+  attack-knockback: 0.0
+behavior:
+  type: MELEE
+  target-strategy: NEAREST_VALID_PLAYER
+  attack-range: 1.8
+  attack-cooldown-ticks: 20
+  target-update-interval-ticks: 20
+  lose-target-distance: 48.0
+navigation:
+  mode: GROUND
+  avoid-water: false
+  can-open-doors: false
+  can-break-doors: false
+  stuck-detection:
+    enabled: true
+    check-interval-ticks: 40
+    minimum-movement-distance: 0.35
+    timeout-ticks: 160
+    maximum-repath-attempts: 3
+    fallback-action: TELEPORT_TO_VALID_SPAWN
+damage:
+  immunities: []
+  multipliers: {}
+  headshot:
+    enabled: true
+    multiplier: 2.0
+abilities: []
+spawn-rules:
+  minimum-round: 1
+  maximum-round: 2147483647
+  weight: 100
+  maximum-alive: -1
+  zones: []
+  pools:
+    - default
+rewards:
+  points-on-hit: 10
+  points-on-kill: 60
+  points-on-headshot-kill: 100
+  experience: 0
+environment:
+  burn-in-daylight: false
+  remove-when-far-away: false
+appearance:
+  custom-name-visible: false
+  glowing: false
+  equipment: {}

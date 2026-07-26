@@ -94,12 +94,16 @@ Le core possède définition immuable, registre, sessions, historique et validat
 en `MapPoint` et compose les écrans avec le framework GUI. Une mutation remplace d'abord le
 snapshot mémoire puis sérialise les écritures de la map sur le pool I/O.
 
-## Extensions futures
+## Moteur d'ennemis
 
 Le domaine de partie est possédé par un `ZombieGame` par UUID d'instance. `ZombieGameService`
-isole les agrégats ; `PaperGameRuntime` exécute un tick groupé et adapte mondes, joueurs,
-scoreboards et entités Paper. `ZombieSpawner` permet de remplacer les zombies vanilla temporaires
-sans modifier le moteur. Voir `GAME_LIFECYCLE.md` et `ROUND_SYSTEM.md`.
+isole les agrégats ; `PaperGameRuntime` exécute un tick groupé. `ZombieDefinitionRegistry`,
+`ZombieInstance`, `ZombieTracker`, `ZombieTargetSelector`, `ZombieDamageService` et les contrats
+de barricade/dégâts sont dans `zombie-core`.
+
+`PaperZombieEngine` est l'unique fabrique et adaptateur d'entités. Il utilise les API Paper stables
+et l'IA native, sans NMS. `ZombieDefinitionLoader` effectue les accès disque hors thread et remplace
+atomiquement le registre. Voir `ZOMBIE_ENGINE.md` et `ZOMBIE_AI.md`.
 
 Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une définition
 éditoriale validée et un monde source homonyme alimentent désormais une partie de test. Le

@@ -88,6 +88,30 @@ La validation manuelle Ticket 005 doit couvrir `/zmap test` à un et plusieurs j
 instances, reconnexion, hémorragie, réanimation, arrêt administratif, retour lobby et nettoyage.
 Elle n'a pas été exécutée ici faute de serveur et clients Minecraft disponibles.
 
+## Ticket 006 — validation manuelle
+
+1. Démarrer Paper et vérifier la création de `plugins/HeneriaZombie/zombies`.
+2. Exécuter `/zzombie types` et vérifier les quatre types livrés.
+3. Lancer `/zmap test`, attendre la manche 1 et contrôler ciblage, navigation et attaques.
+4. Utiliser `/zzombie spawn toxic_zombie`, subir `poison_hit`, puis le tuer et contrôler
+   `explode_on_death`.
+5. Bloquer un zombie plus de huit secondes et contrôler le recalcul puis le retour au spawn.
+6. Lancer deux instances et vérifier qu'aucune cible, attaque, explosion ou récompense ne traverse.
+7. Tester `/zzombie info`, `debug`, `kill`, `removeall` et `reload`.
+8. Modifier une définition, recharger et vérifier que seuls les futurs zombies changent.
+9. Arrêter une partie et vérifier l'absence d'entités et de tâches résiduelles.
+
+Ces scénarios avec clients Minecraft n'ont pas été exécutés dans cet environnement. Les tests
+automatiques couvrent validation, doublons, attributs, sélection, isolation des cibles, dégâts,
+headshots, mort idempotente, cooldowns, blocage et nettoyage des index.
+
+## Charge à mesurer
+
+Tester séparément 25, 50, 100 et 200 zombies sur une machine documentée. Relever MSPT moyen et
+maximum, recalculs de cible, mises à jour différées, mémoire avant/après nettoyage et nombre
+d'entités résiduelles. Le plafond technique de 200 mises à jour par tick répartit la charge ; il ne
+constitue pas une promesse de capacité tant que ces mesures serveur ne sont pas réalisées.
+
 ## Critères de non-régression
 
 Le thread Paper ne doit effectuer aucune copie de modèle. Un échec de déchargement doit préserver

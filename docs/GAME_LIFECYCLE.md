@@ -14,4 +14,6 @@ réanimation accroupie et maintenue rend le joueur vivant.
 
 Toutes les fins passent par `ZombieGame.end`, produisent au plus un `GameResult`, retirent les
 entités indexées, affichent le résultat, renvoient les joueurs et confient le monde à
-`InstanceCoordinator`. L'arrêt serveur vide immédiatement les registres après retrait des entités.
+`InstanceCoordinator`. `PaperZombieEngine.removeAll` annule les capacités, supprime les entités et
+vide les trois index de suivi avant le déchargement du monde. L'arrêt est idempotent et ne laisse
+aucune tâche individuelle.

@@ -60,3 +60,15 @@ Les valeurs par défaut et la hiérarchie exacte figurent dans `plugin.yml`.
 Les GUI ajoutent `zombie.gui.player`, `zombie.gui.admin`, `zombie.gui.maps`,
 `zombie.gui.instances`, `zombie.gui.settings`, `zombie.gui.diagnostics` et
 `zombie.gui.dangerous-actions`. La dernière autorise les confirmations destructives.
+
+## Diagnostic des ennemis
+
+- `/zzombie list` et `/zzombie types` listent instances et définitions ;
+- `/zzombie info <uuid>` et `/zzombie debug <uuid>` affichent le snapshot runtime ;
+- `/zzombie spawn <type> [game]` crée un ennemi au joueur dans une manche active ;
+- `/zzombie kill <uuid>` passe par le service de dégâts ;
+- `/zzombie removeall <game>` nettoie sans récompense ;
+- `/zzombie reload` active atomiquement les définitions futures.
+
+Chaque action possède une permission `zombies.admin.zombie.<action>`, regroupée sous
+`zombie.admin`.

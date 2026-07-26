@@ -21,11 +21,10 @@ requise pour exécuter le mode classique.
 
 ## À compléter
 
-Compte à rebours, difficulté par formule, budgets d'apparition, santé croissante, points, mise à
-terre, réanimation, spectateur après hémorragie, transitions, défaite et retour lobby sont actifs.
-Les zombies actuels sont des zombies Paper standards marqués par PDC et rattachés à leur instance.
-Ils ne brûlent pas au soleil. Le spawn joueur éditorial est traduit vers le monde cloné lors du
-lancement et des reconnexions.
+Compte à rebours, difficulté, budgets d'apparition, points, mise à terre, réanimation, spectateur,
+transitions, défaite et retour lobby sont actifs. Le Ticket 006 ajoute les types pondérés par
+manche, le ciblage isolé, l'attaque de mêlée, résistances, tirs à la tête explicites, mort
+idempotente et secours anti-blocage.
 
-Économie, formules de difficulté, catalogue d'armes, intelligence des zombies, objectifs,
-équilibrage, états de victoire/défaite et budgets de performance.
+L'économie des portes, barricades, armes, boîte, courant, atouts et Pack-a-Punch n'est pas encore
+active. Le moteur expose les contrats nécessaires sans simuler ces systèmes.

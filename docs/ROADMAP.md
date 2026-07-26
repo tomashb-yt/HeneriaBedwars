@@ -1,6 +1,6 @@
 # Roadmap
 
-**Statut :** Tickets 001 à 005 terminés dans le code.
+**Statut :** Tickets 001 à 006 terminés dans le code.
 
 ## Étapes
 
@@ -15,10 +15,13 @@
 6. **Lobby enrichi et matchmaking :** sélection de map, files et groupes.
 7. **Boucle classique minimale :** terminée au Ticket 005 : manches, zombies temporaires, points,
    mort, réanimation et fin contrôlée.
-8. **Économie de map :** portes, barricades, armes, boîte, courant, atouts et Pack-a-Punch.
-9. **Contenu avancé :** bonus, spéciaux, boss, pièges et quêtes.
-10. **Fonctions originales :** modules indépendants après stabilisation du socle classique.
-11. **Persistance et exploitation :** profils nécessaires, migrations, métriques et outils admin.
+8. **Moteur d'ennemis :** terminé au Ticket 006 : définitions, IA de mêlée, dégâts, capacités,
+   isolation, diagnostic et nettoyage.
+9. **Armes et économie de map :** armes, munitions, dégâts balistiques, armes murales, portes,
+   barricades, boîte, courant, atouts et Pack-a-Punch.
+10. **Contenu avancé :** bonus, spéciaux, boss, pièges et quêtes.
+11. **Fonctions originales :** modules indépendants après stabilisation du socle classique.
+12. **Persistance et exploitation :** profils nécessaires, migrations, métriques et outils admin.
 
 Chaque étape devient un ticket borné, compilé, testé, documenté et publié. SQLite ne sera activé
 qu'avec un modèle persistant défini.

@@ -15,6 +15,7 @@ import fr.heneria.zombie.core.game.ZombieSpawner;
 import fr.heneria.zombie.core.instance.GameInstanceSnapshot;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.display.ContextScoreboardService;
+import fr.heneria.zombie.plugin.enemy.PaperZombieEngine;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.message.MessageService;
 import fr.heneria.zombie.plugin.player.PaperAttributeResolver;
@@ -41,7 +42,7 @@ public final class PaperGameRuntime {
   private final ConfigurationManager configurations;
   private final InstanceCoordinator coordinator;
   private final ContextScoreboardService scoreboards;
-  private final ZombieSpawner spawner;
+  private final PaperZombieEngine spawner;
   private final GameResultRepository results;
   private final RoundDifficultyCalculator difficulty = new RoundDifficultyCalculator();
   private final Logger logger;
@@ -56,7 +57,7 @@ public final class PaperGameRuntime {
       ConfigurationManager configurations,
       InstanceCoordinator coordinator,
       ContextScoreboardService scoreboards,
-      ZombieSpawner spawner,
+      PaperZombieEngine spawner,
       GameResultRepository results,
       MessageService messages,
       Logger logger) {
@@ -163,6 +164,7 @@ public final class PaperGameRuntime {
 
   public void tick() {
     tick++;
+    spawner.tick(tick);
     for (RuntimeState runtime : new ArrayList<>(runtimes.values())) {
       try {
         drive(runtime);
@@ -180,6 +182,10 @@ public final class PaperGameRuntime {
   }
 
   public boolean zombieDefeated(UUID entityId, UUID killerId) {
+    return zombieRemoved(entityId, killerId, 0);
+  }
+
+  public boolean zombieRemoved(UUID entityId, UUID killerId, int pointsReward) {
     UUID gameId = entityGames.remove(entityId);
     if (gameId == null) {
       return false;
@@ -188,9 +194,48 @@ public final class PaperGameRuntime {
     if (runtime == null) {
       return false;
     }
-    runtime.entities.remove(entityId);
-    runtime.game.zombieDefeated(killerId);
+    ActiveEntity removed = runtime.entities.remove(entityId);
+    if (removed != null) {
+      runtime.aliveBySpawn.computeIfPresent(
+          removed.spawnId(), (ignored, count) -> count <= 1 ? null : count - 1);
+    }
+    runtime.game.zombieDefeated(killerId, pointsReward);
     return true;
+  }
+
+  public Collection<UUID> playerIds(UUID gameId) {
+    RuntimeState runtime = runtimes.get(gameId);
+    return runtime == null
+        ? java.util.List.of()
+        : java.util.List.copyOf(runtime.game.snapshot().players().keySet());
+  }
+
+  public Optional<UUID> gameFor(UUID playerId) {
+    return gameIdFor(playerId);
+  }
+
+  public boolean isTargetable(UUID gameId, UUID playerId) {
+    RuntimeState runtime = runtimes.get(gameId);
+    if (runtime == null) {
+      return false;
+    }
+    var player = runtime.game.snapshot().players().get(playerId);
+    Player online = Bukkit.getPlayer(playerId);
+    return player != null
+        && online != null
+        && online.isOnline()
+        && !online.isDead()
+        && player.state() == GamePlayerState.ALIVE;
+  }
+
+  public void damagePlayer(UUID gameId, Player target, double amount) {
+    if (!isTargetable(gameId, target.getUniqueId()) || amount <= 0) {
+      return;
+    }
+    if (amount >= target.getHealth() && down(target)) {
+      return;
+    }
+    target.setHealth(Math.max(0, target.getHealth() - amount));
   }
 
   public boolean down(Player player) {
@@ -253,7 +298,7 @@ public final class PaperGameRuntime {
     runtime.bleedOut.clear();
     runtime.revives.clear();
     announce(runtime.game.snapshot().players().keySet(), "game.ended", "reason", reason.name());
-    runtime.entities.forEach((entity, ignored) -> spawner.remove(entity));
+    spawner.removeAll(gameId, fr.heneria.zombie.core.enemy.ZombieRemovalReason.GAME_ENDED);
     runtime.entities.clear();
   }
 
@@ -393,10 +438,13 @@ public final class PaperGameRuntime {
                   runtime.worldName,
                   source.id(),
                   source.position(),
-                  difficulty.zombieHealth(round, runtime.game.configuration())));
+                  source.zone().isBlank() ? Optional.empty() : Optional.of(source.zone()),
+                  source.allowedTypes()));
       if (spawned.isPresent()) {
         runtime.game.spawned();
-        runtime.entities.put(spawned.get(), round);
+        runtime.entities.put(spawned.get(), new ActiveEntity(round, source.id()));
+        runtime.aliveBySpawn.merge(source.id(), 1, Math::addExact);
+        runtime.lastSpawnTick.put(source.id(), tick);
         entityGames.put(spawned.get(), runtime.game.id());
       } else {
         runtime.game.spawnFailed();
@@ -408,10 +456,47 @@ public final class PaperGameRuntime {
 
   private Optional<MapDefinition.ZombieSpawn> selectSpawn(RuntimeState runtime) {
     int round = runtime.game.snapshot().round().orElseThrow().number();
-    return runtime.map.zombieSpawns().values().stream()
-        .filter(spawn -> spawn.minimumRound() <= round && spawn.maximumRound() >= round)
-        .filter(spawn -> spawn.allowedTypes().isEmpty() || spawn.allowedTypes().contains("NORMAL"))
-        .findFirst();
+    java.util.List<MapDefinition.ZombieSpawn> eligible =
+        runtime.map.zombieSpawns().values().stream()
+            .filter(spawn -> spawn.minimumRound() <= round && spawn.maximumRound() >= round)
+            .filter(spawn -> runtime.aliveBySpawn.getOrDefault(spawn.id(), 0) < spawn.capacity())
+            .filter(
+                spawn ->
+                    !runtime.lastSpawnTick.containsKey(spawn.id())
+                        || tick - runtime.lastSpawnTick.get(spawn.id()) >= spawn.cooldownTicks())
+            .filter(spawn -> validPlayerDistance(runtime, spawn))
+            .toList();
+    double total = eligible.stream().mapToDouble(MapDefinition.ZombieSpawn::weight).sum();
+    if (total <= 0) {
+      return Optional.empty();
+    }
+    double cursor = java.util.concurrent.ThreadLocalRandom.current().nextDouble(total);
+    for (MapDefinition.ZombieSpawn spawn : eligible) {
+      cursor -= spawn.weight();
+      if (cursor < 0) {
+        return Optional.of(spawn);
+      }
+    }
+    return Optional.of(eligible.getLast());
+  }
+
+  private static boolean validPlayerDistance(
+      RuntimeState runtime, MapDefinition.ZombieSpawn spawn) {
+    World world = Bukkit.getWorld(runtime.worldName);
+    if (world == null) {
+      return false;
+    }
+    Location location =
+        new Location(world, spawn.position().x(), spawn.position().y(), spawn.position().z());
+    double minimum = spawn.minimumDistance() * spawn.minimumDistance();
+    double maximum = spawn.maximumDistance() * spawn.maximumDistance();
+    return runtime.game.snapshot().players().entrySet().stream()
+        .filter(entry -> entry.getValue().state() == GamePlayerState.ALIVE)
+        .map(entry -> Bukkit.getPlayer(entry.getKey()))
+        .filter(java.util.Objects::nonNull)
+        .filter(player -> player.getWorld().equals(world))
+        .mapToDouble(player -> player.getLocation().distanceSquared(location))
+        .anyMatch(distance -> distance >= minimum && distance <= maximum);
   }
 
   private void updateRevives(RuntimeState runtime) {
@@ -569,7 +654,9 @@ public final class PaperGameRuntime {
     private final ZombieGame game;
     private final MapDefinition map;
     private final String worldName;
-    private final Map<UUID, Integer> entities = new LinkedHashMap<>();
+    private final Map<UUID, ActiveEntity> entities = new LinkedHashMap<>();
+    private final Map<String, Integer> aliveBySpawn = new LinkedHashMap<>();
+    private final Map<String, Long> lastSpawnTick = new LinkedHashMap<>();
     private final Map<UUID, Long> bleedOut = new LinkedHashMap<>();
     private final Map<UUID, ReviveAttempt> revives = new LinkedHashMap<>();
     private long nextActionAt;
@@ -585,4 +672,6 @@ public final class PaperGameRuntime {
   }
 
   private record ReviveAttempt(UUID reviver, long completeAt) {}
+
+  private record ActiveEntity(int round, String spawnId) {}
 }
