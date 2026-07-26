@@ -295,7 +295,8 @@ public final class ZombieBootstrap {
         new MapPreviewListener(previewService),
         new GuiListener(guiService),
         new GuiChatInputListener(plugin, guiService),
-        new EditorPlacementListener(editorService, editorItems, Clock.systemUTC(), mainThread),
+        new EditorPlacementListener(
+            editorService, editorItems, guiService, Clock.systemUTC(), mainThread),
         new EditorSessionListener(editorService, editorItems));
     registerCommand(
         configurations,

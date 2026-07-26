@@ -4,6 +4,8 @@ import fr.heneria.zombie.core.editor.EditorTool;
 import fr.heneria.zombie.core.editor.MapDefinition;
 import fr.heneria.zombie.core.editor.MapEditorService;
 import fr.heneria.zombie.core.editor.MapPoint;
+import fr.heneria.zombie.plugin.gui.GuiId;
+import fr.heneria.zombie.plugin.gui.GuiService;
 import java.time.Clock;
 import java.util.Map;
 import java.util.Set;
@@ -23,23 +25,26 @@ public final class EditorPlacementListener implements Listener {
   private static final MiniMessage MINI = MiniMessage.miniMessage();
   private final MapEditorService editors;
   private final EditorItemService items;
+  private final GuiService guis;
   private final Clock clock;
   private final Executor mainThread;
 
   public EditorPlacementListener(
-      MapEditorService editors, EditorItemService items, Clock clock, Executor mainThread) {
+      MapEditorService editors,
+      EditorItemService items,
+      GuiService guis,
+      Clock clock,
+      Executor mainThread) {
     this.editors = editors;
     this.items = items;
+    this.guis = guis;
     this.clock = clock;
     this.mainThread = mainThread;
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onInteract(PlayerInteractEvent event) {
-    if (event.getClickedBlock() == null
-        || (event.getAction() != Action.RIGHT_CLICK_BLOCK
-            && event.getAction() != Action.LEFT_CLICK_BLOCK)
-        || !items.isTool(event.getItem())) {
+    if (!items.isTool(event.getItem())) {
       return;
     }
     var session = editors.session(event.getPlayer().getUniqueId()).orElse(null);
@@ -47,6 +52,14 @@ public final class EditorPlacementListener implements Listener {
       return;
     }
     event.setCancelled(true);
+    if (event.getAction() == Action.RIGHT_CLICK_AIR
+        || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+      guis.openHome(event.getPlayer(), new GuiId("editor-main"));
+      return;
+    }
+    if (event.getAction() != Action.LEFT_CLICK_BLOCK || event.getClickedBlock() == null) {
+      return;
+    }
     MapPoint point = point(event.getClickedBlock().getLocation().add(0.5, 1, 0.5));
     EditorTool tool = session.tool();
     if (tool == EditorTool.NONE) {

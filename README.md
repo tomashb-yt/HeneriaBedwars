@@ -24,7 +24,7 @@ et l'éditeur universel. La boucle de manches et les zombies ne sont pas encore 
 .\gradlew.bat qualityGate
 ```
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.5.0-SNAPSHOT.jar`.
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.5.1-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire
