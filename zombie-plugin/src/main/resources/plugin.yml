@@ -18,7 +18,7 @@ commands:
     permission: zombie.gui.player
   zmap:
     description: Creates and edits versioned Zombies maps in game
-    usage: /zmap [create|edit|leave|validate|save|undo|redo]
+    usage: /zmap [create|edit|leave|validate|test|save|undo|redo]
     permission: zombie.editor
 
 permissions:

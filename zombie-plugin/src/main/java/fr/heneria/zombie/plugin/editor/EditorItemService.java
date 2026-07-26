@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,7 +16,11 @@ public final class EditorItemService {
   private final NamespacedKey key;
 
   public EditorItemService(JavaPlugin plugin) {
-    key = new NamespacedKey(plugin, "map_editor_tool");
+    this(new NamespacedKey(plugin, "map_editor_tool"));
+  }
+
+  EditorItemService(NamespacedKey key) {
+    this.key = java.util.Objects.requireNonNull(key, "key");
   }
 
   public void give(Player player, MapEditorSession session) {
@@ -35,8 +40,14 @@ public final class EditorItemService {
   }
 
   public boolean isTool(ItemStack item) {
-    return item != null
-        && item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.BYTE);
+    if (item == null || !item.hasItemMeta()) {
+      return false;
+    }
+    return hasToolMarker(item.getItemMeta());
+  }
+
+  boolean hasToolMarker(ItemMeta meta) {
+    return meta != null && meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE);
   }
 
   public void remove(Player player) {

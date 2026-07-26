@@ -11,6 +11,11 @@
    Un clic droit dans l'air ou accroupi + clic droit avec l'outil la rouvre à tout moment.
 4. `/zmap leave` sauvegarde, ferme la session et retire l'outil. Une déconnexion fait de même.
 
+`/zmap test` exige une validation sans erreur et un monde source homonyme dans
+`zombie_templates/<mapId>`. La commande ferme proprement l'éditeur, supprime un éventuel aperçu,
+crée une instance privée puis y téléporte l'administrateur. Cette instance teste le clone, le
+spawn, l'isolation et la définition ; elle ne lance pas encore de manches ni de zombies.
+
 Une session contient la définition courante, l'outil, la sélection, le presse-papiers et un
 historique undo/redo borné à 64 versions. Un administrateur ne possède jamais deux sessions.
 

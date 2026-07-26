@@ -49,6 +49,9 @@ Préparer un monde valide dans `zombie_templates/crypt` sans manifeste, puis :
 12. exécuter `/zmap create crypt_edit`, placer spawn, zones, porte et spawn zombie ;
 13. déplacer, dupliquer, supprimer, tester undo/redo puis valider ;
 14. quitter, redémarrer Paper, rouvrir la map et vérifier la restauration.
+15. avec un modèle homonyme dans `zombie_templates`, exécuter `/zmap test`, vérifier le clone privé
+    et la téléportation, puis quitter et arrêter l'instance ;
+16. cliquer sur des cases vides et items sans métadonnées dans les GUI sans exception console.
 
 Une exécution locale sans trois comptes ne valide honnêtement que démarrage, création de monde,
 commandes console et arrêt. La validation visuelle multi-clients doit être consignée séparément.

@@ -28,6 +28,7 @@ Elles exigent `zombie.command.use` et, pour les transitions joueur, `zombie.play
 - `/zmap edit <id>` — ouvre une session existante ;
 - `/zmap leave` — sauvegarde et ferme proprement la session ;
 - `/zmap validate` — affiche erreurs, avertissements et conseils ;
+- `/zmap test` — valide, sauvegarde puis crée et rejoint une instance privée du modèle homonyme ;
 - `/zmap save`, `/zmap undo`, `/zmap redo` — sauvegarde et historique.
 
 Les commandes de map et les quatre commandes d'instance exigent `zombie.instance.admin`. Le reload

@@ -42,6 +42,16 @@ la charge avec le même adaptateur monde, autorise son propriétaire, puis le t�
 vanilla. `/zombie map leave` et la déconnexion renvoient ou libèrent le joueur, déchargent la copie
 et la suppriment même lorsque la suppression des mondes de partie est désactivée.
 
+## Instance de test éditeur
+
+`/zmap test` réutilise le pipeline d'instance : validation éditoriale, sauvegarde, fermeture de
+session, sortie d'un éventuel aperçu, clone privé puis entrée du créateur. Le `mapId` éditorial
+doit correspondre à un dossier `zombie_templates/<mapId>` valide.
+
+`/zombie instance leave` quitte le test. L'instance reste inspectable puis peut être supprimée avec
+`/zombie instance list` et `/zombie instance stop <id>`. Le test ne contourne ni capacité,
+isolation, protection, chargement Paper ni nettoyage.
+
 ## Entrée et sortie joueur
 
 `InstanceCoordinator` réalise la transaction entre session, registre, état joueur, téléportation,

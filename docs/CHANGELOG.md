@@ -2,6 +2,18 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.5.3-SNAPSHOT — Instance de test et sécurité d'inventaire
+
+### Ajouté
+
+- `/zmap test` valide la map puis crée et rejoint une instance privée du modèle homonyme.
+
+### Corrigé
+
+- les items Paper sans métadonnées ne provoquent plus de `NullPointerException` pendant un clic
+  d'inventaire ;
+- une entrée refusée dans l'instance de test déclenche son nettoyage.
+
 ## 0.5.2-SNAPSHOT — Placement et ouverture sans conflit
 
 ### Corrigé

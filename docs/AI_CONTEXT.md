@@ -47,6 +47,9 @@ Le Ticket 004 ajoute un schéma éditorial v2, un registre asynchrone, des sessi
 les commandes `/zmap`, l'outil protégé, les GUI de placement et un validateur structurel. Les
 définitions sont auto-sauvegardées sous `plugins/HeneriaZombie/maps`.
 
+Le correctif 0.5.3 transforme une définition valide en instance privée de test lorsque le
+catalogue contient un monde source homonyme. Il ne constitue pas encore une boucle de gameplay.
+
 Les états sont `CREATING`, `WAITING`, `STARTING`, `RUNNING`, `ENDING`, `CLEANING`, `CLOSED` et
 `ERROR`. Aucune manche, aucun zombie et aucun matchmaking ne sont implémentés.
 

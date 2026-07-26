@@ -466,7 +466,14 @@ public final class ZombieBootstrap {
       throw new IllegalStateException("Command zmap is missing from plugin.yml");
     }
     ZMapCommand executor =
-        new ZMapCommand(editorService, validator, editorItems, guiService, mainThread);
+        new ZMapCommand(
+            editorService,
+            validator,
+            editorItems,
+            guiService,
+            coordinator,
+            previewService,
+            mainThread);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }

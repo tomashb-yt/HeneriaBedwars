@@ -5,8 +5,12 @@ import fr.heneria.zombie.core.editor.MapEditorService;
 import fr.heneria.zombie.core.editor.MapValidator;
 import fr.heneria.zombie.plugin.gui.GuiId;
 import fr.heneria.zombie.plugin.gui.GuiService;
+import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
+import fr.heneria.zombie.plugin.instance.PlayerInstanceResult;
+import fr.heneria.zombie.plugin.map.MapPreviewService;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,6 +29,8 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   private final MapValidator validator;
   private final EditorItemService items;
   private final GuiService guis;
+  private final InstanceCoordinator coordinator;
+  private final MapPreviewService previews;
   private final Executor mainThread;
 
   public ZMapCommand(
@@ -32,11 +38,15 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       MapValidator validator,
       EditorItemService items,
       GuiService guis,
+      InstanceCoordinator coordinator,
+      MapPreviewService previews,
       Executor mainThread) {
     this.editors = editors;
     this.validator = validator;
     this.items = items;
     this.guis = guis;
+    this.coordinator = coordinator;
+    this.previews = previews;
     this.mainThread = mainThread;
   }
 
@@ -75,6 +85,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       }
       case "leave" -> leave(player);
       case "validate" -> validate(player);
+      case "test" -> test(player);
       case "save" -> complete(player, editors.save(player.getUniqueId()), "Map sauvegardée.");
       case "undo" -> history(player, true);
       case "redo" -> history(player, false);
@@ -91,7 +102,8 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       @NotNull String[] arguments) {
     if (arguments.length == 1) {
       return filter(
-          List.of("create", "edit", "leave", "validate", "save", "undo", "redo"), arguments[0]);
+          List.of("create", "edit", "leave", "validate", "test", "save", "undo", "redo"),
+          arguments[0]);
     }
     if (arguments.length == 2 && arguments[0].equalsIgnoreCase("edit")) {
       return filter(
@@ -165,6 +177,67 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
     report.advice().forEach(value -> player.sendMessage(MINI.deserialize("<aqua>ℹ " + value)));
   }
 
+  private void test(Player player) {
+    var session = editors.session(player.getUniqueId()).orElse(null);
+    if (session == null) {
+      player.sendMessage(MINI.deserialize("<red>Ouvrez d'abord la map avec /zmap edit <map>."));
+      return;
+    }
+    MapDefinition definition = session.definition();
+    var report = validator.validate(definition);
+    if (!report.valid()) {
+      player.sendMessage(
+          MINI.deserialize(
+              "<red>Test refusé : " + report.errors().size() + " erreur(s) bloquante(s)."));
+      report.errors().forEach(value -> player.sendMessage(MINI.deserialize("<red>✘ " + value)));
+      return;
+    }
+    player.closeInventory();
+    player.sendMessage(MINI.deserialize("<yellow>Préparation de l'instance de test..."));
+    editors
+        .leave(player.getUniqueId())
+        .thenComposeAsync(
+            ignored -> {
+              items.remove(player);
+              return previews.leave(player);
+            },
+            mainThread)
+        .thenComposeAsync(
+            leftPreview -> {
+              if (!leftPreview) {
+                coordinator.leave(player);
+              }
+              return coordinator.create(definition.id(), Optional.of(player.getUniqueId()));
+            },
+            mainThread)
+        .thenCompose(
+            created ->
+                coordinator
+                    .join(player, created.id())
+                    .thenCompose(
+                        result -> {
+                          if (result == PlayerInstanceResult.SUCCESS) {
+                            return java.util.concurrent.CompletableFuture.completedFuture(created);
+                          }
+                          return coordinator
+                              .stop(created.id())
+                              .thenCompose(
+                                  ignored ->
+                                      java.util.concurrent.CompletableFuture.failedFuture(
+                                          new IllegalStateException(
+                                              "Entrée refusée : " + result.name())));
+                        }))
+        .whenCompleteAsync(
+            (created, failure) ->
+                player.sendMessage(
+                    failure == null
+                        ? MINI.deserialize(
+                            "<green>Instance de test rejointe : <white>"
+                                + created.id().toString().substring(0, 8))
+                        : MINI.deserialize("<red>Test impossible : " + safe(failure))),
+            mainThread);
+  }
+
   private void history(Player player, boolean undo) {
     var future = undo ? editors.undo(player.getUniqueId()) : editors.redo(player.getUniqueId());
     future.whenCompleteAsync(
@@ -190,7 +263,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   private static void usage(Player player) {
     player.sendMessage(
         MINI.deserialize(
-            "<yellow>/zmap create <nom>, edit <map>, leave, validate, save, undo, redo"));
+            "<yellow>/zmap create <nom>, edit <map>, leave, validate, test, save, undo, redo"));
   }
 
   private static List<String> filter(List<String> values, String prefix) {
