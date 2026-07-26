@@ -8,7 +8,7 @@
    mémorise l'auteur et les dates, puis ouvre l'éditeur.
 2. `/zmap edit <id>` ouvre une session exclusive et donne l'outil protégé dans le slot 9.
 3. La GUI donne accès aux informations, zones, portes, spawns, objets, validation et sauvegarde.
-   Un clic droit avec l'outil la rouvre à tout moment.
+   Un clic droit dans l'air ou accroupi + clic droit avec l'outil la rouvre à tout moment.
 4. `/zmap leave` sauvegarde, ferme la session et retire l'outil. Une déconnexion fait de même.
 
 Une session contient la définition courante, l'outil, la sélection, le presse-papiers et un
@@ -21,8 +21,8 @@ privée dans le chat. Auteur et monde sont fixés à la création. Le spawn joue
 l'outil.
 
 Chaque collection est sans plafond métier. Ajouter sélectionne l'outil de placement ; un clic
-gauche avec l'outil sur un bloc place ou déplace l'élément. Dans une liste GUI, un clic gauche
-prépare le déplacement, un clic droit demande confirmation avant suppression et Maj-clic
+gauche ou droit avec l'outil sur un bloc place ou déplace l'élément. Dans une liste GUI, un clic
+gauche prépare le déplacement, un clic droit demande confirmation avant suppression et Maj-clic
 duplique. Les objets couvrent barricade, Mystery Box, Pack-a-Punch, perk, piège, téléporteur,
 power, objectif, quête et boss. Leurs paramètres extensibles sont stockés dans `properties`.
 

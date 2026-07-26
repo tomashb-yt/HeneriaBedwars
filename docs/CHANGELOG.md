@@ -2,13 +2,21 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
-## 0.5.1-SNAPSHOT — Ergonomie de l'outil éditeur
+## 0.5.2-SNAPSHOT — Placement et ouverture sans conflit
 
 ### Corrigé
 
-- un clic droit en l'air ou sur un bloc avec l'outil rouvre désormais le menu éditeur ;
-- le placement est réservé au clic gauche sur un bloc afin d'éviter les actions ambiguës ;
-- le lore de l'outil indique directement ses deux commandes.
+- un clic droit dans l'air ou accroupi + clic droit rouvre désormais le menu éditeur ;
+- un clic gauche ou droit sur un bloc place l'élément lorsqu'une action est sélectionnée ;
+- sans action sélectionnée, le clic droit sur un bloc ouvre également le menu ;
+- le lore de l'outil explique les interactions sans ambiguïté.
+
+## 0.5.1-SNAPSHOT — Réouverture du menu éditeur
+
+### Corrigé
+
+- l'outil permet de rouvrir le menu sans relancer `/zmap edit` ;
+- le lore présente les commandes de l'outil.
 
 ## 0.5.0-SNAPSHOT — Éditeur universel de maps
 

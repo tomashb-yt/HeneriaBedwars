@@ -26,8 +26,9 @@ public final class EditorItemService {
     meta.lore(
         List.of(
             mini.deserialize("<gray>Map : <white>" + session.mapId()),
-            mini.deserialize("<yellow>Clic droit : <white>ouvrir le menu"),
-            mini.deserialize("<yellow>Clic gauche bloc : <white>placer/déplacer")));
+            mini.deserialize("<yellow>Clic droit en l'air : <white>ouvrir le menu"),
+            mini.deserialize("<yellow>Clic sur un bloc : <white>placer/déplacer"),
+            mini.deserialize("<yellow>Accroupi + clic droit : <white>ouvrir le menu")));
     meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
     item.setItemMeta(meta);
     player.getInventory().setItem(8, item);

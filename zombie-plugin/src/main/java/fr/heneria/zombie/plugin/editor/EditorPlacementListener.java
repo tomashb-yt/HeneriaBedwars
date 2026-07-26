@@ -52,16 +52,19 @@ public final class EditorPlacementListener implements Listener {
       return;
     }
     event.setCancelled(true);
+    EditorTool tool = session.tool();
     if (event.getAction() == Action.RIGHT_CLICK_AIR
-        || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        || (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().isSneaking())
+        || (event.getAction() == Action.RIGHT_CLICK_BLOCK && tool == EditorTool.NONE)) {
       guis.openHome(event.getPlayer(), new GuiId("editor-main"));
       return;
     }
-    if (event.getAction() != Action.LEFT_CLICK_BLOCK || event.getClickedBlock() == null) {
+    if ((event.getAction() != Action.LEFT_CLICK_BLOCK
+            && event.getAction() != Action.RIGHT_CLICK_BLOCK)
+        || event.getClickedBlock() == null) {
       return;
     }
     MapPoint point = point(event.getClickedBlock().getLocation().add(0.5, 1, 0.5));
-    EditorTool tool = session.tool();
     if (tool == EditorTool.NONE) {
       event.getPlayer().sendMessage(MINI.deserialize("<yellow>Sélectionnez un outil dans le GUI."));
       return;
