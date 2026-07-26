@@ -27,7 +27,7 @@ mécaniques originales optionnelles par map.
 - fichiers hors thread serveur, appels Bukkit sur le thread serveur ;
 - snapshots de configuration validés puis activés atomiquement.
 
-## État réel — Ticket 004
+## État réel — Tickets 004 et 005
 
 Le socle Ticket 001 reste opérationnel. Le Ticket 002 ajoute :
 

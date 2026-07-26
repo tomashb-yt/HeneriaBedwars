@@ -1,6 +1,6 @@
 # Modèles de données
 
-**Statut :** modèles runtime, GUI et éditeur universel opérationnels ; gameplay à venir.
+**Statut :** modèles runtime, GUI, éditeur universel et boucle de jeu opérationnels.
 
 ## Instance
 

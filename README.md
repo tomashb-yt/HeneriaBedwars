@@ -5,8 +5,8 @@ classique de Black Ops 2 et enrichi de mécaniques originales facultatives par m
 
 ## État
 
-Les Tickets 001 à 005 fournissent la fondation, le lobby, les instances isolées, le framework GUI
-et l'éditeur universel. La boucle de manches et les zombies ne sont pas encore implémentés.
+Les Tickets 001 à 005 fournissent la fondation, le lobby, les instances isolées, le framework GUI,
+l'éditeur universel et une boucle de manches jouable avec zombies vanilla temporaires.
 
 ## Prérequis
 
