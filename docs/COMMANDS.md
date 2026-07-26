@@ -4,6 +4,18 @@
 
 ## Commandes joueur
 
+## Administration de partie
+
+- `/zgame list` liste les parties ;
+- `/zgame info <instance>` et `/zgame debug <instance>` affichent leur snapshot ;
+- `/zgame start <instance>` lance la partie ;
+- `/zgame stop <instance>` demande une fin contrôlée ;
+- `/zgame nextround <instance>` accélère une transition ;
+- `/zgame setround <instance> <numéro>` choisit la prochaine manche pendant une transition.
+
+Les permissions sont `zombies.admin.game.start`, `.stop`, `.round`, `.list` et `.debug`.
+`/zmap test` démarre automatiquement la boucle sur l'instance créée.
+
 - `/zombies` — ouvre le menu principal joueur ;
 - `/zombie` — état, version et compteurs réels ;
 - `/zombie help` — aide ;

@@ -71,5 +71,12 @@ expose tranche, index, nombre de pages et total sans plafond global.
 
 ## Persistance
 
+## Partie et manche
+
+`ZombieGame.Snapshot` contient état, manche, joueurs, raison de fin et durée.
+`RoundState.Snapshot` expose total, attente, réservations, vivants, éliminés et phase.
+`GamePlayer.Snapshot` conserve points, kills, réanimations, mises à terre, manche maximale et
+échéance de reconnexion. `GameResult` est immuable et son port de persistance est asynchrone.
+
 Les définitions éditoriales sont écrites en YAML versionné et atomique. Instances et sessions
 restent runtime. SQLite reste réservé aux futures données de profil.

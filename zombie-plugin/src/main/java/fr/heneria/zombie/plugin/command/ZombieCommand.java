@@ -7,6 +7,7 @@ import fr.heneria.zombie.core.command.ZombieCommandParser;
 import fr.heneria.zombie.core.instance.GameInstanceSnapshot;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.config.ReloadResult;
+import fr.heneria.zombie.plugin.game.PaperGameRuntime;
 import fr.heneria.zombie.plugin.gui.GuiConfigurationService;
 import fr.heneria.zombie.plugin.gui.GuiId;
 import fr.heneria.zombie.plugin.gui.GuiService;
@@ -48,6 +49,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
   private final GuiConfigurationService guiConfigurations;
   private final GuiService guiService;
   private final Executor mainThread;
+  private final PaperGameRuntime games;
 
   /**
    * Creates the command adapter.
@@ -73,6 +75,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       MapPreviewService previews,
       GuiConfigurationService guiConfigurations,
       GuiService guiService,
+      PaperGameRuntime games,
       Executor mainThread) {
     this.version = Objects.requireNonNull(version, "version");
     this.api = Objects.requireNonNull(api, "api");
@@ -84,6 +87,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     this.previews = Objects.requireNonNull(previews, "previews");
     this.guiConfigurations = Objects.requireNonNull(guiConfigurations, "guiConfigurations");
     this.guiService = Objects.requireNonNull(guiService, "guiService");
+    this.games = Objects.requireNonNull(games, "games");
     this.mainThread = Objects.requireNonNull(mainThread, "mainThread");
   }
 
@@ -214,6 +218,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
     withPlayer(
         sender,
         player -> {
+          games.left(player.getUniqueId());
           coordinator.leave(player);
           previews
               .open(player, mapId.toLowerCase(Locale.ROOT))
@@ -242,6 +247,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
                 return;
               }
               if (!leftPreview) {
+                games.left(player.getUniqueId());
                 coordinator.leave(player);
               }
               sender.sendMessage(
@@ -298,6 +304,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
                     messages.render(
                         "command.instance-join-failure", "reason", safeFailureMessage(failure)));
               } else if (result == PlayerInstanceResult.SUCCESS) {
+                games.joined(resolved.get().id(), player.getUniqueId());
                 sender.sendMessage(
                     messages.render("command.instance-joined", "id", shortId(resolved.get().id())));
               } else {
@@ -314,6 +321,7 @@ public final class ZombieCommand implements CommandExecutor, TabCompleter {
       sender.sendMessage(messages.render("command.instance-not-found"));
       return;
     }
+    games.end(resolved.get().id(), fr.heneria.zombie.core.game.GameEndReason.ADMIN_STOP);
     coordinator
         .stop(resolved.get().id())
         .whenCompleteAsync(

@@ -260,7 +260,276 @@ public final class ZombieBootstrap {
     new EditorGuiModule(
             guiRegistry,
             guiActions,
-            guiConf×vâÚ$z{-®éÜj×ÛÜTÙXÝ[ÛŠÚ[]\™Ù]
-NÃBˆCBˆH[ÙHYˆ
-ÙXÝ[Û‹š\ÔÝš[™ÊÙ^JJHÃBˆ\™Ù]œ]
-]ÙXÝ[Û‹™Ù]Ýš[™ÊÙ^KˆŠJNÃBˆCBˆCBˆCBƒBˆš]˜]H™XÛÜ™Ø[™Y]JÛÛ™šYÝ\˜][Û”Û˜\ÚÝÛ˜\ÚÝ\ÝÛÛ™šYÝ\˜][Û’\ÜÝYOˆ\ÜÝY\ÊHßCBŸCB
+            guiConfigurations,
+            guiService,
+            editorService,
+            mapValidator,
+            editorItems,
+            mainThread,
+            Clock.systemUTC())
+        .register();
+    guiConfigurations
+        .initializeAsync()
+        .whenComplete(
+            (ignored, failure) -> {
+              if (failure != null) {
+                plugin
+                    .getLogger()
+                    .severe(
+                        "guis.yml rejected; bundled defaults remain active: "
+                            + failure.getMessage());
+              }
+            });
+
+    ZombieGameService gameService =
+        new ZombieGameService(
+            Clock.systemUTC(),
+            event ->
+                plugin
+                    .getLogger()
+                    .fine(
+                        "Game event "
+                            + event.getClass().getSimpleName()
+                            + " for "
+                            + event.gameId()));
+    gameRuntime =
+        new PaperGameRuntime(
+            gameService,
+            mapRegistry,
+            configurations,
+            coordinator,
+            scoreboards,
+            new PaperZombieSpawner(plugin),
+            result -> java.util.concurrent.CompletableFuture.completedFuture(null),
+            messages,
+            plugin.getLogger());
+
+    registerServices(
+        configurations,
+        messages,
+        templates,
+        worlds,
+        registry,
+        instances,
+        sessions,
+        playerStates,
+        scoreboards,
+        lobby,
+        visibility,
+        audiences,
+        previewService);
+    registerListeners(
+        new PlayerContextListener(
+            coordinator, sessions, configurations, audiences, messages, gameRuntime),
+        new IsolatedChatListener(sessions, visibilityPolicy, configurations, messages),
+        new ContextDeathListener(sessions, audiences),
+        new InstanceWorldProtectionListener(worlds, sessions, configurations, previewService),
+        new MapPreviewListener(previewService),
+        new GuiListener(guiService),
+        new GuiChatInputListener(plugin, guiService),
+        new GameCombatListener(gameRuntime, messages),
+        new EditorPlacementListener(
+            editorService, editorItems, guiService, Clock.systemUTC(), mainThread),
+        new EditorSessionListener(editorService, editorItems));
+    registerCommand(
+        configurations,
+        messages,
+        templates,
+        previewService,
+        guiConfigurations,
+        guiService,
+        mainThread);
+    registerPlayerGuiCommand(guiService);
+    registerMapEditorCommand(mapValidator, mainThread);
+    registerGameCommand(gameRuntime);
+
+    maintenanceTask =
+        plugin
+            .getServer()
+            .getScheduler()
+            .runTaskTimer(plugin, coordinator::expireReconnectReservations, 20L, 20L);
+    gameTask = plugin.getServer().getScheduler().runTaskTimer(plugin, gameRuntime::tick, 1L, 1L);
+    for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
+      coordinator.connect(player);
+    }
+    plugin
+        .getServer()
+        .getServicesManager()
+        .register(ZombieApi.class, api, plugin, ServicePriority.Normal);
+    plugin.getLogger().info("Lobby and isolated-instance runtime initialized.");
+  }
+
+  /** Releases tasks, players, worlds, API registration and executor threads. */
+  public void stop() {
+    if (editorService != null) {
+      for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
+        editorService.leave(player.getUniqueId());
+        if (editorItems != null) {
+          editorItems.remove(player);
+        }
+      }
+      editorService = null;
+      editorItems = null;
+    }
+    if (guiService != null) {
+      guiService.shutdown();
+      guiService = null;
+    }
+    if (maintenanceTask != null) {
+      maintenanceTask.cancel();
+      maintenanceTask = null;
+    }
+    if (gameTask != null) {
+      gameTask.cancel();
+      gameTask = null;
+    }
+    if (gameRuntime != null) {
+      gameRuntime.shutdown();
+      gameRuntime = null;
+    }
+    if (coordinator != null) {
+      if (previewService != null) {
+        previewService.clear();
+        previewService = null;
+      }
+      List<String> failures = coordinator.shutdown();
+      failures.forEach(
+          world -> plugin.getLogger().warning("World could not be unloaded: " + world));
+      coordinator = null;
+    }
+    if (api != null) {
+      plugin.getServer().getServicesManager().unregister(ZombieApi.class, api);
+      api = null;
+    }
+    services.clear();
+    if (ioExecutor != null) {
+      ioExecutor.shutdown();
+      try {
+        if (!ioExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
+          ioExecutor.shutdownNow();
+        }
+      } catch (InterruptedException interrupted) {
+        ioExecutor.shutdownNow();
+        Thread.currentThread().interrupt();
+      }
+      ioExecutor = null;
+    }
+  }
+
+  private void registerServices(
+      ConfigurationManager configurations,
+      MessageService messages,
+      MapTemplateCatalog templates,
+      PaperWorldInstanceService worlds,
+      GameInstanceRegistry registry,
+      GameInstanceService instances,
+      PlayerSessionService sessions,
+      PaperPlayerStateService playerStates,
+      ContextScoreboardService scoreboards,
+      LobbyService lobby,
+      VisibilityService visibility,
+      PaperAudienceService audiences,
+      MapPreviewService previews) {
+    services.register(ConfigurationManager.class, configurations);
+    services.register(MessageService.class, messages);
+    services.register(MapTemplateCatalog.class, templates);
+    services.register(PaperWorldInstanceService.class, worlds);
+    services.register(GameInstanceRegistry.class, registry);
+    services.register(GameInstanceService.class, instances);
+    services.register(PlayerSessionService.class, sessions);
+    services.register(PaperPlayerStateService.class, playerStates);
+    services.register(ContextScoreboardService.class, scoreboards);
+    services.register(LobbyService.class, lobby);
+    services.register(VisibilityService.class, visibility);
+    services.register(PaperAudienceService.class, audiences);
+    services.register(MapPreviewService.class, previews);
+    services.register(InstanceCoordinator.class, coordinator);
+    services.register(ZombieApi.class, api);
+  }
+
+  private void registerListeners(Listener... listeners) {
+    for (Listener listener : listeners) {
+      plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+    }
+  }
+
+  private void registerCommand(
+      ConfigurationManager configurations,
+      MessageService messages,
+      MapTemplateCatalog templates,
+      MapPreviewService previews,
+      GuiConfigurationService guiConfigurations,
+      GuiService guiService,
+      PaperMainThreadExecutor mainThread) {
+    PluginCommand command = plugin.getCommand("zombie");
+    if (command == null) {
+      throw new IllegalStateException("Command zombie is missing from plugin.yml");
+    }
+    ZombieCommand executor =
+        new ZombieCommand(
+            plugin.getPluginMeta().getVersion(),
+            api,
+            state,
+            configurations,
+            messages,
+            coordinator,
+            templates,
+            previews,
+            guiConfigurations,
+            guiService,
+            gameRuntime,
+            mainThread);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+
+  private void registerPlayerGuiCommand(GuiService guiService) {
+    PluginCommand command = plugin.getCommand("zombies");
+    if (command == null) {
+      throw new IllegalStateException("Command zombies is missing from plugin.yml");
+    }
+    command.setExecutor(
+        (sender, ignored, label, arguments) -> {
+          if (!(sender instanceof org.bukkit.entity.Player player)) {
+            sender.sendMessage("Cette commande doit Ãªtre utilisÃ©e en jeu.");
+          } else if (!player.hasPermission("zombie.gui.player")) {
+            player.sendMessage(
+                net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
+                    .deserialize("<red>Vous n'avez pas la permission."));
+          } else {
+            guiService.openHome(player, new fr.heneria.zombie.plugin.gui.GuiId("player-main"));
+          }
+          return true;
+        });
+  }
+
+  private void registerMapEditorCommand(
+      MapValidator validator, PaperMainThreadExecutor mainThread) {
+    PluginCommand command = plugin.getCommand("zmap");
+    if (command == null) {
+      throw new IllegalStateException("Command zmap is missing from plugin.yml");
+    }
+    ZMapCommand executor =
+        new ZMapCommand(
+            editorService,
+            validator,
+            editorItems,
+            guiService,
+            coordinator,
+            previewService,
+            gameRuntime,
+            mainThread);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+
+  private void registerGameCommand(PaperGameRuntime games) {
+    PluginCommand command = plugin.getCommand("zgame");
+    if (command == null) {
+      throw new IllegalStateException("Command zgame is missing from plugin.yml");
+    }
+    ZGameCommand executor = new ZGameCommand(games, coordinator);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+}

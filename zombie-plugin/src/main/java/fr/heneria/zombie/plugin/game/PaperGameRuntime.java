@@ -350,18 +350,208 @@ public final class PaperGameRuntime {
               runtime.game.zombieDefeated(null);
               return true;
             });
-    if (tick < runtime.nextAction€]u∂âûÀk∫wµÁY\ãõX^X[
+    if (tick < runtime.nextActionAt) {
+      return;
+    }
+    int maximumAlive =
+        difficulty.maximumAlive(activePlayers(runtime), runtime.game.configuration());
+    int reserved =
+        runtime.game.reserveSpawns(runtime.game.configuration().batchSize(), maximumAlive);
+    for (int index = 0; index < reserved; index++) {
+      MapDefinition.ZombieSpawn source = selectSpawn(runtime).orElse(null);
+      if (source == null) {
+        runtime.game.spawnFailed();
+        continue;
+      }
+      int round = runtime.game.snapshot().round().orElseThrow().number();
+      Optional<UUID> spawned =
+          spawner.spawn(
+              new ZombieSpawner.SpawnRequest(
+                  runtime.game.id(),
+                  round,
+                  runtime.worldName,
+                  source.id(),
+                  source.position(),
+                  difficulty.zombieHealth(round, runtime.game.configuration())));
+      if (spawned.isPresent()) {
+        runtime.game.spawned();
+        runtime.entities.put(spawned.get(), round);
+        entityGames.put(spawned.get(), runtime.game.id());
+      } else {
+        runtime.game.spawnFailed();
+      }
+    }
+    int round = runtime.game.snapshot().round().orElseThrow().number();
+    runtime.nextActionAt = tick + difficulty.spawnDelayTicks(round, runtime.game.configuration());
+  }
 
-JN√Bàô]\õà]öXù]HOHù[»ååà]öXù]KôŸ]ò[YJ
-N√BàCBÉBàö]ò]Hõ⁄Y[õõ›[òŸJ€€X›[€èURQà^Y\úÀ›ö[ô»Ÿ^K›ö[ôÀããàXŸZ€\ú H√Bà€€\€ô[ù^HY\‹ÿYŸ\Àúô[ô\äŸ^KXŸZ€\ú N√Bàõ‹à
-URQ^Y\íYà^Y\ú H√Bà^Y\à^Y\àHùZ⁄⁄]ôŸ]^Y\ä^Y\íY
-N√BàYà
-^Y\àOHù[
-H√Bà^Y\ãú⁄›’]J]Kù]J^€€\€ô[ùô[\J
-JJN√BàCBàCBàCBÉBàö]ò]H›]X»ö[ò[€\‹»ù[ù[YT›]H√Bàö]ò]Hö[ò[õ€XöYQÿ[YHÿ[YN√Bàö]ò]Hö[ò[X\Yö[ö][€àX\√Bàö]ò]Hö[ò[›ö[ô»€‹õò[YN√Bàö]ò]Hö[ò[X\URQ[ùYŸ\èà[ù]Y\»Hô]»[öŸY\⁄X\ä
-N√Bàö]ò]Hö[ò[X\URQ€ôœàõYY›]Hô]»[öŸY\⁄X\ä
-N√Bàö]ò]Hö[ò[X\URQô]ö]ôP][\àô]ö]ô\»Hô]»[öŸY\⁄X\ä
-N√Bàö]ò]H€ô»ô^X›[€ê]√Bàö]ò]H€ô»[ô]√Bàö]ò]Hõ€€X[à[ô[ôŒ√BÉBàö]ò]Hù[ù[YT›]Jõ€XöYQÿ[YHÿ[YKX\Yö[ö][€àX\›ö[ô»€‹õò[YK€ô»ô^X›[€ê]
-H√Bà\Àôÿ[YHHÿ[YN√Bà\ÀõX\HX\√Bà\Àù€‹õò[YHH€‹õò[YN√Bà\Àõô^X›[€ê]Hô^X›[€ê]√BàCBàCBÉBàö]ò]HôX€‹ôô]ö]ôP][\
-URQô]ö]ô\ã€ô»€€\]P]
-HﬂCBüCB
+  private Optional<MapDefinition.ZombieSpawn> selectSpawn(RuntimeState runtime) {
+    int round = runtime.game.snapshot().round().orElseThrow().number();
+    return runtime.map.zombieSpawns().values().stream()
+        .filter(spawn -> spawn.minimumRound() <= round && spawn.maximumRound() >= round)
+        .filter(spawn -> spawn.allowedTypes().isEmpty() || spawn.allowedTypes().contains("NORMAL"))
+        .findFirst();
+  }
+
+  private void updateRevives(RuntimeState runtime) {
+    runtime
+        .bleedOut
+        .entrySet()
+        .removeIf(
+            entry -> {
+              if (tick < entry.getValue()) {
+                return false;
+              }
+              runtime.game.eliminate(entry.getKey());
+              runtime.game.spectate(entry.getKey());
+              Player player = Bukkit.getPlayer(entry.getKey());
+              if (player != null) {
+                player.setGameMode(GameMode.SPECTATOR);
+              }
+              return true;
+            });
+    runtime
+        .revives
+        .entrySet()
+        .removeIf(
+            entry -> {
+              ReviveAttempt attempt = entry.getValue();
+              Player target = Bukkit.getPlayer(entry.getKey());
+              Player reviver = Bukkit.getPlayer(attempt.reviver);
+              if (target == null
+                  || reviver == null
+                  || !reviver.isSneaking()
+                  || reviver.getLocation().distanceSquared(target.getLocation()) > 9) {
+                return true;
+              }
+              if (tick < attempt.completeAt) {
+                return false;
+              }
+              if (runtime.game.revive(entry.getKey(), attempt.reviver)) {
+                runtime.bleedOut.remove(entry.getKey());
+                target.setGameMode(GameMode.ADVENTURE);
+                target.setHealth(
+                    Math.min(maximumHealth(target), runtime.game.configuration().reviveHealth()));
+              }
+              return true;
+            });
+  }
+
+  private void updateBoards(RuntimeState runtime) {
+    if (tick % 10 != 0) {
+      return;
+    }
+    ZombieGame.Snapshot snapshot = runtime.game.snapshot();
+    for (UUID playerId : snapshot.players().keySet()) {
+      Player player = Bukkit.getPlayer(playerId);
+      if (player != null) {
+        scoreboards.updateGame(player, snapshot);
+      }
+    }
+  }
+
+  private void finish(RuntimeState runtime) {
+    runtimes.remove(runtime.game.id());
+    entityGames.entrySet().removeIf(entry -> entry.getValue().equals(runtime.game.id()));
+    for (UUID playerId : runtime.game.snapshot().players().keySet()) {
+      Player player = Bukkit.getPlayer(playerId);
+      if (player != null) {
+        coordinator.leave(player);
+      }
+    }
+    coordinator.stop(runtime.game.id());
+    games.remove(runtime.game.id());
+  }
+
+  private int activePlayers(RuntimeState runtime) {
+    return (int)
+        runtime.game.snapshot().players().values().stream()
+            .filter(
+                player ->
+                    player.state() == GamePlayerState.ALIVE
+                        || player.state() == GamePlayerState.WAITING
+                        || player.state() == GamePlayerState.DOWNED
+                        || player.state() == GamePlayerState.DISCONNECTED)
+            .count();
+  }
+
+  private Optional<RuntimeState> runtimeFor(UUID playerId) {
+    return gameIdFor(playerId).map(runtimes::get);
+  }
+
+  private Optional<UUID> gameIdFor(UUID playerId) {
+    return runtimes.values().stream()
+        .filter(runtime -> runtime.game.snapshot().players().containsKey(playerId))
+        .map(runtime -> runtime.game.id())
+        .findFirst();
+  }
+
+  private RoundConfiguration configuration() {
+    GameplayOptions value = configurations.current().settings().gameplay();
+    return new RoundConfiguration(
+        value.minimumPlayers(),
+        value.countdownSeconds(),
+        value.cancelCountdownWhenInsufficient(),
+        value.joinInProgress(),
+        value.endScreenSeconds(),
+        value.startingPoints(),
+        value.maximumRound(),
+        value.firstRoundDelaySeconds(),
+        value.transitionSeconds(),
+        value.enemyBase(),
+        value.enemiesPerRound(),
+        value.playerMultiplier(),
+        value.minimumEnemies(),
+        value.maximumEnemies(),
+        value.baseHealth(),
+        value.healthMultiplier(),
+        value.maximumHealth(),
+        value.maximumAliveBase(),
+        value.maximumAlivePerPlayer(),
+        value.initialSpawnDelayTicks(),
+        value.spawnDelayTicks(),
+        value.minimumSpawnDelayTicks(),
+        value.batchSize(),
+        value.downedEnabled(),
+        value.bleedOutSeconds(),
+        value.reviveSeconds(),
+        value.reviveHealth(),
+        value.pointsPerKill());
+  }
+
+  private static double maximumHealth(Player player) {
+    var attribute = player.getAttribute(PaperAttributeResolver.maxHealth());
+    return attribute == null ? 20.0 : attribute.getValue();
+  }
+
+  private void announce(Collection<UUID> players, String key, String... placeholders) {
+    Component text = messages.render(key, placeholders);
+    for (UUID playerId : players) {
+      Player player = Bukkit.getPlayer(playerId);
+      if (player != null) {
+        player.showTitle(Title.title(text, Component.empty()));
+      }
+    }
+  }
+
+  private static final class RuntimeState {
+    private final ZombieGame game;
+    private final MapDefinition map;
+    private final String worldName;
+    private final Map<UUID, Integer> entities = new LinkedHashMap<>();
+    private final Map<UUID, Long> bleedOut = new LinkedHashMap<>();
+    private final Map<UUID, ReviveAttempt> revives = new LinkedHashMap<>();
+    private long nextActionAt;
+    private long endAt;
+    private boolean ending;
+
+    private RuntimeState(ZombieGame game, MapDefinition map, String worldName, long nextActionAt) {
+      this.game = game;
+      this.map = map;
+      this.worldName = worldName;
+      this.nextActionAt = nextActionAt;
+    }
+  }
+
+  private record ReviveAttempt(UUID reviver, long completeAt) {}
+}

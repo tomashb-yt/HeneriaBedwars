@@ -5,6 +5,7 @@ import fr.heneria.zombie.core.config.ValidationSeverity;
 import fr.heneria.zombie.core.config.ZombieSettings;
 import fr.heneria.zombie.core.config.ZombieSettings.ChatOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.DocumentationOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.GameplayOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.GuiOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.InstanceOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.LobbyOptions;
@@ -186,6 +187,35 @@ public final class ConfigurationManager {
                 config.getInt("gui.refresh.maps-menu-ticks", 100),
                 config.getInt("gui.refresh.instances-menu-ticks", 20),
                 config.getInt("gui.refresh.diagnostics-menu-ticks", 40)),
+            new GameplayOptions(
+                config.getInt("game.minimum-players", 1),
+                config.getInt("game.countdown-seconds", 15),
+                config.getBoolean("game.cancel-countdown-if-not-enough-players", true),
+                config.getBoolean("game.join-in-progress", false),
+                config.getInt("game.end-screen-duration-seconds", 8),
+                config.getInt("players.starting-points", 500),
+                config.getInt("rounds.maximum-round", -1),
+                config.getInt("rounds.first-round-delay-seconds", 3),
+                config.getInt("rounds.transition.duration-seconds", 8),
+                config.getInt("rounds.enemy-count.base", 6),
+                config.getInt("rounds.enemy-count.per-round", 2),
+                config.getDouble("rounds.enemy-count.player-multiplier", 0.75),
+                config.getInt("rounds.enemy-count.minimum", 1),
+                config.getInt("rounds.enemy-count.maximum-per-round", -1),
+                config.getDouble("rounds.zombie-health.base-health", 20.0),
+                config.getDouble("rounds.zombie-health.exponential-multiplier", 1.10),
+                config.getDouble("rounds.zombie-health.maximum-health", -1),
+                config.getInt("rounds.spawning.maximum-alive.base", 24),
+                config.getInt("rounds.spawning.maximum-alive.per-player", 6),
+                config.getInt("rounds.spawning.initial-delay-ticks", 40),
+                config.getInt("rounds.spawning.spawn-delay-ticks", 20),
+                config.getInt("rounds.spawning.minimum-spawn-delay-ticks", 5),
+                config.getInt("rounds.spawning.batch-size", 1),
+                config.getBoolean("players.downed-system.enabled", true),
+                config.getInt("players.downed-system.bleed-out-seconds", 30),
+                config.getInt("players.downed-system.revive-duration-seconds", 5),
+                config.getDouble("players.downed-system.revive-health", 8.0),
+                config.getInt("players.points-per-kill", 100)),
             new DocumentationOptions(
                 config.getBoolean("documentation.require-context-update", true)));
     Map<String, String> mergedMessages = bundledMessages();

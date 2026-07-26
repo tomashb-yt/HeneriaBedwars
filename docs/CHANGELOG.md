@@ -2,6 +2,21 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.6.0-SNAPSHOT — Boucle de jeu et manches
+
+### Ajouté
+
+- agrégats métier isolés `ZombieGame`, `RoundState` et `GamePlayer` ;
+- difficulté configurable, budgets d'apparition et zombies vanilla temporaires ;
+- compte à rebours, points, mise à terre, réanimation, reconnexion et défaite ;
+- scoreboard, résultats asynchrones, nettoyage et commande `/zgame` ;
+- démarrage automatique avec `/zmap test` et tests du cycle complet.
+
+### Modifié
+
+- version portée à `0.6.0-SNAPSHOT` ;
+- configuration enrichie des sections `game`, `players` et `rounds`.
+
 ## 0.5.3-SNAPSHOT — Instance de test et sécurité d'inventaire
 
 ### Ajouté

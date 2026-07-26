@@ -119,6 +119,13 @@ thème sont validés. Un avertissement est journalisé ; une erreur bloque l'act
 
 ## Définitions éditoriales
 
+## Boucle de jeu
+
+`game` configure joueurs minimum, compte à rebours, arrivée en cours et écran de fin. `players`
+configure points, état à terre, hémorragie, réanimation et santé restaurée. `rounds` configure
+limite, délais, formule de population, santé et budget d'apparition. Ces valeurs sont résolues
+dans un `RoundConfiguration` immuable au démarrage ; un reload n'altère jamais une manche active.
+
 L'éditeur gère automatiquement `plugins/HeneriaZombie/maps/<mapId>/map.yml` et son
 `map.yml.bak`. Le schéma est en version 2 et n'est pas destiné à l'édition manuelle. Écriture
 temporaire, backup et remplacement atomique s'exécutent hors thread serveur. Ce dossier est
