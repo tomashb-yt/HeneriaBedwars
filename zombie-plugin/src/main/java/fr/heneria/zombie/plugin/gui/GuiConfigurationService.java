@@ -33,7 +33,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public final class GuiConfigurationService {
 
   private static final String RESOURCE = "guis.yml";
-  private static final int CURRENT_SCHEMA = 3;
+  private static final int CURRENT_SCHEMA = 4;
   private final Path dataDirectory;
   private final ClassLoader resourceLoader;
   private final Executor ioExecutor;
@@ -157,6 +157,27 @@ public final class GuiConfigurationService {
       if ("nav.maps".equals(mapsAction)) {
         candidate.set("menus.admin-main.buttons.maps.actions.left", "maps.admin");
         candidate.set("menus.admin-main.buttons.maps.permission", "zombies.admin.maps.view");
+      }
+    }
+    if (schema < 4) {
+      String detail = "menus.admin-map-detail";
+      candidate.set(detail + ".title", null);
+      candidate.set(detail + ".size", null);
+      for (String button :
+          List.of(
+              "visit",
+              "edit",
+              "duplicate",
+              "validate",
+              "test",
+              "publish",
+              "unpublish",
+              "history",
+              "archive",
+              "delete",
+              "back",
+              "home")) {
+        candidate.set(detail + ".buttons." + button, null);
       }
     }
     candidate.set("schema-version", CURRENT_SCHEMA);

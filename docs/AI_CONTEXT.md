@@ -128,6 +128,11 @@ Le correctif `0.10.2` porte le schéma GUI à `3` et migre également l'ancien b
 fichier ouvrait le sélecteur technique au lieu du gestionnaire donnant accès au test, à la
 publication et à la suppression.
 
+La version `0.10.3` porte le schéma GUI à `4`. Le détail d'une map devient un tableau de bord en
+trois étapes. L'action `maps.visit` délègue à `MapPreviewService` : elle clone le template dans un
+monde temporaire, téléporte uniquement l'administrateur et ne crée aucune partie. Une session
+d'édition doit être fermée avant la visite.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec

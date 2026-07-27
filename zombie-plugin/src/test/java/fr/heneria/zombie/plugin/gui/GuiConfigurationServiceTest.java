@@ -146,6 +146,14 @@ class GuiConfigurationServiceTest {
     assertFalse(menu.buttons().containsKey("group"));
     assertFalse(menu.buttons().containsKey("join"));
     assertFalse(menu.buttons().containsKey("profile"));
+
+    GuiMenuTemplate detail =
+        service().initializeAsync().join().menu(new GuiId("admin-map-detail")).orElseThrow();
+    assertEquals(54, detail.size());
+    assertEquals(10, detail.buttons().get("visit").slot());
+    assertEquals("maps.visit", detail.buttons().get("visit").leftAction());
+    assertEquals(28, detail.buttons().get("test").slot());
+    assertEquals(42, detail.buttons().get("delete").slot());
   }
 
   private GuiConfigurationService service() {

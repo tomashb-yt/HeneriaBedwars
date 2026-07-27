@@ -59,6 +59,7 @@ permissions:
       zombies.menu.player: true
       zombies.menu.admin: true
       zombies.admin.maps.view: true
+      zombies.admin.maps.visit: true
       zombies.admin.maps.create: true
       zombies.admin.maps.edit: true
       zombies.admin.maps.validate: true
@@ -145,6 +146,9 @@ permissions:
     default: op
   zombies.admin.maps.view:
     description: Views editable maps and their publication state
+    default: op
+  zombies.admin.maps.visit:
+    description: Opens an isolated administrative copy of an uploaded map
     default: op
   zombies.admin.maps.create:
     description: Creates editable maps through the guided menu

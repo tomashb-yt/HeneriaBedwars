@@ -2,6 +2,24 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.10.3-SNAPSHOT — Tableau de bord et visite des maps
+
+### Ajouté
+
+- bouton `Visiter la map` ouvrant une copie administrative isolée du template ;
+- téléportation au spawn du monde sans création de partie ni modification du template ;
+- permission dédiée `zombies.admin.maps.visit` ;
+- informations synthétiques : état, monde de travail, disponibilité du template, validation,
+  version, zones, spawns et objets.
+
+### Modifié
+
+- tableau de bord agrandi à 54 slots et organisé en trois étapes visuelles ;
+- ordre explicite : visiter, modifier, dupliquer, vérifier, tester puis publier ;
+- descriptions complètes distinguant visite, édition, test, publication, archivage et suppression ;
+- schéma GUI porté à `4` avec migration ciblée du menu de détail ;
+- version portée à `0.10.3-SNAPSHOT`.
+
 ## 0.10.2-SNAPSHOT — Accès au gestionnaire de maps
 
 ### Corrigé

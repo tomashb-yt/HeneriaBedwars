@@ -1,4 +1,4 @@
-schema-version: 3
+schema-version: 4
 default-theme: dark
 
 themes:
@@ -70,21 +70,22 @@ menus:
       home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
 
   admin-map-detail:
-    title: "<dark_gray>Gestion de la map"
-    size: 45
+    title: "<dark_gray>Tableau de bord de la map"
+    size: 54
     theme: dark
     buttons:
-      edit: {slot: 10, material: BLAZE_ROD, name: "<gold>Modifier", lore: ["<gray>Ouvre une copie de travail verrouillée."], permission: zombies.admin.maps.edit, actions: {left: maps.edit}}
-      duplicate: {slot: 11, material: MAP, name: "<aqua>Dupliquer", lore: ["<gray>Copie la configuration et le monde d'édition."], permission: zombies.admin.maps.create, actions: {left: maps.duplicate}}
-      validate: {slot: 12, material: SPYGLASS, name: "<yellow>Valider", lore: ["<gray>Affiche les erreurs et avertissements."], permission: zombies.admin.maps.validate, actions: {left: maps.validate}}
-      test: {slot: 14, material: ENDER_EYE, name: "<aqua>Tester", lore: ["<gray>Crée une instance privée."], permission: zombies.admin.maps.test, actions: {left: maps.test}}
-      publish: {slot: 16, material: LIME_CONCRETE, name: "<green>Publier", lore: ["<gray>Crée une version immuable visible des joueurs."], permission: zombies.admin.maps.publish, actions: {left: maps.publish}}
-      unpublish: {slot: 17, material: ORANGE_CONCRETE, name: "<gold>Dépublier", lore: ["<gray>Retire la map du catalogue sans arrêter les parties."], permission: zombies.admin.maps.unpublish, actions: {left: maps.unpublish}}
-      history: {slot: 22, material: BOOKSHELF, name: "<light_purple>Historique", lore: ["<gray>Consulter toutes les versions publiées."], permission: zombies.admin.maps.view, actions: {left: maps.history}}
-      archive: {slot: 26, material: LAVA_BUCKET, name: "<red>Archiver", lore: ["<gray>Retire la map sans supprimer son historique."], permission: zombies.admin.maps.delete, actions: {left: maps.archive}}
-      delete: {slot: 25, material: BARRIER, name: "<dark_red>Supprimer définitivement", lore: ["<red>Supprime la map, sa configuration,", "<red>ses spawns, ses versions et ses mondes.", "", "<dark_red>Cette action est irréversible."], permission: zombies.admin.maps.delete, actions: {left: maps.delete}}
-      back: {slot: 36, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
-      home: {slot: 44, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
+      visit: {slot: 10, material: ENDER_PEARL, name: "<aqua>1. Visiter la map", lore: ["<gray>Charge une copie privée du template", "<gray>et vous téléporte dessus.", "", "<green>Aucune partie n'est lancée.", "<yellow>Les modifications ne sont pas sauvegardées.", "", "<white>Quitter : <yellow>/zombie map leave"], permission: zombies.admin.maps.visit, actions: {left: maps.visit}}
+      edit: {slot: 12, material: BLAZE_ROD, name: "<gold>2. Modifier la map", lore: ["<gray>Ouvre le monde de travail avec", "<gray>l'outil d'édition HeneriaZombie.", "", "<yellow>Les changements sont sauvegardés.", "<dark_gray>Une seule personne peut modifier la map."], permission: zombies.admin.maps.edit, actions: {left: maps.edit}}
+      duplicate: {slot: 14, material: MAP, name: "<aqua>3. Dupliquer", lore: ["<gray>Crée une nouvelle map indépendante", "<gray>avec la configuration et les blocs.", "", "<yellow>Un nouvel identifiant sera demandé."], permission: zombies.admin.maps.create, actions: {left: maps.duplicate}}
+      validate: {slot: 16, material: SPYGLASS, name: "<yellow>4. Vérifier la configuration", lore: ["<gray>Contrôle spawn joueur, zones,", "<gray>spawns zombies et machines.", "", "<red>Les erreurs bloquent le test", "<red>et la publication."], permission: zombies.admin.maps.validate, actions: {left: maps.validate}}
+      test: {slot: 28, material: ENDER_EYE, name: "<light_purple>5. Lancer une partie de test", lore: ["<gray>Crée une véritable partie privée", "<gray>avec manches, zombies et armes.", "", "<yellow>La map doit être valide.", "<aqua>Vous serez téléporté automatiquement."], permission: zombies.admin.maps.test, actions: {left: maps.test}}
+      publish: {slot: 30, material: LIME_CONCRETE, name: "<green>6. Publier pour les joueurs", lore: ["<gray>Crée un snapshot immuable de", "<gray>la configuration et des blocs.", "", "<green>La map apparaîtra dans /zombies.", "<yellow>Disponible uniquement si elle est valide."], permission: zombies.admin.maps.publish, actions: {left: maps.publish}}
+      unpublish: {slot: 31, material: ORANGE_CONCRETE, name: "<gold>Retirer du menu joueur", lore: ["<gray>Masque la map dans /zombies.", "", "<yellow>Les versions et parties existantes", "<yellow>sont conservées."], permission: zombies.admin.maps.unpublish, actions: {left: maps.unpublish}}
+      history: {slot: 32, material: BOOKSHELF, name: "<light_purple>Versions publiées", lore: ["<gray>Consulte chaque snapshot publié", "<gray>et restaure une ancienne version.", "", "<green>Aucun historique n'est écrasé."], permission: zombies.admin.maps.view, actions: {left: maps.history}}
+      archive: {slot: 38, material: CHEST, name: "<gold>Archiver sans supprimer", lore: ["<gray>Retire la map des catalogues", "<gray>mais conserve tous ses fichiers.", "", "<green>Action sans perte de données."], permission: zombies.admin.maps.delete, actions: {left: maps.archive}}
+      delete: {slot: 42, material: BARRIER, name: "<dark_red>Supprimer définitivement", lore: ["<red>Efface configuration, spawns,", "<red>objets, versions et mondes possédés.", "", "<dark_red>IRRÉVERSIBLE — confirmation requise.", "<gray>Refusé si une partie utilise la map."], permission: zombies.admin.maps.delete, actions: {left: maps.delete}}
+      back: {slot: 45, material: ARROW, name: "<blue>Retour à la liste", lore: ["<gray>Revenir aux maps administratives."], actions: {left: nav.back}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil administration", lore: ["<gray>Retourner au menu principal."], actions: {left: nav.home}}
 
   admin-map-history:
     title: "<dark_gray>Versions publiées"

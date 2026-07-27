@@ -4,6 +4,15 @@
 
 ## Parcours administrateur
 
+Depuis `/zombies admin`, le tableau de bord d'une map sépare désormais :
+
+- **Visiter**, qui ouvre une copie temporaire du template sans sauvegarde et sans partie ;
+- **Modifier**, qui ouvre le monde de travail avec l'outil et l'auto-save ;
+- **Tester**, qui crée une véritable partie privée après validation.
+
+La visite se quitte avec `/zombie map leave`. Elle est refusée tant que l'administrateur conserve
+une session d'édition active.
+
 1. `/zmap create <id>` crée `plugins/HeneriaZombie/maps/<id>/map.yml`, associe le monde courant,
    mémorise l'auteur et les dates, puis ouvre l'éditeur.
 2. `/zmap edit <id>` ouvre une session exclusive et donne l'outil protégé dans le slot 9.

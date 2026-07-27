@@ -31,7 +31,7 @@ deux capacités. Les commandes de diagnostic sont regroupées sous `/zzombie`.
 Le Ticket 007 ajoute cinq armes YAML, munitions, rechargement, dégâts balistiques, achats muraux,
 Mystery Box, Pack-a-Punch et `/zweapon`.
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.10.2-SNAPSHOT.jar`.
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.10.3-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire
@@ -81,3 +81,6 @@ historique publié, ses snapshots et ses mondes possédés.
 
 Le correctif `0.10.2` migre aussi l'ancien bouton « Gestion des maps » afin qu'il ouvre bien le
 gestionnaire contenant les actions Tester, Publier et Supprimer.
+
+La version `0.10.3` réorganise ce gestionnaire en trois étapes lisibles et ajoute « Visiter la
+map », qui téléporte l'administrateur dans une copie privée sans démarrer de partie.

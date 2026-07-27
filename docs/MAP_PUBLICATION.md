@@ -1,6 +1,6 @@
 # Publication et catalogue de maps
 
-**Statut :** opérationnel en `0.10.2-SNAPSHOT`.
+**Statut :** opérationnel en `0.10.3-SNAPSHOT`.
 
 ## Deux snapshots distincts
 
@@ -37,6 +37,7 @@ Le menu `/zombies admin` propose le parcours suivant :
 ```text
 Gestion des maps
 → Créer ou ouvrir
+→ Visiter le template dans une copie temporaire
 → Configurer et sauvegarder
 → Valider
 → Tester

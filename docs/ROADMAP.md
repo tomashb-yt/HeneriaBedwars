@@ -54,6 +54,9 @@ qu'avec un modèle persistant défini.
 Le correctif `0.10.2` restaure l'accès au gestionnaire complet depuis les anciens menus
 administratifs.
 
+La version `0.10.3` livre le tableau de bord réorganisé et la visite isolée d'un template depuis
+ce gestionnaire.
+
 ## Prochain ticket
 
 Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,

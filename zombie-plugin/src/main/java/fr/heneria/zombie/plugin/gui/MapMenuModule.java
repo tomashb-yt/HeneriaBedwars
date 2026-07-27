@@ -16,6 +16,7 @@ import fr.heneria.zombie.plugin.editor.MapWorldPublicationService;
 import fr.heneria.zombie.plugin.game.PaperGameRuntime;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.instance.PlayerInstanceResult;
+import fr.heneria.zombie.plugin.map.MapPreviewService;
 import fr.heneria.zombie.plugin.map.MapTemplateCatalog;
 import java.time.Clock;
 import java.util.Comparator;
@@ -42,6 +43,7 @@ public final class MapMenuModule {
           "maps.duplicate",
           "maps.archive",
           "maps.delete",
+          "maps.visit",
           "maps.edit",
           "maps.validate",
           "maps.test",
@@ -60,6 +62,7 @@ public final class MapMenuModule {
   private final MapValidator validator;
   private final MapPublicationService publications;
   private final MapTemplateCatalog templates;
+  private final MapPreviewService previews;
   private final MapWorldPublicationService worldPublications;
   private final EditorItemService editorItems;
   private final MapVisualizationService visualizations;
@@ -77,6 +80,7 @@ public final class MapMenuModule {
       MapValidator validator,
       MapPublicationService publications,
       MapTemplateCatalog templates,
+      MapPreviewService previews,
       MapWorldPublicationService worldPublications,
       EditorItemService editorItems,
       MapVisualizationService visualizations,
@@ -92,6 +96,7 @@ public final class MapMenuModule {
     this.validator = validator;
     this.publications = publications;
     this.templates = templates;
+    this.previews = previews;
     this.worldPublications = worldPublications;
     this.editorItems = editorItems;
     this.visualizations = visualizations;
@@ -123,6 +128,7 @@ public final class MapMenuModule {
         "maps.archive", context -> requestArchive(context.player(), selected(context)));
     actions.register(
         "maps.delete", context -> requestDeletion(context.player(), selected(context)));
+    actions.register("maps.visit", context -> visit(context.player(), selected(context)));
     actions.register("maps.edit", context -> edit(context.player(), selected(context)));
     actions.register(
         "maps.validate",
@@ -263,14 +269,48 @@ public final class MapMenuModule {
         List.of(
             "<gray>ID : <white>" + id,
             "<gray>Ã‰tat : <white>" + publication.status(),
+            "<gray>Monde de travail : <white>" + map.world(),
+            "<gray>Template visitable : "
+                + (templates.knownMapIds().contains(id) ? "<green>disponible" : "<red>absent"),
             "<gray>Version publiÃ©e : <white>"
                 + publication.activeVersion().map(value -> "v" + value).orElse("aucune"),
             "<gray>Validation : "
                 + (report.valid()
                     ? "<green>valide"
-                    : "<red>" + report.errors().size() + " erreur(s)")));
+                    : "<red>" + report.errors().size() + " erreur(s)"),
+            "",
+            "<gray>Zones : <white>"
+                + map.zones().size()
+                + " <dark_gray>â€¢ <gray>Spawns : <white>"
+                + map.zombieSpawns().size()
+                + " <dark_gray>â€¢ <gray>Objets : <white>"
+                + map.objects().size()));
+    view.information(
+        1,
+        Material.COMPASS,
+        "<aqua>Ã‰tape 1 â€” Explorer et prÃ©parer",
+        List.of(
+            "<gray>Visitez d'abord le template.",
+            "<gray>Modifiez ensuite la copie de travail.",
+            "<gray>Terminez par la vÃ©rification."));
+    view.information(
+        19,
+        Material.CLOCK,
+        "<light_purple>Ã‰tape 2 â€” Tester et publier",
+        List.of(
+            "<gray>Le test lance une partie privÃ©e.",
+            "<gray>La publication rend un snapshot",
+            "<gray>accessible depuis /zombies."));
+    view.information(
+        37,
+        Material.CHEST,
+        "<gold>Ã‰tape 3 â€” Cycle de vie",
+        List.of(
+            "<gray>Archiver conserve les fichiers.",
+            "<red>Supprimer efface dÃ©finitivement",
+            "<red>tout le contenu possÃ©dÃ©."));
     for (String key :
-        List.of("edit", "duplicate", "validate", "test", "history", "archive", "delete")) {
+        List.of("visit", "edit", "duplicate", "validate", "test", "history", "archive", "delete")) {
       view.configured(key);
     }
     if (publication.status() == MapStatus.PUBLISHED) {
@@ -300,46 +340,7 @@ public final class MapMenuModule {
               "<gray>Auteur : <white>" + version.publishedBy(),
               "<gray>Nom : <white>" + version.definition().displayName(),
               "",
-              "<yellow>Cliquez pour restaurer cette version"),
-          "zombies.admin.maps.rollback",
-          click -> requestRollback(click.player(), id, version.version()),
-          null,
-          null);
-    }
-    navigation(view, page, versions.size(), "version(s)");
-  }
-
-  private void renderValidation(GuiView view, GuiContext context) {
-    String id = context.value("map", String.class).orElse("");
-    MapDefinition map = editors.registry().find(id).orElse(null);
-    if (map == null) {
-      view.information(22, Material.BARRIER, "<red>Map introuvable", List.of());
-      view.configured("back");
-      return;
-    }
-    List<ValidationItem> issues = validationItems(map);
-    GuiSession session = guis.session(view.player());
-    GuiPagination.Page<ValidationItem> page =
-        GuiPagination.page(issues, session.page(), view.menu().contentSlots().size());
-    session.page(page.index());
-    for (int index = 0; index < page.items().size(); index++) {
-      ValidationItem issue = page.items().get(index);
-      view.button(
-          view.menu().contentSlots().get(index),
-          issue.material(),
-          issue.title() + issue.message(),
-          List.of(
-              "<gray>Type : <white>" + issue.type(),
-              "<gray>Solution : <white>" + issue.solution(),
-              issue.position().isPresent()
-                  ? "<yellow>Cliquez pour vous tÃ©lÃ©porter"
-                  : "<dark_gray>Aucune position associÃ©e"),
-          "zombies.admin.maps.validate",
-          click -> issue.position().ifPresent(point -> teleport(click.player(), point)),
-          null,
-          null);
-    }
-    navigation(view, page, issues.size()ß®ô¶‰ËkºwµçHRS’K™\Ù\šX[^™JBˆ™YÛÛ™šYİ\˜][Û‹Ü]ÛœËØš™]Ë™\œÚ[ÛœÈ][Û™\ÈÜÜğêY0ê\ÈÙ\›Ûİ\š[pê\ËˆŠKBˆÛØÚËš[œİ[
+              "<yellow>Cliquez pour restã­;¶‰ËkºwµçHRS’K™\Ù\šX[^™JBˆ™YÛÛ™šYİ\˜][Û‹Ü]ÛœËØš™]Ë™\œÚ[ÛœÈ][Û™\ÈÜÜğêY0ê\ÈÙ\›Ûİ\š[pê\ËˆŠKBˆÛØÚËš[œİ[
 
 Kœ\ÔÙXÛÛ™ÊJKBˆÛÛ^OˆÃBˆİš[™Èİ\œ™[›ØÚÙ\ˆH[][Û›ØÚÙ\ŠX\Y
 NÃBˆYˆ
