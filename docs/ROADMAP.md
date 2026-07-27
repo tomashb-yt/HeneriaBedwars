@@ -60,6 +60,9 @@ ce gestionnaire.
 Le correctif `0.10.4` fiabilise les transitions depuis cette visite vers le monde d'édition ou une
 instance privée de test.
 
+La version `0.10.5` rend les templates importés visibles et visitables dans le gestionnaire avant
+toute création de configuration.
+
 ## Prochain ticket
 
 Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,

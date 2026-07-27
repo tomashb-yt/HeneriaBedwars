@@ -120,7 +120,7 @@ public final class MapMenuModule {
         new StandardGui("admin-map-validation", configurations, this::renderValidation, () -> 0));
     actions.register(
         "maps.player", context -> guis.open(context.player(), new GuiId("player-maps")));
-    actions.register("maps.admin", context -> guis.open(context.player(), new GuiId("admin-maps")));
+    actions.register("maps.admin", context -> openAdminMaps(context.player()));
     actions.register("maps.create", context -> requestCreate(context.player()));
     actions.register(
         "maps.duplicate", context -> requestDuplicate(context.player(), selected(context)));
@@ -205,24 +205,59 @@ public final class MapMenuModule {
 
   private void renderAdminMaps(GuiView view, GuiContext ignored) {
     GuiSession session = guis.session(view.player());
-    List<MapDefinition> maps =
+    java.util.Map<String, MapDefinition> configured =
         editors.registry().all().stream()
+            .collect(
+                java.util.stream.Collectors.toMap(
+                    MapDefinition::id, map -> map, (first, ignoredDuplicate) -> first));
+    java.util.Set<String> identifiers = new java.util.HashSet<>(templates.knownMapIds());
+    identifiers.addAll(configured.keySet());
+    List<AdminMapEntry> maps =
+        identifiers.stream()
+            .map(id -> new AdminMapEntry(id, Optional.ofNullable(configured.get(id))))
             .filter(
-                map ->
+                entry ->
                     session.search().isBlank()
-                        || map.id()
+                        || entry
+                            .id()
                             .toLowerCase(Locale.ROOT)
                             .contains(session.search().toLowerCase(Locale.ROOT))
-                        || map.displayName()
+                        || entry
+                            .definition()
+                            .map(MapDefinition::displayName)
+                            .orElse(entry.id())
                             .toLowerCase(Locale.ROOT)
                             .contains(session.search().toLowerCase(Locale.ROOT)))
-            .sorted(Comparator.comparing(MapDefinition::id))
+            .sorted(Comparator.comparing(AdminMapEntry::id))
             .toList();
-    GuiPagination.Page<MapDefinition> page =
+    GuiPagination.Page<AdminMapEntry> page =
         GuiPagination.page(maps, session.page(), view.menu().contentSlots().size());
     session.page(page.index());
     for (int index = 0; index < page.items().size(); index++) {
-      MapDefinition map = page.items().get(index);
+      AdminMapEntry entry = page.items().get(index);
+      if (entry.definition().isEmpty()) {
+        view.button(
+            view.menu().contentSlots().get(index),
+            Material.ENDER_PEARL,
+            "<aqua>" + entry.id(),
+            List.of(
+                "<gray>État : <yellow>template importé",
+                "<gray>Configuration : <red>non créée",
+                "<gray>Dossier : <white>zombie_templates/" + entry.id(),
+                "",
+                "<green>La visite est déjà disponible.",
+                "<yellow>Cliquez pour ouvrir la fiche"),
+            "zombies.admin.maps.view",
+            context ->
+                guis.open(
+                    context.player(),
+                    new GuiId("admin-map-detail"),
+                    GuiContext.of("map", entry.id())),
+            null,
+            null);
+        continue;
+      }
+      MapDefinition map = entry.definition().orElseThrow();
       MapPublication publication = publications.publication(map.id());
       var report = validator.validate(map);
       view.button(
@@ -248,7 +283,7 @@ public final class MapMenuModule {
           null,
           null);
     }
-    navigation(view, page, maps.size(), "map(s)");
+    navigation(view, page, maps.size(), "template(s) et map(s)");
     view.configured("create");
   }
 
@@ -256,6 +291,31 @@ public final class MapMenuModule {
     String id = context.value("map", String.class).orElse("");
     MapDefinition map = editors.registry().find(id).orElse(null);
     if (map == null) {
+      if (templates.knownMapIds().contains(id)) {
+        view.information(
+            4,
+            Material.FILLED_MAP,
+            "<aqua>" + id,
+            List.of(
+                "<gray>État : <yellow>template importé",
+                "<gray>Configuration : <red>non créée",
+                "<gray>Source : <white>zombie_templates/" + id,
+                "",
+                "<green>Vous pouvez déjà visiter cette map.",
+                "<yellow>Aucune partie ne sera créée."));
+        view.information(
+            19,
+            Material.WRITABLE_BOOK,
+            "<gold>Configuration à faire plus tard",
+            List.of(
+                "<gray>La visite ne crée aucun map.yml.",
+                "<gray>Spawns, zones et machines restent",
+                "<gray>à configurer avant un test."));
+        view.configured("visit");
+        view.configured("back");
+        view.configured("home");
+        return;
+      }
       view.information(22, Material.BARRIER, "<red>Map introuvable", List.of());
       view.configured("back");
       return;
@@ -534,6 +594,21 @@ public final class MapMenuModule {
                                 + ". Vérifiez zombie_templates/"
                                 + mapId
                                 + ".")),
+            mainThread);
+  }
+
+  private void openAdminMaps(Player player) {
+    guis.open(player, new GuiId("admin-maps"));
+    templates
+        .discover()
+        .whenCompleteAsync(
+            (ignored, failure) -> {
+              if (failure != null) {
+                player.sendMessage(
+                    MINI.deserialize("<red>Impossible d'actualiser les templates importés."));
+              }
+              guis.refresh(player);
+            },
             mainThread);
   }
 
@@ -1054,4 +1129,6 @@ public final class MapMenuModule {
       String solution,
       Optional<MapPoint> position,
       Material material) {}
+
+  private record AdminMapEntry(String id, Optional<MapDefinition> definition) {}
 }

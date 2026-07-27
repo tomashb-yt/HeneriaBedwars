@@ -138,6 +138,10 @@ l'aperçu, attendent la destruction de son monde temporaire, puis seulement tél
 monde de travail ou l'instance. Le retour technique au lobby pendant le déchargement ne peut donc
 plus écraser la destination finale.
 
+La version `0.10.5` réunit dans le gestionnaire les définitions éditoriales et les dossiers
+valides détectés dans `zombie_templates/`. Un template sans `map.yml` possède une fiche limitée à
+la visite : l'administrateur peut contrôler la construction avant toute création ou configuration.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec

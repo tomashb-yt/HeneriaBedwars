@@ -1,6 +1,6 @@
 # Publication et catalogue de maps
 
-**Statut :** opérationnel en `0.10.4-SNAPSHOT`.
+**Statut :** opérationnel en `0.10.5-SNAPSHOT`.
 
 ## Deux snapshots distincts
 

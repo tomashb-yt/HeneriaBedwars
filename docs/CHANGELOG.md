@@ -2,6 +2,21 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.10.5-SNAPSHOT — Visite avant configuration
+
+### Ajouté
+
+- les dossiers valides de `zombie_templates/` apparaissent dans le gestionnaire administratif,
+  même lorsqu'aucune définition éditoriale n'existe encore ;
+- une fiche dédiée indique clairement l'état `template importé` et permet de visiter immédiatement
+  une copie privée sans créer de map, de partie ou de fichier `map.yml`.
+
+### Modifié
+
+- le catalogue des templates est actualisé à chaque ouverture du gestionnaire ;
+- les templates configurés et non configurés partagent désormais la même recherche et pagination ;
+- version portée à `0.10.5-SNAPSHOT`.
+
 ## 0.10.4-SNAPSHOT — Transition visite, édition et test
 
 ### Corrigé

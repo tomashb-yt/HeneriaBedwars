@@ -10,6 +10,10 @@ Depuis `/zombies admin`, le tableau de bord d'une map sépare désormais :
 - **Modifier**, qui ouvre le monde de travail avec l'outil et l'auto-save ;
 - **Tester**, qui crée une véritable partie privée après validation.
 
+Le gestionnaire affiche aussi directement chaque dossier valide de `zombie_templates/`, même
+avant la création d'une définition éditoriale. Sa fiche **template importé** permet de visiter une
+copie privée immédiatement ; cette visite ne crée ni `map.yml`, ni partie, ni sauvegarde.
+
 La visite se quitte avec `/zombie map leave`. Elle est refusée tant que l'administrateur conserve
 une session d'édition active. Depuis le tableau de bord, choisir **Modifier** ou **Tester** pendant
 une visite ferme automatiquement la copie temporaire, attend son déchargement, puis poursuit vers

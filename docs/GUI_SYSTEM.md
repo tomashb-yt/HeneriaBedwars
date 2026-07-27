@@ -43,7 +43,8 @@ ne nécessitent aucun listener supplémentaire.
 - `/zombies` : accueil joueur, catalogue publié et sortie de partie ;
 - `/zombies admin` : accueil administration consolidé ;
 - maps joueur : informations, état temps réel et entrée automatique ;
-- maps administrateur : création, édition, validation, test, publication et versions ;
+- maps administrateur : templates importés visitables avant création, puis création, édition,
+  validation, test, publication et versions ;
 - maps : recherche, pagination, aperçu et création d'instance ;
 - instances : état dynamique, entrée et arrêt confirmé ;
 - diagnostics : versions, compteurs, lobby, stockage et avertissements ;
@@ -67,6 +68,11 @@ La migration vers le schéma 3 redirige aussi l'ancien bouton administratif des 
 gestionnaire complet au lieu du sélecteur technique.
 La migration vers le schéma 4 réinstalle la disposition officielle du tableau de bord d'une map,
 avec des descriptions distinguant clairement visite, édition, test et publication.
+
+À chaque ouverture, le gestionnaire actualise `zombie_templates/` hors thread serveur. Un dossier
+valide sans définition éditoriale apparaît avec l'état `template importé`. Sa fiche expose
+uniquement la visite, le retour et l'accueil ; les actions d'édition, de test et de publication ne
+sont affichées qu'après création de la configuration.
 
 La validation contrôle ensuite :
 
