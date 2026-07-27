@@ -346,6 +346,20 @@ public final class PaperGameRuntime {
         && player.state() == GamePlayerState.ALIVE;
   }
 
+  public boolean canAct(UUID playerId) {
+    return runtimeFor(playerId)
+        .map(runtime -> runtime.game.snapshot().players().get(playerId))
+        .map(player -> player.state() == GamePlayerState.ALIVE)
+        .orElse(false);
+  }
+
+  public boolean isDowned(UUID playerId) {
+    return runtimeFor(playerId)
+        .map(runtime -> runtime.game.snapshot().players().get(playerId))
+        .map(player -> player.state() == GamePlayerState.DOWNED)
+        .orElse(false);
+  }
+
   public void damagePlayer(UUID gameId, Player target, double amount) {
     if (!isTargetable(gameId, target.getUniqueId()) || amount <= 0) {
       return;
@@ -354,12 +368,21 @@ public final class PaperGameRuntime {
       return;
     }
     target.setHealth(Math.max(0, target.getHealth() - amount));
+    damageFeedback(target);
   }
 
   public boolean down(Player player) {
     Optional<RuntimeState> runtime = runtimeFor(player.getUniqueId());
     if (runtime.isEmpty() || !runtime.get().game.configuration().downedEnabled()) {
       return false;
+    }
+    if (!runtime.get().game.hasLivingTeammate(player.getUniqueId())) {
+      runtime.get().game.eliminate(player.getUniqueId());
+      runtime.get().game.spectate(player.getUniqueId());
+      player.setGameMode(GameMode.SPECTATOR);
+      player.sendMessage(messages.render("game.player-eliminated-alone"));
+      end(runtime.get().game.id(), GameEndReason.TEAM_ELIMINATED);
+      return true;
     }
     if (!runtime.get().game.down(player.getUniqueId())) {
       return false;
@@ -371,6 +394,7 @@ public final class PaperGameRuntime {
             player.getUniqueId(),
             tick + runtime.get().game.configuration().bleedOutSeconds() * 20L);
     player.setHealth(Math.min(maximumHealth(player), 1.0));
+    applyDownedPresentation(player);
     player.sendMessage(messages.render("game.player-downed"));
     return true;
   }
@@ -413,6 +437,10 @@ public final class PaperGameRuntime {
                           return null;
                         }));
     runtime.endAt = tick + runtime.game.configuration().endScreenSeconds() * 20L;
+    runtime.bleedOut.keySet().stream()
+        .map(Bukkit::getPlayer)
+        .filter(java.util.Objects::nonNull)
+        .forEach(this::clearDownedPresentation);
     runtime.bleedOut.clear();
     runtime.revives.clear();
     announce(runtime.game.snapshot().players().keySet(), "game.ended", "reason", reason.name());
@@ -621,6 +649,10 @@ public final class PaperGameRuntime {
   }
 
   private void updateRevives(RuntimeState runtime) {
+    runtime.bleedOut.keySet().stream()
+        .map(Bukkit::getPlayer)
+        .filter(java.util.Objects::nonNull)
+        .forEach(this::applyDownedPresentation);
     runtime
         .bleedOut
         .entrySet()
@@ -633,6 +665,7 @@ public final class PaperGameRuntime {
               runtime.game.spectate(entry.getKey());
               Player player = Bukkit.getPlayer(entry.getKey());
               if (player != null) {
+                clearDownedPresentation(player);
                 player.setGameMode(GameMode.SPECTATOR);
               }
               return true;
@@ -669,6 +702,7 @@ public final class PaperGameRuntime {
                         + ":"
                         + tick);
                 target.setGameMode(GameMode.ADVENTURE);
+                clearDownedPresentation(target);
                 target.setHealth(
                     Math.min(maximumHealth(target), runtime.game.configuration().reviveHealth()));
               }
@@ -694,6 +728,39 @@ public final class PaperGameRuntime {
             powerUps.active(runtime.game.id()).size());
       }
     }
+  }
+
+  private void damageFeedback(Player player) {
+    player.playHurtAnimation(0);
+    player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_HURT, 0.8f, 0.9f);
+    player
+        .getWorld()
+        .spawnParticle(
+            org.bukkit.Particle.DAMAGE_INDICATOR,
+            player.getLocation().add(0, 1, 0),
+            4,
+            0.25,
+            0.35,
+            0.25,
+            0.05);
+    player.sendActionBar(messages.render("game.damage-received"));
+    org.bukkit.util.Vector recoil = player.getLocation().getDirection().multiply(-0.16).setY(0.08);
+    player.setVelocity(player.getVelocity().add(recoil));
+  }
+
+  private void applyDownedPresentation(Player player) {
+    player.setSprinting(false);
+    player.setPose(org.bukkit.entity.Pose.SWIMMING, true);
+    player.setWalkSpeed(0);
+    player.addPotionEffect(
+        new org.bukkit.potion.PotionEffect(
+            org.bukkit.potion.PotionEffectType.SLOWNESS, 12, 10, false, false, false));
+  }
+
+  private void clearDownedPresentation(Player player) {
+    player.setPose(org.bukkit.entity.Pose.STANDING, false);
+    player.setWalkSpeed(0.2f);
+    player.removePotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS);
   }
 
   private void finish(RuntimeState runtime) {

@@ -111,7 +111,10 @@ public final class MapVisualizationService {
     map.objects().values().stream()
         .filter(object -> isStation(object.type()))
         .forEach(
-            object -> placeStation(world, object.position(), stationMaterial(object.type()), null));
+            object -> {
+              placeStation(world, object.position(), stationMaterial(object.type()), null);
+              runtimeLabel(world, object.position(), stationLabel(object.type()));
+            });
   }
 
   /** Removes marker entities and restores editor-world blocks changed by this service. */
@@ -203,6 +206,20 @@ public final class MapVisualizationService {
     label.setDefaultBackground(false);
     configure(editorId, label);
     entities.add(label.getUniqueId());
+  }
+
+  private void runtimeLabel(World world, MapPoint point, String text) {
+    Location location =
+        new Location(
+            world, floor(point.x()) + 0.5, floor(point.y()) + 2.15, floor(point.z()) + 0.5);
+    TextDisplay label = world.spawn(location, TextDisplay.class);
+    label.text(MINI.deserialize(text));
+    label.setBillboard(Display.Billboard.CENTER);
+    label.setSeeThrough(true);
+    label.setShadowed(true);
+    label.setDefaultBackground(false);
+    label.setPersistent(false);
+    label.getPersistentDataContainer().set(markerKey, PersistentDataType.BYTE, (byte) 1);
   }
 
   private void configure(UUID editorId, Entity entity) {

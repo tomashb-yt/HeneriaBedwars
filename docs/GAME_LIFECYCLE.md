@@ -12,6 +12,11 @@ minimum revient. Une déconnexion conserve l'état précédent jusqu'à l'éché
 le restaure, sinon le joueur est éliminé. L'hémorragie mène au spectateur, tandis qu'une
 réanimation accroupie et maintenue rend le joueur vivant.
 
+Une blessure létale ne passe à l'état `DOWNED` que si un autre joueur `ALIVE` peut réanimer. Sans
+sauveteur, le joueur est immédiatement éliminé et la partie se termine. Paper fixe la pose basse
+du joueur à terre, bloque ses déplacements et interactions, puis restaure son profil de mouvement
+à la réanimation, à l'élimination ou à la fin de partie.
+
 Toutes les fins passent par `ZombieGame.end`, produisent au plus un `GameResult`, retirent les
 entités indexées, affichent le résultat, renvoient les joueurs et confient le monde à
 `InstanceCoordinator`. `PaperZombieEngine.removeAll` annule les capacités, supprime les entités et

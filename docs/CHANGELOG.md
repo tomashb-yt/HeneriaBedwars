@@ -2,6 +2,29 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.9.2-SNAPSHOT — Stabilisation des interactions
+
+### Corrigé
+
+- un joueur sans allié vivant est éliminé immédiatement au lieu d'attendre une réanimation
+  impossible ;
+- les joueurs à terre utilisent une pose basse fixe et ne peuvent plus se déplacer, tirer,
+  interagir, déplacer leur inventaire ou ramasser un objet ;
+- les coups de zombies produisent animation de blessure, son, particules, actionbar et recul bref ;
+- les bonus recherchent un sol sûr à proximité et restent ancrés sans gravité ni vélocité.
+
+### Ajouté
+
+- animation Mystery Box de cinq secondes avec défilement d'armes avant attribution et paiement ;
+- animation Pack-a-Punch de cinq secondes avec arme visible et restitution après traitement ;
+- hologrammes `Mystery Box` et `Pack-a-Punch` dans le monde isolé de chaque instance.
+
+### Modifié
+
+- durée des animations de station configurable par propriété `animation-ticks`, valeur par défaut
+  `100` ;
+- version portée à `0.9.2-SNAPSHOT`.
+
 ## 0.9.1-SNAPSHOT — Stabilisation gameplay et édition
 
 ### Corrigé

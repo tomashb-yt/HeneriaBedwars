@@ -42,6 +42,7 @@ import fr.heneria.zombie.plugin.enemy.PaperZombieEngine;
 import fr.heneria.zombie.plugin.enemy.ZZombieCommand;
 import fr.heneria.zombie.plugin.enemy.ZombieDefinitionLoader;
 import fr.heneria.zombie.plugin.enemy.ZombieProtectionListener;
+import fr.heneria.zombie.plugin.game.DownedPlayerListener;
 import fr.heneria.zombie.plugin.game.GameCombatListener;
 import fr.heneria.zombie.plugin.game.PaperGameRuntime;
 import fr.heneria.zombie.plugin.game.ZGameCommand;
@@ -508,6 +509,10 @@ public final class ZombieBootstrap {
             rewards,
             gameId ->
                 powerUps.active(gameId, fr.heneria.zombie.core.powerup.PowerUpType.INSTA_KILL),
+            playerId -> {
+              PaperGameRuntime runtime = gameReference.get();
+              return runtime != null && runtime.canAct(playerId);
+            },
             (gameId, playerId, appliedDamage, headshot) -> {
               PaperGameRuntime runtime = gameReference.get();
               if (runtime != null) {
@@ -575,6 +580,7 @@ public final class ZombieBootstrap {
         new MapPreviewListener(previewService),
         new GuiListener(guiService),
         new GuiChatInputListener(plugin, guiService),
+        new DownedPlayerListener(gameRuntime),
         new GameCombatListener(gameRuntime, zombieEngine, messages),
         new ZombieProtectionListener(zombieEngine),
         new WeaponListener(weaponService),

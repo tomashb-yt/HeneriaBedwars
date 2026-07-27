@@ -40,6 +40,7 @@ class ZombieGameTest {
     game.prepare();
     game.start(1);
 
+    assertTrue(game.hasLivingTeammate(first));
     assertTrue(game.down(first));
     assertTrue(game.revive(first, second));
     assertEquals(1, game.snapshot().players().get(second).revives());
@@ -47,6 +48,16 @@ class ZombieGameTest {
     assertTrue(game.eliminate(first));
     assertTrue(game.down(second));
     assertTrue(game.eliminate(second));
+    assertTrue(game.defeated());
+  }
+
+  @Test
+  void soloPlayerHasNoPossibleReviver() {
+    ZombieGame game = game(new MutableClock());
+    UUID player = addAndStart(game, 1);
+
+    assertFalse(game.hasLivingTeammate(player));
+    assertTrue(game.eliminate(player));
     assertTrue(game.defeated());
   }
 

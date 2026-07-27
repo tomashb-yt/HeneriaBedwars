@@ -10,6 +10,11 @@ durée de vie, collecte idempotente et expiration.
 `PaperPowerUpService` matérialise un drop lumineux, interdit son ramassage vanilla et vérifie sa
 proximité depuis le tick groupé existant. Il n'existe aucune tâche par drop ou par bonus.
 
+Avant l'apparition, l'adaptateur cherche dans un rayon de deux blocs une surface solide disposant
+de deux blocs d'air. Le drop est centré juste au-dessus, sa vélocité reste nulle et le tick groupé
+le ramène à son ancre s'il a été déplacé. Le secours utilise la surface la plus haute de la colonne
+d'origine.
+
 ## Bonus implémentés
 
 - `DOUBLE_POINTS` double les récompenses compatibles et étend sa durée jusqu'au plafond ;

@@ -39,3 +39,7 @@ de raisons de transaction dédiés, sans gameplay factice.
 
 Les bonus Double Points, Max Ammo, Insta-Kill et Nuke sont collectables sur les morts de zombies.
 Leur logique est détaillée dans `POWER_UP_SYSTEM.md`.
+
+La stabilisation 0.9.2 rend la mise à terre dépendante d'un sauveteur vivant, ajoute les animations
+visuelles des deux machines, leurs hologrammes isolés, un retour court sur les dégâts reçus et un
+ancrage sûr au sol pour chaque bonus.

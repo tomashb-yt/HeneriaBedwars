@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -35,6 +36,7 @@ public final class PaperPowerUpService {
   private final PaperZombieEngine zombies;
   private final Function<UUID, Collection<UUID>> gamePlayers;
   private final Map<UUID, UUID> entities = new ConcurrentHashMap<>();
+  private final Map<UUID, Location> anchors = new ConcurrentHashMap<>();
   private final Map<UUID, Map<UUID, Long>> collected = new ConcurrentHashMap<>();
   private PaperWeaponService weapons;
 
@@ -64,14 +66,20 @@ public final class PaperPowerUpService {
         .roll(gameId, round)
         .ifPresent(
             drop -> {
+              Location anchor = safeGround(location);
               Item item =
-                  location.getWorld().dropItem(location.clone().add(0, 0.4, 0), item(drop.type()));
+                  anchor
+                      .getWorld()
+                      .spawn(
+                          anchor, Item.class, spawned -> spawned.setItemStack(item(drop.type())));
               item.setCanMobPickup(false);
               item.setCanPlayerPickup(false);
               item.setGlowing(true);
               item.setGravity(false);
+              item.setVelocity(new org.bukkit.util.Vector());
               item.setUnlimitedLifetime(true);
               entities.put(drop.id(), item.getUniqueId());
+              anchors.put(drop.id(), anchor);
             });
   }
 
@@ -82,6 +90,14 @@ public final class PaperPowerUpService {
       Entity entity = Bukkit.getEntity(entities.get(drop.id()));
       if (entity == null || !entity.isValid()) {
         continue;
+      }
+      Location anchor = anchors.get(drop.id());
+      if (anchor != null) {
+        entity.setVelocity(new org.bukkit.util.Vector());
+        if (!entity.getWorld().equals(anchor.getWorld())
+            || entity.getLocation().distanceSquared(anchor) > 0.01) {
+          entity.teleport(anchor);
+        }
       }
       for (UUID playerId : gamePlayers.apply(drop.gameId())) {
         Player player = Bukkit.getPlayer(playerId);
@@ -163,10 +179,42 @@ public final class PaperPowerUpService {
 
   private void removeEntity(UUID dropId) {
     UUID entityId = entities.remove(dropId);
+    anchors.remove(dropId);
     Entity entity = entityId == null ? null : Bukkit.getEntity(entityId);
     if (entity != null) {
       entity.remove();
     }
+  }
+
+  private static Location safeGround(Location death) {
+    var world = death.getWorld();
+    int originX = death.getBlockX();
+    int originZ = death.getBlockZ();
+    int startY =
+        Math.min(world.getMaxHeight() - 2, Math.max(world.getMinHeight(), death.getBlockY()));
+    for (int radius = 0; radius <= 2; radius++) {
+      for (int x = originX - radius; x <= originX + radius; x++) {
+        for (int z = originZ - radius; z <= originZ + radius; z++) {
+          if (radius > 0
+              && x > originX - radius
+              && x < originX + radius
+              && z > originZ - radius
+              && z < originZ + radius) {
+            continue;
+          }
+          for (int y = startY; y >= Math.max(world.getMinHeight(), startY - 24); y--) {
+            Block ground = world.getBlockAt(x, y, z);
+            if (ground.getType().isSolid()
+                && ground.getRelative(0, 1, 0).isPassable()
+                && ground.getRelative(0, 2, 0).isPassable()) {
+              return new Location(world, x + 0.5, y + 1.05, z + 0.5);
+            }
+          }
+        }
+      }
+    }
+    Block highest = world.getHighestBlockAt(originX, originZ);
+    return new Location(world, originX + 0.5, highest.getY() + 1.05, originZ + 0.5);
   }
 
   private static ItemStack item(PowerUpType type) {

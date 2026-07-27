@@ -12,6 +12,7 @@ multi-clients à réaliser sur un serveur dédié.
 - dégâts par distance, headshot, pénétration et Pack-a-Punch ;
 - sélection Mystery Box, blacklist, Wonder Weapons et isolation/nettoyage par partie ;
 - parsing YAML valide et refus des matériaux, modes ou dégâts invalides ;
+- durée par défaut, surcharge et borne minimale des animations de machine ;
 
 - calculs bornés de population, santé, plafond vivant et délai ;
 - réservations et comptage idempotent d'une manche ;
@@ -188,3 +189,24 @@ Ces interactions nécessitent un client Minecraft et restent des contrôles manu
 tests unitaires, formatage et assemblage sont automatisés par le quality gate. Le JAR
 `0.9.1-SNAPSHOT` a été démarré sur Paper 1.21.11 build 132 avec Java 21 : lobby, quatre types de
 zombies, cinq armes et runtime se sont initialisés sans exception.
+
+## Stabilisation 0.9.2 — contrôles en jeu
+
+1. En solo, subir une blessure létale : aucune attente de réanimation ne doit commencer et la
+   partie doit se terminer.
+2. À deux joueurs, mettre un joueur à terre : vérifier sa pose basse, son immobilité et le blocage
+   du tir, des interactions, de l'inventaire, du ramassage et des attaques.
+3. Réanimer ce joueur et vérifier le retour de la pose, de la vitesse et des actions normales.
+4. Utiliser la Mystery Box : contrôler cinq secondes de défilement, le décompte, puis seulement le
+   paiement et l'attribution finale.
+5. Utiliser le Pack-a-Punch : vérifier le retrait temporaire, l'arme visible au-dessus de la
+   machine, puis sa restitution améliorée après cinq secondes.
+6. Vérifier les hologrammes `Mystery Box` et `Pack-a-Punch`, sans visibilité entre deux instances.
+7. Subir un coup de zombie et contrôler animation rouge, son, particules, actionbar et recul bref.
+8. Provoquer des drops près d'un mur, d'une marche et d'un vide : chacun doit rester immobile sur
+   une surface sûre jusqu'à collecte ou expiration.
+
+Les invariants de sauveteur et de défaite sont automatisés. Les poses, animations, hologrammes,
+effets client et géométrie réelle des maps nécessitent une validation avec plusieurs clients.
+Le JAR `0.9.2-SNAPSHOT` a été démarré sur Paper 1.21.11 build 132 avec Java 21 ; tous les services
+et catalogues se sont initialisés sans exception.

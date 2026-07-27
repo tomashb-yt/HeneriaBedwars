@@ -171,6 +171,15 @@ public final class ZombieGame {
     return true;
   }
 
+  /** Returns whether another conscious teammate can currently start a revive. */
+  public synchronized boolean hasLivingTeammate(UUID playerId) {
+    return players.entrySet().stream()
+        .anyMatch(
+            entry ->
+                !entry.getKey().equals(playerId)
+                    && entry.getValue().snapshot().state() == GamePlayerState.ALIVE);
+  }
+
   public synchronized boolean revive(UUID targetId, UUID reviverId) {
     GamePlayer target = players.get(targetId);
     GamePlayer reviver = players.get(reviverId);

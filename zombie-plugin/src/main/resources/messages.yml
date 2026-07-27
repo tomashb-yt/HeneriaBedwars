@@ -59,5 +59,7 @@ game:
   preparing: '<yellow>Partie en préparation</yellow>'
   round-start: '<gold><bold>Manche <round></bold></gold>'
   player-downed: '<red>Vous êtes à terre. Un allié peut vous réanimer.</red>'
+  player-eliminated-alone: '<dark_red>Vous êtes éliminé : aucun allié ne peut vous réanimer.</dark_red>'
+  damage-received: '<red>✦ Dégâts reçus</red>'
   revive-started: '<green>Réanimation en cours, restez accroupi à proximité.</green>'
   ended: '<dark_red><bold>Partie terminée</bold></dark_red> <gray>• <reason></gray>'

@@ -106,6 +106,10 @@ chargé hors thread serveur.
 groupé termine les rechargements, rafales et tirs chargés. La mort reste la responsabilité
 exclusive de `PaperZombieEngine` et `ZombieDamageService`. Voir `WEAPON_SYSTEM.md`.
 
+Les animations de Mystery Box et Pack-a-Punch sont également des états bornés de
+`PaperWeaponService` traités par ce tick groupé. Les `ItemDisplay` appartiennent au monde unique de
+l'instance et sont supprimés à la fin de l'animation ou au nettoyage de la partie.
+
 ## Moteur d'ennemis
 
 Le domaine de partie est possédé par un `ZombieGame` par UUID d'instance. `ZombieGameService`

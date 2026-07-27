@@ -40,6 +40,12 @@ L'éditeur place une arme murale initiale `starter_pistol`. Les propriétés per
 `weapon-id`, `cost` et `ammo-cost`. Les Mystery Box et Pack-a-Punch existants deviennent
 interactifs pendant une manche active.
 
+Chaque station exécute une animation dans le tick groupé, sans tâche dédiée. La Mystery Box fait
+défiler des `ItemDisplay` pendant cinq secondes avant de débiter puis attribuer l'arme finale. Le
+Pack-a-Punch retire temporairement l'arme tenue, l'affiche en rotation, effectue l'achat à la fin
+et restitue toujours l'arme, améliorée uniquement si le paiement aboutit. Une déconnexion avant la
+fin ne débite rien. `animation-ticks` permet de modifier la durée par objet de map.
+
 ## Contenu livré
 
 Les exemples `starter_pistol`, `ak47`, `mp5`, `pump_shotgun` et `raygun` couvrent pistolet,

@@ -167,4 +167,15 @@ Le moteur Paper force les mobs à être conscients et agressifs. Les contacts na
 puis traduits vers `PaperZombieEngine.attackPlayer`, qui conserve portée, ciblage, cooldown,
 capacités et chemin de dégâts central. L'équipement est vidé avant application de la configuration.
 
+## Stabilisation 0.9.2
+
+La mise à terre requiert désormais un allié vivant ; sinon l'élimination et la fin d'équipe sont
+immédiates. `DownedPlayerListener` interdit mouvement et actions, tandis que `PaperGameRuntime`
+maintient une pose basse fixe et la restaure proprement.
+
+`PaperWeaponService` possède les animations Mystery Box et Pack-a-Punch dans son tick existant.
+Les achats n'ont lieu qu'à la fin des cinq secondes et les `ItemDisplay` sont nettoyés avec la
+partie. Les hologrammes de machine vivent uniquement dans le clone d'instance. Les impacts zombies
+ont un retour Paper court. `PaperPowerUpService` trouve et conserve une ancre de sol sûre par drop.
+
 Le prochain ticket recommandé est le système complet de perks et de machines à atouts.

@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -41,6 +43,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -69,12 +72,14 @@ public final class PaperWeaponService {
   private final PurchaseService purchases;
   private final RewardService rewards;
   private final Predicate<UUID> instaKill;
+  private final Predicate<UUID> canAct;
   private final HitObserver hitObserver;
   private final WeaponEventDispatcher events;
   private final NamespacedKey markerKey;
   private final NamespacedKey instanceKey;
   private final NamespacedKey definitionKey;
   private final List<PendingShot> pendingShots = new ArrayList<>();
+  private final Map<UUID, StationAnimation> stationAnimations = new LinkedHashMap<>();
 
   public PaperWeaponService(
       JavaPlugin plugin,
@@ -85,6 +90,7 @@ public final class PaperWeaponService {
       PurchaseService purchases,
       RewardService rewards,
       Predicate<UUID> instaKill,
+      Predicate<UUID> canAct,
       HitObserver hitObserver) {
     this.definitions = java.util.Objects.requireNonNull(definitions, "definitions");
     this.zombies = java.util.Objects.requireNonNull(zombies, "zombies");
@@ -93,6 +99,7 @@ public final class PaperWeaponService {
     this.purchases = java.util.Objects.requireNonNull(purchases, "purchases");
     this.rewards = java.util.Objects.requireNonNull(rewards, "rewards");
     this.instaKill = java.util.Objects.requireNonNull(instaKill, "instaKill");
+    this.canAct = java.util.Objects.requireNonNull(canAct, "canAct");
     this.hitObserver = java.util.Objects.requireNonNull(hitObserver, "hitObserver");
     this.events =
         new WeaponEventDispatcher(
@@ -130,6 +137,9 @@ public final class PaperWeaponService {
   }
 
   public boolean fire(Player player, long tick) {
+    if (!canAct.test(player.getUniqueId())) {
+      return false;
+    }
     WeaponInstance weapon = current(player).orElse(null);
     if (weapon == null
         || !playerGame.apply(player.getUniqueId()).filter(weapon.gameId()::equals).isPresent()) {
@@ -174,6 +184,9 @@ public final class PaperWeaponService {
   }
 
   public boolean beginReload(Player player, long tick) {
+    if (!canAct.test(player.getUniqueId())) {
+      return false;
+    }
     WeaponInstance weapon = current(player).orElse(null);
     if (weapon == null
         || !publish(WeaponEvent.Type.PRE_RELOAD, weapon, java.util.Map.of())
@@ -187,6 +200,7 @@ public final class PaperWeaponService {
   }
 
   public void tick(long tick) {
+    tickStationAnimations(tick);
     pendingShots.removeIf(
         shot -> {
           if (shot.fireAtTick() > tick) {
@@ -215,6 +229,9 @@ public final class PaperWeaponService {
   }
 
   public boolean interactMapObject(Player player, Location clicked, long tick) {
+    if (!canAct.test(player.getUniqueId())) {
+      return false;
+    }
     UUID gameId = playerGame.apply(player.getUniqueId()).orElse(null);
     MapDefinition map = gameId == null ? null : gameMap.apply(gameId).orElse(null);
     if (gameId == null || map == null) {
@@ -236,7 +253,7 @@ public final class PaperWeaponService {
     return switch (object.type()) {
       case WEAPON_WALL -> wallPurchase(gameId, player, object, tick);
       case MYSTERY_BOX -> mysteryPurchase(gameId, player, object, tick);
-      case PACK_A_PUNCH -> packAPunch(gameId, player);
+      case PACK_A_PUNCH -> packAPunch(gameId, player, object, tick);
       default -> false;
     };
   }
@@ -286,6 +303,17 @@ public final class PaperWeaponService {
             });
     weapons.removeGame(gameId);
     pendingShots.removeIf(value -> removedIds.contains(value.weaponInstanceId()));
+    stationAnimations
+        .values()
+        .removeIf(
+            animation -> {
+              if (!animation.gameId.equals(gameId)) {
+                return false;
+              }
+              animation.removeDisplay();
+              restorePackWeapon(animation);
+              return true;
+            });
     players.stream()
         .map(Bukkit::getPlayer)
         .filter(java.util.Objects::nonNull)
@@ -415,6 +443,10 @@ public final class PaperWeaponService {
 
   private boolean mysteryPurchase(
       UUID gameId, Player player, MapDefinition.MapObject object, long tick) {
+    if (stationAnimations.containsKey(player.getUniqueId())) {
+      player.sendActionBar(MINI.deserialize("<yellow>Une machine est déjà en cours."));
+      return true;
+    }
     int cost = parseCost(object.properties(), "cost", 950);
     Set<String> blacklist =
         Set.of(object.properties().getOrDefault("blacklist", "").split(",")).stream()
@@ -433,35 +465,195 @@ public final class PaperWeaponService {
       player.sendMessage(MINI.deserialize("<red>Aucune arme éligible dans cette boîte."));
       return true;
     }
+    List<WeaponDefinition> previews =
+        definitions.current().all().stream()
+            .filter(value -> !blacklist.contains(value.id()))
+            .filter(value -> wonder || value.rarity() != WeaponDefinition.WeaponRarity.WONDER)
+            .toList();
+    ItemDisplay display = spawnWeaponDisplay(player, object, previewItem(previews.getFirst()));
+    stationAnimations.put(
+        player.getUniqueId(),
+        StationAnimation.mystery(
+            gameId,
+            player.getUniqueId(),
+            object.id(),
+            cost,
+            tick,
+            animationTicks(object),
+            selected.get(),
+            previews,
+            display.getUniqueId()));
+    player.sendActionBar(MINI.deserialize("<light_purple>Mystery Box… <white>5"));
+    player.playSound(display.getLocation(), Sound.BLOCK_CHEST_OPEN, 1, 1);
+    return true;
+  }
+
+  private void tickStationAnimations(long tick) {
+    var iterator = stationAnimations.values().iterator();
+    while (iterator.hasNext()) {
+      StationAnimation animation = iterator.next();
+      Player player = Bukkit.getPlayer(animation.playerId);
+      if (tick >= animation.completeAt) {
+        animation.removeDisplay();
+        if (animation.type == StationAnimation.Type.MYSTERY_BOX) {
+          completeMystery(animation, player, tick);
+        } else {
+          completePack(animation, player);
+        }
+        iterator.remove();
+        continue;
+      }
+      if (tick < animation.nextVisualAt) {
+        continue;
+      }
+      animation.nextVisualAt = tick + 5;
+      Entity rawDisplay = Bukkit.getEntity(animation.displayId);
+      if (rawDisplay instanceof ItemDisplay display) {
+        display.setRotation((float) ((tick * 12) % 360), 0);
+        if (animation.type == StationAnimation.Type.MYSTERY_BOX) {
+          WeaponDefinition preview =
+              animation.previews.get(animation.previewIndex++ % animation.previews.size());
+          display.setItemStack(previewItem(preview));
+          display
+              .getWorld()
+              .playSound(display.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 0.5f, 1.5f);
+        } else {
+          display.getWorld().playSound(display.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.25f, 1.8f);
+        }
+      }
+      if (player != null) {
+        long seconds = Math.max(1, (animation.completeAt - tick + 19) / 20);
+        player.sendActionBar(
+            MINI.deserialize(
+                (animation.type == StationAnimation.Type.MYSTERY_BOX
+                        ? "<light_purple>Mystery Box… "
+                        : "<aqua>Pack-a-Punch… ")
+                    + "<white>"
+                    + seconds));
+      }
+    }
+  }
+
+  private void completeMystery(StationAnimation animation, Player player, long tick) {
+    if (player == null
+        || !player.isOnline()
+        || !playerGame.apply(player.getUniqueId()).filter(animation.gameId::equals).isPresent()) {
+      return;
+    }
     final WeaponInstance[] granted = new WeaponInstance[1];
     PurchaseResult purchase =
         purchases.purchase(
             purchase(
-                gameId,
+                animation.gameId,
                 player,
                 PurchaseType.MYSTERY_BOX,
-                object.id(),
-                cost,
+                animation.objectId,
+                animation.cost,
                 TransactionReason.MYSTERY_BOX_PURCHASE,
                 () -> {
-                  granted[0] = give(gameId, player, selected.get(), tick).orElse(null);
+                  granted[0] =
+                      give(animation.gameId, player, animation.selected, tick).orElse(null);
                   return granted[0] != null;
                 }));
     if (!purchase.successful()) {
       purchaseFailure(player, purchase);
-      return true;
+      return;
     }
-    WeaponInstance purchased = granted[0];
     publish(
         WeaponEvent.Type.PURCHASED,
-        purchased,
-        java.util.Map.of("source", "mystery_box", "cost", Integer.toString(cost)));
+        granted[0],
+        Map.of("source", "mystery_box", "cost", Integer.toString(animation.cost)));
     player.sendMessage(
-        MINI.deserialize("<light_purple>Mystery Box : " + selected.get().displayName()));
-    return true;
+        MINI.deserialize("<light_purple>Mystery Box : " + animation.selected.displayName()));
+    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.2f);
   }
 
-  private boolean packAPunch(UUID gameId, Player player) {
+  private void completePack(StationAnimation animation, Player player) {
+    if (player == null
+        || !player.isOnline()
+        || !playerGame.apply(player.getUniqueId()).filter(animation.gameId::equals).isPresent()) {
+      restorePackWeapon(animation);
+      return;
+    }
+    PurchaseResult purchase =
+        purchases.purchase(
+            purchase(
+                animation.gameId,
+                player,
+                PurchaseType.PACK_A_PUNCH,
+                animation.weapon.id().toString(),
+                animation.cost,
+                TransactionReason.PACK_A_PUNCH_PURCHASE,
+                animation.weapon::upgrade));
+    restorePackWeapon(animation);
+    if (!purchase.successful()) {
+      purchaseFailure(player, purchase);
+      return;
+    }
+    publish(
+        WeaponEvent.Type.UPGRADED,
+        animation.weapon,
+        Map.of("level", Integer.toString(animation.weapon.snapshot().upgradeLevel())));
+    player.sendMessage(
+        MINI.deserialize(
+            "<light_purple>Pack-a-Punch niveau "
+                + animation.weapon.snapshot().upgradeLevel()
+                + " !"));
+    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 0.8f);
+  }
+
+  private void restorePackWeapon(StationAnimation animation) {
+    if (animation.weapon == null) {
+      return;
+    }
+    Player owner = Bukkit.getPlayer(animation.playerId);
+    if (owner != null && owner.isOnline()) {
+      owner.getInventory().setItem(animation.inventorySlot, item(animation.weapon));
+    }
+  }
+
+  private ItemDisplay spawnWeaponDisplay(
+      Player player, MapDefinition.MapObject object, ItemStack stack) {
+    Location location =
+        new Location(
+            player.getWorld(),
+            Math.floor(object.position().x()) + 0.5,
+            Math.floor(object.position().y()) + 1.35,
+            Math.floor(object.position().z()) + 0.5);
+    ItemDisplay display = player.getWorld().spawn(location, ItemDisplay.class);
+    display.setItemStack(stack);
+    display.setGlowing(true);
+    display.setPersistent(false);
+    return display;
+  }
+
+  private static ItemStack previewItem(WeaponDefinition definition) {
+    Material material = Material.matchMaterial(definition.presentation().material());
+    ItemStack stack = new ItemStack(material == null ? Material.STICK : material);
+    ItemMeta meta = stack.getItemMeta();
+    meta.displayName(MINI.deserialize(definition.displayName()));
+    if (definition.presentation().customModelData() > 0) {
+      meta.setCustomModelData(definition.presentation().customModelData());
+    }
+    stack.setItemMeta(meta);
+    return stack;
+  }
+
+  static int animationTicks(MapDefinition.MapObject object) {
+    try {
+      return Math.max(
+          20, Integer.parseInt(object.properties().getOrDefault("animation-ticks", "100")));
+    } catch (NumberFormatException ignored) {
+      return 100;
+    }
+  }
+
+  private boolean packAPunch(
+      UUID gameId, Player player, MapDefinition.MapObject object, long tick) {
+    if (stationAnimations.containsKey(player.getUniqueId())) {
+      player.sendActionBar(MINI.deserialize("<yellow>Une machine est déjà en cours."));
+      return true;
+    }
     WeaponInstance weapon = current(player).orElse(null);
     if (weapon == null) {
       player.sendMessage(MINI.deserialize("<red>Tenez une arme à améliorer."));
@@ -475,28 +667,22 @@ public final class PaperWeaponService {
     if (!publish(WeaponEvent.Type.PRE_UPGRADE, weapon, java.util.Map.of())) {
       return true;
     }
-    PurchaseResult purchase =
-        purchases.purchase(
-            purchase(
-                gameId,
-                player,
-                PurchaseType.PACK_A_PUNCH,
-                weapon.id().toString(),
-                cost,
-                TransactionReason.PACK_A_PUNCH_PURCHASE,
-                weapon::upgrade));
-    if (!purchase.successful()) {
-      purchaseFailure(player, purchase);
-      return true;
-    }
-    publish(
-        WeaponEvent.Type.UPGRADED,
-        weapon,
-        java.util.Map.of("level", Integer.toString(weapon.snapshot().upgradeLevel())));
-    refreshItem(player, weapon);
-    player.sendMessage(
-        MINI.deserialize(
-            "<light_purple>Pack-a-Punch niveau " + weapon.snapshot().upgradeLevel() + " !"));
+    int slot = player.getInventory().getHeldItemSlot();
+    player.getInventory().setItem(slot, null);
+    ItemDisplay display = spawnWeaponDisplay(player, object, item(weapon));
+    stationAnimations.put(
+        player.getUniqueId(),
+        StationAnimation.pack(
+            gameId,
+            player.getUniqueId(),
+            cost,
+            tick,
+            animationTicks(object),
+            weapon,
+            slot,
+            display.getUniqueId()));
+    player.sendActionBar(MINI.deserialize("<aqua>Pack-a-Punch… <white>5"));
+    player.playSound(display.getLocation(), Sound.BLOCK_ANVIL_USE, 0.8f, 1.2f);
     return true;
   }
 
@@ -763,6 +949,110 @@ public final class PaperWeaponService {
       UUID playerId, UUID weaponInstanceId, long fireAtTick, boolean consumeAmmo) {}
 
   private record Target(UUID entityId, double distance, boolean headshot) {}
+
+  private static final class StationAnimation {
+    private enum Type {
+      MYSTERY_BOX,
+      PACK_A_PUNCH
+    }
+
+    private final Type type;
+    private final UUID gameId;
+    private final UUID playerId;
+    private final String objectId;
+    private final int cost;
+    private final long completeAt;
+    private final WeaponDefinition selected;
+    private final List<WeaponDefinition> previews;
+    private final WeaponInstance weapon;
+    private final int inventorySlot;
+    private final UUID displayId;
+    private long nextVisualAt;
+    private int previewIndex;
+
+    private StationAnimation(
+        Type type,
+        UUID gameId,
+        UUID playerId,
+        String objectId,
+        int cost,
+        long startedAt,
+        int durationTicks,
+        WeaponDefinition selected,
+        List<WeaponDefinition> previews,
+        WeaponInstance weapon,
+        int inventorySlot,
+        UUID displayId) {
+      this.type = type;
+      this.gameId = gameId;
+      this.playerId = playerId;
+      this.objectId = objectId;
+      this.cost = cost;
+      this.completeAt = startedAt + durationTicks;
+      this.selected = selected;
+      this.previews = previews;
+      this.weapon = weapon;
+      this.inventorySlot = inventorySlot;
+      this.displayId = displayId;
+      this.nextVisualAt = startedAt;
+    }
+
+    private static StationAnimation mystery(
+        UUID gameId,
+        UUID playerId,
+        String objectId,
+        int cost,
+        long startedAt,
+        int durationTicks,
+        WeaponDefinition selected,
+        List<WeaponDefinition> previews,
+        UUID displayId) {
+      return new StationAnimation(
+          Type.MYSTERY_BOX,
+          gameId,
+          playerId,
+          objectId,
+          cost,
+          startedAt,
+          durationTicks,
+          selected,
+          previews,
+          null,
+          -1,
+          displayId);
+    }
+
+    private static StationAnimation pack(
+        UUID gameId,
+        UUID playerId,
+        int cost,
+        long startedAt,
+        int durationTicks,
+        WeaponInstance weapon,
+        int inventorySlot,
+        UUID displayId) {
+      return new StationAnimation(
+          Type.PACK_A_PUNCH,
+          gameId,
+          playerId,
+          weapon.id().toString(),
+          cost,
+          startedAt,
+          durationTicks,
+          null,
+          List.of(),
+          weapon,
+          inventorySlot,
+          displayId);
+    }
+
+    private void removeDisplay() {
+      Entity display = Bukkit.getEntity(displayId);
+      if (display != null) {
+        display.remove();
+      }
+    }
+  }
 
   @FunctionalInterface
   public interface HitObserver {
