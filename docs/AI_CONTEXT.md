@@ -142,6 +142,12 @@ La version `0.10.5` réunit dans le gestionnaire les définitions éditoriales e
 valides détectés dans `zombie_templates/`. Un template sans `map.yml` possède une fiche limitée à
 la visite : l'administrateur peut contrôler la construction avant toute création ou configuration.
 
+La version `0.11.0` ouvre la refonte structurelle de la gestion des maps. Un import fabrique
+désormais une copie de travail possédée sous `zombie_editing/`, tandis qu'une création génère
+également son propre monde. `ManagedMapWorldService` centralise chargement, sauvegarde,
+déchargement, duplication et synchronisation. Le bouton de sauvegarde persiste blocs et YAML ;
+`/zmap edit` téléporte réellement dans le monde de travail. Voir `MAP_MANAGEMENT_REFACTOR.md`.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec

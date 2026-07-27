@@ -2,6 +2,28 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.11.0-SNAPSHOT — Refonte des mondes de travail
+
+### Ajouté
+
+- `ManagedMapWorldService`, propriétaire unique du cycle physique des mondes d'édition ;
+- action `Importer et modifier` copiant un template vers `zombie_editing/hz_edit_<id>` ;
+- création systématique d'un monde dédié pour toute nouvelle map ;
+- sauvegarde conjointe des blocs et de la configuration ;
+- statut chargé/déchargé et action de déchargement sécurisé dans le tableau de bord ;
+- documentation d'audit et invariants dans `MAP_MANAGEMENT_REFACTOR.md`.
+
+### Corrigé
+
+- une création depuis le lobby ne référence plus le lobby comme monde d'édition ;
+- `/zmap edit` charge et téléporte désormais réellement sur la map ;
+- le chargement du monde n'est plus dupliqué dans le menu ;
+- aucun contrôle de dossier n'est exécuté sur le thread serveur.
+
+### Modifié
+
+- version portée à `0.11.0-SNAPSHOT`.
+
 ## 0.10.5-SNAPSHOT — Visite avant configuration
 
 ### Ajouté

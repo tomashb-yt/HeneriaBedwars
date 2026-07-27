@@ -71,8 +71,9 @@ avec des descriptions distinguant clairement visite, édition, test et publicati
 
 À chaque ouverture, le gestionnaire actualise `zombie_templates/` hors thread serveur. Un dossier
 valide sans définition éditoriale apparaît avec l'état `template importé`. Sa fiche expose
-uniquement la visite, le retour et l'accueil ; les actions d'édition, de test et de publication ne
-sont affichées qu'après création de la configuration.
+la visite et **Importer et modifier**. L'import crée le monde de travail dédié et ouvre l'éditeur.
+Les maps configurées exposent aussi le chargement automatique par **Modifier** et le déchargement
+explicite de leur monde de travail.
 
 La validation contrôle ensuite :
 

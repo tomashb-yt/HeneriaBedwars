@@ -11,8 +11,8 @@ import fr.heneria.zombie.core.editor.PublishedMapVersion;
 import fr.heneria.zombie.core.instance.GameInstanceSnapshot;
 import fr.heneria.zombie.core.instance.GameInstanceState;
 import fr.heneria.zombie.plugin.editor.EditorItemService;
+import fr.heneria.zombie.plugin.editor.ManagedMapWorldService;
 import fr.heneria.zombie.plugin.editor.MapVisualizationService;
-import fr.heneria.zombie.plugin.editor.MapWorldPublicationService;
 import fr.heneria.zombie.plugin.game.PaperGameRuntime;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.instance.PlayerInstanceResult;
@@ -30,7 +30,6 @@ import java.util.concurrent.Executor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
 /** Player catalogue and administrative publication workflow built on the shared GUI engine. */
@@ -44,6 +43,8 @@ public final class MapMenuModule {
           "maps.archive",
           "maps.delete",
           "maps.visit",
+          "maps.import",
+          "maps.unload",
           "maps.edit",
           "maps.validate",
           "maps.test",
@@ -63,7 +64,7 @@ public final class MapMenuModule {
   private final MapPublicationService publications;
   private final MapTemplateCatalog templates;
   private final MapPreviewService previews;
-  private final MapWorldPublicationService worldPublications;
+  private final ManagedMapWorldService worldManagement;
   private final EditorItemService editorItems;
   private final MapVisualizationService visualizations;
   private final InstanceCoordinator instances;
@@ -81,7 +82,7 @@ public final class MapMenuModule {
       MapPublicationService publications,
       MapTemplateCatalog templates,
       MapPreviewService previews,
-      MapWorldPublicationService worldPublications,
+      ManagedMapWorldService worldManagement,
       EditorItemService editorItems,
       MapVisualizationService visualizations,
       InstanceCoordinator instances,
@@ -97,7 +98,7 @@ public final class MapMenuModule {
     this.publications = publications;
     this.templates = templates;
     this.previews = previews;
-    this.worldPublications = worldPublications;
+    this.worldManagement = worldManagement;
     this.editorItems = editorItems;
     this.visualizations = visualizations;
     this.instances = instances;
@@ -129,6 +130,8 @@ public final class MapMenuModule {
     actions.register(
         "maps.delete", context -> requestDeletion(context.player(), selected(context)));
     actions.register("maps.visit", context -> visit(context.player(), selected(context)));
+    actions.register("maps.import", context -> importTemplate(context.player(), selected(context)));
+    actions.register("maps.unload", context -> unloadWorld(context.player(), selected(context)));
     actions.register("maps.edit", context -> edit(context.player(), selected(context)));
     actions.register(
         "maps.validate",
@@ -312,6 +315,7 @@ public final class MapMenuModule {
                 "<gray>Spawns, zones et machines restent",
                 "<gray>à configurer avant un test."));
         view.configured("visit");
+        view.configured("import");
         view.configured("back");
         view.configured("home");
         return;
@@ -330,6 +334,10 @@ public final class MapMenuModule {
             "<gray>ID : <white>" + id,
             "<gray>État : <white>" + publication.status(),
             "<gray>Monde de travail : <white>" + map.world(),
+            "<gray>Chargement : "
+                + (org.bukkit.Bukkit.getWorld(map.world()) == null
+                    ? "<yellow>déchargé"
+                    : "<green>chargé"),
             "<gray>Template visitable : "
                 + (templates.knownMapIds().contains(id) ? "<green>disponible" : "<red>absent"),
             "<gray>Version publiée : <white>"
@@ -370,7 +378,16 @@ public final class MapMenuModule {
             "<red>Supprimer efface définitivement",
             "<red>tout le contenu possédé."));
     for (String key :
-        List.of("visit", "edit", "duplicate", "validate", "test", "history", "archive", "delete")) {
+        List.of(
+            "visit",
+            "edit",
+            "unload",
+            "duplicate",
+            "validate",
+            "test",
+            "history",
+            "archive",
+            "delete")) {
       view.configured(key);
     }
     if (publication.status() == MapStatus.PUBLISHED) {
@@ -454,12 +471,15 @@ public final class MapMenuModule {
                     : GuiInputRequest.Validation.reject(
                         MINI.deserialize("<red>Utilisez a-z, 0-9, _ ou - (64 caractères).")),
             value ->
-                editors
-                    .create(
-                        value.toLowerCase(Locale.ROOT),
-                        value.toLowerCase(Locale.ROOT),
-                        player.getUniqueId(),
-                        player.getWorld().getName())
+                worldManagement
+                    .createEditingWorld(value.toLowerCase(Locale.ROOT))
+                    .thenCompose(
+                        world ->
+                            editors.create(
+                                value.toLowerCase(Locale.ROOT),
+                                value.toLowerCase(Locale.ROOT),
+                                player.getUniqueId(),
+                                world))
                     .whenCompleteAsync(
                         (map, failure) -> {
                           if (failure != null) {
@@ -475,10 +495,27 @@ public final class MapMenuModule {
 
   private void requestDuplicate(Player player, String sourceId) {
     MapDefinition source = editors.registry().find(sourceId).orElse(null);
-    if (source == null || loadEditingWorld(source) == null) {
+    if (source == null) {
       player.sendMessage(MINI.deserialize("<red>Le monde source ne peut pas être chargé."));
       return;
     }
+    worldManagement
+        .loadEditingWorld(source)
+        .whenCompleteAsync(
+            (world, failure) -> {
+              if (failure != null || world == null) {
+                player.sendMessage(
+                    MINI.deserialize(
+                        "<red>Le monde source ne peut pas être chargé : "
+                            + (failure == null ? "dossier absent" : safe(failure))));
+                return;
+              }
+              requestDuplicateInput(player, sourceId, source);
+            },
+            mainThread);
+  }
+
+  private void requestDuplicateInput(Player player, String sourceId, MapDefinition source) {
     guis.requestInput(
         player,
         new GuiInputRequest(
@@ -492,7 +529,7 @@ public final class MapMenuModule {
                         MINI.deserialize("<red>Identifiant invalide ou déjà utilisé.")),
             value -> {
               String newId = value.toLowerCase(Locale.ROOT);
-              worldPublications
+              worldManagement
                   .duplicateEditingWorld(source, newId)
                   .thenCompose(
                       world -> editors.duplicate(sourceId, newId, player.getUniqueId(), world))
@@ -531,42 +568,46 @@ public final class MapMenuModule {
     editors
         .open(player.getUniqueId(), mapId)
         .ifPresentOrElse(
-            session -> {
-              World editingWorld = loadEditingWorld(session.definition());
-              if (editingWorld == null) {
-                editors.leave(player.getUniqueId());
-                player.sendMessage(
-                    MINI.deserialize("<red>Impossible de charger le monde d'édition."));
-                return;
-              }
-              var spawn = session.definition().playerSpawn();
-              org.bukkit.Location destination =
-                  spawn
-                      .map(
-                          point ->
-                              new org.bukkit.Location(
-                                  editingWorld,
-                                  point.x(),
-                                  point.y(),
-                                  point.z(),
-                                  point.yaw(),
-                                  point.pitch()))
-                      .orElseGet(editingWorld::getSpawnLocation);
-              if (!player.teleport(destination)) {
-                editors.leave(player.getUniqueId());
-                player.sendMessage(
-                    MINI.deserialize("<red>Impossible d'entrer dans le monde d'édition."));
-                return;
-              }
-              editorItems.give(player, session);
-              visualizations.refreshEditor(
-                  player.getUniqueId(), editingWorld, session.definition());
-              guis.openHome(player, new GuiId("editor-main"));
-              player.sendMessage(MINI.deserialize("<green>Copie de travail ouverte."));
-            },
+            session ->
+                worldManagement
+                    .loadEditingWorld(session.definition())
+                    .whenCompleteAsync(
+                        (editingWorld, failure) -> {
+                          if (failure != null || editingWorld == null) {
+                            editors.leave(player.getUniqueId());
+                            player.sendMessage(
+                                MINI.deserialize(
+                                    "<red>Impossible de charger le monde d'édition : "
+                                        + (failure == null ? "dossier absent" : safe(failure))));
+                            return;
+                          }
+                          enterEditor(player, session, editingWorld);
+                        },
+                        mainThread),
             () ->
                 player.sendMessage(
                     MINI.deserialize("<red>Map inconnue, déjà ouverte ou verrouillée.")));
+  }
+
+  private void enterEditor(
+      Player player, fr.heneria.zombie.core.editor.MapEditorSession session, World editingWorld) {
+    var spawn = session.definition().playerSpawn();
+    org.bukkit.Location destination =
+        spawn
+            .map(
+                point ->
+                    new org.bukkit.Location(
+                        editingWorld, point.x(), point.y(), point.z(), point.yaw(), point.pitch()))
+            .orElseGet(editingWorld::getSpawnLocation);
+    if (!player.teleport(destination)) {
+      editors.leave(player.getUniqueId());
+      player.sendMessage(MINI.deserialize("<red>Impossible d'entrer dans le monde d'édition."));
+      return;
+    }
+    editorItems.give(player, session);
+    visualizations.refreshEditor(player.getUniqueId(), editingWorld, session.definition());
+    guis.openHome(player, new GuiId("editor-main"));
+    player.sendMessage(MINI.deserialize("<green>Copie de travail ouverte."));
   }
 
   private void visit(Player player, String mapId) {
@@ -594,6 +635,62 @@ public final class MapMenuModule {
                                 + ". Vérifiez zombie_templates/"
                                 + mapId
                                 + ".")),
+            mainThread);
+  }
+
+  private void importTemplate(Player player, String mapId) {
+    if (editors.registry().find(mapId).isPresent()) {
+      player.sendMessage(MINI.deserialize("<yellow>Cette map est déjà importée."));
+      edit(player, mapId);
+      return;
+    }
+    player.closeInventory();
+    player.sendMessage(
+        MINI.deserialize("<yellow>Import du template dans un monde d'édition dédié..."));
+    previews
+        .leave(player)
+        .thenComposeAsync(ignored -> worldManagement.importTemplate(mapId), mainThread)
+        .thenCompose(world -> editors.create(mapId, mapId, player.getUniqueId(), world))
+        .whenCompleteAsync(
+            (definition, failure) -> {
+              if (failure != null) {
+                player.sendMessage(MINI.deserialize("<red>Import impossible : " + safe(failure)));
+                return;
+              }
+              player.sendMessage(
+                  MINI.deserialize("<green>Template importé. Le monde source reste intact."));
+              openEditor(player, definition.id());
+            },
+            mainThread);
+  }
+
+  private void unloadWorld(Player player, String mapId) {
+    MapDefinition definition = editors.registry().find(mapId).orElse(null);
+    if (definition == null) {
+      player.sendMessage(MINI.deserialize("<red>Map inconnue."));
+      return;
+    }
+    if (editors.editorOf(mapId).isPresent()) {
+      player.sendMessage(
+          MINI.deserialize("<red>Fermez d'abord la session d'édition de cette map."));
+      return;
+    }
+    worldManagement
+        .unloadEditingWorld(definition)
+        .whenCompleteAsync(
+            (unloaded, failure) -> {
+              if (failure != null) {
+                player.sendMessage(
+                    MINI.deserialize("<red>Déchargement impossible : " + safe(failure)));
+              } else {
+                player.sendMessage(
+                    MINI.deserialize(
+                        unloaded
+                            ? "<green>Monde sauvegardé et déchargé."
+                            : "<yellow>Le monde était déjà déchargé."));
+              }
+              guis.refresh(player);
+            },
             mainThread);
   }
 
@@ -637,7 +734,7 @@ public final class MapMenuModule {
       closedEditor = CompletableFuture.completedFuture(null);
     }
     closedEditor
-        .thenComposeAsync(ignored -> worldPublications.updateTemplate(definition), mainThread)
+        .thenComposeAsync(ignored -> worldManagement.updateTemplate(definition), mainThread)
         .thenCompose(ignored -> templates.find(mapId))
         .thenCompose(
             template ->
@@ -760,7 +857,7 @@ public final class MapMenuModule {
                 guis.back(player);
                 return;
               }
-              worldPublications
+              worldManagement
                   .prepareDeletion(definition)
                   .thenCompose(ignored -> publications.delete(mapId, () -> editors.delete(mapId)))
                   .thenRun(
@@ -801,15 +898,28 @@ public final class MapMenuModule {
       player.sendMessage(MINI.deserialize("<red>La map doit être valide avant le test."));
       return;
     }
-    if (loadEditingWorld(map) == null) {
-      player.sendMessage(MINI.deserialize("<red>Le monde d'édition ne peut pas être chargé."));
-      return;
-    }
     Optional<UUID> editor = editors.editorOf(mapId);
     if (editor.isPresent() && !editor.orElseThrow().equals(player.getUniqueId())) {
       player.sendMessage(MINI.deserialize("<red>La map est encore modifiée par un autre admin."));
       return;
     }
+    worldManagement
+        .loadEditingWorld(map)
+        .whenCompleteAsync(
+            (world, failure) -> {
+              if (failure != null || world == null) {
+                player.sendMessage(
+                    MINI.deserialize(
+                        "<red>Le monde d'édition ne peut pas être chargé : "
+                            + (failure == null ? "dossier absent" : safe(failure))));
+                return;
+              }
+              startTest(player, mapId, map);
+            },
+            mainThread);
+  }
+
+  private void startTest(Player player, String mapId, MapDefinition map) {
     player.closeInventory();
     CompletableFuture<Void> closedEditor;
     if (editors
@@ -829,7 +939,7 @@ public final class MapMenuModule {
             ignored -> {
               games.left(player.getUniqueId());
               instances.leave(player);
-              return worldPublications.updateTemplate(map);
+              return worldManagement.updateTemplate(map);
             },
             mainThread)
         .thenCompose(
@@ -1106,20 +1216,6 @@ public final class MapMenuModule {
             ? failure.getCause()
             : failure;
     return cause.getMessage() == null ? cause.getClass().getSimpleName() : cause.getMessage();
-  }
-
-  private static World loadEditingWorld(MapDefinition definition) {
-    World loaded = org.bukkit.Bukkit.getWorld(definition.world());
-    if (loaded != null) {
-      return loaded;
-    }
-    java.nio.file.Path root =
-        org.bukkit.Bukkit.getWorldContainer().toPath().toAbsolutePath().normalize();
-    java.nio.file.Path candidate = root.resolve(definition.world()).toAbsolutePath().normalize();
-    if (!candidate.startsWith(root) || !java.nio.file.Files.isDirectory(candidate)) {
-      return null;
-    }
-    return org.bukkit.Bukkit.createWorld(new WorldCreator(definition.world()));
   }
 
   private record ValidationItem(

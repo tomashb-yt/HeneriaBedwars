@@ -54,6 +54,14 @@ final class WorldDirectoryCopier {
     }
   }
 
+  static void deleteOwned(Path directory, Path allowedParent) {
+    try {
+      deleteTree(directory, allowedParent);
+    } catch (IOException failure) {
+      throw new java.util.concurrent.CompletionException(failure);
+    }
+  }
+
   private static void copyTree(Path source, Path destination) throws IOException {
     Files.walkFileTree(
         source,
@@ -116,10 +124,27 @@ final class WorldDirectoryCopier {
   }
 
   private static void move(Path source, Path target) throws IOException {
-    try {
-      Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
-    } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
-      Files.move(source, target);
+    IOException lastFailure = null;
+    for (int attempt = 1; attempt <= 5; attempt++) {
+      try {
+        try {
+          Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
+        } catch (java.nio.file.AtomicMoveNotSupportedException ignored) {
+          Files.move(source, target);
+        }
+        return;
+      } catch (java.nio.file.AccessDeniedException transientFailure) {
+        lastFailure = transientFailure;
+        if (attempt < 5) {
+          try {
+            Thread.sleep(25L * attempt);
+          } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted while moving world directory", interrupted);
+          }
+        }
+      }
     }
+    throw lastFailure;
   }
 }

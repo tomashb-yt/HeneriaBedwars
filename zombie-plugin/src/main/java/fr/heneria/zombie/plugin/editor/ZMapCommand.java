@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -34,6 +35,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   private final MapPreviewService previews;
   private final PaperGameRuntime games;
   private final MapVisualizationService visualizations;
+  private final ManagedMapWorldService worldManagement;
   private final Executor mainThread;
 
   public ZMapCommand(
@@ -45,6 +47,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       MapPreviewService previews,
       PaperGameRuntime games,
       MapVisualizationService visualizations,
+      ManagedMapWorldService worldManagement,
       Executor mainThread) {
     this.editors = editors;
     this.validator = validator;
@@ -54,6 +57,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
     this.previews = previews;
     this.games = games;
     this.visualizations = visualizations;
+    this.worldManagement = worldManagement;
     this.mainThread = mainThread;
   }
 
@@ -93,7 +97,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       case "leave" -> leave(player);
       case "validate" -> validate(player);
       case "test" -> test(player);
-      case "save" -> complete(player, editors.save(player.getUniqueId()), "Map sauvegardée.");
+      case "save" -> save(player);
       case "undo" -> history(player, true);
       case "redo" -> history(player, false);
       default -> usage(player);
@@ -120,8 +124,9 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   }
 
   private void create(Player player, String id) {
-    editors
-        .create(id, id, player.getUniqueId(), player.getWorld().getName())
+    worldManagement
+        .createEditingWorld(id)
+        .thenCompose(world -> editors.create(id, id, player.getUniqueId(), world))
         .whenCompleteAsync(
             (definition, failure) -> {
               if (failure != null) {
@@ -137,18 +142,65 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   }
 
   private void edit(Player player, String id) {
+    player.closeInventory();
+    previews
+        .leave(player)
+        .whenCompleteAsync(
+            (ignored, failure) -> {
+              if (failure != null) {
+                player.sendMessage(
+                    MINI.deserialize("<red>Impossible de fermer la visite : " + safe(failure)));
+                return;
+              }
+              openEditor(player, id);
+            },
+            mainThread);
+  }
+
+  private void openEditor(Player player, String id) {
     editors
         .open(player.getUniqueId(), id)
         .ifPresentOrElse(
-            session -> {
-              items.give(player, session);
-              visualizations.refreshEditor(
-                  player.getUniqueId(), player.getWorld(), session.definition());
-              guis.openHome(player, new GuiId("editor-main"));
-              player.sendMessage(MINI.deserialize("<green>Session d'édition ouverte."));
-            },
+            session ->
+                worldManagement
+                    .loadEditingWorld(session.definition())
+                    .whenCompleteAsync(
+                        (world, failure) -> {
+                          if (failure != null || world == null) {
+                            editors.leave(player.getUniqueId());
+                            player.sendMessage(
+                                MINI.deserialize(
+                                    "<red>Le monde d'édition ne peut pas être chargé : "
+                                        + (failure == null ? "dossier absent" : safe(failure))));
+                            return;
+                          }
+                          enterEditor(player, session, world);
+                        },
+                        mainThread),
             () ->
                 player.sendMessage(MINI.deserialize("<red>Map inconnue ou session déjà ouverte.")));
+  }
+
+  private void enterEditor(
+      Player player, fr.heneria.zombie.core.editor.MapEditorSession session, World world) {
+    var destination =
+        session
+            .definition()
+            .playerSpawn()
+            .map(
+                point ->
+                    new org.bukkit.Location(
+                        world, point.x(), point.y(), point.z(), point.yaw(), point.pitch()))
+            .orElseGet(world::getSpawnLocation);
+    if (!player.teleport(destination)) {
+      editors.leave(player.getUniqueId());
+      player.sendMessage(MINI.deserialize("<red>La téléportation vers l'éditeur a échoué."));
+      return;
+    }
+    items.give(player, session);
+    visualizations.refreshEditor(player.getUniqueId(), world, session.definition());
+    guis.openHome(player, new GuiId("editor-main"));
+    player.sendMessage(MINI.deserialize("<green>Monde d'édition chargé et session ouverte."));
   }
 
   private void leave(Player player) {
@@ -168,6 +220,20 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
               }
             },
             mainThread);
+  }
+
+  private void save(Player player) {
+    var session = editors.session(player.getUniqueId()).orElse(null);
+    if (session == null) {
+      player.sendMessage(MINI.deserialize("<red>Aucune session d'édition."));
+      return;
+    }
+    complete(
+        player,
+        worldManagement
+            .saveEditingWorld(session.definition())
+            .thenCompose(ignored -> editors.save(player.getUniqueId())),
+        "Blocs et configuration sauvegardés.");
   }
 
   private void validate(Player player) {

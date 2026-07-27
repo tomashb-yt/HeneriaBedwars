@@ -99,6 +99,11 @@ actives, décharge sur le thread Paper un éventuel monde d'édition possédé, 
 pool I/O la racine de données, les versions et le modèle. Le registre n'oublie la définition
 qu'après le succès du stockage. Les mondes serveur non possédés ne sont jamais supprimés.
 
+`ManagedMapWorldService` centralise désormais le cycle physique du monde de travail. Il copie un
+template sur le pool I/O, charge `zombie_editing/hz_edit_<mapId>` sur le thread Paper, sauvegarde
+les blocs, décharge les mondes inoccupés et synchronise le template avant test ou publication.
+Les menus et `/zmap` ne manipulent plus directement `WorldCreator` ni les dossiers.
+
 ## Moteur d'armes
 
 `WeaponRegistry`, `WeaponDefinition`, `WeaponInstance`, `WeaponService`,

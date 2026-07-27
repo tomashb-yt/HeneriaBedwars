@@ -190,3 +190,16 @@ Un monde n'est supprimable que si son chemin est exactement
 `zombie_editing/hz_edit_<mapId>`. Une définition peut référencer un monde serveur existant lors de
 sa création ; ce monde n'appartient pas au plugin et doit rester intact. Le registre en mémoire
 n'oublie la map qu'après le succès de la suppression persistante.
+
+## ADR-033 — Monde de travail possédé pour chaque map gérée
+
+Toute nouvelle map éditoriale référence un monde possédé sous
+`zombie_editing/hz_edit_<mapId>`. Un template importé est copié vers ce monde avant l'ouverture de
+la session ; une création génère directement ce monde. Le monde courant de l'administrateur ne
+peut plus devenir implicitement la source d'édition.
+
+`ManagedMapWorldService` est l'unique propriétaire du chargement, de la sauvegarde, du
+déchargement, de la duplication et de la synchronisation vers `zombie_templates`. Les accès
+fichiers sont asynchrones et les appels Bukkit synchrones. Les anciennes définitions référençant
+un monde externe restent lisibles pour compatibilité et ne deviennent jamais supprimables par le
+plugin.

@@ -13,15 +13,18 @@ Depuis `/zombies admin`, le tableau de bord d'une map sépare désormais :
 Le gestionnaire affiche aussi directement chaque dossier valide de `zombie_templates/`, même
 avant la création d'une définition éditoriale. Sa fiche **template importé** permet de visiter une
 copie privée immédiatement ; cette visite ne crée ni `map.yml`, ni partie, ni sauvegarde.
+**Importer et modifier** crée au contraire `zombie_editing/hz_edit_<id>`, y copie les blocs hors
+thread serveur, crée la définition puis téléporte l'administrateur dans ce monde de travail.
 
 La visite se quitte avec `/zombie map leave`. Elle est refusée tant que l'administrateur conserve
 une session d'édition active. Depuis le tableau de bord, choisir **Modifier** ou **Tester** pendant
 une visite ferme automatiquement la copie temporaire, attend son déchargement, puis poursuit vers
 la destination demandée ; le joueur ne reste pas au lobby.
 
-1. `/zmap create <id>` crée `plugins/HeneriaZombie/maps/<id>/map.yml`, associe le monde courant,
-   mémorise l'auteur et les dates, puis ouvre l'éditeur.
-2. `/zmap edit <id>` ouvre une session exclusive et donne l'outil protégé dans le slot 9.
+1. `/zmap create <id>` crée un monde de travail dédié et
+   `plugins/HeneriaZombie/maps/<id>/map.yml`, puis ouvre l'éditeur.
+2. `/zmap edit <id>` charge le monde de travail, téléporte le joueur, ouvre une session exclusive
+   et donne l'outil protégé dans le slot 9.
 3. La GUI donne accès aux informations, zones, portes, spawns, objets, validation et sauvegarde.
    Un clic droit dans l'air ou accroupi + clic droit avec l'outil la rouvre à tout moment.
 4. `/zmap leave` sauvegarde, ferme la session et retire l'outil. Une déconnexion fait de même.
@@ -66,6 +69,10 @@ futurs systèmes de gameplay sans migration du schéma.
 le registre puis déclenche l'auto-save. Les écritures d'une même map sont sérialisées sur le pool
 I/O. Le fichier temporaire est remplacé atomiquement et l'ancienne version devient `map.yml.bak`.
 Aucune lecture ou écriture YAML n'a lieu sur le thread Paper.
+
+La sauvegarde manuelle appelle d'abord `World.save()` sur le thread Paper, puis sérialise la
+définition hors thread. Un monde de travail sans joueur peut être sauvegardé et déchargé depuis
+son tableau de bord ; **Modifier** le recharge automatiquement.
 
 Le chargement refuse une version inconnue. L'identifiant est validé et le chemin normalisé ne peut
 pas sortir du dossier `maps`.

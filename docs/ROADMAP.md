@@ -63,6 +63,14 @@ instance privée de test.
 La version `0.10.5` rend les templates importés visibles et visitables dans le gestionnaire avant
 toute création de configuration.
 
+## Refonte 0.11
+
+- **Tranche 1 — mondes de travail possédés :** terminée ; import de template, création dédiée,
+  chargement, téléportation, sauvegarde des blocs et déchargement centralisés ;
+- **Tranche 2 — catalogue serveur :** mondes externes disponibles, import guidé et statuts ;
+- **Tranche 3 — administration physique :** renommage, duplication et suppression consolidés ;
+- **Tranche 4 — configuration avancée :** propriétés encore absentes, validation et tests en jeu.
+
 ## Prochain ticket
 
 Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,

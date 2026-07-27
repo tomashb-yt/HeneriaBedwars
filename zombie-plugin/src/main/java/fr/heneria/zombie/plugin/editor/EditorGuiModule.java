@@ -57,6 +57,7 @@ public final class EditorGuiModule {
   private final MapEditorService editors;
   private final MapValidator validator;
   private final EditorItemService items;
+  private final ManagedMapWorldService worldManagement;
   private final Executor mainThread;
   private final Clock clock;
 
@@ -68,6 +69,7 @@ public final class EditorGuiModule {
       MapEditorService editors,
       MapValidator validator,
       EditorItemService items,
+      ManagedMapWorldService worldManagement,
       Executor mainThread,
       Clock clock) {
     this.registry = registry;
@@ -77,6 +79,7 @@ public final class EditorGuiModule {
     this.editors = editors;
     this.validator = validator;
     this.items = items;
+    this.worldManagement = worldManagement;
     this.mainThread = mainThread;
     this.clock = clock;
   }
@@ -398,15 +401,29 @@ public final class EditorGuiModule {
   }
 
   private void save(Player player) {
-    editors
-        .save(player.getUniqueId())
+    var session = editors.session(player.getUniqueId()).orElse(null);
+    if (session == null) {
+      player.sendMessage(MINI.deserialize("<red>Aucune session d'édition."));
+      return;
+    }
+    worldManagement
+        .saveEditingWorld(session.definition())
+        .thenCompose(ignored -> editors.save(player.getUniqueId()))
         .whenCompleteAsync(
             (ignored, failure) ->
                 player.sendMessage(
                     failure == null
-                        ? MINI.deserialize("<green>Map sauvegardée.")
-                        : MINI.deserialize("<red>Sauvegarde échouée.")),
+                        ? MINI.deserialize("<green>Blocs et configuration sauvegardés.")
+                        : MINI.deserialize("<red>Sauvegarde échouée : " + safe(failure))),
             mainThread);
+  }
+
+  private static String safe(Throwable failure) {
+    Throwable cause =
+        failure instanceof java.util.concurrent.CompletionException && failure.getCause() != null
+            ? failure.getCause()
+            : failure;
+    return cause.getMessage() == null ? cause.getClass().getSimpleName() : cause.getMessage();
   }
 
   private static List<EntityEntry> entries(MapDefinition map, String category) {
