@@ -83,6 +83,42 @@ public final class MapWorldPublicationService {
         ioExecutor);
   }
 
+  /**
+   * Unloads the plugin-owned editing world before its directory is permanently removed.
+   *
+   * <p>Maps created from an existing server world never own that world and therefore never unload
+   * or delete it.
+   */
+  public CompletableFuture<Void> prepareDeletion(MapDefinition definition) {
+    if (!Bukkit.isPrimaryThread()) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Map deletion must start on the Paper thread"));
+    }
+    Path configured = worldContainer.resolve(definition.world()).toAbsolutePath().normalize();
+    Path owned =
+        worldContainer
+            .resolve("zombie_editing")
+            .resolve("hz_edit_" + definition.id())
+            .toAbsolutePath()
+            .normalize();
+    if (!configured.equals(owned)) {
+      return CompletableFuture.completedFuture(null);
+    }
+    World world = Bukkit.getWorld(definition.world());
+    if (world == null) {
+      return CompletableFuture.completedFuture(null);
+    }
+    if (!world.getPlayers().isEmpty()) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Des joueurs se trouvent encore dans le monde d'édition"));
+    }
+    if (!Bukkit.unloadWorld(world, false)) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Le monde d'édition n'a pas pu être déchargé"));
+    }
+    return CompletableFuture.completedFuture(null);
+  }
+
   private static void writeTechnicalMetadata(MapDefinition definition, Path target) {
     fr.heneria.zombie.core.editor.MapPoint spawn =
         definition

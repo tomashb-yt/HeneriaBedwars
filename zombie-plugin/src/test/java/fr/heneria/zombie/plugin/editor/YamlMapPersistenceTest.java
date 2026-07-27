@@ -21,7 +21,10 @@ class YamlMapPersistenceTest {
   void savesReloadsAndCreatesRollbackBackup() throws Exception {
     Path root = Path.of("build", "test-data", "maps-" + UUID.randomUUID());
     Files.createDirectories(root);
-    YamlMapPersistence persistence = new YamlMapPersistence(root, Runnable::run);
+    Path worldContainer = root.resolve("server");
+    Path templates = worldContainer.resolve("zombie_templates");
+    YamlMapPersistence persistence =
+        new YamlMapPersistence(root, templates, worldContainer, Runnable::run);
     MapPoint point = new MapPoint("world", 2.5, 65, 8.5, 90, 0);
     UUID creator = UUID.randomUUID();
     MapDefinition definition =
@@ -78,5 +81,51 @@ class YamlMapPersistenceTest {
     assertEquals(1, loaded.zombieSpawns().size());
     assertEquals("950", loaded.objects().get("box").properties().get("cost"));
     assertTrue(Files.isRegularFile(root.resolve("maps/crypt/map.yml.bak")));
+  }
+
+  @Test
+  void deletionRemovesAllOwnedArtifactsButPreservesAnExternalWorld() throws Exception {
+    Path root = Path.of("build", "test-data", "map-delete-" + UUID.randomUUID());
+    Path worldContainer = root.resolve("server");
+    Path templates = worldContainer.resolve("zombie_templates");
+    Path externalWorld = worldContainer.resolve("world");
+    Files.createDirectories(templates.resolve("crypt/region"));
+    Files.createDirectories(externalWorld);
+    Files.writeString(templates.resolve("crypt/region/r.0.0.mca"), "chunks");
+    Files.writeString(externalWorld.resolve("level.dat"), "external");
+    YamlMapPersistence persistence =
+        new YamlMapPersistence(root, templates, worldContainer, Runnable::run);
+    MapDefinition definition =
+        MapDefinition.create("crypt", "Crypt", UUID.randomUUID(), Instant.EPOCH, "world");
+    persistence.save(definition).join();
+    Files.createDirectories(root.resolve("maps/crypt/world-versions/v1"));
+    Files.writeString(root.resolve("maps/crypt/world-versions/v1/level.dat"), "snapshot");
+
+    persistence.delete(definition).join();
+
+    assertTrue(Files.notExists(root.resolve("maps/crypt")));
+    assertTrue(Files.notExists(templates.resolve("crypt")));
+    assertTrue(Files.isRegularFile(externalWorld.resolve("level.dat")));
+  }
+
+  @Test
+  void deletionRemovesTheOwnedEditingWorldOfADuplicatedMap() throws Exception {
+    Path root = Path.of("build", "test-data", "owned-world-delete-" + UUID.randomUUID());
+    Path worldContainer = root.resolve("server");
+    Path templates = worldContainer.resolve("zombie_templates");
+    Path editingWorld = worldContainer.resolve("zombie_editing/hz_edit_crypt");
+    Files.createDirectories(editingWorld);
+    Files.writeString(editingWorld.resolve("level.dat"), "editing");
+    YamlMapPersistence persistence =
+        new YamlMapPersistence(root, templates, worldContainer, Runnable::run);
+    MapDefinition definition =
+        MapDefinition.create(
+            "crypt", "Crypt", UUID.randomUUID(), Instant.EPOCH, "zombie_editing/hz_edit_crypt");
+    persistence.save(definition).join();
+
+    persistence.delete(definition).join();
+
+    assertTrue(Files.notExists(editingWorld));
+    assertTrue(Files.notExists(root.resolve("maps/crypt")));
   }
 }

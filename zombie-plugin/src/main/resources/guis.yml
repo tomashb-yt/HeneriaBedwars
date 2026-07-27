@@ -1,3 +1,4 @@
+schema-version: 2
 default-theme: dark
 
 themes:
@@ -81,6 +82,7 @@ menus:
       unpublish: {slot: 17, material: ORANGE_CONCRETE, name: "<gold>Dépublier", lore: ["<gray>Retire la map du catalogue sans arrêter les parties."], permission: zombies.admin.maps.unpublish, actions: {left: maps.unpublish}}
       history: {slot: 22, material: BOOKSHELF, name: "<light_purple>Historique", lore: ["<gray>Consulter toutes les versions publiées."], permission: zombies.admin.maps.view, actions: {left: maps.history}}
       archive: {slot: 26, material: LAVA_BUCKET, name: "<red>Archiver", lore: ["<gray>Retire la map sans supprimer son historique."], permission: zombies.admin.maps.delete, actions: {left: maps.archive}}
+      delete: {slot: 25, material: BARRIER, name: "<dark_red>Supprimer définitivement", lore: ["<red>Supprime la map, sa configuration,", "<red>ses spawns, ses versions et ses mondes.", "", "<dark_red>Cette action est irréversible."], permission: zombies.admin.maps.delete, actions: {left: maps.delete}}
       back: {slot: 36, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
       home: {slot: 44, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
 

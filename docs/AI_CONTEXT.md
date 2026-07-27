@@ -111,6 +111,18 @@ Voir `MAP_PUBLICATION.md`. Les commandes `/zmap`, `/zgame`, `/zzombie`, `/zweapo
 restent les surfaces avancées. Les statistiques persistantes, groupes, files configurables et
 options de simulation qui dépendent des futurs moteurs ne doivent pas être présentés comme actifs.
 
+## Stabilisation 0.10.1
+
+Le schéma GUI courant vaut `2`. Au chargement d'un ancien `guis.yml`, les boutons joueur
+embarqués devenus obsolètes sont retirés en mémoire avant la fusion des valeurs manquantes ; cela
+évite notamment la collision du slot 24 entre `group` et `leave`.
+
+Le détail administratif propose une suppression irréversible distincte de l'archivage. Elle est
+refusée tant qu'une instance ou un éditeur utilise la map, puis supprime hors thread serveur toute
+la définition (spawns et objets inclus), l'historique publié, les snapshots et le modèle. Seul un
+monde d'édition au chemin possédé `zombie_editing/hz_edit_<mapId>` peut être supprimé ; un monde
+serveur externe n'est jamais effacé.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec

@@ -1,6 +1,6 @@
 # Publication et catalogue de maps
 
-**Statut :** opérationnel en `0.10.0-SNAPSHOT`.
+**Statut :** opérationnel en `0.10.1-SNAPSHOT`.
 
 ## Deux snapshots distincts
 
@@ -19,6 +19,12 @@ jamais depuis le monde de travail.
 Le menu peut dupliquer une map : un nouveau monde sous `zombie_editing/` et une définition dont
 tous les points ciblent ce monde sont créés. L'archivage retire une map du catalogue sans
 supprimer ses données. Une archive reste restaurable ou republiable.
+
+La suppression définitive est une action différente et irréversible. Elle efface la définition
+complète, donc aussi tous les spawns, portes, zones et objets, ainsi que `publication.yml`,
+`versions/`, `world-versions/` et `zombie_templates/<mapId>`. Un monde d'édition est supprimé
+seulement s'il appartient au plugin sous `zombie_editing/hz_edit_<mapId>` ; le monde externe
+éventuellement utilisé lors de la création reste intact.
 
 Une modification ultérieure remplace seulement le snapshot du `MapRegistry`. Le catalogue joueur
 et les nouvelles parties publiques continuent à utiliser la dernière version publiée. Une partie
@@ -62,6 +68,7 @@ participation et le renvoie au lobby.
 - les versions sont monotones et les snapshots existants ne sont jamais écrasés ;
 - les écritures YAML et copies de monde utilisent le pool I/O ;
 - une map ne peut avoir qu'un éditeur actif ;
+- une suppression est refusée pendant une instance ou une édition et attend les écritures en cours ;
 - les permissions sont vérifiées au clic ;
 - les restaurations passent par la confirmation sensible partagée.
 
@@ -76,6 +83,9 @@ participation et le renvoie au lobby.
 7. restaurer la première version depuis l'historique ;
 8. dépublier et vérifier la disparition du catalogue sans arrêt de la partie déjà lancée ;
 9. répéter avec deux administrateurs et confirmer le verrou exclusif d'édition.
+10. archiver une map et vérifier que ses fichiers restent présents ;
+11. supprimer une map sans instance ni éditeur, puis vérifier la disparition de sa configuration,
+    de ses versions et de son modèle.
 
 Les réglages avancés de simulation (joueurs artificiels, portes forcées, courant, perks et
 invincibilité) nécessitent leurs moteurs de gameplay respectifs et ne sont pas simulés.

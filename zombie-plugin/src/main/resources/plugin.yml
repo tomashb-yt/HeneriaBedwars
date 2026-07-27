@@ -168,7 +168,7 @@ permissions:
     description: Restores a historical map and world snapshot as a new version
     default: op
   zombies.admin.maps.delete:
-    description: Archives unused maps after a protected confirmation
+    description: Archives or permanently deletes unused maps after a protected confirmation
     default: op
   zombies.admin.games.view:
     description: Views and joins active game instances

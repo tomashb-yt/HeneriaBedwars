@@ -33,6 +33,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public final class GuiConfigurationService {
 
   private static final String RESOURCE = "guis.yml";
+  private static final int CURRENT_SCHEMA = 2;
   private final Path dataDirectory;
   private final ClassLoader resourceLoader;
   private final Executor ioExecutor;
@@ -117,6 +118,7 @@ public final class GuiConfigurationService {
               }
             }
             YamlConfiguration candidate = YamlConfiguration.loadConfiguration(target.toFile());
+            migrateLegacy(candidate);
             YamlConfiguration defaults = bundledYaml();
             mergeMissingLeaves(candidate, defaults);
             GuiConfigurationSnapshot snapshot = parse(candidate);
@@ -129,6 +131,37 @@ public final class GuiConfigurationService {
           }
         },
         ioExecutor);
+  }
+
+  /**
+   * Migrates identifiers shipped by the first GUI schema before new defaults are merged.
+   *
+   * <p>Without this migration, the removed {@code group} button remains at slot 24 while the
+   * current {@code leave} button is added to the same slot. Only legacy buttons still pointing to
+   * their bundled action are removed, so unrelated custom buttons are preserved.
+   */
+  private static void migrateLegacy(YamlConfiguration candidate) {
+    int schema = candidate.getInt("schema-version", 1);
+    if (schema >= CURRENT_SCHEMA) {
+      return;
+    }
+    removeLegacyButton(candidate, "join", "nav.instances");
+    removeLegacyButton(candidate, "group", "feedback.unavailable");
+    removeLegacyButton(candidate, "profile", "feedback.unavailable");
+    String playAction = candidate.getString("menus.player-main.buttons.play.actions.left", "");
+    if ("nav.instances".equals(playAction)) {
+      candidate.set("menus.player-main.buttons.play.actions.left", "maps.player");
+      candidate.set("menus.player-main.buttons.play.permission", "zombies.menu.player");
+    }
+    candidate.set("schema-version", CURRENT_SCHEMA);
+  }
+
+  private static void removeLegacyButton(
+      YamlConfiguration candidate, String button, String bundledAction) {
+    String path = "menus.player-main.buttons." + button;
+    if (bundledAction.equals(candidate.getString(path + ".actions.left", ""))) {
+      candidate.set(path, null);
+    }
   }
 
   private YamlConfiguration bundledYaml() throws IOException {

@@ -17,6 +17,7 @@ public final class MapPublicationService {
   private final ConcurrentHashMap<String, MapPublication> publications = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, CompletableFuture<Void>> operations =
       new ConcurrentHashMap<>();
+  private final java.util.Set<String> deleting = ConcurrentHashMap.newKeySet();
 
   public MapPublicationService(
       MapRegistry maps,
@@ -67,8 +68,48 @@ public final class MapPublicationService {
     return publication.active().map(PublishedMapVersion::definition);
   }
 
+  /** Serializes a permanent deletion after pending publication writes and rejects new revisions. */
+  public CompletableFuture<Void> delete(
+      String mapId, java.util.function.Supplier<CompletableFuture<?>> deletion) {
+    if (!deleting.add(mapId)) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Map deletion is already in progress"));
+    }
+    CompletableFuture<Void> result = new CompletableFuture<>();
+    operations.compute(
+        mapId,
+        (ignored, previous) -> {
+          CompletableFuture<Void> prerequisite =
+              previous == null
+                  ? CompletableFuture.completedFuture(null)
+                  : previous.handle((value, failure) -> null);
+          CompletableFuture<Void> operation =
+              prerequisite
+                  .thenCompose(value -> deletion.get())
+                  .thenRun(
+                      () -> {
+                        publications.remove(mapId);
+                        result.complete(null);
+                      })
+                  .whenComplete(
+                      (value, failure) -> {
+                        deleting.remove(mapId);
+                        if (failure != null) {
+                          result.completeExceptionally(failure);
+                        }
+                      });
+          operation.whenComplete((value, failure) -> operations.remove(mapId, operation));
+          return operation;
+        });
+    return result;
+  }
+
   /** Validates, persists and then atomically exposes a new immutable revision. */
   public CompletableFuture<MapPublication> publish(String mapId, UUID actor) {
+    if (deleting.contains(mapId)) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Map deletion is in progress"));
+    }
     MapDefinition definition =
         maps.find(mapId).orElseThrow(() -> new IllegalArgumentException("Unknown map " + mapId));
     ValidationReport report = validator.validate(definition);
@@ -100,6 +141,10 @@ public final class MapPublicationService {
   }
 
   public CompletableFuture<MapPublication> changeStatus(String mapId, MapStatus status) {
+    if (deleting.contains(mapId)) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Map deletion is in progress"));
+    }
     if (status == MapStatus.PUBLISHED) {
       return CompletableFuture.failedFuture(
           new IllegalArgumentException("Use publish to expose a validated revision"));
@@ -114,6 +159,10 @@ public final class MapPublicationService {
 
   /** Re-publishes a historical snapshot as a new auditable version. */
   public CompletableFuture<MapPublication> rollback(String mapId, int version, UUID actor) {
+    if (deleting.contains(mapId)) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Map deletion is in progress"));
+    }
     MapPublication current = publication(mapId);
     MapDefinition selected =
         current.versions().stream()
@@ -143,6 +192,10 @@ public final class MapPublicationService {
     operations.compute(
         mapId,
         (ignored, previous) -> {
+          if (deleting.contains(mapId)) {
+            result.completeExceptionally(new IllegalStateException("Map deletion is in progress"));
+            return previous;
+          }
           CompletableFuture<Void> prerequisite =
               previous == null
                   ? CompletableFuture.completedFuture(null)

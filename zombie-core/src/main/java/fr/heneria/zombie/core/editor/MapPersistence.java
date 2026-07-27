@@ -8,4 +8,7 @@ public interface MapPersistence {
   CompletableFuture<Collection<MapDefinition>> loadAll();
 
   CompletableFuture<Void> save(MapDefinition definition);
+
+  /** Permanently removes a definition and every persistent artifact owned by it. */
+  CompletableFuture<Void> delete(MapDefinition definition);
 }

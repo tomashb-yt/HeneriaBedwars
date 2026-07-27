@@ -2,6 +2,7 @@ package fr.heneria.zombie.core.editor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
@@ -87,6 +88,25 @@ class MapEditorServiceTest {
     assertEquals(copy, persistence.values.get("crypt_copy"));
   }
 
+  @Test
+  void permanentlyDeletesUnlockedDefinitionAndRejectsAnActiveEditor() {
+    MemoryPersistence persistence = new MemoryPersistence();
+    MapEditorService service =
+        new MapEditorService(new MapRegistry(), persistence, Clock.systemUTC());
+    UUID creator = UUID.randomUUID();
+    service.create("crypt", "Crypt", creator, "world").join();
+    service.open(creator, "crypt");
+
+    assertThrows(
+        java.util.concurrent.CompletionException.class, () -> service.delete("crypt").join());
+    assertTrue(service.registry().find("crypt").isPresent());
+
+    service.leave(creator).join();
+    assertTrue(service.delete("crypt").join());
+    assertFalse(service.registry().find("crypt").isPresent());
+    assertFalse(persistence.values.containsKey("crypt"));
+  }
+
   private static final class MemoryPersistence implements MapPersistence {
     private final Map<String, MapDefinition> values = new ConcurrentHashMap<>();
 
@@ -98,6 +118,12 @@ class MapEditorServiceTest {
     @Override
     public CompletableFuture<Void> save(MapDefinition definition) {
       values.put(definition.id(), definition);
+      return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(MapDefinition definition) {
+      values.remove(definition.id());
       return CompletableFuture.completedFuture(null);
     }
   }

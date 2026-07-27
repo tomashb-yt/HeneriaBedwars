@@ -5,9 +5,13 @@ import fr.heneria.zombie.core.editor.MapObjectType;
 import fr.heneria.zombie.core.editor.MapPersistence;
 import fr.heneria.zombie.core.editor.MapPoint;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,12 +30,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public final class YamlMapPersistence implements MapPersistence {
   private static final String FILE = "map.yml";
   private final Path root;
+  private final Path templates;
+  private final Path worldContainer;
   private final Executor ioExecutor;
   private final java.util.concurrent.ConcurrentHashMap<String, CompletableFuture<Void>> writes =
       new java.util.concurrent.ConcurrentHashMap<>();
 
-  public YamlMapPersistence(Path dataDirectory, Executor ioExecutor) {
+  public YamlMapPersistence(
+      Path dataDirectory, Path templateDirectory, Path worldContainer, Executor ioExecutor) {
     root = dataDirectory.resolve("maps").toAbsolutePath().normalize();
+    templates = templateDirectory.toAbsolutePath().normalize();
+    this.worldContainer = worldContainer.toAbsolutePath().normalize();
     this.ioExecutor = java.util.Objects.requireNonNull(ioExecutor, "ioExecutor");
   }
 
@@ -78,6 +87,23 @@ public final class YamlMapPersistence implements MapPersistence {
     return next;
   }
 
+  @Override
+  public CompletableFuture<Void> delete(MapDefinition definition) {
+    CompletableFuture<Void> next;
+    synchronized (writes) {
+      CompletableFuture<Void> previous = writes.get(definition.id());
+      CompletableFuture<Void> prerequisite =
+          previous == null
+              ? CompletableFuture.completedFuture(null)
+              : previous.handle((ignored, failure) -> null);
+      next = prerequisite.thenRunAsync(() -> deleteArtifacts(definition), ioExecutor);
+      writes.put(definition.id(), next);
+    }
+    CompletableFuture<Void> completed = next;
+    next.whenComplete((ignored, failure) -> writes.remove(definition.id(), completed));
+    return next;
+  }
+
   public Path rootDirectory() {
     return root;
   }
@@ -113,6 +139,70 @@ public final class YamlMapPersistence implements MapPersistence {
     } catch (IOException | RuntimeException failure) {
       throw new CompletionException(failure);
     }
+  }
+
+  private void deleteArtifacts(MapDefinition definition) {
+    try {
+      Path mapDirectory = safeDirectory(definition.id());
+      Path templateDirectory = safeChild(templates, definition.id(), "Template");
+      Path ownedEditingWorld =
+          safeChild(
+              worldContainer.resolve("zombie_editing").normalize(),
+              "hz_edit_" + definition.id(),
+              "Editing world");
+      Path configuredWorld =
+          worldContainer.resolve(definition.world()).toAbsolutePath().normalize();
+      if (configuredWorld.equals(ownedEditingWorld)) {
+        deleteTree(ownedEditingWorld, worldContainer.resolve("zombie_editing").normalize());
+      }
+      deleteTree(templateDirectory, templates);
+      deleteTree(mapDirectory, root);
+    } catch (IOException | RuntimeException failure) {
+      throw new CompletionException(failure);
+    }
+  }
+
+  private static Path safeChild(Path parent, String name, String label) {
+    Path normalizedParent = parent.toAbsolutePath().normalize();
+    Path child = normalizedParent.resolve(name).toAbsolutePath().normalize();
+    if (!child.startsWith(normalizedParent) || child.equals(normalizedParent)) {
+      throw new IllegalArgumentException(label + " path escapes its root");
+    }
+    return child;
+  }
+
+  private static void deleteTree(Path directory, Path allowedParent) throws IOException {
+    Path normalized = directory.toAbsolutePath().normalize();
+    Path parent = allowedParent.toAbsolutePath().normalize();
+    if (!normalized.startsWith(parent) || normalized.equals(parent)) {
+      throw new IllegalArgumentException("Deletion path escapes its root");
+    }
+    if (!Files.exists(normalized, LinkOption.NOFOLLOW_LINKS)) {
+      return;
+    }
+    if (Files.isSymbolicLink(normalized)) {
+      throw new IOException("Refusing to delete symbolic directory " + normalized);
+    }
+    Files.walkFileTree(
+        normalized,
+        new SimpleFileVisitor<>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attributes)
+              throws IOException {
+            Files.delete(file);
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult postVisitDirectory(Path current, IOException failure)
+              throws IOException {
+            if (failure != null) {
+              throw failure;
+            }
+            Files.delete(current);
+            return FileVisitResult.CONTINUE;
+          }
+        });
   }
 
   static YamlConfiguration serialize(MapDefinition definition) {

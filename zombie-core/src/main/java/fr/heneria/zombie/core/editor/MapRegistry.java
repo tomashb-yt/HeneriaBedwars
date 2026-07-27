@@ -27,6 +27,10 @@ public final class MapRegistry {
     return Optional.ofNullable(maps.get(id));
   }
 
+  public boolean remove(MapDefinition definition) {
+    return maps.remove(definition.id(), definition);
+  }
+
   public Collection<MapDefinition> all() {
     return maps.values().stream()
         .sorted(java.util.Comparator.comparing(MapDefinition::id))

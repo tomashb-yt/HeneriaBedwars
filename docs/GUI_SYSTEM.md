@@ -54,13 +54,17 @@ pas livré. Les commandes techniques restent disponibles pour la console et le d
 
 ## Configuration et thèmes
 
-`plugins/HeneriaZombie/guis.yml` est créé hors thread serveur. Il définit `default-theme`,
-`themes` et `menus`. Un bouton configure slot, matériau, nom MiniMessage, lore, permission,
+`plugins/HeneriaZombie/guis.yml` est créé hors thread serveur. Le schéma courant `2` définit
+`default-theme`, `themes` et `menus`. Un bouton configure slot, matériau, nom MiniMessage, lore, permission,
 visibilité verrouillée, son et actions.
 
 Le candidat est complété récursivement en mémoire par chaque valeur feuille embarquée manquante,
 puis validé. Cette fusion permet à un `guis.yml` d'une ancienne version de recevoir de nouveaux
-menus sans perdre ses personnalisations :
+menus sans perdre ses personnalisations. Avant cette fusion, la migration du schéma 1 retire
+uniquement les anciens boutons joueur encore reliés à leurs actions embarquées et redirige
+`play` vers le catalogue publié. Elle empêche la collision historique du slot 24.
+
+La validation contrôle ensuite :
 
 - taille multiple de neuf entre 9 et 54 ;
 - slots et collisions ;
@@ -71,6 +75,7 @@ Une erreur agrégée refuse atomiquement le candidat et conserve le snapshot val
 jamais le disque. Couleur, icône et texte décrivent ensemble chaque état.
 
 ```yaml
+schema-version: 2
 default-theme: dark
 themes:
   dark:

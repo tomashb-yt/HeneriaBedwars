@@ -1,6 +1,7 @@
 package fr.heneria.zombie.plugin.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -111,6 +112,37 @@ class GuiConfigurationServiceTest {
     assertEquals("dark", editor.theme());
     assertEquals(10, information.slot());
     assertEquals(org.bukkit.Material.BOOK, information.material());
+  }
+
+  @Test
+  void migratesLegacyPlayerButtonsBeforeMergingCurrentDefaults() throws Exception {
+    Files.writeString(
+        directory.resolve("guis.yml"),
+        """
+        default-theme: dark
+        themes:
+          dark:
+            background: {material: BLACK_STAINED_GLASS_PANE, name: " "}
+        menus:
+          player-main:
+            title: "Legacy"
+            size: 54
+            theme: dark
+            buttons:
+              play: {slot: 20, material: NETHER_STAR, actions: {left: nav.instances}}
+              join: {slot: 22, material: ENDER_EYE, actions: {left: nav.instances}}
+              group: {slot: 24, material: PLAYER_HEAD, actions: {left: feedback.unavailable}}
+              profile: {slot: 29, material: NAME_TAG, actions: {left: feedback.unavailable}}
+        """);
+
+    GuiMenuTemplate menu =
+        service().initializeAsync().join().menu(new GuiId("player-main")).orElseThrow();
+
+    assertEquals("maps.player", menu.buttons().get("play").leftAction());
+    assertTrue(menu.buttons().containsKey("leave"));
+    assertFalse(menu.buttons().containsKey("group"));
+    assertFalse(menu.buttons().containsKey("join"));
+    assertFalse(menu.buttons().containsKey("profile"));
   }
 
   private GuiConfigurationService service() {

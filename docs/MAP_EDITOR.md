@@ -55,6 +55,12 @@ Aucune lecture ou écriture YAML n'a lieu sur le thread Paper.
 Le chargement refuse une version inconnue. L'identifiant est validé et le chemin normalisé ne peut
 pas sortir du dossier `maps`.
 
+L'administration distingue archivage et suppression. L'archivage conserve tout. La suppression
+irréversible exige une confirmation, refuse une map utilisée par une instance ou un éditeur, puis
+efface hors thread serveur la définition et toutes ses collections, les versions publiées et le
+modèle. Un monde serveur ordinaire associé à la définition n'est jamais considéré comme possédé et
+reste intact.
+
 ## Validation
 
 `/zmap validate` et la GUI produisent erreurs, avertissements et conseils. Le validateur contrôle

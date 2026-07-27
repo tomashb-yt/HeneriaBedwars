@@ -44,6 +44,13 @@ qu'avec un modèle persistant défini.
 - création, validation, test, publication et dépublication depuis les menus ;
 - historique durable, restauration non destructive et verrou exclusif d'édition.
 
+## Version 0.10.1 — stabilisation administrative
+
+- migration compatible des anciens menus et correction de la collision du slot 24 ;
+- suppression complète d'une map inutilisée avec configuration, contenu éditorial, historique,
+  snapshots et mondes possédés ;
+- protection absolue des mondes serveur externes.
+
 ## Prochain ticket
 
 Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,

@@ -251,7 +251,11 @@ public final class ZombieBootstrap {
     GuiRegistry guiRegistry = new GuiRegistry();
     GuiActionRegistry guiActions = new GuiActionRegistry();
     YamlMapPersistence mapPersistence =
-        new YamlMapPersistence(plugin.getDataFolder().toPath(), ioExecutor);
+        new YamlMapPersistence(
+            plugin.getDataFolder().toPath(),
+            templates.rootDirectory(),
+            plugin.getServer().getWorldContainer().toPath(),
+            ioExecutor);
     MapRegistry mapRegistry = new MapRegistry();
     editorService = new MapEditorService(mapRegistry, mapPersistence, Clock.systemUTC());
     MapValidator mapValidator = new MapValidator();
@@ -319,12 +323,7 @@ public final class ZombieBootstrap {
             configurations,
             guiService,
             templates,
-            previewService,
-            coordinator,
-            sessions,
-            api,
-            mainThread,
-            Clock.system€ü|∂âûÀk∫wµÁHYà
+            prev€Æ5∂âûÀk∫wµÁHYà
 ù[ù[YHOHù[	âàôX\€€ãò€€\]\‘õ›[ô€›
 
 JH√Bàù[ù[YKûõ€XöYTô[[›ôY

@@ -179,3 +179,14 @@ Un clic joueur rejoint en priorité une instance publique disposant d'une place.
 d'instance, le système en crée une avec le pipeline isolé existant. Aucune file persistante ou
 simulation de disponibilité n'est créée tant qu'une politique de file configurable n'est pas
 définie.
+
+## ADR-032 — Suppression possédée et archivage distinct
+
+L'archivage est réversible et conserve tous les fichiers. La suppression permanente exige une
+confirmation, l'absence d'instance et de verrou d'édition, puis retire définition, publication,
+snapshots et modèle hors thread serveur.
+
+Un monde n'est supprimable que si son chemin est exactement
+`zombie_editing/hz_edit_<mapId>`. Une définition peut référencer un monde serveur existant lors de
+sa création ; ce monde n'appartient pas au plugin et doit rester intact. Le registre en mémoire
+n'oublie la map qu'après le succès de la suppression persistante.

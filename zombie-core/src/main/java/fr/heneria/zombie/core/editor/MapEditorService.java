@@ -57,6 +57,29 @@ public final class MapEditorService {
     return persistence.save(definition).thenApply(ignored -> definition);
   }
 
+  /**
+   * Permanently deletes an unlocked map after its persistent artifacts have been removed.
+   *
+   * <p>The registry remains unchanged when persistence fails.
+   */
+  public CompletableFuture<Boolean> delete(String mapId) {
+    MapDefinition definition =
+        registry.find(mapId).orElseThrow(() -> new IllegalArgumentException("Unknown map"));
+    if (mapEditors.containsKey(mapId)) {
+      return CompletableFuture.failedFuture(
+          new IllegalStateException("Map is currently being edited"));
+    }
+    return persistence
+        .delete(definition)
+        .thenApply(
+            ignored -> {
+              if (!registry.remove(definition)) {
+                throw new IllegalStateException("Map changed during deletion");
+              }
+              return true;
+            });
+  }
+
   public Optional<MapEditorSession> open(UUID playerId, String mapId) {
     MapDefinition definition = registry.find(mapId).orElse(null);
     if (definition == null || sessions.containsKey(playerId)) {

@@ -70,6 +70,28 @@ class MapPublicationServiceTest {
     assertTrue(persistence.values.isEmpty());
   }
 
+  @Test
+  void permanentDeletionRemovesPublicationAndRejectsLaterPublishing() {
+    MapRegistry maps = new MapRegistry();
+    maps.register(validMap("crypt", "Crypt"));
+    MapPublicationService service =
+        new MapPublicationService(
+            maps, new MapValidator(), new MemoryPublicationPersistence(), Clock.systemUTC());
+    service.publish("crypt", UUID.randomUUID()).join();
+
+    service
+        .delete(
+            "crypt",
+            () -> {
+              maps.remove(maps.find("crypt").orElseThrow());
+              return CompletableFuture.completedFuture(null);
+            })
+        .join();
+
+    assertTrue(service.published().isEmpty());
+    assertThrows(IllegalArgumentException.class, () -> service.publish("crypt", UUID.randomUUID()));
+  }
+
   private static MapDefinition validMap(String id, String name) {
     UUID creator = UUID.randomUUID();
     Instant now = Instant.parse("2026-07-27T09:00:00Z");

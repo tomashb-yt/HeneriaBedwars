@@ -94,6 +94,11 @@ Le core possède définition immuable, registre, sessions, historique et validat
 en `MapPoint` et compose les écrans avec le framework GUI. Une mutation remplace d'abord le
 snapshot mémoire puis sérialise les écritures de la map sur le pool I/O.
 
+La suppression permanente attend les écritures de la map, refuse les sessions et instances
+actives, décharge sur le thread Paper un éventuel monde d'édition possédé, puis supprime sur le
+pool I/O la racine de données, les versions et le modèle. Le registre n'oublie la définition
+qu'après le succès du stockage. Les mondes serveur non possédés ne sont jamais supprimés.
+
 ## Moteur d'armes
 
 `WeaponRegistry`, `WeaponDefinition`, `WeaponInstance`, `WeaponService`,

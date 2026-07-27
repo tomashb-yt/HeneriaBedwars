@@ -2,6 +2,29 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.10.1-SNAPSHOT — Migration GUI et suppression complète
+
+### Corrigé
+
+- migration automatique du premier schéma `guis.yml` avant fusion des nouvelles valeurs ;
+- suppression des anciens boutons `join`, `group` et `profile` lorsqu'ils utilisent encore leurs
+  actions embarquées ;
+- remplacement de l'ancienne action du bouton `play` par le catalogue des maps publiées ;
+- disparition de la collision entre `group` et `leave` au slot 24.
+
+### Ajouté
+
+- bouton de suppression définitive dans le détail administratif d'une map ;
+- confirmation explicite et refus lorsqu'une instance ou une session d'édition utilise la map ;
+- suppression asynchrone de `map.yml`, backups, spawns, objets, publication, versions et snapshots ;
+- suppression du modèle `zombie_templates/<mapId>` et du monde d'édition uniquement lorsque ce
+  dernier appartient explicitement au plugin ;
+- conservation garantie des mondes serveur externes associés à une map.
+
+### Modifié
+
+- version portée à `0.10.1-SNAPSHOT`.
+
 ## 0.10.0-SNAPSHOT — Menus et publication des maps
 
 ### Ajouté
