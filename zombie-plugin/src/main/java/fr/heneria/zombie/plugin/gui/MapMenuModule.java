@@ -340,4 +340,718 @@ public final class MapMenuModule {
               "<gray>Auteur : <white>" + version.publishedBy(),
               "<gray>Nom : <white>" + version.definition().displayName(),
               "",
-              "<yellow>Cliquez pour restãÎ¸¶‰ËkºwµçI•¹Ñ	±½­•È€ô‘•±•Ñ¥½¹	±½­•È¡µ…Á%¤ì4(€€€€€€€€€€€€€¥˜€¡ÕÉÉ•¹Ñ	±½­•È€„ô¹Õ±°¤ì4(€€€€€€€€€€€€€€€½¹Ñ•áĞ¹Í•ÍÍ¥½¸ ¤¹½¹™¥Éµ…Ñ¥½¸¡¹Õ±°¤ì4(€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ùMÕÁÁÉ•ÍÍ¥½¸É•™ÕÏ¥”€è€ˆ€¬ÕÉÉ•¹Ñ	±½­•È¤¤ì4(€€€€€€€€€€€€€€€Õ¥Ì¹‰…¬¡Á±…å•È¤ì4(€€€€€€€€€€€€€€€É•ÑÕÉ¸ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€İ½É±‘AÕ‰±¥…Ñ¥½¹Ì4(€€€€€€€€€€€€€€€€€€¹ÁÉ•Á…É••±•Ñ¥½¸¡‘•™¥¹¥Ñ¥½¸¤4(€€€€€€€€€€€€€€€€€€¹Ñ¡•¹½µÁ½Í”¡¥¹½É•€´øÁÕ‰±¥…Ñ¥½¹Ì¹‘•±•Ñ”¡µ…Á%°€ ¤€´ø•‘¥Ñ½ÉÌ¹‘•±•Ñ”¡µ…Á%¤¤¤4(€€€€€€€€€€€€€€€€€€¹Ñ¡•¹IÕ¸ 4(€€€€€€€€€€€€€€€€€€€€€€ ¤€´øì4(€€€€€€€€€€€€€€€€€€€€€€€Ñ•µÁ±…Ñ•Ì¹É•™É•Í¡½Õ¹Ğ ¤ì4(€€€€€€€€€€€€€€€€€€€€€ô¤4(€€€€€€€€€€€€€€€€€€¹İ¡•¹½µÁ±•Ñ•Íå¹Œ 4(€€€€€€€€€€€€€€€€€€€€€€¡‘•±•Ñ•°™…¥±ÕÉ”¤€´øì4(€€€€€€€€€€€€€€€€€€€€€€€½¹Ñ•áĞ¹Í•ÍÍ¥½¸ ¤¹½¹™¥Éµ…Ñ¥½¸¡¹Õ±°¤ì4(€€€€€€€€€€€€€€€€€€€€€€€¥˜€¡™…¥±ÕÉ”€ôô¹Õ±°¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€5%9$¹‘•Í•É¥…±¥é” 4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ˆñÉ••¸ù5…ÀÍÕÁÁÉ¥·¥”…Ù•ŒÍ„½¹™¥ÕÉ…Ñ¥½¸°Í•ÌÙ•ÉÍ¥½¹Ì•ĞÍ•Ìµ½¹‘•Ì¸ˆ¤¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€Õ¥Ì¹½Á•¸¡Á±…å•È°¹•ÜÕ¥% ‰…‘µ¥¸µµ…ÁÌˆ¤¤ì4(€€€€€€€€€€€€€€€€€€€€€€€ô•±Í”ì4(€€€€€€€€€€€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ùMÕÁÁÉ•ÍÍ¥½¸¥µÁ½ÍÍ¥‰±”€è€ˆ€¬Í…™”¡™…¥±ÕÉ”¤¤¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€Õ¥Ì¹‰…¬¡Á±…å•È¤ì4(€€€€€€€€€€€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€€€€€€€€€ô°4(€€€€€€€€€€€€€€€€€€€€€µ…¥¹Q¡É•…¤ì4(€€€€€€€€€€€ô¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”MÑÉ¥¹œ‘•±•Ñ¥½¹	±½­•È¡MÑÉ¥¹œµ…Á%¤ì4(€€€¥˜€¡¥¹ÍÑ…¹•Ì¹…Ñ¥Ù•%¹ÍÑ…¹•Ì ¤¹ÍÑÉ•…´ ¤¹…¹å5…Ñ ¡Ù…±Õ”€´øÙ…±Õ”¹µ…Á% ¤¹•ÅÕ…±Ì¡µ…Á%¤¤¤ì4(€€€€€É•ÑÕÉ¸€‰Õ¹”¥¹ÍÑ…¹”ÕÑ¥±¥Í”•¹½É”•ÑÑ”µ…À¸ˆì4(€€€ô4(€€€¥˜€¡•‘¥Ñ½ÉÌ¹•‘¥Ñ½É=˜¡µ…Á%¤¹¥ÍAÉ•Í•¹Ğ ¤¤ì4(€€€€€É•ÑÕÉ¸€‰±„µ…À•ÍĞ•¹½É”½ÕÙ•ÉÑ”‘…¹Ì°Ÿ¥‘¥Ñ•ÕÈ¸ˆì4(€€€ô4(€€€É•ÑÕÉ¸¹Õ±°ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥Ñ•ÍĞ¡A±…å•ÈÁ±…å•È°MÑÉ¥¹œµ…Á%¤ì4(€€€5…Á•™¥¹¥Ñ¥½¸µ…À€ô•‘¥Ñ½ÉÌ¹É•¥ÍÑÉä ¤¹™¥¹¡µ…Á%¤¹½É±Í”¡¹Õ±°¤ì4(€€€¥˜€¡µ…À€ôô¹Õ±°ñğ€…Ù…±¥‘…Ñ½È¹Ù…±¥‘…Ñ”¡µ…À¤¹Ù…±¥ ¤¤ì4(€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…”¡5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ù1„µ…À‘½¥Ğƒ©ÑÉ”Ù…±¥‘”…Ù…¹Ğ±”Ñ•ÍĞ¸ˆ¤¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€¥˜€¡±½…‘‘¥Ñ¥¹]½É±¡µ…À¤€ôô¹Õ±°¤ì4(€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…”¡5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ù1”µ½¹‘”Ÿ¥‘¥Ñ¥½¸¹”Á•ÕĞÁ…Ìƒ©ÑÉ”¡…ÉŸ¤¸ˆ¤¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€=ÁÑ¥½¹…°ñUU%ø•‘¥Ñ½È€ô•‘¥Ñ½ÉÌ¹•‘¥Ñ½É=˜¡µ…Á%¤ì4(€€€¥˜€¡•‘¥Ñ½È¹¥ÍAÉ•Í•¹Ğ ¤€˜˜€…•‘¥Ñ½È¹½É±Í•Q¡É½Ü ¤¹•ÅÕ…±Ì¡Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤¤ì4(€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…”¡5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ù1„µ…À•ÍĞ•¹½É”µ½‘¥™§¥”Á…ÈÕ¸…ÕÑÉ”…‘µ¥¸¸ˆ¤¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€Á±…å•È¹±½Í•%¹Ù•¹Ñ½Éä ¤ì4(€€€½µÁ±•Ñ…‰±•ÕÑÕÉ”ñY½¥ø±½Í•‘‘¥Ñ½Èì4(€€€¥˜€¡•‘¥Ñ½ÉÌ4(€€€€€€€€¹Í•ÍÍ¥½¸¡Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤4(€€€€€€€€¹™¥±Ñ•È¡Í•ÍÍ¥½¸€´øÍ•ÍÍ¥½¸¹‘•™¥¹¥Ñ¥½¸ ¤¹¥ ¤¹•ÅÕ…±Ì¡µ…Á%¤¤4(€€€€€€€€¹¥ÍAÉ•Í•¹Ğ ¤¤ì4(€€€€€Ù¥ÍÕ…±¥é…Ñ¥½¹Ì¹±•…É‘¥Ñ½È¡Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤ì4(€€€€€•‘¥Ñ½É%Ñ•µÌ¹É•µ½Ù”¡Á±…å•È¤ì4(€€€€€±½Í•‘‘¥Ñ½È€ô•‘¥Ñ½ÉÌ¹±•…Ù”¡Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤¹Ñ¡•¹ÁÁ±ä¡¥¹½É•€´ø¹Õ±°¤ì4(€€€€€¥¹ÍÑ…¹•Ì¹±•…Ù”¡Á±…å•È¤ì4(€€€ô•±Í”ì4(€€€€€±½Í•‘‘¥Ñ½È€ô½µÁ±•Ñ…‰±•ÕÑÕÉ”¹½µÁ±•Ñ•‘ÕÑÕÉ”¡¹Õ±°¤ì4(€€€ô4(€€€±½Í•‘‘¥Ñ½È4(€€€€€€€€¹Ñ¡•¹½µÁ½Í•Íå¹Œ¡¥¹½É•€´øÁÉ•Ù¥•İÌ¹±•…Ù”¡Á±…å•È¤°µ…¥¹Q¡É•…¤4(€€€€€€€€¹Ñ¡•¹½µÁ½Í•Íå¹Œ 4(€€€€€€€€€€€¥¹½É•€´øì4(€€€€€€€€€€€€€…µ•Ì¹±•™Ğ¡Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤ì4(€€€€€€€€€€€€€¥¹ÍÑ…¹•Ì¹±•…Ù”¡Á±…å•È¤ì4(€€€€€€€€€€€€€É•ÑÕÉ¸İ½É±‘AÕ‰±¥…Ñ¥½¹Ì¹ÕÁ‘…Ñ•Q•µÁ±…Ñ”¡µ…À¤ì4(€€€€€€€€€€€ô°4(€€€€€€€€€€€µ…¥¹Q¡É•…¤4(€€€€€€€€¹Ñ¡•¹½µÁ½Í” 4(€€€€€€€€€€€¥¹½É•€´ø4(€€€€€€€€€€€€€€€¥¹ÍÑ…¹•Ì¹É•…Ñ”¡µ…Á%°=ÁÑ¥½¹…°¹½˜¡Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤°µ…À¹µ…á¥µÕµA±…å•ÉÌ ¤¤¤4(€€€€€€€€¹Ñ¡•¹½µÁ½Í” 4(€€€€€€€€€€€É•…Ñ•€´ø4(€€€€€€€€€€€€€€€¥¹ÍÑ…¹•Ì4(€€€€€€€€€€€€€€€€€€€€¹©½¥¸¡Á±…å•È°É•…Ñ•¹¥ ¤¤4(€€€€€€€€€€€€€€€€€€€€¹Ñ¡•¹ÁÁ±ä 4(€€€€€€€€€€€€€€€€€€€€€€€É•ÍÕ±Ğ€´øì4(€€€€€€€€€€€€€€€€€€€€€€€€€¥˜€¡É•ÍÕ±Ğ€„ôA±…å•É%¹ÍÑ…¹•I•ÍÕ±Ğ¹MUML¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ¡É½Ü¹•Ü%±±•…±MÑ…Ñ•á•ÁÑ¥½¸ ‰¹ÑË¥”É•™ÕÏ¥”€è€ˆ€¬É•ÍÕ±Ğ¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€€€€€€€€€€€€€…µ•Ì¹ÍÑ…ÉĞ¡É•…Ñ•¹¥ ¤¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸É•…Ñ•ì4(€€€€€€€€€€€€€€€€€€€€€€€ô¤¤4(€€€€€€€€¹İ¡•¹½µÁ±•Ñ•Íå¹Œ 4(€€€€€€€€€€€€¡É•…Ñ•°™…¥±ÕÉ”¤€´ø4(€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€™…¥±ÕÉ”€ôô¹Õ±°4(€€€€€€€€€€€€€€€€€€€€€€€€ü5%9$¹‘•Í•É¥…±¥é” ˆñÉ••¸ùA…ÉÑ¥”‘”Ñ•ÍĞ“¥µ…ÉË¥”¸ˆ¤4(€€€€€€€€€€€€€€€€€€€€€€€€è5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ùQ•ÍĞ¥µÁ½ÍÍ¥‰±”€è€ˆ€¬Í…™”¡™…¥±ÕÉ”¤¤¤°4(€€€€€€€€€€€µ…¥¹Q¡É•…¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥©½¥¹AÕ‰±¥Í¡•¡A±…å•ÈÁ±…å•È°MÑÉ¥¹œµ…Á%¤ì4(€€€¥˜€¡ÁÕ‰±¥…Ñ¥½¹Ì¹ÁÕ‰±¥Í¡•‘•™¥¹¥Ñ¥½¸¡µ…Á%¤¹¥ÍµÁÑä ¤¤ì4(€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…”¡5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ù•ÑÑ”µ…À¸•ÍĞÁ±ÕÌÁÕ‰±§¥”¸ˆ¤¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€Á±…å•È¹±½Í•%¹Ù•¹Ñ½Éä ¤ì4(€€€=ÁÑ¥½¹…°ñ…µ•%¹ÍÑ…¹•M¹…ÁÍ¡½Ğø…Ù…¥±…‰±”€ô4(€€€€€€€ÁÕ‰±¥%¹ÍÑ…¹•Ì¡µ…Á%¤¹ÍÑÉ•…´ ¤4(€€€€€€€€€€€€¹™¥±Ñ•È 4(€€€€€€€€€€€€€€€Ù…±Õ”€´ø4(€€€€€€€€€€€€€€€€€€€Ù…±Õ”¹Á±…å•ÉÌ ¤¹Í¥é” ¤€ğÙ…±Õ”¹µ…á¥µÕµA±…å•ÉÌ ¤4(€€€€€€€€€€€€€€€€€€€€€€€€˜˜€¡Ù…±Õ”¹ÍÑ…Ñ” ¤€ôô…µ•%¹ÍÑ…¹•MÑ…Ñ”¹]%Q%94(€€€€€€€€€€€€€€€€€€€€€€€€€€€ñğÙ…±Õ”¹ÍÑ…Ñ” ¤€ôô…µ•%¹ÍÑ…¹•MÑ…Ñ”¹MQIQ%94(€€€€€€€€€€€€€€€€€€€€€€€€€€€ñğÙ…±Õ”¹ÍÑ…Ñ” ¤€ôô…µ•%¹ÍÑ…¹•MÑ…Ñ”¹IU99%9¤¤4(€€€€€€€€€€€€¹™¥¹‘¥ÉÍĞ ¤ì4(€€€¥˜€¡…Ù…¥±…‰±”¹¥ÍAÉ•Í•¹Ğ ¤¤ì4(€€€€€©½¥¹á¥ÍÑ¥¹œ¡Á±…å•È°…Ù…¥±…‰±”¹½É±Í•Q¡É½Ü ¤¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€Á±…å•È¹Í•¹‘5•ÍÍ…”¡5%9$¹‘•Í•É¥…±¥é” ˆñå•±±½ÜùË¥…Ñ¥½¸…ÕÑ½µ…Ñ¥ÅÕ”Õ¹”Á…ÉÑ¥”¸¸¸ˆ¤¤ì4(€€€¥¹ÍÑ…¹•Ì4(€€€€€€€€¹É•…Ñ” 4(€€€€€€€€€€€µ…Á%°4(€€€€€€€€€€€=ÁÑ¥½¹…°¹•µÁÑä ¤°4(€€€€€€€€€€€ÁÕ‰±¥…Ñ¥½¹Ì¹ÁÕ‰±¥Í¡•‘•™¥¹¥Ñ¥½¸¡µ…Á%¤¹½É±Í•Q¡É½Ü ¤¹µ…á¥µÕµA±…å•ÉÌ ¤¤4(€€€€€€€€¹Ñ¡•¹½µÁ½Í” 4(€€€€€€€€€€€É•…Ñ•€´ø4(€€€€€€€€€€€€€€€¥¹ÍÑ…¹•Ì4(€€€€€€€€€€€€€€€€€€€€¹©½¥¸¡Á±…å•È°É•…Ñ•¹¥ ¤¤4(€€€€€€€€€€€€€€€€€€€€¹Ñ¡•¹ÁÁ±ä 4(€€€€€€€€€€€€€€€€€€€€€€€É•ÍÕ±Ğ€´øì4(€€€€€€€€€€€€€€€€€€€€€€€€€¥˜€¡É•ÍÕ±Ğ€„ôA±…å•É%¹ÍÑ…¹•I•ÍÕ±Ğ¹MUML¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€€€Ñ¡É½Ü¹•Ü%±±•…±MÑ…Ñ•á•ÁÑ¥½¸ ‰¹ÑË¥”É•™ÕÏ¥”€è€ˆ€¬É•ÍÕ±Ğ¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€€€€€€€€€€€€€5…Á•™¥¹¥Ñ¥½¸ÁÕ‰±¥Í¡•€ô4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ÁÕ‰±¥…Ñ¥½¹Ì¹ÁÕ‰±¥Í¡•‘•™¥¹¥Ñ¥½¸¡µ…Á%¤¹½É±Í•Q¡É½Ü ¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€¥¹ĞÁ±…å•ÉÌ€ô4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¥¹ÍÑ…¹•Ì¹…Ñ¥Ù•%¹ÍÑ…¹•Ì ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¹™¥±Ñ•È¡Ù…±Õ”€´øÙ…±Õ”¹¥ ¤¹•ÅÕ…±Ì¡É•…Ñ•¹¥ ¤¤¤4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¹µ…ÁQ½%¹Ğ¡Ù…±Õ”€´øÙ…±Õ”¹Á±…å•ÉÌ ¤¹Í¥é” ¤¤4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¹™¥¹‘¥ÉÍĞ ¤4(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¹½É±Í” À¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€¥˜€¡Á±…å•ÉÌ€øôÁÕ‰±¥Í¡•¹µ¥¹¥µÕµA±…å•ÉÌ ¤¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€€€…µ•Ì¹ÍÑ…ÉĞ¡É•…Ñ•¹¥ ¤¤ì4(€€€€€€€€€€€€€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€€€€€€€€€€€€€É•ÑÕÉ¸É•…Ñ•ì4(€€€€€€€€€€€€€€€€€€€€€€€ô¤¤4(€€€€€€€€¹İ¡•¹½µÁ±•Ñ•Íå¹Œ 4(€€€€€€€€€€€€¡É•…Ñ•°™…¥±ÕÉ”¤€´ø4(€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€™…¥±ÕÉ”€ôô¹Õ±°4(€€€€€€€€€€€€€€€€€€€€€€€€ü5%9$¹‘•Í•É¥…±¥é” ˆñÉ••¸ùA…ÉÑ¥”Ë§¥”•ĞÉ•©½¥¹Ñ”¸ˆ¤4(€€€€€€€€€€€€€€€€€€€€€€€€è5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ù%µÁ½ÍÍ¥‰±”‘”É•©½¥¹‘É”€è€ˆ€¬Í…™”¡™…¥±ÕÉ”¤¤¤°4(€€€€€€€€€€€µ…¥¹Q¡É•…¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥©½¥¹á¥ÍÑ¥¹œ¡A±…å•ÈÁ±…å•È°…µ•%¹ÍÑ…¹•M¹…ÁÍ¡½Ğ¥¹ÍÑ…¹”¤ì4(€€€¥¹ÍÑ…¹•Ì4(€€€€€€€€¹©½¥¸¡Á±…å•È°¥¹ÍÑ…¹”¹¥ ¤¤4(€€€€€€€€¹İ¡•¹½µÁ±•Ñ•Íå¹Œ 4(€€€€€€€€€€€€¡É•ÍÕ±Ğ°™…¥±ÕÉ”¤€´øì4(€€€€€€€€€€€€€¥˜€¡™…¥±ÕÉ”€„ô¹Õ±°ñğÉ•ÍÕ±Ğ€„ôA±…å•É%¹ÍÑ…¹•I•ÍÕ±Ğ¹MUML¤ì4(€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€5%9$¹‘•Í•É¥…±¥é” 4(€€€€€€€€€€€€€€€€€€€€€€€€ˆñÉ•ù½¹¹•á¥½¸É•™ÕÏ¥”€è€ˆ€¬€¡™…¥±ÕÉ”€ôô¹Õ±°€üÉ•ÍÕ±Ğ€èÍ…™”¡™…¥±ÕÉ”¤¤¤¤ì4(€€€€€€€€€€€€€ô•±Í”ì4(€€€€€€€€€€€€€€€¥˜€¡…µ•Ì¹Í¹…ÁÍ¡½Ğ¡¥¹ÍÑ…¹”¹¥ ¤¤¹¥ÍAÉ•Í•¹Ğ ¤¤ì4(€€€€€€€€€€€€€€€€€…µ•Ì¹©½¥¹•¡¥¹ÍÑ…¹”¹¥ ¤°Á±…å•È¹•ÑU¹¥ÅÕ•% ¤¤ì4(€€€€€€€€€€€€€€€€€É•ÑÕÉ¸ì4(€€€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€€€¥¹ĞÁ±…å•ÉÌ€ô4(€€€€€€€€€€€€€€€€€€€¥¹ÍÑ…¹•Ì¹…Ñ¥Ù•%¹ÍÑ…¹•Ì ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€€€€€€€€€€€€€€€€€¹™¥±Ñ•È¡Ù…±Õ”€´øÙ…±Õ”¹¥ ¤¹•ÅÕ…±Ì¡¥¹ÍÑ…¹”¹¥ ¤¤¤4(€€€€€€€€€€€€€€€€€€€€€€€€¹µ…ÁQ½%¹Ğ¡Ù…±Õ”€´øÙ…±Õ”¹Á±…å•ÉÌ ¤¹Í¥é” ¤¤4(€€€€€€€€€€€€€€€€€€€€€€€€¹™¥¹‘¥ÉÍĞ ¤4(€€€€€€€€€€€€€€€€€€€€€€€€¹½É±Í” À¤ì4(€€€€€€€€€€€€€€€¥¹Ğµ¥¹¥µÕ´€ô4(€€€€€€€€€€€€€€€€€€€ÁÕ‰±¥…Ñ¥½¹Ì4(€€€€€€€€€€€€€€€€€€€€€€€€¹ÁÕ‰±¥Í¡•‘•™¥¹¥Ñ¥½¸¡¥¹ÍÑ…¹”¹µ…Á% ¤¤4(€€€€€€€€€€€€€€€€€€€€€€€€¹µ…À¡5…Á•™¥¹¥Ñ¥½¸èéµ¥¹¥µÕµA±…å•ÉÌ¤4(€€€€€€€€€€€€€€€€€€€€€€€€¹½É±Í” Ä¤ì4(€€€€€€€€€€€€€€€¥˜€¡Á±…å•ÉÌ€øôµ¥¹¥µÕ´¤ì4(€€€€€€€€€€€€€€€€€…µ•Ì¹ÍÑ…ÉĞ¡¥¹ÍÑ…¹”¹¥ ¤¤ì4(€€€€€€€€€€€€€€€ô•±Í”ì4(€€€€€€€€€€€€€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…” 4(€€€€€€€€€€€€€€€€€€€€€5%9$¹‘•Í•É¥…±¥é” 4(€€€€€€€€€€€€€€€€€€€€€€€€€€ˆñå•±±½Üù¸…ÑÑ•¹Ñ”‘”©½Õ•ÕÉÌ€è€ñİ¡¥Ñ”øˆ€¬Á±…å•ÉÌ€¬€ˆ¼ˆ€¬µ¥¹¥µÕ´¤¤ì4(€€€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€ô°4(€€€€€€€€€€€µ…¥¹Q¡É•…¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”1¥ÍĞñ…µ•%¹ÍÑ…¹•M¹…ÁÍ¡½ĞøÁÕ‰±¥%¹ÍÑ…¹•Ì¡MÑÉ¥¹œµ…Á%¤ì4(€€€É•ÑÕÉ¸¥¹ÍÑ…¹•Ì¹…Ñ¥Ù•%¹ÍÑ…¹•Ì ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€¹™¥±Ñ•È¡Ù…±Õ”€´øÙ…±Õ”¹µ…Á% ¤¹•ÅÕ…±Ì¡µ…Á%¤€˜˜Ù…±Õ”¹½İ¹•È ¤¹¥ÍµÁÑä ¤¤4(€€€€€€€€¹Ñ½1¥ÍĞ ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥¹…Ù¥…Ñ¥½¸¡Õ¥Y¥•ÜÙ¥•Ü°Õ¥A…¥¹…Ñ¥½¸¹A…”ğüøÁ…”°¥¹ĞÑ½Ñ…°°MÑÉ¥¹œ±…‰•°¤ì4(€€€Ù¥•Ü¹½¹™¥ÕÉ• ‰‰…¬ˆ¤ì4(€€€Ù¥•Ü¹½¹™¥ÕÉ• ‰¡½µ”ˆ¤ì4(€€€Ù¥•Ü¹½¹™¥ÕÉ• ‰Í•…É ˆ¤ì4(€€€¥˜€¡Á…”¹¥¹‘•à ¤€ø€À¤ì4(€€€€€Ù¥•Ü¹½¹™¥ÕÉ• ‰ÁÉ•Ù¥½ÕÌˆ¤ì4(€€€ô4(€€€¥˜€¡Á…”¹¥¹‘•à ¤€¬€Ä€ğÁ…”¹Á…•½Õ¹Ğ ¤¤ì4(€€€€€Ù¥•Ü¹½¹™¥ÕÉ• ‰¹•áĞˆ¤ì4(€€€ô4(€€€Ù¥•Ü¹¥¹™½Éµ…Ñ¥½¸ 4(€€€€€€€€Ğä°4(€€€€€€€5…Ñ•É¥…°¹AAH°4(€€€€€€€€ˆñİ¡¥Ñ”ùA…”€ˆ€¬€¡Á…”¹¥¹‘•à ¤€¬€Ä¤€¬€ˆ¼ˆ€¬Á…”¹Á…•½Õ¹Ğ ¤°4(€€€€€€€1¥ÍĞ¹½˜ ˆñÉ…äøˆ€¬Ñ½Ñ…°€¬€ˆ€ˆ€¬±…‰•°¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥ŒMÑÉ¥¹œÍ•±•Ñ•¡Õ¥±¥­½¹Ñ•áĞ½¹Ñ•áĞ¤ì4(€€€É•ÑÕÉ¸½¹Ñ•áĞ¹Í•ÍÍ¥½¸ ¤¹ÕÉÉ•¹Ñ½¹Ñ•áĞ ¤¹Ù…±Õ” ‰µ…Àˆ°MÑÉ¥¹œ¹±…ÍÌ¤¹½É±Í” ˆˆ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ5…Ñ•É¥…°µ…Ñ•É¥…°¡MÑÉ¥¹œ¹…µ”¤ì4(€€€5…Ñ•É¥…°µ…Ñ•É¥…°€ô5…Ñ•É¥…°¹µ…Ñ¡5…Ñ•É¥…°¡¹…µ”¤ì4(€€€É•ÑÕÉ¸µ…Ñ•É¥…°€ôô¹Õ±°ñğ€…µ…Ñ•É¥…°¹¥Í%Ñ•´ ¤€ü5…Ñ•É¥…°¹%11}5@€èµ…Ñ•É¥…°ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ5…Ñ•É¥…°ÍÑ…ÑÕÍ5…Ñ•É¥…°¡5…ÁMÑ…ÑÕÌÍÑ…ÑÕÌ¤ì4(€€€É•ÑÕÉ¸Íİ¥Ñ €¡ÍÑ…ÑÕÌ¤ì4(€€€€€…Í”AU	1%M!€´ø5…Ñ•É¥…°¹1%5}=9IQì4(€€€€€…Í”%9Y1%€´ø5…Ñ•É¥…°¹I}=9IQì4(€€€€€…Í”QMQ%9€´ø5…Ñ•É¥…°¹9I}eì4(€€€€€…Í”5%9Q99€´ø5…Ñ•É¥…°¹=I9}=9IQì4(€€€€€…Í”I!%Y€´ø5…Ñ•É¥…°¹Ie}=9IQì4(€€€€€‘•™…Õ±Ğ€´ø5…Ñ•É¥…°¹%11}5@ì4(€€€ôì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥ŒMÑÉ¥¹œ•µÁÑä¡MÑÉ¥¹œÙ…±Õ”°MÑÉ¥¹œ™…±±‰…¬¤ì4(€€€É•ÑÕÉ¸Ù…±Õ”¹¥Í	±…¹¬ ¤€ü™…±±‰…¬€èÙ…±Õ”ì4(€ô4(4(€ÁÉ¥Ù…Ñ”MÑÉ¥¹œÁ±…å•ÉMÑ…ÑÕÌ¡1¥ÍĞñ…µ•%¹ÍÑ…¹•M¹…ÁÍ¡½Ğø¥¹ÍÑ…¹•Ì¤ì4(€€€¥˜€¡¥¹ÍÑ…¹•Ì¹¥ÍµÁÑä ¤¤ì4(€€€€€É•ÑÕÉ¸€‰¥ÍÁ½¹¥‰±”ˆì4(€€€ô4(€€€¥˜€¡¥¹ÍÑ…¹•Ì¹ÍÑÉ•…´ ¤¹…±±5…Ñ ¡Ù…±Õ”€´øÙ…±Õ”¹Á±…å•ÉÌ ¤¹Í¥é” ¤€øôÙ…±Õ”¹µ…á¥µÕµA±…å•ÉÌ ¤¤¤ì4(€€€€€É•ÑÕÉ¸€‰½µÁ³¡Ñ”ˆì4(€€€ô4(€€€¥˜€¡¥¹ÍÑ…¹•Ì¹ÍÑÉ•…´ ¤4(€€€€€€€€¹…¹å5…Ñ  4(€€€€€€€€€€€Ù…±Õ”€´ø4(€€€€€€€€€€€€€€€Ù…±Õ”¹ÍÑ…Ñ” ¤€ôô…µ•%¹ÍÑ…¹•MÑ…Ñ”¹IU99%94(€€€€€€€€€€€€€€€€€€€ñğ…µ•Ì¹Í¹…ÁÍ¡½Ğ¡Ù…±Õ”¹¥ ¤¤¹¥ÍAÉ•Í•¹Ğ ¤¤¤ì4(€€€€€É•ÑÕÉ¸€‰A…ÉÑ¥”•¸½ÕÉÌˆì4(€€€ô4(€€€¥˜€¡¥¹ÍÑ…¹•Ì¹ÍÑÉ•…´ ¤¹…¹å5…Ñ ¡Ù…±Õ”€´ø€…Ù…±Õ”¹Á±…å•ÉÌ ¤¹¥ÍµÁÑä ¤¤¤ì4(€€€€€É•ÑÕÉ¸€‰¸…ÑÑ•¹Ñ”‘”©½Õ•ÕÉÌˆì4(€€€ô4(€€€É•ÑÕÉ¸€‰¥ÍÁ½¹¥‰±”ˆì4(€ô4(4(€ÁÉ¥Ù…Ñ”1¥ÍĞñY…±¥‘…Ñ¥½¹%Ñ•´øÙ…±¥‘…Ñ¥½¹%Ñ•µÌ¡5…Á•™¥¹¥Ñ¥½¸µ…À¤ì4(€€€Ù…ÈÉ•Á½ÉĞ€ôÙ…±¥‘…Ñ½È¹Ù…±¥‘…Ñ”¡µ…À¤ì4(€€€©…Ù„¹ÕÑ¥°¹ÉÉ…å1¥ÍĞñY…±¥‘…Ñ¥½¹%Ñ•´øÉ•ÍÕ±Ğ€ô¹•Ü©…Ù„¹ÕÑ¥°¹ÉÉ…å1¥ÍĞğø ¤ì4(€€€É•Á½ÉĞ4(€€€€€€€€¹•ÉÉ½ÉÌ ¤4(€€€€€€€€¹™½É…  4(€€€€€€€€€€€µ•ÍÍ…”€´ø4(€€€€€€€€€€€€€€€É•ÍÕ±Ğ¹…‘ 4(€€€€€€€€€€€€€€€€€€€¹•ÜY…±¥‘…Ñ¥½¹%Ñ•´ 4(€€€€€€€€€€€€€€€€€€€€€€€€ˆñÉ•ùÉÉ•ÕÈ€è€ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€€‰	1=EU9Qˆ°4(€€€€€€€€€€€€€€€€€€€€€€€µ•ÍÍ…”°4(€€€€€€€€€€€€€€€€€€€€€€€€‰½ÉÉ¥•È•Ğƒ¥³¥µ•¹ĞÁÕ¥ÌÉ•±…¹•È±„Ù…±¥‘…Ñ¥½¸¸ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€±½…Ñ”¡µ…À°µ•ÍÍ…”¤°4(€€€€€€€€€€€€€€€€€€€€€€€5…Ñ•É¥…°¹I}=9IQ¤¤¤ì4(€€€É•Á½ÉĞ4(€€€€€€€€¹İ…É¹¥¹Ì ¤4(€€€€€€€€¹™½É…  4(€€€€€€€€€€€µ•ÍÍ…”€´ø4(€€€€€€€€€€€€€€€É•ÍÕ±Ğ¹…‘ 4(€€€€€€€€€€€€€€€€€€€¹•ÜY…±¥‘…Ñ¥½¹%Ñ•´ 4(€€€€€€€€€€€€€€€€€€€€€€€€ˆñ½±ùÙ•ÉÑ¥ÍÍ•µ•¹Ğ€è€ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€€‰YIQ%MM59Pˆ°4(€€€€€€€€€€€€€€€€€€€€€€€µ•ÍÍ…”°4(€€€€€€€€€€€€€€€€€€€€€€€€‰[¥É¥™¥•È•Ğƒ¥³¥µ•¹Ğ…Ù…¹Ğ±„ÁÕ‰±¥…Ñ¥½¸¸ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€±½…Ñ”¡µ…À°µ•ÍÍ…”¤°4(€€€€€€€€€€€€€€€€€€€€€€€5…Ñ•É¥…°¹=I9}=9IQ¤¤¤ì4(€€€É•Á½ÉĞ4(€€€€€€€€¹…‘Ù¥” ¤4(€€€€€€€€¹™½É…  4(€€€€€€€€€€€µ•ÍÍ…”€´ø4(€€€€€€€€€€€€€€€É•ÍÕ±Ğ¹…‘ 4(€€€€€€€€€€€€€€€€€€€¹•ÜY…±¥‘…Ñ¥½¹%Ñ•´ 4(€€€€€€€€€€€€€€€€€€€€€€€€ˆñ…ÅÕ„ù%¹™½Éµ…Ñ¥½¸€è€ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€€‰%9=I5Q%=8ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€µ•ÍÍ…”°4(€€€€€€€€€€€€€€€€€€€€€€€€‰½µÁ³¥Ñ•È±„½¹™¥ÕÉ…Ñ¥½¸É•½µµ…¹“¥”¸ˆ°4(€€€€€€€€€€€€€€€€€€€€€€€±½…Ñ”¡µ…À°µ•ÍÍ…”¤°4(€€€€€€€€€€€€€€€€€€€€€€€5…Ñ•É¥…°¹1%!Q}	1U}=9IQ¤¤¤ì4(€€€¥˜€¡É•ÍÕ±Ğ¹¥ÍµÁÑä ¤¤ì4(€€€€€É•ÍÕ±Ğ¹…‘ 4(€€€€€€€€€¹•ÜY…±¥‘…Ñ¥½¹%Ñ•´ 4(€€€€€€€€€€€€€€ˆñÉ••¸ùY…±¥‘…Ñ¥½¸€è€ˆ°4(€€€€€€€€€€€€€€‰MU!Lˆ°4(€€€€€€€€€€€€€€‰ÕÕ¸ÁÉ½‰³¡µ”“¥Ñ•Ó¤ˆ°4(€€€€€€€€€€€€€€‰1„µ…ÀÁ•ÕĞƒ©ÑÉ”Ñ•ÍÓ¥”½ÔÁÕ‰±§¥”¸ˆ°4(€€€€€€€€€€€€€=ÁÑ¥½¹…°¹•µÁÑä ¤°4(€€€€€€€€€€€€€5…Ñ•É¥…°¹1%5}=9IQ¤¤ì4(€€€ô4(€€€É•ÑÕÉ¸1¥ÍĞ¹½Áå=˜¡É•ÍÕ±Ğ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ=ÁÑ¥½¹…°ñ5…ÁA½¥¹Ğø±½…Ñ”¡5…Á•™¥¹¥Ñ¥½¸µ…À°MÑÉ¥¹œµ•ÍÍ…”¤ì4(€€€¥¹ĞÍ•Á…É…Ñ½È€ôµ•ÍÍ…”¹¥¹‘•á=˜ œèœ¤ì4(€€€¥˜€¡Í•Á…É…Ñ½È€ğ€ÀñğÍ•Á…É…Ñ½È€¬€Ä€øôµ•ÍÍ…”¹±•¹Ñ  ¤¤ì4(€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹•µÁÑä ¤ì4(€€€ô4(€€€MÑÉ¥¹œ¥€ôµ•ÍÍ…”¹ÍÕ‰ÍÑÉ¥¹œ¡Í•Á…É…Ñ½È€¬€Ä¤¹ÍÑÉ¥À ¤ì4(€€€¥˜€¡µ…À¹‘½½ÉÌ ¤¹½¹Ñ…¥¹Í-•ä¡¥¤¤ì4(€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹½˜¡µ…À¹‘½½ÉÌ ¤¹•Ğ¡¥¤¹Á½Í¥Ñ¥½¸ ¤¤ì4(€€€ô4(€€€¥˜€¡µ…À¹é½µ‰¥•MÁ…İ¹Ì ¤¹½¹Ñ…¥¹Í-•ä¡¥¤¤ì4(€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹½˜¡µ…À¹é½µ‰¥•MÁ…İ¹Ì ¤¹•Ğ¡¥¤¹Á½Í¥Ñ¥½¸ ¤¤ì4(€€€ô4(€€€¥˜€¡µ…À¹½‰©•ÑÌ ¤¹½¹Ñ…¥¹Í-•ä¡¥¤¤ì4(€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹½˜¡µ…À¹½‰©•ÑÌ ¤¹•Ğ¡¥¤¹Á½Í¥Ñ¥½¸ ¤¤ì4(€€€ô4(€€€¥˜€¡µ…À¹é½¹•Ì ¤¹½¹Ñ…¥¹Í-•ä¡¥¤¤ì4(€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹½˜¡µ…À¹é½¹•Ì ¤¹•Ğ¡¥¤¹…¹¡½È ¤¤ì4(€€€ô4(€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹•µÁÑä ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥ŒÙ½¥Ñ•±•Á½ÉĞ¡A±…å•ÈÁ±…å•È°5…ÁA½¥¹ĞÁ½¥¹Ğ¤ì4(€€€]½É±İ½É±€ô½Éœ¹‰Õ­­¥Ğ¹	Õ­­¥Ğ¹•Ñ]½É±¡Á½¥¹Ğ¹İ½É± ¤¤ì4(€€€¥˜€¡İ½É±€ôô¹Õ±°¤ì4(€€€€€Á±…å•È¹Í•¹‘5•ÍÍ…”¡5%9$¹‘•Í•É¥…±¥é” ˆñÉ•ù1”µ½¹‘”…ÍÍ½§¤¸•ÍĞÁ…Ì¡…ÉŸ¤¸ˆ¤¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€Á±…å•È¹Ñ•±•Á½ÉĞ 4(€€€€€€€¹•Ü½Éœ¹‰Õ­­¥Ğ¹1½…Ñ¥½¸ 4(€€€€€€€€€€€İ½É±°Á½¥¹Ğ¹à ¤°Á½¥¹Ğ¹ä ¤°Á½¥¹Ğ¹è ¤°Á½¥¹Ğ¹å…Ü ¤°Á½¥¹Ğ¹Á¥Ñ  ¤¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥ŒMÑÉ¥¹œÍ…™”¡Q¡É½İ…‰±”™…¥±ÕÉ”¤ì4(€€€Q¡É½İ…‰±”…ÕÍ”€ô4(€€€€€€€™…¥±ÕÉ”¥¹ÍÑ…¹•½˜½µÁ±•Ñ¥½¹á•ÁÑ¥½¸€˜˜™…¥±ÕÉ”¹•Ñ…ÕÍ” ¤€„ô¹Õ±°4(€€€€€€€€€€€€ü™…¥±ÕÉ”¹•Ñ…ÕÍ” ¤4(€€€€€€€€€€€€è™…¥±ÕÉ”ì4(€€€É•ÑÕÉ¸…ÕÍ”¹•Ñ5•ÍÍ…” ¤€ôô¹Õ±°€ü…ÕÍ”¹•Ñ±…ÍÌ ¤¹•ÑM¥µÁ±•9…µ” ¤€è…ÕÍ”¹•Ñ5•ÍÍ…” ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ]½É±±½…‘‘¥Ñ¥¹]½É±¡5…Á•™¥¹¥Ñ¥½¸‘•™¥¹¥Ñ¥½¸¤ì4(€€€]½É±±½…‘•€ô½Éœ¹‰Õ­­¥Ğ¹	Õ­­¥Ğ¹•Ñ]½É±¡‘•™¥¹¥Ñ¥½¸¹İ½É± ¤¤ì4(€€€¥˜€¡±½…‘•€„ô¹Õ±°¤ì4(€€€€€É•ÑÕÉ¸±½…‘•ì4(€€€ô4(€€€©…Ù„¹¹¥¼¹™¥±”¹A…Ñ É½½Ğ€ô4(€€€€€€€½Éœ¹‰Õ­­¥Ğ¹	Õ­­¥Ğ¹•Ñ]½É±‘½¹Ñ…¥¹•È ¤¹Ñ½A…Ñ  ¤¹Ñ½‰Í½±ÕÑ•A…Ñ  ¤¹¹½Éµ…±¥é” ¤ì4(€€€©…Ù„¹¹¥¼¹™¥±”¹A…Ñ …¹‘¥‘…Ñ”€ôÉ½½Ğ¹É•Í½±Ù”¡‘•™¥¹¥Ñ¥½¸¹İ½É± ¤¤¹Ñ½‰Í½±ÕÑ•A…Ñ  ¤¹¹½Éµ…±¥é” ¤ì4(€€€¥˜€ ……¹‘¥‘…Ñ”¹ÍÑ…ÉÑÍ]¥Ñ ¡É½½Ğ¤ñğ€…©…Ù„¹¹¥¼¹™¥±”¹¥±•Ì¹¥Í¥É•Ñ½Éä¡…¹‘¥‘…Ñ”¤¤ì4(€€€€€É•ÑÕÉ¸¹Õ±°ì4(€€€ô4(€€€É•ÑÕÉ¸½Éœ¹‰Õ­­¥Ğ¹	Õ­­¥Ğ¹É•…Ñ•]½É±¡¹•Ü]½É±‘É•…Ñ½È¡‘•™¥¹¥Ñ¥½¸¹İ½É± ¤¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”É•½ÉY…±¥‘…Ñ¥½¹%Ñ•´ 4(€€€€€MÑÉ¥¹œÑ¥Ñ±”°4(€€€€€MÑÉ¥¹œÑåÁ”°4(€€€€€MÑÉ¥¹œµ•ÍÍ…”°4(€€€€€MÑÉ¥¹œÍ½±ÕÑ¥½¸°4(€€€€€=ÁÑ¥½¹…°ñ5…ÁA½¥¹ĞøÁ½Í¥Ñ¥½¸°4(€€€€€5…Ñ•É¥…°µ…Ñ•É¥…°¤íô4)ô4
+              "<yellow>Cliquez pour restaurer cette version"),
+          "zombies.admin.maps.rollback",
+          click -> requestRollback(click.player(), id, version.version()),
+          null,
+          null);
+    }
+    navigation(view, page, versions.size(), "version(s)");
+  }
+
+  private void renderValidation(GuiView view, GuiContext context) {
+    String id = context.value("map", String.class).orElse("");
+    MapDefinition map = editors.registry().find(id).orElse(null);
+    if (map == null) {
+      view.information(22, Material.BARRIER, "<red>Map introuvable", List.of());
+      view.configured("back");
+      return;
+    }
+    List<ValidationItem> issues = validationItems(map);
+    GuiSession session = guis.session(view.player());
+    GuiPagination.Page<ValidationItem> page =
+        GuiPagination.page(issues, session.page(), view.menu().contentSlots().size());
+    session.page(page.index());
+    for (int index = 0; index < page.items().size(); index++) {
+      ValidationItem issue = page.items().get(index);
+      view.button(
+          view.menu().contentSlots().get(index),
+          issue.material(),
+          issue.title() + issue.message(),
+          List.of(
+              "<gray>Type : <white>" + issue.type(),
+              "<gray>Solution : <white>" + issue.solution(),
+              issue.position().isPresent()
+                  ? "<yellow>Cliquez pour vous tÃ©lÃ©porter"
+                  : "<dark_gray>Aucune position associÃ©e"),
+          "zombies.admin.maps.validate",
+          click -> issue.position().ifPresent(point -> teleport(click.player(), point)),
+          null,
+          null);
+    }
+    navigation(view, page, issues.size(), "problÃ¨me(s)");
+  }
+
+  private void requestCreate(Player player) {
+    guis.requestInput(
+        player,
+        new GuiInputRequest(
+            MINI.deserialize("<aqua>Entrez l'identifiant de la nouvelle map."),
+            guis.inputExpiry(),
+            value ->
+                MapDefinition.safeId(value.toLowerCase(Locale.ROOT))
+                    ? GuiInputRequest.Validation.accept()
+                    : GuiInputRequest.Validation.reject(
+                        MINI.deserialize("<red>Utilisez a-z, 0-9, _ ou - (64 caractÃ¨res).")),
+            value ->
+                editors
+                    .create(
+                        value.toLowerCase(Locale.ROOT),
+                        value.toLowerCase(Locale.ROOT),
+                        player.getUniqueId(),
+                        player.getWorld().getName())
+                    .whenCompleteAsync(
+                        (map, failure) -> {
+                          if (failure != null) {
+                            player.sendMessage(
+                                MINI.deserialize("<red>CrÃ©ation refusÃ©e : " + safe(failure)));
+                          } else {
+                            edit(player, map.id());
+                          }
+                        },
+                        mainThread),
+            () -> {}));
+  }
+
+  private void requestDuplicate(Player player, String sourceId) {
+    MapDefinition source = editors.registry().find(sourceId).orElse(null);
+    if (source == null || loadEditingWorld(source) == null) {
+      player.sendMessage(MINI.deserialize("<red>Le monde source ne peut pas Ãªtre chargÃ©."));
+      return;
+    }
+    guis.requestInput(
+        player,
+        new GuiInputRequest(
+            MINI.deserialize("<aqua>Entrez l'identifiant de la copie."),
+            guis.inputExpiry(),
+            value ->
+                MapDefinition.safeId(value.toLowerCase(Locale.ROOT))
+                        && editors.registry().find(value.toLowerCase(Locale.ROOT)).isEmpty()
+                    ? GuiInputRequest.Validation.accept()
+                    : GuiInputRequest.Validation.reject(
+                        MINI.deserialize("<red>Identifiant invalide ou dÃ©jÃ  utilisÃ©.")),
+            value -> {
+              String newId = value.toLowerCase(Locale.ROOT);
+              worldPublications
+                  .duplicateEditingWorld(source, newId)
+                  .thenCompose(
+                      world -> editors.duplicate(sourceId, newId, player.getUniqueId(), world))
+                  .whenCompleteAsync(
+                      (copy, failure) -> {
+                        if (failure != null) {
+                          player.sendMessage(
+                              MINI.deserialize("<red>Duplication refusÃ©e : " + safe(failure)));
+                        } else {
+                          edit(player, copy.id());
+                        }
+                      },
+                      mainThread);
+            },
+            () -> {}));
+  }
+
+  private void edit(Player player, String mapId) {
+    player.closeInventory();
+    previews
+        .leave(player)
+        .whenCompleteAsync(
+            (leftPreview, failure) -> {
+              if (failure != null) {
+                player.sendMessage(
+                    MINI.deserialize(
+                        "<red>Impossible de fermer la visite avant l'Ã©dition : " + safe(failure)));
+                return;
+              }
+              openEditor(player, mapId);
+            },
+            mainThread);
+  }
+
+  private void openEditor(Player player, String mapId) {
+    editors
+        .open(player.getUniqueId(), mapId)
+        .ifPresentOrElse(
+            session -> {
+              World editingWorld = loadEditingWorld(session.definition());
+              if (editingWorld == null) {
+                editors.leave(player.getUniqueId());
+                player.sendMessage(
+                    MINI.deserialize("<red>Impossible de charger le monde d'Ã©dition."));
+                return;
+              }
+              var spawn = session.definition().playerSpawn();
+              org.bukkit.Location destination =
+                  spawn
+                      .map(
+                          point ->
+                              new org.bukkit.Location(
+                                  editingWorld,
+                                  point.x(),
+                                  point.y(),
+                                  point.z(),
+                                  point.yaw(),
+                                  point.pitch()))
+                      .orElseGet(editingWorld::getSpawnLocation);
+              if (!player.teleport(destination)) {
+                editors.leave(player.getUniqueId());
+                player.sendMessage(
+                    MINI.deserialize("<red>Impossible d'entrer dans le monde d'Ã©dition."));
+                return;
+              }
+              editorItems.give(player, session);
+              visualizations.refreshEditor(
+                  player.getUniqueId(), editingWorld, session.definition());
+              guis.openHome(player, new GuiId("editor-main"));
+              player.sendMessage(MINI.deserialize("<green>Copie de travail ouverte."));
+            },
+            () ->
+                player.sendMessage(
+                    MINI.deserialize("<red>Map inconnue, dÃ©jÃ  ouverte ou verrouillÃ©e.")));
+  }
+
+  private void visit(Player player, String mapId) {
+    if (editors.session(player.getUniqueId()).isPresent()) {
+      player.sendMessage(
+          MINI.deserialize(
+              "<red>Fermez d'abord votre session d'Ã©dition avec <white>/zmap leave<red>."));
+      return;
+    }
+    player.closeInventory();
+    games.left(player.getUniqueId());
+    instances.leave(player);
+    player.sendMessage(MINI.deserialize("<yellow>PrÃ©paration d'une copie privÃ©e de la map..."));
+    previews
+        .open(player, mapId)
+        .whenCompleteAsync(
+            (opened, failure) ->
+                player.sendMessage(
+                    failure == null
+                        ? MINI.deserialize(
+                            "<green>Map chargÃ©e. <gray>Retour : <white>/zombie map leave")
+                        : MINI.deserialize(
+                            "<red>Visite impossible : "
+                                + safe(failure)
+                                + ". VÃ©rifiez zombie_templates/"
+                                + mapId
+                                + ".")),
+            mainThread);
+  }
+
+  private void publish(Player player, String mapId) {
+    MapDefinition definition = editors.registry().find(mapId).orElse(null);
+    if (definition == null) {
+      return;
+    }
+    Optional<UUID> editor = editors.editorOf(mapId);
+    if (editor.isPresent() && !editor.orElseThrow().equals(player.getUniqueId())) {
+      player.sendMessage(
+          MINI.deserialize("<red>Publication refusÃ©e : cette map est encore modifiÃ©e ailleurs."));
+      return;
+    }
+    player.sendMessage(MINI.deserialize("<yellow>Sauvegarde et copie du monde d'Ã©dition..."));
+    CompletableFuture<Void> closedEditor;
+    if (editors
+        .session(player.getUniqueId())
+        .filter(session -> session.definition().id().equals(mapId))
+        .isPresent()) {
+      visualizations.clearEditor(player.getUniqueId());
+      editorItems.remove(player);
+      closedEditor = editors.leave(player.getUniqueId()).thenApply(ignored -> null);
+      instances.leave(player);
+    } else {
+      closedEditor = CompletableFuture.completedFuture(null);
+    }
+    closedEditor
+        .thenComposeAsync(ignored -> worldPublications.updateTemplate(definition), mainThread)
+        .thenCompose(ignored -> templates.find(mapId))
+        .thenCompose(
+            template ->
+                template.isPresent()
+                    ? publications.publish(mapId, player.getUniqueId())
+                    : java.util.concurrent.CompletableFuture.failedFuture(
+                        new IllegalStateException(
+                            "Le dossier zombie_templates/" + mapId + " est absent ou invalide")))
+        .whenCompleteAsync(
+            (publication, failure) -> {
+              player.sendMessage(
+                  failure == null
+                      ? MINI.deserialize(
+                          "<green>Map publiÃ©e en version <white>"
+                              + publication.activeVersion().orElseThrow())
+                      : MINI.deserialize("<red>Publication refusÃ©e : " + safe(failure)));
+              guis.refresh(player);
+            },
+            mainThread);
+  }
+
+  private void unpublish(Player player, String mapId) {
+    publications
+        .unpublish(mapId)
+        .whenCompleteAsync(
+            (publication, failure) -> {
+              player.sendMessage(
+                  failure == null
+                      ? MINI.deserialize("<yellow>Map retirÃ©e du catalogue joueur.")
+                      : MINI.deserialize("<red>OpÃ©ration refusÃ©e : " + safe(failure)));
+              guis.refresh(player);
+            },
+            mainThread);
+  }
+
+  private void requestRollback(Player player, String mapId, int version) {
+    guis.confirm(
+        player,
+        new GuiConfirmation(
+            MINI.deserialize("<gold>Restaurer une version publiÃ©e"),
+            MINI.deserialize("<white>" + mapId + " v" + version),
+            MINI.deserialize(
+                "<gray>Un nouvel instantanÃ© sera publiÃ©; aucun historique ne sera effacÃ©."),
+            clock.instant().plusSeconds(1),
+            context ->
+                publications
+                    .rollback(mapId, version, player.getUniqueId())
+                    .whenCompleteAsync(
+                        (publication, failure) -> {
+                          context.session().confirmation(null);
+                          player.sendMessage(
+                              failure == null
+                                  ? MINI.deserialize(
+                                      "<green>Version restaurÃ©e et publiÃ©e en v"
+                                          + publication.activeVersion().orElseThrow()
+                                          + ".")
+                                  : MINI.deserialize(
+                                      "<red>Restauration refusÃ©e : " + safe(failure)));
+                          guis.back(player);
+                        },
+                        mainThread)));
+  }
+
+  private void requestArchive(Player player, String mapId) {
+    boolean active =
+        instances.activeInstances().stream().anyMatch(value -> value.mapId().equals(mapId));
+    if (active) {
+      player.sendMessage(
+          MINI.deserialize("<red>Archivage refusÃ© : une instance utilise encore cette map."));
+      return;
+    }
+    guis.confirm(
+        player,
+        new GuiConfirmation(
+            MINI.deserialize("<red>Archiver la map"),
+            MINI.deserialize("<white>" + mapId),
+            MINI.deserialize(
+                "<gray>La map disparaÃ®tra du catalogue; ses fichiers et versions seront conservÃ©s."),
+            clock.instant().plusSeconds(1),
+            context ->
+                publications
+                    .changeStatus(mapId, MapStatus.ARCHIVED)
+                    .whenCompleteAsync(
+                        (publication, failure) -> {
+                          context.session().confirmation(null);
+                          player.sendMessage(
+                              failure == null
+                                  ? MINI.deserialize("<green>Map archivÃ©e sans perte de donnÃ©es.")
+                                  : MINI.deserialize("<red>Archivage refusÃ© : " + safe(failure)));
+                          guis.back(player);
+                        },
+                        mainThread)));
+  }
+
+  private void requestDeletion(Player player, String mapId) {
+    MapDefinition definition = editors.registry().find(mapId).orElse(null);
+    if (definition == null) {
+      player.sendMessage(MINI.deserialize("<red>Suppression refusÃ©e : map introuvable."));
+      return;
+    }
+    String blocker = deletionBlocker(mapId);
+    if (blocker != null) {
+      player.sendMessage(MINI.deserialize("<red>Suppression refusÃ©e : " + blocker));
+      return;
+    }
+    guis.confirm(
+        player,
+        new GuiConfirmation(
+            MINI.deserialize("<dark_red>Supprimer dÃ©finitivement la map"),
+            MINI.deserialize("<white>" + mapId),
+            MINI.deserialize(
+                "<red>Configuration, spawns, objets, versions et mondes possÃ©dÃ©s seront supprimÃ©s."),
+            clock.instant().plusSeconds(1),
+            context -> {
+              String currentBlocker = deletionBlocker(mapId);
+              if (currentBlocker != null) {
+                context.session().confirmation(null);
+                player.sendMessage(
+                    MINI.deserialize("<red>Suppression refusÃ©e : " + currentBlocker));
+                guis.back(player);
+                return;
+              }
+              worldPublications
+                  .prepareDeletion(definition)
+                  .thenCompose(ignored -> publications.delete(mapId, () -> editors.delete(mapId)))
+                  .thenRun(
+                      () -> {
+                        templates.refreshCount();
+                      })
+                  .whenCompleteAsync(
+                      (deleted, failure) -> {
+                        context.session().confirmation(null);
+                        if (failure == null) {
+                          player.sendMessage(
+                              MINI.deserialize(
+                                  "<green>Map supprimÃ©e avec sa configuration, ses versions et ses mondes."));
+                          guis.open(player, new GuiId("admin-maps"));
+                        } else {
+                          player.sendMessage(
+                              MINI.deserialize("<red>Suppression impossible : " + safe(failure)));
+                          guis.back(player);
+                        }
+                      },
+                      mainThread);
+            }));
+  }
+
+  private String deletionBlocker(String mapId) {
+    if (instances.activeInstances().stream().anyMatch(value -> value.mapId().equals(mapId))) {
+      return "une instance utilise encore cette map.";
+    }
+    if (editors.editorOf(mapId).isPresent()) {
+      return "la map est encore ouverte dans l'Ã©diteur.";
+    }
+    return null;
+  }
+
+  private void test(Player player, String mapId) {
+    MapDefinition map = editors.registry().find(mapId).orElse(null);
+    if (map == null || !validator.validate(map).valid()) {
+      player.sendMessage(MINI.deserialize("<red>La map doit Ãªtre valide avant le test."));
+      return;
+    }
+    if (loadEditingWorld(map) == null) {
+      player.sendMessage(MINI.deserialize("<red>Le monde d'Ã©dition ne peut pas Ãªtre chargÃ©."));
+      return;
+    }
+    Optional<UUID> editor = editors.editorOf(mapId);
+    if (editor.isPresent() && !editor.orElseThrow().equals(player.getUniqueId())) {
+      player.sendMessage(MINI.deserialize("<red>La map est encore modifiÃ©e par un autre admin."));
+      return;
+    }
+    player.closeInventory();
+    CompletableFuture<Void> closedEditor;
+    if (editors
+        .session(player.getUniqueId())
+        .filter(session -> session.definition().id().equals(mapId))
+        .isPresent()) {
+      visualizations.clearEditor(player.getUniqueId());
+      editorItems.remove(player);
+      closedEditor = editors.leave(player.getUniqueId()).thenApply(ignored -> null);
+      instances.leave(player);
+    } else {
+      closedEditor = CompletableFuture.completedFuture(null);
+    }
+    closedEditor
+        .thenComposeAsync(ignored -> previews.leave(player), mainThread)
+        .thenComposeAsync(
+            ignored -> {
+              games.left(player.getUniqueId());
+              instances.leave(player);
+              return worldPublications.updateTemplate(map);
+            },
+            mainThread)
+        .thenCompose(
+            ignored ->
+                instances.create(mapId, Optional.of(player.getUniqueId()), map.maximumPlayers()))
+        .thenCompose(
+            created ->
+                instances
+                    .join(player, created.id())
+                    .thenApply(
+                        result -> {
+                          if (result != PlayerInstanceResult.SUCCESS) {
+                            throw new IllegalStateException("EntrÃ©e refusÃ©e : " + result);
+                          }
+                          games.start(created.id());
+                          return created;
+                        }))
+        .whenCompleteAsync(
+            (created, failure) ->
+                player.sendMessage(
+                    failure == null
+                        ? MINI.deserialize("<green>Partie de test dÃ©marrÃ©e.")
+                        : MINI.deserialize("<red>Test impossible : " + safe(failure))),
+            mainThread);
+  }
+
+  private void joinPublished(Player player, String mapId) {
+    if (publications.publishedDefinition(mapId).isEmpty()) {
+      player.sendMessage(MINI.deserialize("<red>Cette map n'est plus publiÃ©e."));
+      return;
+    }
+    player.closeInventory();
+    Optional<GameInstanceSnapshot> available =
+        publicInstances(mapId).stream()
+            .filter(
+                value ->
+                    value.players().size() < value.maximumPlayers()
+                        && (value.state() == GameInstanceState.WAITING
+                            || value.state() == GameInstanceState.STARTING
+                            || value.state() == GameInstanceState.RUNNING))
+            .findFirst();
+    if (available.isPresent()) {
+      joinExisting(player, available.orElseThrow());
+      return;
+    }
+    player.sendMessage(MINI.deserialize("<yellow>CrÃ©ation automatique d'une partie..."));
+    instances
+        .create(
+            mapId,
+            Optional.empty(),
+            publications.publishedDefinition(mapId).orElseThrow().maximumPlayers())
+        .thenCompose(
+            created ->
+                instances
+                    .join(player, created.id())
+                    .thenApply(
+                        result -> {
+                          if (result != PlayerInstanceResult.SUCCESS) {
+                            throw new IllegalStateException("EntrÃ©e refusÃ©e : " + result);
+                          }
+                          MapDefinition published =
+                              publications.publishedDefinition(mapId).orElseThrow();
+                          int players =
+                              instances.activeInstances().stream()
+                                  .filter(value -> value.id().equals(created.id()))
+                                  .mapToInt(value -> value.players().size())
+                                  .findFirst()
+                                  .orElse(0);
+                          if (players >= published.minimumPlayers()) {
+                            games.start(created.id());
+                          }
+                          return created;
+                        }))
+        .whenCompleteAsync(
+            (created, failure) ->
+                player.sendMessage(
+                    failure == null
+                        ? MINI.deserialize("<green>Partie crÃ©Ã©e et rejointe.")
+                        : MINI.deserialize("<red>Impossible de rejoindre : " + safe(failure))),
+            mainThread);
+  }
+
+  private void joinExisting(Player player, GameInstanceSnapshot instance) {
+    instances
+        .join(player, instance.id())
+        .whenCompleteAsync(
+            (result, failure) -> {
+              if (failure != null || result != PlayerInstanceResult.SUCCESS) {
+                player.sendMessage(
+                    MINI.deserialize(
+                        "<red>Connexion refusÃ©e : " + (failure == null ? result : safe(failure))));
+              } else {
+                if (games.snapshot(instance.id()).isPresent()) {
+                  games.joined(instance.id(), player.getUniqueId());
+                  return;
+                }
+                int players =
+                    instances.activeInstances().stream()
+                        .filter(value -> value.id().equals(instance.id()))
+                        .mapToInt(value -> value.players().size())
+                        .findFirst()
+                        .orElse(0);
+                int minimum =
+                    publications
+                        .publishedDefinition(instance.mapId())
+                        .map(MapDefinition::minimumPlayers)
+                        .orElse(1);
+                if (players >= minimum) {
+                  games.start(instance.id());
+                } else {
+                  player.sendMessage(
+                      MINI.deserialize(
+                          "<yellow>En attente de joueurs : <white>" + players + "/" + minimum));
+                }
+              }
+            },
+            mainThread);
+  }
+
+  private List<GameInstanceSnapshot> publicInstances(String mapId) {
+    return instances.activeInstances().stream()
+        .filter(value -> value.mapId().equals(mapId) && value.owner().isEmpty())
+        .toList();
+  }
+
+  private void navigation(GuiView view, GuiPagination.Page<?> page, int total, String label) {
+    view.configured("back");
+    view.configured("home");
+    view.configured("search");
+    if (page.index() > 0) {
+      view.configured("previous");
+    }
+    if (page.index() + 1 < page.pageCount()) {
+      view.configured("next");
+    }
+    view.information(
+        49,
+        Material.PAPER,
+        "<white>Page " + (page.index() + 1) + "/" + page.pageCount(),
+        List.of("<gray>" + total + " " + label));
+  }
+
+  private static String selected(GuiClickContext context) {
+    return context.session().currentContext().value("map", String.class).orElse("");
+  }
+
+  private static Material material(String name) {
+    Material material = Material.matchMaterial(name);
+    return material == null || !material.isItem() ? Material.FILLED_MAP : material;
+  }
+
+  private static Material statusMaterial(MapStatus status) {
+    return switch (status) {
+      case PUBLISHED -> Material.LIME_CONCRETE;
+      case INVALID -> Material.RED_CONCRETE;
+      case TESTING -> Material.ENDER_EYE;
+      case MAINTENANCE -> Material.ORANGE_CONCRETE;
+      case ARCHIVED -> Material.GRAY_CONCRETE;
+      default -> Material.FILLED_MAP;
+    };
+  }
+
+  private static String empty(String value, String fallback) {
+    return value.isBlank() ? fallback : value;
+  }
+
+  private String playerStatus(List<GameInstanceSnapshot> instances) {
+    if (instances.isEmpty()) {
+      return "Disponible";
+    }
+    if (instances.stream().allMatch(value -> value.players().size() >= value.maximumPlayers())) {
+      return "ComplÃ¨te";
+    }
+    if (instances.stream()
+        .anyMatch(
+            value ->
+                value.state() == GameInstanceState.RUNNING
+                    || games.snapshot(value.id()).isPresent())) {
+      return "Partie en cours";
+    }
+    if (instances.stream().anyMatch(value -> !value.players().isEmpty())) {
+      return "En attente de joueurs";
+    }
+    return "Disponible";
+  }
+
+  private List<ValidationItem> validationItems(MapDefinition map) {
+    var report = validator.validate(map);
+    java.util.ArrayList<ValidationItem> result = new java.util.ArrayList<>();
+    report
+        .errors()
+        .forEach(
+            message ->
+                result.add(
+                    new ValidationItem(
+                        "<red>Erreur : ",
+                        "BLOQUANTE",
+                        message,
+                        "Corriger cet Ã©lÃ©ment puis relancer la validation.",
+                        locate(map, message),
+                        Material.RED_CONCRETE)));
+    report
+        .warnings()
+        .forEach(
+            message ->
+                result.add(
+                    new ValidationItem(
+                        "<gold>Avertissement : ",
+                        "AVERTISSEMENT",
+                        message,
+                        "VÃ©rifier cet Ã©lÃ©ment avant la publication.",
+                        locate(map, message),
+                        Material.ORANGE_CONCRETE)));
+    report
+        .advice()
+        .forEach(
+            message ->
+                result.add(
+                    new ValidationItem(
+                        "<aqua>Information : ",
+                        "INFORMATION",
+                        message,
+                        "ComplÃ©ter la configuration recommandÃ©e.",
+                        locate(map, message),
+                        Material.LIGHT_BLUE_CONCRETE)));
+    if (result.isEmpty()) {
+      result.add(
+          new ValidationItem(
+              "<green>Validation : ",
+              "SUCCÃˆS",
+              "Aucun problÃ¨me dÃ©tectÃ©",
+              "La map peut Ãªtre testÃ©e ou publiÃ©e.",
+              Optional.empty(),
+              Material.LIME_CONCRETE));
+    }
+    return List.copyOf(result);
+  }
+
+  private static Optional<MapPoint> locate(MapDefinition map, String message) {
+    int separator = message.indexOf(':');
+    if (separator < 0 || separator + 1 >= message.length()) {
+      return Optional.empty();
+    }
+    String id = message.substring(separator + 1).strip();
+    if (map.doors().containsKey(id)) {
+      return Optional.of(map.doors().get(id).position());
+    }
+    if (map.zombieSpawns().containsKey(id)) {
+      return Optional.of(map.zombieSpawns().get(id).position());
+    }
+    if (map.objects().containsKey(id)) {
+      return Optional.of(map.objects().get(id).position());
+    }
+    if (map.zones().containsKey(id)) {
+      return Optional.of(map.zones().get(id).anchor());
+    }
+    return Optional.empty();
+  }
+
+  private static void teleport(Player player, MapPoint point) {
+    World world = org.bukkit.Bukkit.getWorld(point.world());
+    if (world == null) {
+      player.sendMessage(MINI.deserialize("<red>Le monde associÃ© n'est pas chargÃ©."));
+      return;
+    }
+    player.teleport(
+        new org.bukkit.Location(
+            world, point.x(), point.y(), point.z(), point.yaw(), point.pitch()));
+  }
+
+  private static String safe(Throwable failure) {
+    Throwable cause =
+        failure instanceof CompletionException && failure.getCause() != null
+            ? failure.getCause()
+            : failure;
+    return cause.getMessage() == null ? cause.getClass().getSimpleName() : cause.getMessage();
+  }
+
+  private static World loadEditingWorld(MapDefinition definition) {
+    World loaded = org.bukkit.Bukkit.getWorld(definition.world());
+    if (loaded != null) {
+      return loaded;
+    }
+    java.nio.file.Path root =
+        org.bukkit.Bukkit.getWorldContainer().toPath().toAbsolutePath().normalize();
+    java.nio.file.Path candidate = root.resolve(definition.world()).toAbsolutePath().normalize();
+    if (!candidate.startsWith(root) || !java.nio.file.Files.isDirectory(candidate)) {
+      return null;
+    }
+    return org.bukkit.Bukkit.createWorld(new WorldCreator(definition.world()));
+  }
+
+  private record ValidationItem(
+      String title,
+      String type,
+      String message,
+      String solution,
+      Optional<MapPoint> position,
+      Material material) {}
+}
