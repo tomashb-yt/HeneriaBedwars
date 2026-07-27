@@ -31,6 +31,11 @@ gauche prépare le déplacement, un clic droit demande confirmation avant suppre
 duplique. Les objets couvrent barricade, Mystery Box, Pack-a-Punch, perk, piège, téléporteur,
 power, objectif, quête et boss. Leurs paramètres extensibles sont stockés dans `properties`.
 
+Une actualisation visuelle suit chaque placement, undo et redo. Des blocs d'affichage lumineux et
+des libellés identifient spawn joueur, spawns zombies, portes et fenêtres/barricades sans modifier
+la map. La Mystery Box place temporairement un coffre et le Pack-a-Punch un coffre de l'Ender ;
+les blocs d'origine sont restaurés au rafraîchissement ou à la fermeture de la session.
+
 Zones, portes et spawns possèdent des champs typés complets dans `MapDefinition`. Leur création en
 jeu fournit des valeurs sûres et leurs références de zone. Ces paramètres seront consommés par les
 futurs systèmes de gameplay sans migration du schéma.
@@ -69,5 +74,6 @@ Le moteur utilise le spawn joueur éditorial et les `ZombieSpawn` validés. Pour
 poids, capacité, manches, distances, types autorisés et cooldown alimentent la sélection runtime.
 Les objets `WEAPON_WALL`, `MYSTERY_BOX` et `PACK_A_PUNCH` sont consommés par le moteur d'armes.
 Une arme murale placée en jeu reçoit `starter_pistol`, un coût d'achat et un coût de munitions par
-défaut. Portes et barricades restent des données d'édition jusqu'à leur ticket gameplay ; le moteur
+défaut. Mystery Box et Pack-a-Punch deviennent des coffres visibles dans le clone de partie.
+Portes et barricades restent des données d'édition jusqu'à leur ticket gameplay ; le moteur
 d'ennemis ne les modifie pas directement.

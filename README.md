@@ -31,7 +31,7 @@ deux capacités. Les commandes de diagnostic sont regroupées sous `/zzombie`.
 Le Ticket 007 ajoute cinq armes YAML, munitions, rechargement, dégâts balistiques, achats muraux,
 Mystery Box, Pack-a-Punch et `/zweapon`.
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.8.0-SNAPSHOT.jar`.
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.9.1-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire
@@ -49,3 +49,11 @@ Nuke. Les armes murales, la Mystery Box et le Pack-a-Punch emploient le même `P
 Documentation : [économie](docs/ECONOMY_SYSTEM.md),
 [transactions](docs/TRANSACTION_SYSTEM.md), [achats](docs/PURCHASE_SYSTEM.md) et
 [bonus](docs/POWER_UP_SYSTEM.md).
+
+## Stabilisation 0.9.1
+
+Le clic droit des armes est désormais capturé même lorsque Paper pré-annule l'interaction de
+l'item. L'éditeur affiche des repères lumineux pour les spawns, portes et barricades, et matérialise
+la Mystery Box par un coffre et le Pack-a-Punch par un coffre de l'Ender. Ces deux stations sont
+également présentes dans les mondes de partie. Les zombies sont forcés en IA agressive, leurs
+contacts passent par les dégâts autoritaires du jeu et tout équipement vanilla aléatoire est retiré.

@@ -26,6 +26,7 @@ public final class EditorPlacementListener implements Listener {
   private final MapEditorService editors;
   private final EditorItemService items;
   private final GuiService guis;
+  private final MapVisualizationService visualizations;
   private final Clock clock;
   private final Executor mainThread;
 
@@ -33,11 +34,13 @@ public final class EditorPlacementListener implements Listener {
       MapEditorService editors,
       EditorItemService items,
       GuiService guis,
+      MapVisualizationService visualizations,
       Clock clock,
       Executor mainThread) {
     this.editors = editors;
     this.items = items;
     this.guis = guis;
+    this.visualizations = visualizations;
     this.clock = clock;
     this.mainThread = mainThread;
   }
@@ -75,6 +78,8 @@ public final class EditorPlacementListener implements Listener {
         .whenCompleteAsync(
             (definition, failure) -> {
               if (failure == null) {
+                visualizations.refreshEditor(
+                    event.getPlayer().getUniqueId(), event.getPlayer().getWorld(), definition);
                 event
                     .getPlayer()
                     .sendMessage(

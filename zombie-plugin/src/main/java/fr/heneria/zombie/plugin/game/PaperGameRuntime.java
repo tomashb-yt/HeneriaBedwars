@@ -23,6 +23,7 @@ import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.display.ContextScoreboardService;
 import fr.heneria.zombie.plugin.economy.PaperPowerUpService;
 import fr.heneria.zombie.plugin.economy.PointDisplayService;
+import fr.heneria.zombie.plugin.editor.MapVisualizationService;
 import fr.heneria.zombie.plugin.enemy.PaperZombieEngine;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.message.MessageService;
@@ -60,6 +61,7 @@ public final class PaperGameRuntime {
   private final fr.heneria.zombie.core.powerup.PowerUpService powerUps;
   private final PaperPowerUpService paperPowerUps;
   private final PointDisplayService pointDisplay;
+  private final MapVisualizationService visualizations;
   private final GameResultRepository results;
   private final RoundDifficultyCalculator difficulty = new RoundDifficultyCalculator();
   private final Logger logger;
@@ -83,6 +85,7 @@ public final class PaperGameRuntime {
       fr.heneria.zombie.core.powerup.PowerUpService powerUps,
       PaperPowerUpService paperPowerUps,
       PointDisplayService pointDisplay,
+      MapVisualizationService visualizations,
       GameResultRepository results,
       MessageService messages,
       Logger logger) {
@@ -100,6 +103,7 @@ public final class PaperGameRuntime {
     this.powerUps = powerUps;
     this.paperPowerUps = paperPowerUps;
     this.pointDisplay = pointDisplay;
+    this.visualizations = visualizations;
     this.results = results;
     this.messages = messages;
     this.logger = logger;
@@ -154,6 +158,14 @@ public final class PaperGameRuntime {
             instance.worldName().orElseThrow(),
             tick + game.configuration().countdownSeconds() * 20L);
     runtimes.put(instanceId, runtime);
+    World runtimeWorld = Bukkit.getWorld(runtime.worldName);
+    if (runtimeWorld == null) {
+      runtimes.remove(instanceId);
+      games.remove(instanceId);
+      economies.remove(instanceId);
+      throw new IllegalStateException("Monde de partie introuvable");
+    }
+    visualizations.materializeRuntime(runtimeWorld, map);
     for (UUID playerId : instance.players()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player != null && !teleportToPlayerSpawn(runtime, player)) {
@@ -392,81 +404,7 @@ public final class PaperGameRuntime {
         .end(reason)
         .ifPresent(
             result ->
-                results
-                    .save(result.withEconomy(economyResult(gameId)))
-                    .exceptionally(
-                        failure -> {
-                          logger.severe(
-                              "Could not save game result " + gameId + ": " + failure.getMessage());
-                          return null;
-                        }));
-    runtime.endAt = tick + runtime.game.configuration().endScreenSeconds() * 20L;
-    runtime.bleedOut.clear();
-    runtime.revives.clear();
-    announce(runtime.game.snapshot().players().keySet(), "game.ended", "reason", reason.name());
-    spawner.removeAll(gameId, fr.heneria.zombie.core.enemy.ZombieRemovalReason.GAME_ENDED);
-    weapons.removeGame(gameId);
-    runtime.entities.clear();
-  }
-
-  public void shutdown() {
-    runtimes.keySet().forEach(id -> end(id, GameEndReason.SERVER_SHUTDOWN));
-    runtimes.values().forEach(runtime -> runtime.entities.keySet().forEach(spawner::remove));
-    runtimes.clear();
-    entityGames.clear();
-    games.clear();
-    economies.clear();
-    pointDisplay.clear();
-  }
-
-  public Collection<ZombieGame.Snapshot> snapshots() {
-    return games.snapshots();
-  }
-
-  public Optional<ZombieGame.Snapshot> snapshot(UUID id) {
-    return games.find(id).map(ZombieGame::snapshot);
-  }
-
-  public boolean forceNextRound(UUID id) {
-    RuntimeState runtime = runtimes.get(id);
-    if (runtime == null || runtime.game.snapshot().state() != GameState.ROUND_TRANSITION) {
-      return false;
-    }
-    runtime.nextActionAt = tick;
-    return true;
-  }
-
-  public boolean setRound(UUID id, int round) {
-    RuntimeState runtime = runtimes.get(id);
-    if (runtime == null
-        || round <= 0
-        || runtime.game.snapshot().state() != GameState.ROUND_TRANSITION) {
-      return false;
-    }
-    int enemies =
-        difficulty.enemyCount(round, activePlayers(runtime), runtime.game.configuration());
-    runtime.game.startRoundAt(round, enemies);
-    runtime.nextActionAt = tick + runtime.game.configuration().initialSpawnDelayTicks();
-    return true;
-  }
-
-  private void drive(RuntimeState runtime) {
-    runtime.game.expireDisconnectedPlayers();
-    ZombieGame.Snapshot snapshot = runtime.game.snapshot();
-    if (runtime.ending) {
-      if (tick >= runtime.endAt) {
-        finish(runtime);
-      }
-      return;
-    }
-    if (snapshot.state() == GameState.COUNTDOWN) {
-      if (activePlayers(runtime) < runtime.game.configuration().minimumPlayers()) {
-        if (runtime.game.configuration().cancelCountdownWhenInsufficient()) {
-          runtime.game.cancelCountdown();
-        }
-        return;
-      }
-      if (tick >= runtime.nextActionAt) {
+                reóÝí¢G§²ÚîÆ­yÚ      if (tick >= runtime.nextActionAt) {
         int enemies =
             difficulty.enemyCount(1, activePlayers(runtime), runtime.game.configuration());
         runtime.game.start(enemies);

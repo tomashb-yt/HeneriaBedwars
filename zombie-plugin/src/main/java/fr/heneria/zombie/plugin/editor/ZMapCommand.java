@@ -33,6 +33,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   private final InstanceCoordinator coordinator;
   private final MapPreviewService previews;
   private final PaperGameRuntime games;
+  private final MapVisualizationService visualizations;
   private final Executor mainThread;
 
   public ZMapCommand(
@@ -43,6 +44,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       InstanceCoordinator coordinator,
       MapPreviewService previews,
       PaperGameRuntime games,
+      MapVisualizationService visualizations,
       Executor mainThread) {
     this.editors = editors;
     this.validator = validator;
@@ -51,6 +53,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
     this.coordinator = coordinator;
     this.previews = previews;
     this.games = games;
+    this.visualizations = visualizations;
     this.mainThread = mainThread;
   }
 
@@ -139,6 +142,8 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
         .ifPresentOrElse(
             session -> {
               items.give(player, session);
+              visualizations.refreshEditor(
+                  player.getUniqueId(), player.getWorld(), session.definition());
               guis.openHome(player, new GuiId("editor-main"));
               player.sendMessage(MINI.deserialize("<green>Session d'édition ouverte."));
             },
@@ -148,6 +153,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
 
   private void leave(Player player) {
     player.closeInventory();
+    visualizations.clearEditor(player.getUniqueId());
     editors
         .leave(player.getUniqueId())
         .whenCompleteAsync(
@@ -197,6 +203,7 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
       return;
     }
     player.closeInventory();
+    visualizations.clearEditor(player.getUniqueId());
     player.sendMessage(MINI.deserialize("<yellow>Préparation de l'instance de test..."));
     editors
         .leave(player.getUniqueId())
@@ -249,11 +256,20 @@ public final class ZMapCommand implements CommandExecutor, TabCompleter {
   private void history(Player player, boolean undo) {
     var future = undo ? editors.undo(player.getUniqueId()) : editors.redo(player.getUniqueId());
     future.whenCompleteAsync(
-        (changed, failure) ->
-            player.sendMessage(
-                failure == null && changed
-                    ? MINI.deserialize("<green>Historique appliqué et sauvegardé.")
-                    : MINI.deserialize("<yellow>Aucune version disponible.")),
+        (changed, failure) -> {
+          if (failure == null && changed) {
+            editors
+                .session(player.getUniqueId())
+                .ifPresent(
+                    session ->
+                        visualizations.refreshEditor(
+                            player.getUniqueId(), player.getWorld(), session.definition()));
+          }
+          player.sendMessage(
+              failure == null && changed
+                  ? MINI.deserialize("<green>Historique appliqué et sauvegardé.")
+                  : MINI.deserialize("<yellow>Aucune version disponible."));
+        },
         mainThread);
   }
 

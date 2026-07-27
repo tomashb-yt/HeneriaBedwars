@@ -2,6 +2,26 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.9.1-SNAPSHOT — Stabilisation gameplay et édition
+
+### Corrigé
+
+- les armes traitent les clics droits pré-annulés par Paper et tirent avec les items sans action
+  vanilla ;
+- un contact natif de zombie déclenche désormais exactement une frappe du moteur de jeu ;
+- les zombies sont explicitement conscients et agressifs, et leur équipement vanilla aléatoire
+  est supprimé.
+
+### Ajouté
+
+- repères lumineux et libellés pour le spawn joueur, les spawns zombies, portes et barricades ;
+- coffre visible pour la Mystery Box et coffre de l'Ender visible pour le Pack-a-Punch ;
+- matérialisation automatique de ces stations dans chaque monde de partie jetable.
+
+### Modifié
+
+- version portée à `0.9.1-SNAPSHOT`.
+
 ## 0.9.0-SNAPSHOT — Ticket 008
 
 ### Ajouté

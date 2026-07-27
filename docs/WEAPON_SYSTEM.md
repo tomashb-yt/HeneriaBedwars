@@ -49,6 +49,11 @@ copier un YAML valide dans `plugins/HeneriaZombie/weapons`, puis exécuter `/zwe
 Les armes déjà distribuées conservent leur snapshot après reload. Les nouvelles distributions
 utilisent le registre validé le plus récent.
 
+Le listener de tir observe aussi les interactions pré-annulées par Paper : certains matériaux
+utilisés comme modèles d'armes, notamment l'armure de cheval, n'ont aucune action vanilla et
+produisent malgré tout un événement déjà annulé. Une arme reconnue reste la seule condition qui
+autorise alors le pipeline de tir.
+
 ## Intégration économique
 
 `PaperWeaponService` ne possède plus de passerelle booléenne de points. Un impact appelle

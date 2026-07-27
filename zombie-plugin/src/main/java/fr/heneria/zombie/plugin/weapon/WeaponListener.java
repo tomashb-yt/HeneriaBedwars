@@ -18,7 +18,7 @@ public final class WeaponListener implements Listener {
     this.weapons = weapons;
   }
 
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
   public void onInteract(PlayerInteractEvent event) {
     if (event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND
         || (event.getAction() != Action.RIGHT_CLICK_AIR
@@ -33,8 +33,11 @@ public final class WeaponListener implements Listener {
       event.setCancelled(true);
       return;
     }
-    if (weapons.fire(event.getPlayer(), org.bukkit.Bukkit.getCurrentTick())) {
+    if (weapons.current(event.getPlayer()).isPresent()
+        && weapons.fire(event.getPlayer(), org.bukkit.Bukkit.getCurrentTick())) {
       event.setCancelled(true);
+      event.setUseInteractedBlock(org.bukkit.event.Event.Result.DENY);
+      event.setUseItemInHand(org.bukkit.event.Event.Result.DENY);
     }
   }
 

@@ -281,6 +281,34 @@ public final class PaperZombieEngine implements ZombieSpawner {
         .orElse(false);
   }
 
+  /**
+   * Converts a native Paper melee contact into the authoritative game damage path.
+   *
+   * <p>The native event is cancelled by the listener, so armor and Bukkit damage callbacks cannot
+   * apply a second hit.
+   */
+  public boolean attackPlayer(UUID entityId, Player target, long tick) {
+    ZombieInstance zombie = tracker.findByEntity(entityId).orElse(null);
+    if (zombie == null
+        || !Boolean.TRUE.equals(targetable.apply(zombie.gameId(), target.getUniqueId()))
+        || !zombie.canAttack(tick)) {
+      return false;
+    }
+    Entity entity = Bukkit.getEntity(entityId);
+    double maximumRange = zombie.definition().behavior().attackRange() + 0.75;
+    if (!(entity instanceof Mob mob)
+        || !mob.getWorld().equals(target.getWorld())
+        || mob.getLocation().distanceSquared(target.getLocation()) > maximumRange * maximumRange) {
+      return false;
+    }
+    zombie.target(target.getUniqueId(), tick);
+    zombie.state(ZombieState.ATTACKING);
+    zombie.attackedAt(tick);
+    playerDamage.damage(zombie, target, zombie.attributes().attackDamage());
+    abilities.onAttack(zombie, target, tick);
+    return true;
+  }
+
   public void removeAll(UUID gameId, ZombieRemovalReason reason) {
     for (ZombieInstance zombie : List.copyOf(tracker.game(gameId))) {
       remove(zombie, reason, null, false);
@@ -448,6 +476,7 @@ public final class PaperZombieEngine implements ZombieSpawner {
       Mob mob,
       ZombieDefinition definition,
       ZombieAttributeCalculator.CalculatedAttributes calculated) {
+    mob.setAware(true);
     mob.setRemoveWhenFarAway(definition.environment().removeWhenFarAway());
     mob.setCanPickupItems(false);
     mob.setPersistent(true);
@@ -456,6 +485,7 @@ public final class PaperZombieEngine implements ZombieSpawner {
     mob.customName(MiniMessage.miniMessage().deserialize(definition.displayName()));
     mob.setCustomNameVisible(definition.appearance().customNameVisible());
     if (mob instanceof org.bukkit.entity.Zombie zombie) {
+      zombie.setAggressive(true);
       zombie.setShouldBurnInDay(definition.environment().burnInDaylight());
     }
     if (mob instanceof Ageable ageable) {
@@ -489,6 +519,7 @@ public final class PaperZombieEngine implements ZombieSpawner {
     if (equipment == null) {
       return;
     }
+    equipment.clear();
     configured.forEach(
         (slot, materialName) -> {
           Material material = Material.matchMaterial(materialName);

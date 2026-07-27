@@ -43,9 +43,11 @@ public final class GameCombatListener implements Listener {
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onPlayerDamage(EntityDamageEvent event) {
     if (event instanceof EntityDamageByEntityEvent byEntity
-        && event.getEntity() instanceof Player
+        && event.getEntity() instanceof Player player
         && zombies.find(byEntity.getDamager().getUniqueId()).isPresent()) {
       event.setCancelled(true);
+      zombies.attackPlayer(
+          byEntity.getDamager().getUniqueId(), player, org.bukkit.Bukkit.getCurrentTick());
       return;
     }
     if (event.getEntity() instanceof Player player

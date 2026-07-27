@@ -170,3 +170,21 @@ Ces scénarios avec un client Minecraft n'ont pas été exécutés dans cet envi
 Le JAR `0.9.0-SNAPSHOT` a en revanche été démarré automatiquement sur Paper 1.21.11 build 132 avec
 Java 21 : chargement du plugin, création du lobby, quatre zombies, cinq armes, commandes et runtime
 ont terminé sans exception.
+
+## Stabilisation 0.9.1 — contrôles en jeu
+
+1. Ouvrir une map avec `/zmap edit <id>` et vérifier les repères du spawn joueur, des spawns
+   zombies, portes et fenêtres/barricades.
+2. Placer une Mystery Box et un Pack-a-Punch : un coffre et un coffre de l'Ender doivent apparaître,
+   puis les blocs d'origine doivent revenir avec `/zmap leave`.
+3. Lancer `/zmap test` et vérifier que ces deux coffres sont visibles dans le clone de partie.
+4. Tirer au clic droit avec le pistolet initial, vérifier son, munitions, impact et dégâts.
+5. Laisser plusieurs zombies rejoindre le joueur : ils doivent le cibler, le poursuivre et
+   infliger une seule frappe par cooldown sans passer passivement à côté.
+6. Vérifier que les zombies classiques n'ont aucune épée ; seuls les équipements déclarés dans
+   leur YAML doivent être visibles.
+
+Ces interactions nécessitent un client Minecraft et restent des contrôles manuels. Compilation,
+tests unitaires, formatage et assemblage sont automatisés par le quality gate. Le JAR
+`0.9.1-SNAPSHOT` a été démarré sur Paper 1.21.11 build 132 avec Java 21 : lobby, quatre types de
+zombies, cinq armes et runtime se sont initialisés sans exception.

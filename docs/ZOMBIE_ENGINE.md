@@ -23,6 +23,12 @@ atomiquement par `claimDeath`; récompense et compteur de manche ne peuvent êtr
 fois. Toute cible doit être vivante, non spectatrice, en ligne, dans la même partie et le même
 monde.
 
+Paper force chaque mob créé à rester conscient et agressif. Le moteur conserve la cible native
+pour la navigation, puis traduit aussi chaque contact natif en une frappe autoritaire soumise à la
+portée et au cooldown configurés. Les dégâts vanilla sont annulés afin qu'un contact ne frappe
+jamais deux fois. L'équipement généré aléatoirement par Minecraft est vidé avant d'appliquer
+l'équipement YAML.
+
 Les disparitions anormales libèrent le compteur vivant. `GAME_ENDED` et `ROUND_CANCELLED`
 nettoient sans récompense ni progression artificielle. La fin de partie appelle `removeAll` et
 libère les registres.

@@ -156,4 +156,15 @@ sont via `GameResultRepository`. Les tests avec un véritable client Paper reste
 Commandes utiles : `/zeconomy balance <joueur>`, `/zeconomy history <joueur>`,
 `/zeconomy givepowerup <type> [partie]` et `/zeconomy debug <partie>`.
 
+## Stabilisation 0.9.1
+
+`WeaponListener` accepte les clics droits que Paper marque déjà comme annulés pour les matériaux
+sans usage vanilla. `MapVisualizationService` possède les repères d'édition et restaure les blocs
+remplacés à la fermeture ; les mondes de partie étant jetables, il y matérialise directement les
+stations Mystery Box et Pack-a-Punch.
+
+Le moteur Paper force les mobs à être conscients et agressifs. Les contacts natifs sont annulés
+puis traduits vers `PaperZombieEngine.attackPlayer`, qui conserve portée, ciblage, cooldown,
+capacités et chemin de dégâts central. L'équipement est vidé avant application de la configuration.
+
 Le prochain ticket recommandé est le système complet de perks et de machines à atouts.
