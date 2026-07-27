@@ -130,3 +130,30 @@ une manche. `/zweapon` et le catalogue GUI fournissent diagnostic, distribution 
 Voir `WEAPON_SYSTEM.md`.
 
 Le prochain ticket recommandé est l'économie complète : portes, achats partagés et transactions.
+
+## État après le Ticket 008
+
+Le Ticket 008 est terminé. Les classes centrales ajoutées sont `EconomyService`, `GameEconomy`,
+`PlayerWallet`, `TransactionService`, `PurchaseService`, `PriceResolver`, `RewardService`,
+`PowerUpService` et `PowerUpDropService`. Les adaptateurs Paper sont `PaperPowerUpService`,
+`PointDisplayService` et `ZEconomyCommand`.
+
+Les armes/recharges murales, la Mystery Box et le Pack-a-Punch utilisent réellement
+`PurchaseService`. Les récompenses d'impact, élimination, assistance et réanimation utilisent
+`RewardService`. Double Points, Max Ammo, Insta-Kill et Nuke sont jouables ; chance, plafonds,
+cooldowns et durées sont configurables.
+
+L'idempotence conserve un `operationId` pendant toute la partie. Paper compose partie, joueur,
+cible/objet et tick ; une commande administrative utilise sa séquence d'exécution. Un échec
+d'attribution après débit déclenche un remboursement qui référence le débit et ne peut dépasser
+son montant.
+
+Limites connues : seul le financement individuel est actif ; les portefeuilles d'équipe et
+contributions sont préparés par les enums mais non branchés. Les événements sont internes et
+synchrones. Les transactions détaillées ne sont pas persistées ; les agrégats de fin de partie le
+sont via `GameResultRepository`. Les tests avec un véritable client Paper restent manuels.
+
+Commandes utiles : `/zeconomy balance <joueur>`, `/zeconomy history <joueur>`,
+`/zeconomy givepowerup <type> [partie]` et `/zeconomy debug <partie>`.
+
+Le prochain ticket recommandé est le système complet de perks et de machines à atouts.

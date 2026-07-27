@@ -149,3 +149,16 @@ de la partie, sans tâche par joueur ou par item.
 Le moteur d'armes calcule un dégât et le transmet à `PaperZombieEngine.damageFromWeapon`. Seuls
 `ZombieDamageService` et la procédure idempotente de retrait attribuent mort et récompense. Une
 arme ne supprime jamais directement une entité.
+
+## ADR-008 — économie transactionnelle par partie
+
+Décision : utiliser un agrégat en mémoire par partie, des montants `long` et une mutation unique
+via `TransactionService`. Les achats appliquent une compensation plutôt qu'une transaction
+distribuée : débit, attribution, puis remboursement lié au débit si nécessaire.
+
+Raisons : accès constant, isolation stricte, aucun disque dans la boucle serveur, diagnostic
+complet et nettoyage déterministe. Les clés idempotentes restent en mémoire jusqu'à la fin de la
+partie, même si les détails anciens du journal sont purgés.
+
+Conséquence : le financement individuel est sûr maintenant ; les économies d'équipe et
+contributions nécessiteront leurs propres agrégats, sans réutiliser un portefeuille joueur.

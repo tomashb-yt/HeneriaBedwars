@@ -1,6 +1,12 @@
 package fr.heneria.zombie.plugin.game;
 
 import fr.heneria.zombie.core.config.ZombieSettings.GameplayOptions;
+import fr.heneria.zombie.core.economy.EconomyPolicy;
+import fr.heneria.zombie.core.economy.EconomyService;
+import fr.heneria.zombie.core.economy.PurchaseService;
+import fr.heneria.zombie.core.economy.RewardService;
+import fr.heneria.zombie.core.economy.TransactionService;
+import fr.heneria.zombie.core.economy.TransactionType;
 import fr.heneria.zombie.core.editor.MapDefinition;
 import fr.heneria.zombie.core.editor.MapRegistry;
 import fr.heneria.zombie.core.game.GameEndReason;
@@ -15,6 +21,8 @@ import fr.heneria.zombie.core.game.ZombieSpawner;
 import fr.heneria.zombie.core.instance.GameInstanceSnapshot;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.display.ContextScoreboardService;
+import fr.heneria.zombie.plugin.economy.PaperPowerUpService;
+import fr.heneria.zombie.plugin.economy.PointDisplayService;
 import fr.heneria.zombie.plugin.enemy.PaperZombieEngine;
 import fr.heneria.zombie.plugin.instance.InstanceCoordinator;
 import fr.heneria.zombie.plugin.message.MessageService;
@@ -45,6 +53,13 @@ public final class PaperGameRuntime {
   private final ContextScoreboardService scoreboards;
   private final PaperZombieEngine spawner;
   private final PaperWeaponService weapons;
+  private final EconomyService economies;
+  private final TransactionService transactions;
+  private final PurchaseService purchases;
+  private final RewardService rewards;
+  private final fr.heneria.zombie.core.powerup.PowerUpService powerUps;
+  private final PaperPowerUpService paperPowerUps;
+  private final PointDisplayService pointDisplay;
   private final GameResultRepository results;
   private final RoundDifficultyCalculator difficulty = new RoundDifficultyCalculator();
   private final Logger logger;
@@ -61,6 +76,13 @@ public final class PaperGameRuntime {
       ContextScoreboardService scoreboards,
       PaperZombieEngine spawner,
       PaperWeaponService weapons,
+      EconomyService economies,
+      TransactionService transactions,
+      PurchaseService purchases,
+      RewardService rewards,
+      fr.heneria.zombie.core.powerup.PowerUpService powerUps,
+      PaperPowerUpService paperPowerUps,
+      PointDisplayService pointDisplay,
       GameResultRepository results,
       MessageService messages,
       Logger logger) {
@@ -71,6 +93,13 @@ public final class PaperGameRuntime {
     this.scoreboards = scoreboards;
     this.spawner = spawner;
     this.weapons = weapons;
+    this.economies = economies;
+    this.transactions = transactions;
+    this.purchases = purchases;
+    this.rewards = rewards;
+    this.powerUps = powerUps;
+    this.paperPowerUps = paperPowerUps;
+    this.pointDisplay = pointDisplay;
     this.results = results;
     this.messages = messages;
     this.logger = logger;
@@ -91,8 +120,33 @@ public final class PaperGameRuntime {
       throw new IllegalStateException("Spawn joueur ou zombie manquant");
     }
     ZombieGame game = games.create(instanceId, instance.mapId(), configuration());
-    instance.players().forEach(game::addPlayer);
-    game.prepare();
+    var economy = configurations.current().settings().economy();
+    economies.create(
+        instanceId,
+        new EconomyPolicy(
+            economy.maximumBalance(),
+            fr.heneria.zombie.core.economy.OverflowPolicy.valueOf(
+                economy.overflowPolicy().toUpperCase(java.util.Locale.ROOT)),
+            economy.allowNegativeBalance(),
+            economy.maximumHistoryEntries()));
+    instance
+        .players()
+        .forEach(
+            playerId -> {
+              game.addPlayer(playerId);
+              transactions.openWallet(
+                  instanceId,
+                  playerId,
+                  economy.startingPoints(),
+                  "starting-points:" + instanceId + ":" + playerId);
+            });
+    try {
+      game.prepare();
+    } catch (RuntimeException failure) {
+      economies.remove(instanceId);
+      games.remove(instanceId);
+      throw failure;
+    }
     RuntimeState runtime =
         new RuntimeState(
             game,
@@ -105,6 +159,7 @@ public final class PaperGameRuntime {
       if (player != null && !teleportToPlayerSpawn(runtime, player)) {
         runtimes.remove(instanceId);
         games.remove(instanceId);
+        economies.remove(instanceId);
         throw new IllegalStateException("Téléportation impossible vers le spawn joueur configuré");
       }
       if (player != null) {
@@ -120,6 +175,11 @@ public final class PaperGameRuntime {
     if (runtime == null || !runtime.game.addPlayer(playerId)) {
       return;
     }
+    transactions.openWallet(
+        instanceId,
+        playerId,
+        configurations.current().settings().economy().startingPoints(),
+        "join-points:" + instanceId + ":" + playerId);
     Player player = Bukkit.getPlayer(playerId);
     if (player != null && !teleportToPlayerSpawn(runtime, player)) {
       runtime.game.leave(playerId);
@@ -180,6 +240,8 @@ public final class PaperGameRuntime {
     tick++;
     spawner.tick(tick);
     weapons.tick(tick);
+    paperPowerUps.tick();
+    pointDisplay.tick();
     for (RuntimeState runtime : new ArrayList<>(runtimes.values())) {
       try {
         drive(runtime);
@@ -197,10 +259,16 @@ public final class PaperGameRuntime {
   }
 
   public boolean zombieDefeated(UUID entityId, UUID killerId) {
-    return zombieRemoved(entityId, killerId, 0);
+    return zombieRemoved(
+        entityId, killerId, 0, fr.heneria.zombie.core.economy.TransactionReason.ZOMBIE_KILL, null);
   }
 
-  public boolean zombieRemoved(UUID entityId, UUID killerId, int pointsReward) {
+  public boolean zombieRemoved(
+      UUID entityId,
+      UUID killerId,
+      int pointsReward,
+      fr.heneria.zombie.core.economy.TransactionReason rewardReason,
+      Location deathLocation) {
     UUID gameId = entityGames.remove(entityId);
     if (gameId == null) {
       return false;
@@ -214,7 +282,18 @@ public final class PaperGameRuntime {
       runtime.aliveBySpawn.computeIfPresent(
           removed.spawnId(), (ignored, count) -> count <= 1 ? null : count - 1);
     }
-    runtime.game.zombieDefeated(killerId, pointsReward);
+    int round = runtime.game.snapshot().round().map(value -> value.number()).orElse(0);
+    rewards.kill(
+        gameId,
+        killerId,
+        entityId,
+        pointsReward,
+        rewardReason,
+        "zombie-kill:" + gameId + ":" + entityId);
+    runtime.game.zombieDefeated(killerId);
+    if (killerId != null && pointsReward > 0) {
+      paperPowerUps.zombieDefeated(gameId, round, deathLocation);
+    }
     return true;
   }
 
@@ -234,16 +313,10 @@ public final class PaperGameRuntime {
     return runtime == null ? Optional.empty() : Optional.of(runtime.map);
   }
 
-  public boolean spendPoints(UUID gameId, UUID playerId, int amount) {
-    RuntimeState runtime = runtimes.get(gameId);
-    return runtime != null && runtime.game.spendPoints(playerId, amount);
-  }
-
-  public void weaponHit(
-      UUID gameId, UUID playerId, int reward, double appliedDamage, boolean headshot) {
+  public void weaponHit(UUID gameId, UUID playerId, double appliedDamage, boolean headshot) {
     RuntimeState runtime = runtimes.get(gameId);
     if (runtime != null) {
-      runtime.game.weaponHit(playerId, reward, appliedDamage, headshot);
+      runtime.game.weaponHit(playerId, appliedDamage, headshot);
     }
   }
 
@@ -320,7 +393,7 @@ public final class PaperGameRuntime {
         .ifPresent(
             result ->
                 results
-                    .save(result)
+                    .save(result.withEconomy(economyResult(gameId)))
                     .exceptionally(
                         failure -> {
                           logger.severe(
@@ -342,6 +415,8 @@ public final class PaperGameRuntime {
     runtimes.clear();
     entityGames.clear();
     games.clear();
+    economies.clear();
+    pointDisplay.clear();
   }
 
   public Collection<ZombieGame.Snapshot> snapshots() {
@@ -569,6 +644,18 @@ public final class PaperGameRuntime {
               }
               if (runtime.game.revive(entry.getKey(), attempt.reviver)) {
                 runtime.bleedOut.remove(entry.getKey());
+                rewards.revive(
+                    runtime.game.id(),
+                    attempt.reviver,
+                    entry.getKey(),
+                    "revive:"
+                        + runtime.game.id()
+                        + ":"
+                        + attempt.reviver
+                        + ":"
+                        + entry.getKey()
+                        + ":"
+                        + tick);
                 target.setGameMode(GameMode.ADVENTURE);
                 target.setHealth(
                     Math.min(maximumHealth(target), runtime.game.configuration().reviveHealth()));
@@ -585,7 +672,14 @@ public final class PaperGameRuntime {
     for (UUID playerId : snapshot.players().keySet()) {
       Player player = Bukkit.getPlayer(playerId);
       if (player != null) {
-        scoreboards.updateGame(player, snapshot);
+        long balance =
+            economies.wallet(runtime.game.id(), playerId).map(value -> value.balance()).orElse(0L);
+        scoreboards.updateGame(
+            player,
+            snapshot,
+            balance,
+            powerUps.pointMultiplier(runtime.game.id()),
+            powerUps.active(runtime.game.id()).size());
       }
     }
   }
@@ -601,6 +695,47 @@ public final class PaperGameRuntime {
     }
     coordinator.stop(runtime.game.id());
     games.remove(runtime.game.id());
+    paperPowerUps.clear(runtime.game.id());
+    rewards.clear(runtime.game.id());
+    purchases.removeGame(runtime.game.id());
+    economies.remove(runtime.game.id());
+  }
+
+  private Map<UUID, fr.heneria.zombie.core.game.GameResult.EconomyPlayerResult> economyResult(
+      UUID gameId) {
+    var economy = economies.find(gameId).orElse(null);
+    if (economy == null) {
+      return Map.of();
+    }
+    LinkedHashMap<UUID, fr.heneria.zombie.core.game.GameResult.EconomyPlayerResult> values =
+        new LinkedHashMap<>();
+    economy
+        .snapshot()
+        .wallets()
+        .forEach(
+            (playerId, wallet) -> {
+              var history = economy.history(playerId);
+              long purchases =
+                  history.stream().filter(value -> value.type() == TransactionType.DEBIT).count();
+              long largest =
+                  history.stream()
+                      .filter(value -> value.type() == TransactionType.DEBIT)
+                      .mapToLong(value -> value.amount())
+                      .max()
+                      .orElse(0);
+              values.put(
+                  playerId,
+                  new fr.heneria.zombie.core.game.GameResult.EconomyPlayerResult(
+                      wallet.totalEarned(),
+                      wallet.totalSpent(),
+                      wallet.totalRefunded(),
+                      wallet.balance(),
+                      wallet.transactionCount(),
+                      purchases,
+                      largest,
+                      paperPowerUps.collected(gameId, playerId)));
+            });
+    return Map.copyOf(values);
   }
 
   private int activePlayers(RuntimeState runtime) {

@@ -15,3 +15,10 @@ Ticket 006 remplace l'adaptateur temporaire. Une apparition réussie est enregis
 spawn, partie et manche. Une mort ou disparition anormale retire exactement un vivant ; les causes
 de fin/annulation nettoient sans fausser les compteurs. La sélection respecte poids, manches,
 zones, pools, plafond par type, capacité et cooldown du spawn.
+
+## Interactions économiques de manche
+
+Chaque mort libère son entrée de contribution, attribue une seule récompense puis tente un drop
+avec le numéro de manche courant. Le plafond de drops est indexé par couple partie/manche. Les
+récompenses de fin de manche et de réparation sont représentées par des raisons dédiées mais
+restent désactivées tant que leurs gameplays ne sont pas livrés.

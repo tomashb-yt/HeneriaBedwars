@@ -29,3 +29,13 @@ idempotente et secours anti-blocage.
 Les armes de départ, armes murales, munitions, Mystery Box et Pack-a-Punch sont actifs depuis le
 Ticket 007. Les coûts débitent les points de la partie et les dégâts passent par le moteur
 d'ennemis. Portes, barricades, courant et atouts restent réservés aux tickets suivants.
+
+## Économie commune
+
+Les impacts, éliminations, assistances et réanimations alimentent désormais le portefeuille de la
+partie. Les achats muraux, Mystery Box et Pack-a-Punch utilisent un pipeline commun avec
+remboursement. Les futurs perks, portes, pièges et téléporteurs disposent déjà de types d'achat et
+de raisons de transaction dédiés, sans gameplay factice.
+
+Les bonus Double Points, Max Ammo, Insta-Kill et Nuke sont collectables sur les morts de zombies.
+Leur logique est détaillée dans `POWER_UP_SYSTEM.md`.

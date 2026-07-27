@@ -115,6 +115,50 @@ public final class ZombieSettingsValidator {
     } catch (IllegalArgumentException invalid) {
       error(issues, "game/players/rounds", invalid.getMessage());
     }
+    var economy = settings.economy();
+    if (economy.startingPoints() < 0
+        || economy.maximumBalance() < economy.startingPoints()
+        || economy.minimumPrice() < 0
+        || economy.maximumPrice() < economy.minimumPrice()
+        || economy.maximumHitReward() < 0
+        || economy.fixedAssistReward() < 0
+        || economy.reviveReward() < 0
+        || economy.reviveAntiFarmSeconds() < 0
+        || economy.maximumHistoryEntries() < 1
+        || economy.displayGroupWindowTicks() < 1) {
+      error(issues, "economy", "Economy amounts and limits are inconsistent");
+    }
+    if (!Double.isFinite(economy.minimumAssistPercentage())
+        || economy.minimumAssistPercentage() < 0
+        || economy.minimumAssistPercentage() > 1) {
+      error(
+          issues,
+          "economy.assists.minimum-damage-percentage",
+          "Assist percentage must be between 0 and 1");
+    }
+    try {
+      fr.heneria.zombie.core.economy.OverflowPolicy.valueOf(
+          economy.overflowPolicy().toUpperCase(Locale.ROOT));
+    } catch (IllegalArgumentException invalid) {
+      error(issues, "economy.overflow-policy", "Unknown overflow policy");
+    }
+    try {
+      fr.heneria.zombie.core.economy.PriceResolver.Rounding.valueOf(
+          economy.priceRounding().toUpperCase(Locale.ROOT));
+    } catch (IllegalArgumentException invalid) {
+      error(issues, "economy.prices.rounding", "Unknown price rounding policy");
+    }
+    var powerUps = settings.powerUps();
+    if (!Double.isFinite(powerUps.baseDropChance())
+        || powerUps.baseDropChance() < 0
+        || powerUps.baseDropChance() > 1
+        || powerUps.maximumDropsPerRound() < 0
+        || powerUps.minimumSecondsBetweenDrops() < 0
+        || powerUps.dropLifetimeSeconds() < 0
+        || powerUps.doublePointsDurationSeconds() < 0
+        || powerUps.instaKillDurationSeconds() < 0) {
+      error(issues, "power-ups", "Drop probabilities, caps and durations are invalid");
+    }
     if (!settings.documentation().requireContextUpdate()) {
       issues.add(
           new ConfigurationIssue(

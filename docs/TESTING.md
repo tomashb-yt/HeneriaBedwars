@@ -138,3 +138,35 @@ constitue pas une promesse de capacité tant que ces mesures serveur ne sont pas
 Le thread Paper ne doit effectuer aucune copie de modèle. Un échec de déchargement doit préserver
 les fichiers. Une erreur de création ne doit laisser aucune instance active. Aucun test ne doit
 dépendre d'un ordre ou d'une connexion réseau.
+
+## Ticket 008 — économie et bonus
+
+Les tests automatisés couvrent création et nettoyage des portefeuilles, points de départ, crédit,
+débit, fonds insuffisants, montant invalide, plafond, idempotence, agrégats, remboursements partiels
+et complets, achat réussi, échec d'attribution compensé, prix, multiplicateurs, arrondi, Double
+Points, cumul, expiration, création/collecte/double collecte/expiration/plafond des drops et
+isolation de deux parties.
+
+Validation manuelle avec Paper 1.21.x :
+
+1. Démarrer une partie et vérifier les points de départ avec `/zeconomy balance <joueur>`.
+2. Toucher puis tuer un zombie et vérifier l'actionbar, le solde et l'historique.
+3. Faire contribuer deux joueurs au même zombie et vérifier la récompense d'assistance.
+4. Réanimer un joueur deux fois rapidement et vérifier la fenêtre anti-farm.
+5. Acheter une arme murale, puis tenter un achat trop coûteux.
+6. Utiliser la Mystery Box et le Pack-a-Punch ; provoquer si possible un échec d'attribution et
+   vérifier le remboursement.
+7. Double-cliquer une interaction et vérifier l'absence de double débit au même tick.
+8. Exécuter `/zeconomy givepowerup DOUBLE_POINTS`, tuer un zombie puis attendre l'expiration.
+9. Tester `MAX_AMMO`, `INSTA_KILL` et `NUKE` et vérifier qu'ils passent par les moteurs existants.
+10. Laisser un drop expirer, puis collecter un autre drop et tenter une seconde collecte.
+11. Lancer deux parties et comparer `/zeconomy debug <game>` pour vérifier l'isolation.
+12. Arrêter une partie et vérifier la suppression de ses drops, bonus, opérations et transactions
+    sans affecter l'autre.
+
+Ces scénarios avec un client Minecraft n'ont pas été exécutés dans cet environnement. Ils doivent
+être réalisés sur le serveur de validation avant une mise en production publique.
+
+Le JAR `0.9.0-SNAPSHOT` a en revanche été démarré automatiquement sur Paper 1.21.11 build 132 avec
+Java 21 : chargement du plugin, création du lobby, quatre zombies, cinq armes, commandes et runtime
+ont terminé sans exception.

@@ -33,3 +33,11 @@ La navigation `GROUND` utilise l'IA native stable de Paper, sans NMS. Les modes 
 portes et barricades ont leurs contrats métier, mais leur gameplay arrivera avec leurs systèmes
 dédiés. La téléportation anti-blocage revient au spawn d'origine après trois tentatives de
 recalcul. Les tests de charge réels en serveur restent à mesurer.
+
+## Récompenses et bonus
+
+Le moteur retourne uniquement les dégâts réellement appliqués et la récompense configurée ; il ne
+modifie aucun solde. `RewardService` déduplique les impacts et la mort, conserve les contributions
+pour les assistances puis les efface. La position de mort est transmise à l'adaptateur de drops.
+Nuke et Insta-Kill repassent par `ZombieDamageService`, et la protection `claimDeath` garantit
+qu'une mort concurrente ne récompense jamais deux fois.

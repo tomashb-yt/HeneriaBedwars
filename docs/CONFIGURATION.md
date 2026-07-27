@@ -152,3 +152,15 @@ dispersion, recul, pénétration, prix, poids Mystery Box, sons, effets et nivea
 Les cinq exemples embarqués sont installés sans écraser les fichiers existants. `/zweapon reload`
 charge et valide hors thread serveur, puis active le registre en une opération. Un candidat
 invalide conserve le snapshot précédent ; les armes runtime existantes ne changent pas.
+
+## Économie et bonus
+
+`economy` configure activation, points de départ, plafond, politique de débordement, solde négatif,
+bornes et arrondi des prix, récompenses, assistances, réanimation, taille du journal et fenêtre
+d'affichage. `power-ups` configure activation, drops, probabilité, plafond par manche, cooldown,
+durée de vie et durées de Double Points/Insta-Kill.
+
+Les montants doivent être positifs ou nuls, les probabilités comprises entre 0 et 1, les durées
+non négatives, le journal et la fenêtre d'affichage strictement positifs. Les noms valides sont
+`CLAMP`, `REJECT`, `LOG_AND_CLAMP` et `FLOOR`, `CEIL`, `NEAREST`. Une erreur rejette le snapshot
+complet et conserve la configuration active.

@@ -86,6 +86,45 @@ players:
     revive-duration-seconds: 5
     revive-health: 8.0
 
+economy:
+  enabled: true
+  starting-points:
+    default: 500
+  maximum-balance: 999999999
+  overflow-policy: LOG_AND_CLAMP
+  allow-negative-balance: false
+  prices:
+    rounding: NEAREST
+    minimum-price: 0
+    maximum-price: 999999999
+  combat-rewards:
+    maximum-hit-reward-per-attack: 10
+  assists:
+    enabled: true
+    minimum-damage-percentage: 0.15
+    fixed-points: 20
+  revive-reward:
+    points: 100
+    prevent-farming-window-seconds: 60
+  transaction-history:
+    maximum-entries-per-player: 1000
+  display:
+    group-rewards-window-ticks: 5
+
+power-ups:
+  enabled: true
+  drops:
+    enabled: true
+    base-chance: 0.02
+    maximum-drops-per-round: 4
+    minimum-seconds-between-drops: 20
+    lifetime-seconds: 30
+  definitions:
+    double_points:
+      duration-seconds: 30
+    insta_kill:
+      duration-seconds: 30
+
 rounds:
   maximum-round: -1
   first-round-delay-seconds: 3

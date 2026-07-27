@@ -95,3 +95,15 @@ instances sans exposer de collection mutable.
 UUID runtime, partie, propriétaire, snapshot de définition, chargeur, réserve, cooldown,
 rechargement, niveau Pack-a-Punch et statistiques. `WeaponService` indexe les instances par UUID,
 joueur et partie, puis supprime tous les index lors du nettoyage d'une partie.
+
+## Modèles économiques
+
+`PlayerWallet` expose un snapshot contenant `balance`, `totalEarned`, `totalSpent`,
+`totalRefunded`, `transactionCount` et la dernière transaction. `Transaction` est un record
+immuable avec UUID, partie, joueur, type, raison, montant, soldes avant/après, instant,
+`operationId` et métadonnées.
+
+`GameEconomy` indexe portefeuilles, opérations, transactions et remboursements. `GameResult`
+contient désormais un `EconomyPlayerResult` par joueur pour la persistance des agrégats. Les
+`PowerUpInstance` et `PowerUpDrop` sont des snapshots immuables ; leur état mutable reste encapsulé
+dans les services.

@@ -232,7 +232,13 @@ public final class PaperZombieEngine implements ZombieSpawner {
           result.headshot()
               ? zombie.definition().rewards().pointsOnHeadshotKill()
               : zombie.definition().rewards().pointsOnKill();
-      remove(zombie, reason, attackerId, true, reward);
+      fr.heneria.zombie.core.economy.TransactionReason rewardReason =
+          result.headshot()
+              ? fr.heneria.zombie.core.economy.TransactionReason.HEADSHOT_KILL
+              : type == ZombieDamageType.MELEE
+                  ? fr.heneria.zombie.core.economy.TransactionReason.MELEE_KILL
+                  : fr.heneria.zombie.core.economy.TransactionReason.ZOMBIE_KILL;
+      remove(zombie, reason, attackerId, true, reward, rewardReason);
     }
     return new WeaponDamageResult(
         true,
@@ -401,7 +407,13 @@ public final class PaperZombieEngine implements ZombieSpawner {
 
   private void remove(
       ZombieInstance zombie, ZombieRemovalReason reason, UUID killerId, boolean reward) {
-    remove(zombie, reason, killerId, reward, 0);
+    remove(
+        zombie,
+        reason,
+        killerId,
+        reward,
+        0,
+        fr.heneria.zombie.core.economy.TransactionReason.ZOMBIE_KILL);
   }
 
   private void remove(
@@ -409,7 +421,8 @@ public final class PaperZombieEngine implements ZombieSpawner {
       ZombieRemovalReason reason,
       UUID killerId,
       boolean reward,
-      int points) {
+      int points,
+      fr.heneria.zombie.core.economy.TransactionReason rewardReason) {
     if (!zombie.claimDeath(reason)) {
       return;
     }
@@ -422,7 +435,13 @@ public final class PaperZombieEngine implements ZombieSpawner {
     }
     tracker.unregister(zombie.id());
     zombie.completeRemoval();
-    removals.removed(zombie, reason, killerId, reward ? points : 0);
+    removals.removed(
+        zombie,
+        reason,
+        killerId,
+        reward ? points : 0,
+        rewardReason,
+        entity == null ? null : entity.getLocation());
   }
 
   private void applyEntity(
@@ -517,7 +536,12 @@ public final class PaperZombieEngine implements ZombieSpawner {
   @FunctionalInterface
   public interface RemovalGateway {
     void removed(
-        ZombieInstance zombie, ZombieRemovalReason reason, UUID killerId, int pointsReward);
+        ZombieInstance zombie,
+        ZombieRemovalReason reason,
+        UUID killerId,
+        int pointsReward,
+        fr.heneria.zombie.core.economy.TransactionReason rewardReason,
+        Location deathLocation);
   }
 
   public record WeaponDamageResult(

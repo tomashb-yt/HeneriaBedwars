@@ -2,6 +2,24 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.9.0-SNAPSHOT — Ticket 008
+
+### Ajouté
+
+- portefeuilles `long` isolés, transactions immuables, journal borné et idempotence ;
+- achats atomiques, résolution de prix et remboursements complets ou partiels ;
+- récompenses d'impact, mort, assistance et réanimation avec anti-farm ;
+- Double Points, Max Ammo, Insta-Kill, Nuke et drops configurables ;
+- commande `/zeconomy`, feedback groupé et scoreboard économique ;
+- agrégats financiers de fin de partie et tests du domaine.
+- démarrage du JAR validé sur Paper 1.21.11 build 132 avec Java 21.
+
+### Modifié
+
+- armes murales, Mystery Box et Pack-a-Punch utilisent `PurchaseService` ;
+- le moteur de jeu ne stocke et ne modifie plus directement les points ;
+- version portée à `0.9.0-SNAPSHOT`.
+
 ## 0.8.0-SNAPSHOT — Ticket 007
 
 ### Ajouté

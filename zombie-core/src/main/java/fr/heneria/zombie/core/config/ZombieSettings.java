@@ -29,6 +29,8 @@ public record ZombieSettings(
     WorldRuleOptions worldRules,
     GuiOptions gui,
     GameplayOptions gameplay,
+    EconomyOptions economy,
+    PowerUpOptions powerUps,
     DocumentationOptions documentation) {
 
   /** Validates mandatory nested records. */
@@ -43,6 +45,8 @@ public record ZombieSettings(
     Objects.requireNonNull(worldRules, "worldRules");
     Objects.requireNonNull(gui, "gui");
     Objects.requireNonNull(gameplay, "gameplay");
+    Objects.requireNonNull(economy, "economy");
+    Objects.requireNonNull(powerUps, "powerUps");
     Objects.requireNonNull(documentation, "documentation");
   }
 
@@ -256,6 +260,41 @@ public record ZombieSettings(
       int reviveSeconds,
       double reviveHealth,
       int pointsPerKill) {}
+
+  /** Validated session economy, pricing, reward and history options. */
+  public record EconomyOptions(
+      boolean enabled,
+      long startingPoints,
+      long maximumBalance,
+      String overflowPolicy,
+      boolean allowNegativeBalance,
+      String priceRounding,
+      long minimumPrice,
+      long maximumPrice,
+      long maximumHitReward,
+      boolean assistsEnabled,
+      double minimumAssistPercentage,
+      long fixedAssistReward,
+      long reviveReward,
+      int reviveAntiFarmSeconds,
+      int maximumHistoryEntries,
+      int displayGroupWindowTicks) {
+    public EconomyOptions {
+      Objects.requireNonNull(overflowPolicy, "overflowPolicy");
+      Objects.requireNonNull(priceRounding, "priceRounding");
+    }
+  }
+
+  /** Shared power-up and drop policy options. */
+  public record PowerUpOptions(
+      boolean enabled,
+      boolean dropsEnabled,
+      double baseDropChance,
+      int maximumDropsPerRound,
+      int minimumSecondsBetweenDrops,
+      int dropLifetimeSeconds,
+      int doublePointsDurationSeconds,
+      int instaKillDurationSeconds) {}
 
   /**
    * Documentation policy.

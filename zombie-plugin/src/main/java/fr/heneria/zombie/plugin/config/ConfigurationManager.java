@@ -5,12 +5,14 @@ import fr.heneria.zombie.core.config.ValidationSeverity;
 import fr.heneria.zombie.core.config.ZombieSettings;
 import fr.heneria.zombie.core.config.ZombieSettings.ChatOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.DocumentationOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.EconomyOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.GameplayOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.GuiOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.InstanceOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.LobbyOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.LocationOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.PluginOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.PowerUpOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.ReconnectOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.ServerOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.StorageOptions;
@@ -216,6 +218,34 @@ public final class ConfigurationManager {
                 config.getInt("players.downed-system.revive-duration-seconds", 5),
                 config.getDouble("players.downed-system.revive-health", 8.0),
                 config.getInt("players.points-per-kill", 100)),
+            new EconomyOptions(
+                config.getBoolean("economy.enabled", true),
+                config.getLong(
+                    "economy.starting-points.default",
+                    config.getLong("players.starting-points", 500)),
+                config.getLong("economy.maximum-balance", 999_999_999L),
+                config.getString("economy.overflow-policy", "LOG_AND_CLAMP"),
+                config.getBoolean("economy.allow-negative-balance", false),
+                config.getString("economy.prices.rounding", "NEAREST"),
+                config.getLong("economy.prices.minimum-price", 0),
+                config.getLong("economy.prices.maximum-price", 999_999_999L),
+                config.getLong("economy.combat-rewards.maximum-hit-reward-per-attack", 10),
+                config.getBoolean("economy.assists.enabled", true),
+                config.getDouble("economy.assists.minimum-damage-percentage", 0.15),
+                config.getLong("economy.assists.fixed-points", 20),
+                config.getLong("economy.revive-reward.points", 100),
+                config.getInt("economy.revive-reward.prevent-farming-window-seconds", 60),
+                config.getInt("economy.transaction-history.maximum-entries-per-player", 1_000),
+                config.getInt("economy.display.group-rewards-window-ticks", 5)),
+            new PowerUpOptions(
+                config.getBoolean("power-ups.enabled", true),
+                config.getBoolean("power-ups.drops.enabled", true),
+                config.getDouble("power-ups.drops.base-chance", 0.02),
+                config.getInt("power-ups.drops.maximum-drops-per-round", 4),
+                config.getInt("power-ups.drops.minimum-seconds-between-drops", 20),
+                config.getInt("power-ups.drops.lifetime-seconds", 30),
+                config.getInt("power-ups.definitions.double_points.duration-seconds", 30),
+                config.getInt("power-ups.definitions.insta_kill.duration-seconds", 30)),
             new DocumentationOptions(
                 config.getBoolean("documentation.require-context-update", true)));
     Map<String, String> mergedMessages = bundledMessages();

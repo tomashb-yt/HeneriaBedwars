@@ -41,7 +41,8 @@ public final class ContextScoreboardService {
   }
 
   /** Updates the existing instance board without allocating a new scoreboard. */
-  public void updateGame(Player player, ZombieGame.Snapshot game) {
+  public void updateGame(
+      Player player, ZombieGame.Snapshot game, long balance, double multiplier, int activeBonuses) {
     Scoreboard scoreboard = instances.get(game.gameId());
     if (scoreboard == null) {
       return;
@@ -57,13 +58,11 @@ public final class ContextScoreboardService {
         game.round()
             .map(value -> value.waitingEnemies() + value.aliveEnemies() + value.pendingSpawns())
             .orElse(0);
-    int points =
-        java.util.Optional.ofNullable(game.players().get(player.getUniqueId()))
-            .map(value -> value.points())
-            .orElse(0);
-    objective.getScore("§6Manche : §f" + round).setScore(3);
-    objective.getScore("§cZombies : §f" + remaining).setScore(2);
-    objective.getScore("§aPoints : §f" + points).setScore(1);
+    objective.getScore("§6Manche : §f" + round).setScore(5);
+    objective.getScore("§cZombies : §f" + remaining).setScore(4);
+    objective.getScore("§aPoints : §f" + balance).setScore(3);
+    objective.getScore("§eMultiplicateur : §fx" + formatMultiplier(multiplier)).setScore(2);
+    objective.getScore("§dBonus actifs : §f" + activeBonuses).setScore(1);
   }
 
   /**
@@ -85,5 +84,11 @@ public final class ContextScoreboardService {
     Objective objective = scoreboard.registerNewObjective(objectiveName, Criteria.DUMMY, title);
     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     return scoreboard;
+  }
+
+  private static String formatMultiplier(double multiplier) {
+    return multiplier == Math.rint(multiplier)
+        ? Long.toString(Math.round(multiplier))
+        : String.format(java.util.Locale.ROOT, "%.2f", multiplier);
   }
 }

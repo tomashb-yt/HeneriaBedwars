@@ -120,3 +120,13 @@ atomiquement le registre. Voir `ZOMBIE_ENGINE.md` et `ZOMBIE_AI.md`.
 Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une définition
 éditoriale validée et un monde source homonyme alimentent désormais une partie de test. Le
 matchmaking et l'activation publique des maps restent à livrer.
+
+## Frontière économique
+
+`zombie-core/economy` contient les agrégats, transactions, récompenses, prix et achats sans import
+Bukkit. `zombie-core/powerup` contient les effets et drops déterministes. `zombie-plugin/economy`
+est l'unique frontière Paper pour l'affichage, les entités de drop, les effets instantanés et les
+commandes.
+
+Le graphe d'appel est `gameplay -> RewardService/PurchaseService -> TransactionService ->
+GameEconomy`. Les adaptateurs ne reçoivent aucune référence mutable vers un portefeuille.

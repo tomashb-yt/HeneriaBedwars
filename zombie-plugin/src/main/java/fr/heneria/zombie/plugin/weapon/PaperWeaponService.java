@@ -1,5 +1,13 @@
 package fr.heneria.zombie.plugin.weapon;
 
+import fr.heneria.zombie.core.economy.PriceResolver;
+import fr.heneria.zombie.core.economy.PurchaseFundingMode;
+import fr.heneria.zombie.core.economy.PurchaseRequest;
+import fr.heneria.zombie.core.economy.PurchaseResult;
+import fr.heneria.zombie.core.economy.PurchaseService;
+import fr.heneria.zombie.core.economy.PurchaseType;
+import fr.heneria.zombie.core.economy.RewardService;
+import fr.heneria.zombie.core.economy.TransactionReason;
 import fr.heneria.zombie.core.editor.MapDefinition;
 import fr.heneria.zombie.core.editor.MapObjectType;
 import fr.heneria.zombie.core.enemy.ZombieInstance;
@@ -23,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -57,7 +66,10 @@ public final class PaperWeaponService {
   private final MysteryBoxSelector mysteryBox = new MysteryBoxSelector();
   private final Function<UUID, Optional<UUID>> playerGame;
   private final Function<UUID, Optional<MapDefinition>> gameMap;
-  private final PointGateway points;
+  private final PurchaseService purchases;
+  private final RewardService rewards;
+  private final Predicate<UUID> instaKill;
+  private final HitObserver hitObserver;
   private final WeaponEventDispatcher events;
   private final NamespacedKey markerKey;
   private final NamespacedKey instanceKey;
@@ -70,12 +82,18 @@ public final class PaperWeaponService {
       PaperZombieEngine zombies,
       Function<UUID, Optional<UUID>> playerGame,
       Function<UUID, Optional<MapDefinition>> gameMap,
-      PointGateway points) {
+      PurchaseService purchases,
+      RewardService rewards,
+      Predicate<UUID> instaKill,
+      HitObserver hitObserver) {
     this.definitions = java.util.Objects.requireNonNull(definitions, "definitions");
     this.zombies = java.util.Objects.requireNonNull(zombies, "zombies");
     this.playerGame = java.util.Objects.requireNonNull(playerGame, "playerGame");
     this.gameMap = java.util.Objects.requireNonNull(gameMap, "gameMap");
-    this.points = java.util.Objects.requireNonNull(points, "points");
+    this.purchases = java.util.Objects.requireNonNull(purchases, "purchases");
+    this.rewards = java.util.Objects.requireNonNull(rewards, "rewards");
+    this.instaKill = java.util.Objects.requireNonNull(instaKill, "instaKill");
+    this.hitObserver = java.util.Objects.requireNonNull(hitObserver, "hitObserver");
     this.events =
         new WeaponEventDispatcher(
             failure -> plugin.getLogger().warning("Weapon event listener failed: " + failure));
@@ -294,13 +312,15 @@ public final class PaperWeaponService {
       for (int index = 0; index < maximum; index++) {
         Target target = targets.get(index);
         double rawDamage =
-            damage.calculate(
-                definition,
-                target.distance(),
-                target.headshot(),
-                weapon.damageMultiplier(),
-                index,
-                1);
+            instaKill.test(weapon.gameId())
+                ? 1_000_000
+                : damage.calculate(
+                    definition,
+                    target.distance(),
+                    target.headshot(),
+                    weapon.damageMultiplier(),
+                    index,
+                    1);
         PaperZombieEngine.WeaponDamageResult result =
             zombies.damageFromWeapon(
                 target.entityId(),
@@ -311,12 +331,19 @@ public final class PaperWeaponService {
                 definition.id());
         if (result.appliedDamage() > 0) {
           weapon.recordHit(result.appliedDamage(), target.headshot());
-          points.weaponHit(
+          rewards.hit(
               weapon.gameId(),
               player.getUniqueId(),
-              result.hitPointsReward(),
+              target.entityId(),
               result.appliedDamage(),
-              target.headshot());
+              result.hitPointsReward(),
+              operation(
+                  "weapon-hit",
+                  weapon.gameId(),
+                  player.getUniqueId(),
+                  target.entityId().toString()));
+          hitObserver.hit(
+              weapon.gameId(), player.getUniqueId(), result.appliedDamage(), target.headshot());
           publish(
               WeaponEvent.Type.DAMAGE,
               weapon,
@@ -346,18 +373,34 @@ public final class PaperWeaponService {
             object.properties(),
             owned.isPresent() ? "ammo-cost" : "cost",
             owned.isPresent() ? definition.economy().ammoCost() : definition.economy().wallCost());
-    if (!points.spend(gameId, player.getUniqueId(), configuredCost)) {
-      player.sendMessage(MINI.deserialize("<red>Points insuffisants."));
+    PurchaseResult purchase =
+        purchases.purchase(
+            purchase(
+                gameId,
+                player,
+                owned.isPresent() ? PurchaseType.WALL_AMMO : PurchaseType.WALL_WEAPON,
+                weaponId,
+                configuredCost,
+                owned.isPresent()
+                    ? TransactionReason.WALL_AMMO_PURCHASE
+                    : TransactionReason.WALL_WEAPON_PURCHASE,
+                () -> {
+                  if (owned.isPresent()) {
+                    owned.get().refillReserve();
+                    refreshItem(player, owned.get());
+                    return true;
+                  }
+                  return give(gameId, player, definition, tick).isPresent();
+                }));
+    if (!purchase.successful()) {
+      purchaseFailure(player, purchase);
       return true;
     }
-    if (owned.isPresent()) {
-      owned.get().refillReserve();
-      refreshItem(player, owned.get());
-      player.sendMessage(MINI.deserialize("<green>Munitions achetées."));
-    } else {
-      give(gameId, player, definition, tick);
-      player.sendMessage(MINI.deserialize("<green>Arme achetée : " + definition.displayName()));
-    }
+    player.sendMessage(
+        MINI.deserialize(
+            owned.isPresent()
+                ? "<green>Munitions achetées."
+                : "<green>Arme achetée : " + definition.displayName()));
     publish(
         WeaponEvent.Type.PURCHASED,
         owned.orElseGet(
@@ -390,11 +433,25 @@ public final class PaperWeaponService {
       player.sendMessage(MINI.deserialize("<red>Aucune arme éligible dans cette boîte."));
       return true;
     }
-    if (!points.spend(gameId, player.getUniqueId(), cost)) {
-      player.sendMessage(MINI.deserialize("<red>Points insuffisants."));
+    final WeaponInstance[] granted = new WeaponInstance[1];
+    PurchaseResult purchase =
+        purchases.purchase(
+            purchase(
+                gameId,
+                player,
+                PurchaseType.MYSTERY_BOX,
+                object.id(),
+                cost,
+                TransactionReason.MYSTERY_BOX_PURCHASE,
+                () -> {
+                  granted[0] = give(gameId, player, selected.get(), tick).orElse(null);
+                  return granted[0] != null;
+                }));
+    if (!purchase.successful()) {
+      purchaseFailure(player, purchase);
       return true;
     }
-    WeaponInstance purchased = give(gameId, player, selected.get(), tick).orElseThrow();
+    WeaponInstance purchased = granted[0];
     publish(
         WeaponEvent.Type.PURCHASED,
         purchased,
@@ -418,11 +475,20 @@ public final class PaperWeaponService {
     if (!publish(WeaponEvent.Type.PRE_UPGRADE, weapon, java.util.Map.of())) {
       return true;
     }
-    if (!points.spend(gameId, player.getUniqueId(), cost)) {
-      player.sendMessage(MINI.deserialize("<red>Points insuffisants."));
+    PurchaseResult purchase =
+        purchases.purchase(
+            purchase(
+                gameId,
+                player,
+                PurchaseType.PACK_A_PUNCH,
+                weapon.id().toString(),
+                cost,
+                TransactionReason.PACK_A_PUNCH_PURCHASE,
+                weapon::upgrade));
+    if (!purchase.successful()) {
+      purchaseFailure(player, purchase);
       return true;
     }
-    weapon.upgrade();
     publish(
         WeaponEvent.Type.UPGRADED,
         weapon,
@@ -630,6 +696,56 @@ public final class PaperWeaponService {
     return events;
   }
 
+  /** Refills every weapon reserve in the game for the Max Ammo power-up. */
+  public void refillGame(UUID gameId) {
+    weapons
+        .game(gameId)
+        .forEach(
+            weapon -> {
+              weapon.refillReserve();
+              Player owner = Bukkit.getPlayer(weapon.ownerId());
+              if (owner != null) {
+                refreshItem(owner, weapon);
+              }
+            });
+  }
+
+  private PurchaseRequest purchase(
+      UUID gameId,
+      Player player,
+      PurchaseType type,
+      String itemId,
+      long price,
+      TransactionReason reason,
+      PurchaseRequest.Grant grant) {
+    return new PurchaseRequest(
+        gameId,
+        player.getUniqueId(),
+        type,
+        itemId,
+        PriceResolver.PriceContext.base(price),
+        operation("purchase-" + type.name(), gameId, player.getUniqueId(), itemId),
+        reason,
+        PurchaseFundingMode.INDIVIDUAL,
+        () ->
+            player.isOnline()
+                && playerGame.apply(player.getUniqueId()).filter(gameId::equals).isPresent(),
+        grant,
+        java.util.Map.of());
+  }
+
+  private String operation(String prefix, UUID gameId, UUID playerId, String itemId) {
+    return prefix + ":" + gameId + ":" + playerId + ":" + itemId + ":" + Bukkit.getCurrentTick();
+  }
+
+  private static void purchaseFailure(Player player, PurchaseResult result) {
+    String message =
+        result.status() == PurchaseResult.Status.PAYMENT_FAILED
+            ? "<red>Points insuffisants."
+            : "<red>Achat impossible : " + result.failureReason();
+    player.sendMessage(MINI.deserialize(message));
+  }
+
   private boolean publish(
       WeaponEvent.Type type, WeaponInstance weapon, java.util.Map<String, String> data) {
     return events.publish(
@@ -643,16 +759,13 @@ public final class PaperWeaponService {
             data));
   }
 
-  @FunctionalInterface
-  public interface PointGateway {
-    boolean spend(UUID gameId, UUID playerId, int amount);
-
-    default void weaponHit(
-        UUID gameId, UUID playerId, int reward, double appliedDamage, boolean headshot) {}
-  }
-
   private record PendingShot(
       UUID playerId, UUID weaponInstanceId, long fireAtTick, boolean consumeAmmo) {}
 
   private record Target(UUID entityId, double distance, boolean headshot) {}
+
+  @FunctionalInterface
+  public interface HitObserver {
+    void hit(UUID gameId, UUID playerId, double appliedDamage, boolean headshot);
+  }
 }

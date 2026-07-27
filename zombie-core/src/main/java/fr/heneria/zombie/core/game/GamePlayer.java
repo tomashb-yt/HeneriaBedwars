@@ -9,7 +9,6 @@ import java.util.UUID;
 public final class GamePlayer {
   private final UUID playerId;
   private GamePlayerState state = GamePlayerState.WAITING;
-  private int points;
   private int kills;
   private int headshots;
   private long damage;
@@ -21,7 +20,9 @@ public final class GamePlayer {
 
   public GamePlayer(UUID playerId, int startingPoints) {
     this.playerId = Objects.requireNonNull(playerId, "playerId");
-    this.points = startingPoints;
+    if (startingPoints < 0) {
+      throw new IllegalArgumentException("startingPoints cannot be negative");
+    }
   }
 
   public void state(GamePlayerState target) {
@@ -59,27 +60,14 @@ public final class GamePlayer {
     return true;
   }
 
-  public void killed(int reward) {
+  public void killed() {
     kills++;
-    points = Math.addExact(points, reward);
   }
 
-  public boolean spend(int amount) {
-    if (amount < 0) {
-      throw new IllegalArgumentException("amount cannot be negative");
-    }
-    if (points < amount) {
-      return false;
-    }
-    points -= amount;
-    return true;
-  }
-
-  public void weaponHit(int reward, double appliedDamage, boolean headshot) {
-    if (reward < 0 || appliedDamage < 0 || !Double.isFinite(appliedDamage)) {
+  public void weaponHit(double appliedDamage, boolean headshot) {
+    if (appliedDamage < 0 || !Double.isFinite(appliedDamage)) {
       throw new IllegalArgumentException("Invalid weapon hit");
     }
-    points = Math.addExact(points, reward);
     damage = Math.addExact(damage, Math.round(appliedDamage));
     if (headshot) {
       headshots++;
@@ -104,7 +92,6 @@ public final class GamePlayer {
     return new Snapshot(
         playerId,
         state,
-        points,
         kills,
         headshots,
         damage,
@@ -117,7 +104,6 @@ public final class GamePlayer {
   public record Snapshot(
       UUID playerId,
       GamePlayerState state,
-      int points,
       int kills,
       int headshots,
       long damage,

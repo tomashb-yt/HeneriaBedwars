@@ -39,3 +39,13 @@ Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServe
 Toute reprise commence par `docs/AI_CONTEXT.md`, puis `docs/ARCHITECTURE.md` et
 `docs/DECISIONS.md`. `docs/ROADMAP.md` décrit la suite sans présenter les fonctions futures comme
 terminées.
+
+## Ticket 008 — économie de partie
+
+La version `0.9.0-SNAPSHOT` centralise les points dans des portefeuilles `long`, journalise chaque
+mutation, rend les achats atomiques et implémente les drops Double Points, Max Ammo, Insta-Kill et
+Nuke. Les armes murales, la Mystery Box et le Pack-a-Punch emploient le même `PurchaseService`.
+
+Documentation : [économie](docs/ECONOMY_SYSTEM.md),
+[transactions](docs/TRANSACTION_SYSTEM.md), [achats](docs/PURCHASE_SYSTEM.md) et
+[bonus](docs/POWER_UP_SYSTEM.md).

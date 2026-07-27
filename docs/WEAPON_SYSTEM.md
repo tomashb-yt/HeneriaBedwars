@@ -48,3 +48,13 @@ copier un YAML valide dans `plugins/HeneriaZombie/weapons`, puis exécuter `/zwe
 
 Les armes déjà distribuées conservent leur snapshot après reload. Les nouvelles distributions
 utilisent le registre validé le plus récent.
+
+## Intégration économique
+
+`PaperWeaponService` ne possède plus de passerelle booléenne de points. Un impact appelle
+`RewardService`. Les achats muraux, de munitions et Mystery Box, ainsi que les améliorations
+Pack-a-Punch, construisent un `PurchaseRequest`. Leur clé inclut partie, joueur, objet et tick afin
+de neutraliser un double événement sans bloquer une interaction ultérieure.
+
+Max Ammo appelle `refillGame` et Insta-Kill modifie la valeur envoyée au moteur de dégâts, jamais
+l'entité directement.

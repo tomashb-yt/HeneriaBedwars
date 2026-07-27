@@ -5,6 +5,12 @@ import fr.heneria.zombie.api.ZombieApi;
 import fr.heneria.zombie.core.bootstrap.ServiceRegistry;
 import fr.heneria.zombie.core.config.ConfigurationIssue;
 import fr.heneria.zombie.core.config.ZombieSettingsValidator;
+import fr.heneria.zombie.core.economy.EconomyEventDispatcher;
+import fr.heneria.zombie.core.economy.EconomyService;
+import fr.heneria.zombie.core.economy.PriceResolver;
+import fr.heneria.zombie.core.economy.PurchaseService;
+import fr.heneria.zombie.core.economy.RewardService;
+import fr.heneria.zombie.core.economy.TransactionService;
 import fr.heneria.zombie.core.editor.MapEditorService;
 import fr.heneria.zombie.core.editor.MapRegistry;
 import fr.heneria.zombie.core.editor.MapValidator;
@@ -13,12 +19,18 @@ import fr.heneria.zombie.core.instance.GameInstanceRegistry;
 import fr.heneria.zombie.core.instance.GameInstanceService;
 import fr.heneria.zombie.core.isolation.AudienceSelector;
 import fr.heneria.zombie.core.isolation.VisibilityPolicy;
+import fr.heneria.zombie.core.powerup.PowerUpDropService;
+import fr.heneria.zombie.core.powerup.PowerUpRegistry;
+import fr.heneria.zombie.core.powerup.PowerUpService;
 import fr.heneria.zombie.core.session.PlayerSessionService;
 import fr.heneria.zombie.core.session.ReconnectPolicy;
 import fr.heneria.zombie.plugin.api.PaperZombieApi;
 import fr.heneria.zombie.plugin.command.ZombieCommand;
 import fr.heneria.zombie.plugin.config.ConfigurationManager;
 import fr.heneria.zombie.plugin.display.ContextScoreboardService;
+import fr.heneria.zombie.plugin.economy.PaperPowerUpService;
+import fr.heneria.zombie.plugin.economy.PointDisplayService;
+import fr.heneria.zombie.plugin.economy.ZEconomyCommand;
 import fr.heneria.zombie.plugin.editor.EditorGuiModule;
 import fr.heneria.zombie.plugin.editor.EditorItemService;
 import fr.heneria.zombie.plugin.editor.EditorPlacementListener;
@@ -66,6 +78,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -287,6 +300,117 @@ public final class ZombieBootstrap {
                             + event.getClass().getSimpleName()
                             + " for "
                             + event.gameId()));
+    EconomyService economies = new EconomyService();
+    PointDisplayService pointDisplay =
+        new PointDisplayService(
+            configurations.current().settings().economy().displayGroupWindowTicks());
+    EconomyEventDispatcher economyEvents =
+        event -> {
+          pointDisplay.accept(event);
+          plugin
+              .getLogger()
+              .fine(
+                  "Economy event "
+                      + event.type()
+                      + " for "
+                      + event.gameId()
+                      + "/"
+                      + event.playerId());
+        };
+    TransactionService transactions =
+        new TransactionService(
+            economies, Clock.systemUTC(), economyEvents, plugin.getLogger()::warning);
+    PurchaseService purchases =
+        new PurchaseService(
+            transactions,
+            new PriceResolver(
+                PriceResolver.Rounding.valueOf(
+                    configurations
+                        .current()
+                        .settings()
+                        .economy()
+                        .priceRounding()
+                        .toUpperCase(java.util.Locale.ROOT)),
+                configurations.current().settings().economy().minimumPrice(),
+                configurations.current().settings().economy().maximumPrice()),
+            economyEvents,
+            Clock.systemUTC());
+    var powerUpOptions = configurations.current().settings().powerUps();
+    PowerUpRegistry powerUpRegistry =
+        new PowerUpRegistry(
+            List.of(
+                new fr.heneria.zombie.core.powerup.PowerUpDefinition(
+                    fr.heneria.zombie.core.powerup.PowerUpType.DOUBLE_POINTS,
+                    "Points doubles",
+                    fr.heneria.zombie.core.powerup.PowerUpScope.GAME,
+                    Duration.ofSeconds(powerUpOptions.doublePointsDurationSeconds()),
+                    Duration.ofSeconds(powerUpOptions.doublePointsDurationSeconds() * 2L),
+                    fr.heneria.zombie.core.powerup.StackPolicy.EXTEND_DURATION,
+                    2,
+                    30),
+                new fr.heneria.zombie.core.powerup.PowerUpDefinition(
+                    fr.heneria.zombie.core.powerup.PowerUpType.INSTA_KILL,
+                    "Mort instantanée",
+                    fr.heneria.zombie.core.powerup.PowerUpScope.GAME,
+                    Duration.ofSeconds(powerUpOptions.instaKillDurationSeconds()),
+                    Duration.ofSeconds(powerUpOptions.instaKillDurationSeconds() * 2L),
+                    fr.heneria.zombie.core.powerup.StackPolicy.EXTEND_DURATION,
+                    1,
+                    25),
+                new fr.heneria.zombie.core.powerup.PowerUpDefinition(
+                    fr.heneria.zombie.core.powerup.PowerUpType.MAX_AMMO,
+                    "Munitions max",
+                    fr.heneria.zombie.core.powerup.PowerUpScope.GAME,
+                    Duration.ZERO,
+                    Duration.ZERO,
+                    fr.heneria.zombie.core.powerup.StackPolicy.REJECT,
+                    1,
+                    25),
+                new fr.heneria.zombie.core.powerup.PowerUpDefinition(
+                    fr.heneria.zombie.core.powerup.PowerUpType.NUKE,
+                    "Nuke",
+                    fr.heneria.zombie.core.powerup.PowerUpScope.GAME,
+                    Duration.ZERO,
+                    Duration.ZERO,
+                    fr.heneria.zombie.core.powerup.StackPolicy.REJECT,
+                    1,
+                    20)));
+    PowerUpService powerUps =
+        new PowerUpService(
+            powerUpRegistry,
+            Clock.systemUTC(),
+            event ->
+                plugin
+                    .getLogger()
+                    .fine("Power-up event " + event.type() + " for " + event.gameId()));
+    var economyOptions = configurations.current().settings().economy();
+    RewardService rewards =
+        new RewardService(
+            transactions,
+            powerUps::pointMultiplier,
+            Clock.systemUTC(),
+            new RewardService.RewardPolicy(
+                economyOptions.maximumHitReward(),
+                economyOptions.assistsEnabled(),
+                economyOptions.minimumAssistPercentage(),
+                economyOptions.fixedAssistReward(),
+                economyOptions.reviveReward(),
+                Duration.ofSeconds(economyOptions.reviveAntiFarmSeconds())));
+    PowerUpDropService powerUpDrops =
+        new PowerUpDropService(
+            powerUpRegistry,
+            new PowerUpDropService.Options(
+                powerUpOptions.enabled() && powerUpOptions.dropsEnabled(),
+                powerUpOptions.baseDropChance(),
+                powerUpOptions.maximumDropsPerRound(),
+                Duration.ofSeconds(powerUpOptions.minimumSecondsBetweenDrops()),
+                Duration.ofSeconds(powerUpOptions.dropLifetimeSeconds())),
+            Clock.systemUTC(),
+            ThreadLocalRandom.current(),
+            event ->
+                plugin
+                    .getLogger()
+                    .fine("Power-up drop event " + event.type() + " for " + event.gameId()));
     ZombieDefinitionLoader zombieDefinitions = new ZombieDefinitionLoader(plugin, ioExecutor);
     zombieDefinitions
         .initializeAsync()
@@ -327,11 +451,21 @@ public final class ZombieBootstrap {
                 runtime.damagePlayer(source.gameId(), target, amount);
               }
             },
-            (zombie, reason, killerId, reward) -> {
+            (zombie, reason, killerId, reward, rewardReason, deathLocation) -> {
               PaperGameRuntime runtime = gameReference.get();
               if (runtime != null && reason.completesRoundSlot()) {
-                runtime.zombieRemoved(zombie.entityId(), killerId, reward);
+                runtime.zombieRemoved(
+                    zombie.entityId(), killerId, reward, rewardReason, deathLocation);
               }
+            });
+    PaperPowerUpService paperPowerUps =
+        new PaperPowerUpService(
+            powerUps,
+            powerUpDrops,
+            zombieEngine,
+            gameId -> {
+              PaperGameRuntime runtime = gameReference.get();
+              return runtime == null ? List.of() : runtime.playerIds(gameId);
             });
     WeaponDefinitionLoader weaponDefinitions = new WeaponDefinitionLoader(plugin, ioExecutor);
     weaponDefinitions
@@ -367,22 +501,17 @@ public final class ZombieBootstrap {
               PaperGameRuntime runtime = gameReference.get();
               return runtime == null ? java.util.Optional.empty() : runtime.mapFor(gameId);
             },
-            new PaperWeaponService.PointGateway() {
-              @Override
-              public boolean spend(UUID gameId, UUID playerId, int amount) {
-                PaperGameRuntime runtime = gameReference.get();
-                return runtime != null && runtime.spendPoints(gameId, playerId, amount);
-              }
-
-              @Override
-              public void weaponHit(
-                  UUID gameId, UUID playerId, int reward, double appliedDamage, boolean headshot) {
-                PaperGameRuntime runtime = gameReference.get();
-                if (runtime != null) {
-                  runtime.weaponHit(gameId, playerId, reward, appliedDamage, headshot);
-                }
+            purchases,
+            rewards,
+            gameId ->
+                powerUps.active(gameId, fr.heneria.zombie.core.powerup.PowerUpType.INSTA_KILL),
+            (gameId, playerId, appliedDamage, headshot) -> {
+              PaperGameRuntime runtime = gameReference.get();
+              if (runtime != null) {
+                runtime.weaponHit(gameId, playerId, appliedDamage, headshot);
               }
             });
+    paperPowerUps.weapons(weaponService);
     gameRuntime =
         new PaperGameRuntime(
             gameService,
@@ -392,6 +521,13 @@ public final class ZombieBootstrap {
             scoreboards,
             zombieEngine,
             weaponService,
+            economies,
+            transactions,
+            purchases,
+            rewards,
+            powerUps,
+            paperPowerUps,
+            pointDisplay,
             result -> java.util.concurrent.CompletableFuture.completedFuture(null),
             messages,
             plugin.getLogger());
@@ -454,6 +590,7 @@ public final class ZombieBootstrap {
     registerGameCommand(gameRuntime);
     registerZombieEngineCommand(zombieEngine, zombieDefinitions);
     registerWeaponCommand(weaponService, weaponDefinitions);
+    registerEconomyCommand(economies, transactions, powerUps, paperPowerUps);
 
     maintenanceTask =
         plugin
@@ -665,6 +802,21 @@ public final class ZombieBootstrap {
     }
     ZWeaponCommand executor =
         new ZWeaponCommand(plugin, weapons, definitions, gameRuntime, guiService);
+    command.setExecutor(executor);
+    command.setTabCompleter(executor);
+  }
+
+  private void registerEconomyCommand(
+      EconomyService economies,
+      TransactionService transactions,
+      PowerUpService powerUps,
+      PaperPowerUpService paperPowerUps) {
+    PluginCommand command = plugin.getCommand("zeconomy");
+    if (command == null) {
+      throw new IllegalStateException("Command zeconomy is missing from plugin.yml");
+    }
+    ZEconomyCommand executor =
+        new ZEconomyCommand(gameRuntime, economies, transactions, powerUps, paperPowerUps);
     command.setExecutor(executor);
     command.setTabCompleter(executor);
   }

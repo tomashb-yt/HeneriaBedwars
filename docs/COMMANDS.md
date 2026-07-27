@@ -73,6 +73,17 @@ Les GUI ajoutent `zombie.gui.player`, `zombie.gui.admin`, `zombie.gui.maps`,
 Chaque action possède une permission `zombies.admin.zombie.<action>`, regroupée sous
 `zombie.admin`.
 
+## `/zeconomy`
+
+- `balance <player>` : solde et agrégats ;
+- `set|add|remove <player> <amount>` : ajustement transactionnel ;
+- `history <player>` et `transaction <uuid>` : audit ;
+- `givepowerup <type> [game]` et `clearpowerups <game>` : bonus ;
+- `debug <game>` : portefeuilles, journal, opérations, refus et effets actifs.
+
+Permissions : `zombies.admin.economy.balance`, `.set`, `.add`, `.remove`, `.history`, `.powerup`
+et `.debug`. Elles sont toutes héritées par `zombie.admin`.
+
 ## Diagnostic des armes
 
 - `/zweapon types` et `/zweapon info <id>` inspectent le catalogue ;

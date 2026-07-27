@@ -126,19 +126,12 @@ public final class ZombieGame {
   }
 
   public synchronized boolean zombieDefeated(UUID killer) {
-    return zombieDefeated(killer, configuration.pointsPerKill());
-  }
-
-  public synchronized boolean zombieDefeated(UUID killer, int reward) {
-    if (reward < 0) {
-      throw new IllegalArgumentException("reward cannot be negative");
-    }
     if (state != GameState.ROUND_ACTIVE || !round.defeated()) {
       return false;
     }
     Optional.ofNullable(players.get(killer))
         .filter(player -> player.snapshot().state() == GamePlayerState.ALIVE)
-        .ifPresent(player -> player.killed(reward));
+        .ifPresent(GamePlayer::killed);
     emit(GameEvent.Type.ZOMBIE_DEFEATED);
     if (round.canComplete()) {
       completeRound();
@@ -146,23 +139,14 @@ public final class ZombieGame {
     return true;
   }
 
-  public synchronized boolean spendPoints(UUID playerId, int amount) {
-    GamePlayer player = players.get(playerId);
-    return state == GameState.ROUND_ACTIVE
-        && player != null
-        && player.snapshot().state() == GamePlayerState.ALIVE
-        && player.spend(amount);
-  }
-
-  public synchronized boolean weaponHit(
-      UUID playerId, int reward, double appliedDamage, boolean headshot) {
+  public synchronized boolean weaponHit(UUID playerId, double appliedDamage, boolean headshot) {
     GamePlayer player = players.get(playerId);
     if (state != GameState.ROUND_ACTIVE
         || player == null
         || player.snapshot().state() != GamePlayerState.ALIVE) {
       return false;
     }
-    player.weaponHit(reward, appliedDamage, headshot);
+    player.weaponHit(appliedDamage, headshot);
     return true;
   }
 

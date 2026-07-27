@@ -32,6 +32,10 @@ commands:
     description: Inspects and administers the HeneriaZombie weapon engine
     usage: /zweapon [types|info|give|reload|stats|gui]
     permission: zombies.admin.weapon.types
+  zeconomy:
+    description: Inspects and administers the isolated game economy
+    usage: /zeconomy [balance|set|add|remove|history|transaction|givepowerup|clearpowerups|debug]
+    permission: zombies.admin.economy.balance
 
 permissions:
   zombie.admin:
@@ -70,6 +74,13 @@ permissions:
       zombies.admin.weapon.give: true
       zombies.admin.weapon.reload: true
       zombies.admin.weapon.stats: true
+      zombies.admin.economy.balance: true
+      zombies.admin.economy.set: true
+      zombies.admin.economy.add: true
+      zombies.admin.economy.remove: true
+      zombies.admin.economy.history: true
+      zombies.admin.economy.powerup: true
+      zombies.admin.economy.debug: true
   zombie.command.use:
     description: Allows use of the base /zombie command
     default: true
@@ -165,4 +176,25 @@ permissions:
     default: op
   zombies.admin.weapon.stats:
     description: Displays current per-weapon statistics
+    default: op
+  zombies.admin.economy.balance:
+    description: Reads a player's in-game wallet
+    default: op
+  zombies.admin.economy.set:
+    description: Sets a player's balance through an adjustment transaction
+    default: op
+  zombies.admin.economy.add:
+    description: Credits a player's in-game wallet
+    default: op
+  zombies.admin.economy.remove:
+    description: Debits a player's in-game wallet
+    default: op
+  zombies.admin.economy.history:
+    description: Reads transaction history
+    default: op
+  zombies.admin.economy.powerup:
+    description: Gives and clears game power-ups
+    default: op
+  zombies.admin.economy.debug:
+    description: Displays detailed economy diagnostics
     default: op

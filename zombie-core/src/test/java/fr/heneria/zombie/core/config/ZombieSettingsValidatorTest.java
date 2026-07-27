@@ -5,12 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import fr.heneria.zombie.core.config.ZombieSettings.ChatOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.DocumentationOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.EconomyOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.GameplayOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.GuiOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.InstanceOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.LobbyOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.LocationOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.PluginOptions;
+import fr.heneria.zombie.core.config.ZombieSettings.PowerUpOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.ReconnectOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.ServerOptions;
 import fr.heneria.zombie.core.config.ZombieSettings.StorageOptions;
@@ -42,6 +44,8 @@ class ZombieSettingsValidatorTest {
             defaults.worldRules(),
             defaults.gui(),
             defaults.gameplay(),
+            defaults.economy(),
+            defaults.powerUps(),
             defaults.documentation());
 
     assertEquals(9, validator.validate(invalid).size());
@@ -65,6 +69,24 @@ class ZombieSettingsValidatorTest {
         new GameplayOptions(
             1, 15, true, false, 8, 500, -1, 3, 8, 6, 2, .75, 1, -1, 20, 1.1, -1, 24, 6, 40, 20, 5,
             1, true, 30, 5, 8, 100),
+        new EconomyOptions(
+            true,
+            500,
+            999_999_999,
+            "LOG_AND_CLAMP",
+            false,
+            "NEAREST",
+            0,
+            999_999_999,
+            10,
+            true,
+            .15,
+            20,
+            100,
+            60,
+            1_000,
+            5),
+        new PowerUpOptions(true, true, .02, 4, 20, 30, 30, 30),
         new DocumentationOptions(true));
   }
 }

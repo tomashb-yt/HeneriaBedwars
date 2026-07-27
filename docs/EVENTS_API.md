@@ -31,3 +31,14 @@ d'événements public prématuré.
 `WeaponEventDispatcher` isole les erreurs d'abonnés et reste synchrone sur le thread propriétaire
 du gameplay. Il est accessible depuis le service d'armes injecté, sans dépendance Bukkit dans le
 modèle d'événement.
+
+## Événements économiques internes
+
+`EconomyEvent` publie `TRANSACTION_PRE`, `TRANSACTION_COMPLETED`, `TRANSACTION_REJECTED`,
+`PURCHASE_PRE_CHECK`, `PURCHASE_COMPLETED`, `PURCHASE_FAILED` et `PURCHASE_REFUNDED`.
+`PowerUpEvent` publie création/collecte/expiration de drop et activation/expiration d'effet.
+
+Ils sont synchrones sur le thread qui exécute la mutation, ordonnés avant/après la validation
+décrite, et protégés par l'adaptateur de composition. Ils ne constituent pas encore une API Bukkit
+publique et ne doivent effectuer ni disque ni appel bloquant. L'annulation métier passe par les
+conditions de `PurchaseRequest` ; les événements d'observation ne mutent pas l'état.

@@ -26,3 +26,16 @@
 
 Chaque étape devient un ticket borné, compilé, testé, documenté et publié. SQLite ne sera activé
 qu'avec un modèle persistant défini.
+
+## Ticket 008 — terminé
+
+- portefeuilles isolés, transactions, journal, limites et idempotence ;
+- récompenses d'impact, mort, assistance et réanimation ;
+- achats atomiques muraux, Mystery Box et Pack-a-Punch ;
+- Double Points, Max Ammo, Insta-Kill, Nuke, drops et nettoyage ;
+- commandes, affichage, agrégats de résultat et tests automatisés.
+
+## Prochain ticket
+
+Ticket 009 : perks, machines, prix via `PurchaseService`, limites, effets, perte à la mise à terre
+et améliorations.
