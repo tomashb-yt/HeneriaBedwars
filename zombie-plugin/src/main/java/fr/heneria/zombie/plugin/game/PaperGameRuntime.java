@@ -404,7 +404,81 @@ public final class PaperGameRuntime {
         .end(reason)
         .ifPresent(
             result ->
-                reóÝí¢G§²ÚîÆ­yÚ      if (tick >= runtime.nextActionAt) {
+                results
+                    .save(result.withEconomy(economyResult(gameId)))
+                    .exceptionally(
+                        failure -> {
+                          logger.severe(
+                              "Could not save game result " + gameId + ": " + failure.getMessage());
+                          return null;
+                        }));
+    runtime.endAt = tick + runtime.game.configuration().endScreenSeconds() * 20L;
+    runtime.bleedOut.clear();
+    runtime.revives.clear();
+    announce(runtime.game.snapshot().players().keySet(), "game.ended", "reason", reason.name());
+    spawner.removeAll(gameId, fr.heneria.zombie.core.enemy.ZombieRemovalReason.GAME_ENDED);
+    weapons.removeGame(gameId);
+    runtime.entities.clear();
+  }
+
+  public void shutdown() {
+    runtimes.keySet().forEach(id -> end(id, GameEndReason.SERVER_SHUTDOWN));
+    runtimes.values().forEach(runtime -> runtime.entities.keySet().forEach(spawner::remove));
+    runtimes.clear();
+    entityGames.clear();
+    games.clear();
+    economies.clear();
+    pointDisplay.clear();
+  }
+
+  public Collection<ZombieGame.Snapshot> snapshots() {
+    return games.snapshots();
+  }
+
+  public Optional<ZombieGame.Snapshot> snapshot(UUID id) {
+    return games.find(id).map(ZombieGame::snapshot);
+  }
+
+  public boolean forceNextRound(UUID id) {
+    RuntimeState runtime = runtimes.get(id);
+    if (runtime == null || runtime.game.snapshot().state() != GameState.ROUND_TRANSITION) {
+      return false;
+    }
+    runtime.nextActionAt = tick;
+    return true;
+  }
+
+  public boolean setRound(UUID id, int round) {
+    RuntimeState runtime = runtimes.get(id);
+    if (runtime == null
+        || round <= 0
+        || runtime.game.snapshot().state() != GameState.ROUND_TRANSITION) {
+      return false;
+    }
+    int enemies =
+        difficulty.enemyCount(round, activePlayers(runtime), runtime.game.configuration());
+    runtime.game.startRoundAt(round, enemies);
+    runtime.nextActionAt = tick + runtime.game.configuration().initialSpawnDelayTicks();
+    return true;
+  }
+
+  private void drive(RuntimeState runtime) {
+    runtime.game.expireDisconnectedPlayers();
+    ZombieGame.Snapshot snapshot = runtime.game.snapshot();
+    if (runtime.ending) {
+      if (tick >= runtime.endAt) {
+        finish(runtime);
+      }
+      return;
+    }
+    if (snapshot.state() == GameState.COUNTDOWN) {
+      if (activePlayers(runtime) < runtime.game.configuration().minimumPlayers()) {
+        if (runtime.game.configuration().cancelCountdownWhenInsufficient()) {
+          runtime.game.cancelCountdown();
+        }
+        return;
+      }
+      if (tick >= runtime.nextActionAt) {
         int enemies =
             difficulty.enemyCount(1, activePlayers(runtime), runtime.game.configuration());
         runtime.game.start(enemies);
