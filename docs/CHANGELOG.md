@@ -2,6 +2,21 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.10.4-SNAPSHOT — Transition visite, édition et test
+
+### Corrigé
+
+- le bouton `Modifier la map` ferme et détruit désormais la copie de visite avant de charger le
+  monde de travail ;
+- la téléportation finale vers l'éditeur ne peut plus être écrasée par le retour au lobby lié au
+  nettoyage de l'aperçu ;
+- le lancement d'un test ferme également tout aperçu actif avant de créer l'instance privée ;
+- les anciennes sessions de partie sont quittées explicitement avant l'entrée dans un test.
+
+### Modifié
+
+- version portée à `0.10.4-SNAPSHOT`.
+
 ## 0.10.3-SNAPSHOT — Tableau de bord et visite des maps
 
 ### Ajouté

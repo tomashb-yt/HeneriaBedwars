@@ -11,7 +11,9 @@ Depuis `/zombies admin`, le tableau de bord d'une map sépare désormais :
 - **Tester**, qui crée une véritable partie privée après validation.
 
 La visite se quitte avec `/zombie map leave`. Elle est refusée tant que l'administrateur conserve
-une session d'édition active.
+une session d'édition active. Depuis le tableau de bord, choisir **Modifier** ou **Tester** pendant
+une visite ferme automatiquement la copie temporaire, attend son déchargement, puis poursuit vers
+la destination demandée ; le joueur ne reste pas au lobby.
 
 1. `/zmap create <id>` crée `plugins/HeneriaZombie/maps/<id>/map.yml`, associe le monde courant,
    mémorise l'auteur et les dates, puis ouvre l'éditeur.

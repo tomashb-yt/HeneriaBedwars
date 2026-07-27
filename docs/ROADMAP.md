@@ -57,6 +57,9 @@ administratifs.
 La version `0.10.3` livre le tableau de bord réorganisé et la visite isolée d'un template depuis
 ce gestionnaire.
 
+Le correctif `0.10.4` fiabilise les transitions depuis cette visite vers le monde d'édition ou une
+instance privée de test.
+
 ## Prochain ticket
 
 Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,

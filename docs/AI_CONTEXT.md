@@ -133,6 +133,11 @@ trois étapes. L'action `maps.visit` délègue à `MapPreviewService` : elle clo
 monde temporaire, téléporte uniquement l'administrateur et ne crée aucune partie. Une session
 d'édition doit être fermée avant la visite.
 
+Le correctif `0.10.4` sérialise la transition inverse : `Modifier` et `Tester` ferment d'abord
+l'aperçu, attendent la destruction de son monde temporaire, puis seulement téléportent vers le
+monde de travail ou l'instance. Le retour technique au lobby pendant le déchargement ne peut donc
+plus écraser la destination finale.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec
