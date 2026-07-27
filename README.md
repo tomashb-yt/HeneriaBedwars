@@ -5,8 +5,8 @@ classique de Black Ops 2 et enrichi de mécaniques originales facultatives par m
 
 ## État
 
-Les Tickets 001 à 007 fournissent la fondation, le lobby, les instances isolées, le framework GUI,
-l'éditeur universel, les manches, le moteur d'ennemis et le moteur d'armes configurable.
+Le projet fournit la fondation, le lobby, les instances isolées, le framework GUI, l'éditeur
+universel, les manches, les ennemis, les armes, l'économie et la publication versionnée des maps.
 
 ## Prérequis
 
@@ -31,7 +31,7 @@ deux capacités. Les commandes de diagnostic sont regroupées sous `/zzombie`.
 Le Ticket 007 ajoute cinq armes YAML, munitions, rechargement, dégâts balistiques, achats muraux,
 Mystery Box, Pack-a-Punch et `/zweapon`.
 
-Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.9.2-SNAPSHOT.jar`.
+Le JAR déployable est produit dans `zombie-plugin/build/libs/HeneriaZombie-0.10.0-SNAPSHOT.jar`.
 Pour un serveur local de développement : `.\gradlew.bat :zombie-plugin:runServer`.
 
 ## Documentation à lire
@@ -63,3 +63,11 @@ contacts passent par les dégâts autoritaires du jeu et tout équipement vanill
 La mise à terre distingue désormais une équipe pouvant réanimer d'un joueur sans sauveteur. Les
 machines possèdent une animation différée de cinq secondes, leur nom reste visible dans l'instance,
 les impacts zombies donnent un retour immédiat et les bonus sont ancrés sur un sol sûr.
+
+## Menus et publication 0.10.0
+
+`/zombies` affiche les maps publiées et rejoint automatiquement une partie. `/zombies admin`
+centralise la création, l'édition, la validation, le test et la publication. Chaque publication
+est un snapshot immuable de la configuration et des blocs ; l'historique peut être restauré sans
+modifier les parties en cours.
+Voir [publication des maps](docs/MAP_PUBLICATION.md).

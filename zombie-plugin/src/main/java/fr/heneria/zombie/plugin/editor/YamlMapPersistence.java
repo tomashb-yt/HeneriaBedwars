@@ -49,7 +49,7 @@ public final class YamlMapPersistence implements MapPersistence {
                       .toList()) {
                 Path file = directory.resolve(FILE);
                 if (Files.isRegularFile(file)) {
-                  loaded.add(read(file));
+                  loaded.add(deserialize(file));
                 }
               }
             }
@@ -100,7 +100,7 @@ public final class YamlMapPersistence implements MapPersistence {
       Path target = directory.resolve(FILE);
       Path temporary = directory.resolve(FILE + ".tmp");
       Path backup = directory.resolve(FILE + ".bak");
-      write(definition).save(temporary.toFile());
+      serialize(definition).save(temporary.toFile());
       if (Files.exists(target)) {
         Files.copy(target, backup, StandardCopyOption.REPLACE_EXISTING);
       }
@@ -115,7 +115,7 @@ public final class YamlMapPersistence implements MapPersistence {
     }
   }
 
-  private static YamlConfiguration write(MapDefinition definition) {
+  static YamlConfiguration serialize(MapDefinition definition) {
     YamlConfiguration yaml = new YamlConfiguration();
     yaml.set("schema-version", definition.schemaVersion());
     yaml.set("id", definition.id());
@@ -127,6 +127,7 @@ public final class YamlMapPersistence implements MapPersistence {
     yaml.set("world", definition.world());
     yaml.set("icon", definition.icon());
     yaml.set("image", definition.image());
+    yaml.set("minimum-players", definition.minimumPlayers());
     yaml.set("maximum-players", definition.maximumPlayers());
     yaml.set("music", definition.music());
     yaml.set("difficulty", definition.difficulty());
@@ -196,7 +197,7 @@ public final class YamlMapPersistence implements MapPersistence {
     return yaml;
   }
 
-  private static MapDefinition read(Path file) {
+  static MapDefinition deserialize(Path file) {
     YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file.toFile());
     if (yaml.getInt("schema-version") != MapDefinition.CURRENT_SCHEMA) {
       throw new IllegalArgumentException("Unsupported map schema in " + file);
@@ -289,6 +290,7 @@ public final class YamlMapPersistence implements MapPersistence {
         yaml.getString("world", ""),
         yaml.getString("icon", "FILLED_MAP"),
         yaml.getString("image", ""),
+        yaml.getInt("minimum-players", 1),
         yaml.getInt("maximum-players"),
         yaml.getString("music", ""),
         yaml.getString("difficulty", "NORMAL"),

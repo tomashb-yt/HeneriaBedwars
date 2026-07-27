@@ -53,6 +53,22 @@ public final class MapTemplateCatalog {
     return CompletableFuture.supplyAsync(() -> load(mapId), ioExecutor);
   }
 
+  /**
+   * Loads technical metadata from an immutable published world snapshot.
+   *
+   * @param mapId logical identifier
+   * @param source published source directory
+   * @return future optional definition
+   */
+  public CompletableFuture<Optional<MapTemplateDefinition>> findPublished(
+      String mapId, Path source) {
+    if (mapId == null || !mapId.matches("[a-z0-9][a-z0-9_-]{0,63}") || source == null) {
+      return CompletableFuture.completedFuture(Optional.empty());
+    }
+    Path normalized = source.toAbsolutePath().normalize();
+    return CompletableFuture.supplyAsync(() -> load(mapId, normalized), ioExecutor);
+  }
+
   /** Refreshes the non-authoritative map snapshot asynchronously. */
   public void refreshCount() {
     discover().exceptionally(ignored -> java.util.List.of());
@@ -145,13 +161,16 @@ public final class MapTemplateCatalog {
   }
 
   private Optional<MapTemplateDefinition> load(String mapId) {
+    return load(mapId, sourceDirectory(mapId));
+  }
+
+  private Optional<MapTemplateDefinition> load(String mapId, Path directory) {
     try {
       Files.createDirectories(templateRoot());
     } catch (IOException failure) {
       throw new CompletionException(
           new IOException("Could not create template directory " + templateRoot(), failure));
     }
-    Path directory = sourceDirectory(mapId);
     Path metadata = directory.resolve(METADATA_FILE);
     Path levelDat = directory.resolve("level.dat");
     if (!Files.isDirectory(directory, LinkOption.NOFOLLOW_LINKS)

@@ -181,13 +181,20 @@ public final class EditorGuiModule {
           view,
           14,
           Material.PLAYER_HEAD,
-          "Nombre de joueurs",
+          "Joueurs minimum",
+          Integer.toString(map.minimumPlayers()),
+          "minimum-players");
+      informationButton(
+          view,
+          15,
+          Material.PLAYER_HEAD,
+          "Joueurs maximum",
           Integer.toString(map.maximumPlayers()),
           "maximum-players");
-      informationButton(view, 15, Material.MUSIC_DISC_13, "Musique", map.music(), "music");
+      informationButton(view, 16, Material.MUSIC_DISC_13, "Musique", map.music(), "music");
       informationButton(
-          view, 16, Material.ZOMBIE_HEAD, "Difficulté", map.difficulty(), "difficulty");
-      informationButton(view, 19, Material.COMMAND_BLOCK, "Mode", map.gameMode(), "game-mode");
+          view, 19, Material.ZOMBIE_HEAD, "Difficulté", map.difficulty(), "difficulty");
+      informationButton(view, 20, Material.COMMAND_BLOCK, "Mode", map.gameMode(), "game-mode");
       view.button(
           22,
           Material.COMPASS,
@@ -351,7 +358,7 @@ public final class EditorGuiModule {
   }
 
   private static boolean validateInformation(String field, String value) {
-    if (field.equals("maximum-players")) {
+    if (field.equals("minimum-players") || field.equals("maximum-players")) {
       try {
         int amount = Integer.parseInt(value);
         return amount > 0 && amount <= 1000;

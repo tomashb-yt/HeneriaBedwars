@@ -20,6 +20,7 @@ public record MapDefinition(
     String world,
     String icon,
     String image,
+    int minimumPlayers,
     int maximumPlayers,
     String music,
     String difficulty,
@@ -37,7 +38,8 @@ public record MapDefinition(
         || !safeId(id)
         || displayName.isBlank()
         || world.isBlank()
-        || maximumPlayers <= 0) {
+        || minimumPlayers <= 0
+        || maximumPlayers < minimumPlayers) {
       throw new IllegalArgumentException("Invalid map definition");
     }
     Objects.requireNonNull(description, "description");
@@ -69,6 +71,7 @@ public record MapDefinition(
         world,
         "FILLED_MAP",
         "",
+        1,
         4,
         "",
         "NORMAL",
@@ -123,6 +126,7 @@ public record MapDefinition(
         world,
         icon,
         image,
+        minimumPlayers,
         maximumPlayers,
         music,
         difficulty,
@@ -140,6 +144,7 @@ public record MapDefinition(
     String newDescription = description;
     String newIcon = icon;
     String newImage = image;
+    int newMinimumPlayers = minimumPlayers;
     int newMaximumPlayers = maximumPlayers;
     String newMusic = music;
     String newDifficulty = difficulty;
@@ -149,14 +154,26 @@ public record MapDefinition(
       case "description" -> newDescription = limited(value, 512, field);
       case "icon" -> newIcon = required(value, 64, field).toUpperCase(java.util.Locale.ROOT);
       case "image" -> newImage = limited(value, 256, field);
+      case "minimum-players" -> {
+        try {
+          newMinimumPlayers = Integer.parseInt(value);
+        } catch (NumberFormatException failure) {
+          throw new IllegalArgumentException("Invalid minimum players", failure);
+        }
+        if (newMinimumPlayers <= 0 || newMinimumPlayers > newMaximumPlayers) {
+          throw new IllegalArgumentException(
+              "Minimum players must be between 1 and maximum players");
+        }
+      }
       case "maximum-players" -> {
         try {
           newMaximumPlayers = Integer.parseInt(value);
         } catch (NumberFormatException failure) {
           throw new IllegalArgumentException("Invalid maximum players", failure);
         }
-        if (newMaximumPlayers <= 0 || newMaximumPlayers > 1000) {
-          throw new IllegalArgumentException("Maximum players must be between 1 and 1000");
+        if (newMaximumPlayers < newMinimumPlayers || newMaximumPlayers > 1000) {
+          throw new IllegalArgumentException(
+              "Maximum players must be between minimum players and 1000");
         }
       }
       case "music" -> newMusic = limited(value, 128, field);
@@ -175,6 +192,7 @@ public record MapDefinition(
         world,
         newIcon,
         newImage,
+        newMinimumPlayers,
         newMaximumPlayers,
         newMusic,
         newDifficulty,
@@ -333,6 +351,103 @@ public record MapDefinition(
     };
   }
 
+  /** Creates a complete editable copy with a distinct identity, author and physical world. */
+  public MapDefinition duplicatedAs(String newId, UUID newCreator, Instant now, String newWorld) {
+    if (!safeId(newId) || newWorld == null || newWorld.isBlank()) {
+      throw new IllegalArgumentException("Invalid duplicated map identity");
+    }
+    java.util.LinkedHashMap<String, Zone> copiedZones = new java.util.LinkedHashMap<>();
+    zones
+        .values()
+        .forEach(
+            value ->
+                copiedZones.put(
+                    value.id(),
+                    new Zone(
+                        value.id(),
+                        value.name(),
+                        value.color(),
+                        value.music(),
+                        value.ambience(),
+                        value.volume(),
+                        inWorld(value.anchor(), newWorld))));
+    java.util.LinkedHashMap<String, Door> copiedDoors = new java.util.LinkedHashMap<>();
+    doors
+        .values()
+        .forEach(
+            value ->
+                copiedDoors.put(
+                    value.id(),
+                    new Door(
+                        value.id(),
+                        value.name(),
+                        value.price(),
+                        value.sourceZone(),
+                        value.targetZone(),
+                        value.type(),
+                        value.powerRequired(),
+                        value.key(),
+                        value.animation(),
+                        value.sound(),
+                        inWorld(value.position(), newWorld))));
+    java.util.LinkedHashMap<String, ZombieSpawn> copiedSpawns = new java.util.LinkedHashMap<>();
+    zombieSpawns
+        .values()
+        .forEach(
+            value ->
+                copiedSpawns.put(
+                    value.id(),
+                    new ZombieSpawn(
+                        value.id(),
+                        value.name(),
+                        value.zone(),
+                        value.weight(),
+                        value.capacity(),
+                        value.minimumRound(),
+                        value.maximumRound(),
+                        value.minimumDistance(),
+                        value.maximumDistance(),
+                        value.visible(),
+                        value.allowedTypes(),
+                        value.cooldownTicks(),
+                        inWorld(value.position(), newWorld))));
+    java.util.LinkedHashMap<String, MapObject> copiedObjects = new java.util.LinkedHashMap<>();
+    objects
+        .values()
+        .forEach(
+            value ->
+                copiedObjects.put(
+                    value.id(),
+                    new MapObject(
+                        value.id(),
+                        value.type(),
+                        value.name(),
+                        value.zone(),
+                        inWorld(value.position(), newWorld),
+                        value.properties())));
+    return new MapDefinition(
+        CURRENT_SCHEMA,
+        newId,
+        displayName + " (copie)",
+        description,
+        newCreator,
+        now,
+        now,
+        newWorld,
+        icon,
+        image,
+        minimumPlayers,
+        maximumPlayers,
+        music,
+        difficulty,
+        gameMode,
+        playerSpawn.map(value -> inWorld(value, newWorld)),
+        copiedZones,
+        copiedDoors,
+        copiedSpawns,
+        copiedObjects);
+  }
+
   private MapDefinition copy(
       Instant now,
       Optional<MapPoint> spawn,
@@ -351,6 +466,7 @@ public record MapDefinition(
         world,
         icon,
         image,
+        minimumPlayers,
         maximumPlayers,
         music,
         difficulty,
@@ -375,6 +491,10 @@ public record MapDefinition(
       throw new IllegalArgumentException(field + " is too long");
     }
     return normalized;
+  }
+
+  private static MapPoint inWorld(MapPoint point, String world) {
+    return new MapPoint(world, point.x(), point.y(), point.z(), point.yaw(), point.pitch());
   }
 
   public static boolean safeId(String value) {

@@ -18,12 +18,17 @@ spawn, l'isolation et la définition ; elle ne lance pas encore de manches ni de
 
 Une session contient la définition courante, l'outil, la sélection, le presse-papiers et un
 historique undo/redo borné à 64 versions. Un administrateur ne possède jamais deux sessions.
+Une map ne possède également qu'un éditeur à la fois ; le menu affiche l'UUID qui détient le
+verrou.
 
 ## Édition
 
-Nom, description, icône, image, joueurs maximum, musique, difficulté et mode sont saisis de façon
+Nom, description, icône, image, joueurs minimum/maximum, musique, difficulté et mode sont saisis de façon
 privée dans le chat. Auteur et monde sont fixés à la création. Le spawn joueur se place avec
 l'outil.
+
+Les joueurs minimum et maximum sont deux champs distincts. Le minimum doit être positif et ne
+peut dépasser le maximum.
 
 Chaque collection est sans plafond métier. Ajouter sélectionne l'outil de placement ; un clic
 gauche ou droit avec l'outil sur un bloc place ou déplace l'élément. Dans une liste GUI, un clic
@@ -67,6 +72,13 @@ pas être activée par la future boucle de jeu.
 - l'outil est identifié par Persistent Data Container, jamais par son nom.
 
 L'outil ne peut ni être jeté, ni déplacé dans un inventaire, ni utilisé sans session et permission.
+
+## Publication
+
+La copie éditoriale n'est jamais servie directement aux joueurs. Le menu de gestion crée une
+version immuable après validation, et `PaperGameRuntime` résout cette version pour une instance
+publique. Une instance privée de test continue à utiliser la copie de travail. Voir
+`MAP_PUBLICATION.md`.
 
 ## Consommation par le moteur
 

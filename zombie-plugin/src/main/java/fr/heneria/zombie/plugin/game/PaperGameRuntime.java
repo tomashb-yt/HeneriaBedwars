@@ -8,6 +8,7 @@ import fr.heneria.zombie.core.economy.RewardService;
 import fr.heneria.zombie.core.economy.TransactionService;
 import fr.heneria.zombie.core.economy.TransactionType;
 import fr.heneria.zombie.core.editor.MapDefinition;
+import fr.heneria.zombie.core.editor.MapPublicationService;
 import fr.heneria.zombie.core.editor.MapRegistry;
 import fr.heneria.zombie.core.game.GameEndReason;
 import fr.heneria.zombie.core.game.GamePlayerState;
@@ -49,6 +50,7 @@ import org.bukkit.entity.Player;
 public final class PaperGameRuntime {
   private final ZombieGameService games;
   private final MapRegistry maps;
+  private final MapPublicationService publications;
   private final ConfigurationManager configurations;
   private final InstanceCoordinator coordinator;
   private final ContextScoreboardService scoreboards;
@@ -73,6 +75,7 @@ public final class PaperGameRuntime {
   public PaperGameRuntime(
       ZombieGameService games,
       MapRegistry maps,
+      MapPublicationService publications,
       ConfigurationManager configurations,
       InstanceCoordinator coordinator,
       ContextScoreboardService scoreboards,
@@ -91,6 +94,7 @@ public final class PaperGameRuntime {
       Logger logger) {
     this.games = games;
     this.maps = maps;
+    this.publications = publications;
     this.configurations = configurations;
     this.coordinator = coordinator;
     this.scoreboards = scoreboards;
@@ -119,7 +123,15 @@ public final class PaperGameRuntime {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Instance inconnue"));
     MapDefinition map =
-        maps.find(instance.mapId()).orElseThrow(() -> new IllegalStateException("Map non Ã©ditÃ©e"));
+        (instance.owner().isPresent()
+                ? maps.find(instance.mapId())
+                : publications.publishedDefinition(instance.mapId()))
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        instance.owner().isPresent()
+                            ? "Map non Ã©ditÃ©e"
+                            : "Map non publiÃ©e ou en maintenance"));
     if (map.playerSpawn().isEmpty() || map.zombieSpawns().isEmpty()) {
       throw new IllegalStateException("Spawn joueur ou zombie manquant");
     }
@@ -381,545 +393,4 @@ public final class PaperGameRuntime {
       runtime.get().game.spectate(player.getUniqueId());
       player.setGameMode(GameMode.SPECTATOR);
       player.sendMessage(messages.render("game.player-eliminated-alone"));
-      end(runtime.get().game.id(), GameEndReason.TEAM_ELIMINATED);
-      return true;
-    }
-    if (!runtime.get().game.down(player.getUniqueId())) {
-      return false;
-    }
-    runtime
-        .get()
-        .bleedOut
-        .put(
-            player.getUniqueId(),
-            tick + runtime.get().game.configuration().bleedOutSeconds() * 20L);
-    player.setHealth(Math.min(maximumHealth(player), 1.0));
-    applyDownedPresentation(player);
-    player.sendMessage(messages.render("game.player-downed"));
-    return true;
-  }
-
-  public boolean beginRevive(Player reviver, Player target) {
-    Optional<RuntimeState> runtime = runtimeFor(reviver.getUniqueId());
-    if (runtime.isEmpty()
-        || !runtime.get().game.id().equals(gameIdFor(target.getUniqueId()).orElse(null))
-        || reviver.getLocation().distanceSquared(target.getLocation()) > 9) {
-      return false;
-    }
-    runtime
-        .get()
-        .revives
-        .put(
-            target.getUniqueId(),
-            new ReviveAttempt(
-                reviver.getUniqueId(),
-                tick + runtime.get().game.configuration().reviveSeconds() * 20L));
-    return true;
-  }
-
-  public void end(UUID gameId, GameEndReason reason) {
-    RuntimeState runtime = runtimes.get(gameId);
-    if (runtime == null || runtime.ending) {
-      return;
-    }
-    runtime.ending = true;
-    runtime
-        .game
-        .end(reason)
-        .ifPresent(
-            result ->
-                results
-                    .save(result.withEconomy(economyResult(gameId)))
-                    .exceptionally(
-                        failure -> {
-                          logger.severe(
-                              "Could not save game result " + gameId + ": " + failure.getMessage());
-                          return null;
-                        }));
-    runtime.endAt = tick + runtime.game.configuration().endScreenSeconds() * 20L;
-    runtime.bleedOut.keySet().stream()
-        .map(Bukkit::getPlayer)
-        .filter(java.util.Objects::nonNull)
-        .forEach(this::clearDownedPresentation);
-    runtime.bleedOut.clear();
-    runtime.revives.clear();
-    announce(runtime.game.snapshot().players().keySet(), "game.ended", "reason", reason.name());
-    spawner.removeAll(gameId, fr.heneria.zombie.core.enemy.ZombieRemovalReason.GAME_ENDED);
-    weapons.removeGame(gameId);
-    runtime.entities.clear();
-  }
-
-  public void shutdown() {
-    runtimes.keySet().forEach(id -> end(id, GameEndReason.SERVER_SHUTDOWN));
-    runtimes.values().forEach(runtime -> runtime.entities.keySet().forEach(spawner::remove));
-    runtimes.clear();
-    entityGames.clear();
-    games.clear();
-    economies.clear();
-    pointDisplay.clear();
-  }
-
-  public Collection<ZombieGame.Snapshot> snapshots() {
-    return games.snapshots();
-  }
-
-  public Optional<ZombieGame.Snapshot> snapshot(UUID id) {
-    return games.find(id).map(ZombieGame::snapshot);
-  }
-
-  public boolean forceNextRound(UUID id) {
-    RuntimeState runtime = runtimes.get(id);
-    if (runtime == null || runtime.game.snapshot().state() != GameState.ROUND_TRANSITION) {
-      return false;
-    }
-    runtime.nextActionAt = tick;
-    return true;
-  }
-
-  public boolean setRound(UUID id, int round) {
-    RuntimeState runtime = runtimes.get(id);
-    if (runtime == null
-        || round <= 0
-        || runtime.game.snapshot().state() != GameState.ROUND_TRANSITION) {
-      return false;
-    }
-    int enemies =
-        difficulty.enemyCount(round, activePlayers(runtime), runtime.game.configuration());
-    runtime.game.startRoundAt(round, enemies);
-    runtime.nextActionAt = tick + runtime.game.configuration().initialSpawnDelayTicks();
-    return true;
-  }
-
-  private void drive(RuntimeState runtime) {
-    runtime.game.expireDisconnectedPlayers();
-    ZombieGame.Snapshot snapshot = runtime.game.snapshot();
-    if (runtime.ending) {
-      if (tick >= runtime.endAt) {
-        finish(runtime);
-      }
-      return;
-    }
-    if (snapshot.state() == GameState.COUNTDOWN) {
-      if (activePlayers(runtime) < runtime.game.configuration().minimumPlayers()) {
-        if (runtime.game.configuration().cancelCountdownWhenInsufficient()) {
-          runtime.game.cancelCountdown();
-        }
-        return;
-      }
-      if (tick >= runtime.nextActionAt) {
-        int enemies =
-            difficulty.enemyCount(1, activePlayers(runtime), runtime.game.configuration());
-        runtime.game.start(enemies);
-        runtime.nextActionAt = tick + runtime.game.configuration().initialSpawnDelayTicks();
-        announce(snapshot.players().keySet(), "game.round-start", "round", "1");
-      }
-      return;
-    }
-    if (snapshot.state() == GameState.WAITING_FOR_PLAYERS
-        && activePlayers(runtime) >= runtime.game.configuration().minimumPlayers()) {
-      runtime.game.prepare();
-      runtime.nextActionAt = tick + runtime.game.configuration().countdownSeconds() * 20L;
-      return;
-    }
-    if (snapshot.state() == GameState.ROUND_ACTIVE) {
-      spawn(runtime);
-      updateRevives(runtime);
-      if (runtime.game.defeated()) {
-        end(runtime.game.id(), GameEndReason.TEAM_ELIMINATED);
-      }
-      if (runtime.game.snapshot().state() == GameState.ROUND_TRANSITION) {
-        int completed = runtime.game.snapshot().round().orElseThrow().number();
-        if (runtime.game.configuration().maximumRound() != -1
-            && completed >= runtime.game.configuration().maximumRound()) {
-          end(runtime.game.id(), GameEndReason.MAXIMUM_ROUND);
-        } else {
-          runtime.nextActionAt = tick + runtime.game.configuration().transitionSeconds() * 20L;
-        }
-      }
-      updateBoards(runtime);
-      return;
-    }
-    if (snapshot.state() == GameState.ROUND_TRANSITION && tick >= runtime.nextActionAt) {
-      int next = snapshot.round().orElseThrow().number() + 1;
-      int enemies =
-          difficulty.enemyCount(next, activePlayers(runtime), runtime.game.configuration());
-      runtime.game.startNextRound(enemies);
-      runtime.nextActionAt =
-          tick
-              + runtime.game.configuration().firstRoundDelaySeconds() * 20L
-              + runtime.game.configuration().initialSpawnDelayTicks();
-      announce(snapshot.players().keySet(), "game.round-start", "round", Integer.toString(next));
-    }
-  }
-
-  private void spawn(RuntimeState runtime) {
-    runtime
-        .entities
-        .entrySet()
-        .removeIf(
-            entry -> {
-              if (Bukkit.getEntity(entry.getKey()) != null) {
-                return false;
-              }
-              entityGames.remove(entry.getKey());
-              runtime.game.zombieDefeated(null);
-              return true;
-            });
-    if (tick < runtime.nextActionAt) {
-      return;
-    }
-    int maximumAlive =
-        difficulty.maximumAlive(activePlayers(runtime), runtime.game.configuration());
-    int reserved =
-        runtime.game.reserveSpawns(runtime.game.configuration().batchSize(), maximumAlive);
-    for (int index = 0; index < reserved; index++) {
-      MapDefinition.ZombieSpawn source = selectSpawn(runtime).orElse(null);
-      if (source == null) {
-        runtime.game.spawnFailed();
-        continue;
-      }
-      int round = runtime.game.snapshot().round().orElseThrow().number();
-      Optional<UUID> spawned =
-          spawner.spawn(
-              new ZombieSpawner.SpawnRequest(
-                  runtime.game.id(),
-                  round,
-                  runtime.worldName,
-                  source.id(),
-                  source.position(),
-                  source.zone().isBlank() ? Optional.empty() : Optional.of(source.zone()),
-                  source.allowedTypes()));
-      if (spawned.isPresent()) {
-        runtime.game.spawned();
-        runtime.entities.put(spawned.get(), new ActiveEntity(round, source.id()));
-        runtime.aliveBySpawn.merge(source.id(), 1, Math::addExact);
-        runtime.lastSpawnTick.put(source.id(), tick);
-        entityGames.put(spawned.get(), runtime.game.id());
-      } else {
-        runtime.game.spawnFailed();
-      }
-    }
-    int round = runtime.game.snapshot().round().orElseThrow().number();
-    runtime.nextActionAt = tick + difficulty.spawnDelayTicks(round, runtime.game.configuration());
-  }
-
-  private Optional<MapDefinition.ZombieSpawn> selectSpawn(RuntimeState runtime) {
-    int round = runtime.game.snapshot().round().orElseThrow().number();
-    java.util.List<MapDefinition.ZombieSpawn> eligible =
-        runtime.map.zombieSpawns().values().stream()
-            .filter(spawn -> spawn.minimumRound() <= round && spawn.maximumRound() >= round)
-            .filter(spawn -> runtime.aliveBySpawn.getOrDefault(spawn.id(), 0) < spawn.capacity())
-            .filter(
-                spawn ->
-                    !runtime.lastSpawnTick.containsKey(spawn.id())
-                        || tick - runtime.lastSpawnTick.get(spawn.id()) >= spawn.cooldownTicks())
-            .filter(spawn -> validPlayerDistance(runtime, spawn))
-            .toList();
-    double total = eligible.stream().mapToDouble(MapDefinition.ZombieSpawn::weight).sum();
-    if (total <= 0) {
-      return Optional.empty();
-    }
-    double cursor = java.util.concurrent.ThreadLocalRandom.current().nextDouble(total);
-    for (MapDefinition.ZombieSpawn spawn : eligible) {
-      cursor -= spawn.weight();
-      if (cursor < 0) {
-        return Optional.of(spawn);
-      }
-    }
-    return Optional.of(eligible.getLast());
-  }
-
-  private static boolean validPlayerDistance(
-      RuntimeState runtime, MapDefinition.ZombieSpawn spawn) {
-    World world = Bukkit.getWorld(runtime.worldName);
-    if (world == null) {
-      return false;
-    }
-    Location location =
-        new Location(world, spawn.position().x(), spawn.position().y(), spawn.position().z());
-    double minimum = spawn.minimumDistance() * spawn.minimumDistance();
-    double maximum = spawn.maximumDistance() * spawn.maximumDistance();
-    return runtime.game.snapshot().players().entrySet().stream()
-        .filter(entry -> entry.getValue().state() == GamePlayerState.ALIVE)
-        .map(entry -> Bukkit.getPlayer(entry.getKey()))
-        .filter(java.util.Objects::nonNull)
-        .filter(player -> player.getWorld().equals(world))
-        .mapToDouble(player -> player.getLocation().distanceSquared(location))
-        .anyMatch(distance -> distance >= minimum && distance <= maximum);
-  }
-
-  private void updateRevives(RuntimeState runtime) {
-    runtime.bleedOut.keySet().stream()
-        .map(Bukkit::getPlayer)
-        .filter(java.util.Objects::nonNull)
-        .forEach(this::applyDownedPresentation);
-    runtime
-        .bleedOut
-        .entrySet()
-        .removeIf(
-            entry -> {
-              if (tick < entry.getValue()) {
-                return false;
-              }
-              runtime.game.eliminate(entry.getKey());
-              runtime.game.spectate(entry.getKey());
-              Player player = Bukkit.getPlayer(entry.getKey());
-              if (player != null) {
-                clearDownedPresentation(player);
-                player.setGameMode(GameMode.SPECTATOR);
-              }
-              return true;
-            });
-    runtime
-        .revives
-        .entrySet()
-        .removeIf(
-            entry -> {
-              ReviveAttempt attempt = entry.getValue();
-              Player target = Bukkit.getPlayer(entry.getKey());
-              Player reviver = Bukkit.getPlayer(attempt.reviver);
-              if (target == null
-                  || reviver == null
-                  || !reviver.isSneaking()
-                  || reviver.getLocation().distanceSquared(target.getLocation()) > 9) {
-                return true;
-              }
-              if (tick < attempt.completeAt) {
-                return false;
-              }
-              if (runtime.game.revive(entry.getKey(), attempt.reviver)) {
-                runtime.bleedOut.remove(entry.getKey());
-                rewards.revive(
-                    runtime.game.id(),
-                    attempt.reviver,
-                    entry.getKey(),
-                    "revive:"
-                        + runtime.game.id()
-                        + ":"
-                        + attempt.reviver
-                        + ":"
-                        + entry.getKey()
-                        + ":"
-                        + tick);
-                target.setGameMode(GameMode.ADVENTURE);
-                clearDownedPresentation(target);
-                target.setHealth(
-                    Math.min(maximumHealth(target), runtime.game.configuration().reviveHealth()));
-              }
-              return true;
-            });
-  }
-
-  private void updateBoards(RuntimeState runtime) {
-    if (tick % 10 != 0) {
-      return;
-    }
-    ZombieGame.Snapshot snapshot = runtime.game.snapshot();
-    for (UUID playerId : snapshot.players().keySet()) {
-      Player player = Bukkit.getPlayer(playerId);
-      if (player != null) {
-        long balance =
-            economies.wallet(runtime.game.id(), playerId).map(value -> value.balance()).orElse(0L);
-        scoreboards.updateGame(
-            player,
-            snapshot,
-            balance,
-            powerUps.pointMultiplier(runtime.game.id()),
-            powerUps.active(runtime.game.id()).size());
-      }
-    }
-  }
-
-  private void damageFeedback(Player player) {
-    player.playHurtAnimation(0);
-    player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_HURT, 0.8f, 0.9f);
-    player
-        .getWorld()
-        .spawnParticle(
-            org.bukkit.Particle.DAMAGE_INDICATOR,
-            player.getLocation().add(0, 1, 0),
-            4,
-            0.25,
-            0.35,
-            0.25,
-            0.05);
-    player.sendActionBar(messages.render("game.damage-received"));
-    org.bukkit.util.Vector recoil = player.getLocation().getDirection().multiply(-0.16).setY(0.08);
-    player.setVelocity(player.getVelocity().add(recoil));
-  }
-
-  private void applyDownedPresentation(Player player) {
-    player.setSprinting(false);
-    player.setPose(org.bukkit.entity.Pose.SWIMMING, true);
-    player.setWalkSpeed(0);
-    player.addPotionEffect(
-        new org.bukkit.potion.PotionEffect(
-            org.bukkit.potion.PotionEffectType.SLOWNESS, 12, 10, false, false, false));
-  }
-
-  private void clearDownedPresentation(Player player) {
-    player.setPose(org.bukkit.entity.Pose.STANDING, false);
-    player.setWalkSpeed(0.2f);
-    player.removePotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS);
-  }
-
-  private void finish(RuntimeState runtime) {
-    runtimes.remove(runtime.game.id());
-    entityGames.entrySet().removeIf(entry -> entry.getValue().equals(runtime.game.id()));
-    for (UUID playerId : runtime.game.snapshot().players().keySet()) {
-      Player player = Bukkit.getPlayer(playerId);
-      if (player != null) {
-        coordinator.leave(player);
-      }
-    }
-    coordinator.stop(runtime.game.id());
-    games.remove(runtime.game.id());
-    paperPowerUps.clear(runtime.game.id());
-    rewards.clear(runtime.game.id());
-    purchases.removeGame(runtime.game.id());
-    economies.remove(runtime.game.id());
-  }
-
-  private Map<UUID, fr.heneria.zombie.core.game.GameResult.EconomyPlayerResult> economyResult(
-      UUID gameId) {
-    var economy = economies.find(gameId).orElse(null);
-    if (economy == null) {
-      return Map.of();
-    }
-    LinkedHashMap<UUID, fr.heneria.zombie.core.game.GameResult.EconomyPlayerResult> values =
-        new LinkedHashMap<>();
-    economy
-        .snapshot()
-        .wallets()
-        .forEach(
-            (playerId, wallet) -> {
-              var history = economy.history(playerId);
-              long purchases =
-                  history.stream().filter(value -> value.type() == TransactionType.DEBIT).count();
-              long largest =
-                  history.stream()
-                      .filter(value -> value.type() == TransactionType.DEBIT)
-                      .mapToLong(value -> value.amount())
-                      .max()
-                      .orElse(0);
-              values.put(
-                  playerId,
-                  new fr.heneria.zombie.core.game.GameResult.EconomyPlayerResult(
-                      wallet.totalEarned(),
-                      wallet.totalSpent(),
-                      wallet.totalRefunded(),
-                      wallet.balance(),
-                      wallet.transactionCount(),
-                      purchases,
-                      largest,
-                      paperPowerUps.collected(gameId, playerId)));
-            });
-    return Map.copyOf(values);
-  }
-
-  private int activePlayers(RuntimeState runtime) {
-    return (int)
-        runtime.game.snapshot().players().values().stream()
-            .filter(
-                player ->
-                    player.state() == GamePlayerState.ALIVE
-                        || player.state() == GamePlayerState.WAITING
-                        || player.state() == GamePlayerState.DOWNED
-                        || player.state() == GamePlayerState.DISCONNECTED)
-            .count();
-  }
-
-  private Optional<RuntimeState> runtimeFor(UUID playerId) {
-    return gameIdFor(playerId).map(runtimes::get);
-  }
-
-  private Optional<UUID> gameIdFor(UUID playerId) {
-    return runtimes.values().stream()
-        .filter(runtime -> runtime.game.snapshot().players().containsKey(playerId))
-        .map(runtime -> runtime.game.id())
-        .findFirst();
-  }
-
-  private RoundConfiguration configuration() {
-    GameplayOptions value = configurations.current().settings().gameplay();
-    return new RoundConfiguration(
-        value.minimumPlayers(),
-        value.countdownSeconds(),
-        value.cancelCountdownWhenInsufficient(),
-        value.joinInProgress(),
-        value.endScreenSeconds(),
-        value.startingPoints(),
-        value.maximumRound(),
-        value.firstRoundDelaySeconds(),
-        value.transitionSeconds(),
-        value.enemyBase(),
-        value.enemiesPerRound(),
-        value.playerMultiplier(),
-        value.minimumEnemies(),
-        value.maximumEnemies(),
-        value.baseHealth(),
-        value.healthMultiplier(),
-        value.maximumHealth(),
-        value.maximumAliveBase(),
-        value.maximumAlivePerPlayer(),
-        value.initialSpawnDelayTicks(),
-        value.spawnDelayTicks(),
-        value.minimumSpawnDelayTicks(),
-        value.batchSize(),
-        value.downedEnabled(),
-        value.bleedOutSeconds(),
-        value.reviveSeconds(),
-        value.reviveHealth(),
-        value.pointsPerKill());
-  }
-
-  private static double maximumHealth(Player player) {
-    var attribute = player.getAttribute(PaperAttributeResolver.maxHealth());
-    return attribute == null ? 20.0 : attribute.getValue();
-  }
-
-  private static boolean teleportToPlayerSpawn(RuntimeState runtime, Player player) {
-    World world = Bukkit.getWorld(runtime.worldName);
-    if (world == null) {
-      return false;
-    }
-    var point = runtime.map.playerSpawn().orElseThrow();
-    return player.teleport(
-        new Location(world, point.x(), point.y(), point.z(), point.yaw(), point.pitch()));
-  }
-
-  private void announce(Collection<UUID> players, String key, String... placeholders) {
-    Component text = messages.render(key, placeholders);
-    for (UUID playerId : players) {
-      Player player = Bukkit.getPlayer(playerId);
-      if (player != null) {
-        player.showTitle(Title.title(text, Component.empty()));
-      }
-    }
-  }
-
-  private static final class RuntimeState {
-    private final ZombieGame game;
-    private final MapDefinition map;
-    private final String worldName;
-    private final Map<UUID, ActiveEntity> entities = new LinkedHashMap<>();
-    private final Map<String, Integer> aliveBySpawn = new LinkedHashMap<>();
-    private final Map<String, Long> lastSpawnTick = new LinkedHashMap<>();
-    private final Map<UUID, Long> bleedOut = new LinkedHashMap<>();
-    private final Map<UUID, ReviveAttempt> revives = new LinkedHashMap<>();
-    private long nextActionAt;
-    private long endAt;
-    private boolean ending;
-
-    private RuntimeState(ZombieGame game, MapDefinition map, String worldName, long nextActionAt) {
-      this.game = game;
-      this.map = map;
-      this.worldName = worldName;
-      this.nextActionAt = nextActionAt;
-    }
-  }
-
-  private record ReviveAttempt(UUID reviver, long completeAt) {}
-
-  private record ActiveEntity(int round, String spawnId) {}
-}
+      end×Þt¶‰žËkºwµçM%Q%=8€˜˜Ñ¥¬€øôÉÕ¹Ñ¥µ”¹¹•áÑÑ¥½¹Ð¤ì4(€€€€€¥¹Ð¹•áÐ€ôÍ¹…ÁÍ¡½Ð¹É½Õ¹ ¤¹½É±Í•Q¡É½Ü ¤¹¹Õµ‰•È ¤€¬€Äì4(€€€€€¥¹Ð•¹•µ¥•Ì€ô4(€€€€€€€€€‘¥™™¥Õ±Ñä¹•¹•µå½Õ¹Ð¡¹•áÐ°…Ñ¥Ù•A±…å•ÉÌ¡ÉÕ¹Ñ¥µ”¤°ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¤ì4(€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹ÍÑ…ÉÑ9•áÑI½Õ¹¡•¹•µ¥•Ì¤ì4(€€€€€ÉÕ¹Ñ¥µ”¹¹•áÑÑ¥½¹Ð€ô4(€€€€€€€€€Ñ¥¬4(€€€€€€€€€€€€€€¬ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¹™¥ÉÍÑI½Õ¹‘•±…åM•½¹‘Ì ¤€¨€ÈÁ04(€€€€€€€€€€€€€€¬ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¹¥¹¥Ñ¥…±MÁ…Ý¹•±…åQ¥­Ì ¤ì4(€€€€€…¹¹½Õ¹”¡Í¹…ÁÍ¡½Ð¹Á±…å•ÉÌ ¤¹­•åM•Ð ¤°€‰…µ”¹É½Õ¹µÍÑ…ÉÐˆ°€‰É½Õ¹ˆ°%¹Ñ••È¹Ñ½MÑÉ¥¹œ¡¹•áÐ¤¤ì4(€€€ô4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥ÍÁ…Ý¸¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”¤ì4(€€€ÉÕ¹Ñ¥µ”4(€€€€€€€€¹•¹Ñ¥Ñ¥•Ì4(€€€€€€€€¹•¹ÑÉåM•Ð ¤4(€€€€€€€€¹É•µ½Ù•%˜ 4(€€€€€€€€€€€•¹ÑÉä€´øì4(€€€€€€€€€€€€€¥˜€¡	Õ­­¥Ð¹•Ñ¹Ñ¥Ñä¡•¹ÑÉä¹•Ñ-•ä ¤¤€„ô¹Õ±°¤ì4(€€€€€€€€€€€€€€€É•ÑÕÉ¸™…±Í”ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€•¹Ñ¥Ñå…µ•Ì¹É•µ½Ù”¡•¹ÑÉä¹•Ñ-•ä ¤¤ì4(€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹é½µ‰¥••™•…Ñ•¡¹Õ±°¤ì4(€€€€€€€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì4(€€€€€€€€€€€ô¤ì4(€€€¥˜€¡Ñ¥¬€ðÉÕ¹Ñ¥µ”¹¹•áÑÑ¥½¹Ð¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€¥¹Ðµ…á¥µÕµ±¥Ù”€ô4(€€€€€€€‘¥™™¥Õ±Ñä¹µ…á¥µÕµ±¥Ù”¡…Ñ¥Ù•A±…å•ÉÌ¡ÉÕ¹Ñ¥µ”¤°ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¤ì4(€€€¥¹ÐÉ•Í•ÉÙ•€ô4(€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹É•Í•ÉÙ•MÁ…Ý¹Ì¡ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¹‰…Ñ¡M¥é” ¤°µ…á¥µÕµ±¥Ù”¤ì4(€€€™½È€¡¥¹Ð¥¹‘•à€ô€Àì¥¹‘•à€ðÉ•Í•ÉÙ•ì¥¹‘•à¬¬¤ì4(€€€€€5…Á•™¥¹¥Ñ¥½¸¹i½µ‰¥•MÁ…Ý¸Í½ÕÉ”€ôÍ•±•ÑMÁ…Ý¸¡ÉÕ¹Ñ¥µ”¤¹½É±Í”¡¹Õ±°¤ì4(€€€€€¥˜€¡Í½ÕÉ”€ôô¹Õ±°¤ì4(€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹ÍÁ…Ý¹…¥±• ¤ì4(€€€€€€€½¹Ñ¥¹Õ”ì4(€€€€€ô4(€€€€€¥¹ÐÉ½Õ¹€ôÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹É½Õ¹ ¤¹½É±Í•Q¡É½Ü ¤¹¹Õµ‰•È ¤ì4(€€€€€=ÁÑ¥½¹…°ñUU%øÍÁ…Ý¹•€ô4(€€€€€€€€€ÍÁ…Ý¹•È¹ÍÁ…Ý¸ 4(€€€€€€€€€€€€€¹•Üi½µ‰¥•MÁ…Ý¹•È¹MÁ…Ý¹I•ÅÕ•ÍÐ 4(€€€€€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤°4(€€€€€€€€€€€€€€€€€É½Õ¹°4(€€€€€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹Ý½É±‘9…µ”°4(€€€€€€€€€€€€€€€€€Í½ÕÉ”¹¥ ¤°4(€€€€€€€€€€€€€€€€€Í½ÕÉ”¹Á½Í¥Ñ¥½¸ ¤°4(€€€€€€€€€€€€€€€€€Í½ÕÉ”¹é½¹” ¤¹¥Í	±…¹¬ ¤€ü=ÁÑ¥½¹…°¹•µÁÑä ¤€è=ÁÑ¥½¹…°¹½˜¡Í½ÕÉ”¹é½¹” ¤¤°4(€€€€€€€€€€€€€€€€€Í½ÕÉ”¹…±±½Ý•‘QåÁ•Ì ¤¤¤ì4(€€€€€¥˜€¡ÍÁ…Ý¹•¹¥ÍAÉ•Í•¹Ð ¤¤ì4(€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹ÍÁ…Ý¹• ¤ì4(€€€€€€€ÉÕ¹Ñ¥µ”¹•¹Ñ¥Ñ¥•Ì¹ÁÕÐ¡ÍÁ…Ý¹•¹•Ð ¤°¹•ÜÑ¥Ù•¹Ñ¥Ñä¡É½Õ¹°Í½ÕÉ”¹¥ ¤¤¤ì4(€€€€€€€ÉÕ¹Ñ¥µ”¹…±¥Ù•	åMÁ…Ý¸¹µ•É”¡Í½ÕÉ”¹¥ ¤°€Ä°5…Ñ èé…‘‘á…Ð¤ì4(€€€€€€€ÉÕ¹Ñ¥µ”¹±…ÍÑMÁ…Ý¹Q¥¬¹ÁÕÐ¡Í½ÕÉ”¹¥ ¤°Ñ¥¬¤ì4(€€€€€€€•¹Ñ¥Ñå…µ•Ì¹ÁÕÐ¡ÍÁ…Ý¹•¹•Ð ¤°ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€€€ô•±Í”ì4(€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹ÍÁ…Ý¹…¥±• ¤ì4(€€€€€ô4(€€€ô4(€€€¥¹ÐÉ½Õ¹€ôÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹É½Õ¹ ¤¹½É±Í•Q¡É½Ü ¤¹¹Õµ‰•È ¤ì4(€€€ÉÕ¹Ñ¥µ”¹¹•áÑÑ¥½¹Ð€ôÑ¥¬€¬‘¥™™¥Õ±Ñä¹ÍÁ…Ý¹•±…åQ¥­Ì¡É½Õ¹°ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”=ÁÑ¥½¹…°ñ5…Á•™¥¹¥Ñ¥½¸¹i½µ‰¥•MÁ…Ý¸øÍ•±•ÑMÁ…Ý¸¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”¤ì4(€€€¥¹ÐÉ½Õ¹€ôÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹É½Õ¹ ¤¹½É±Í•Q¡É½Ü ¤¹¹Õµ‰•È ¤ì4(€€€©…Ù„¹ÕÑ¥°¹1¥ÍÐñ5…Á•™¥¹¥Ñ¥½¸¹i½µ‰¥•MÁ…Ý¸ø•±¥¥‰±”€ô4(€€€€€€€ÉÕ¹Ñ¥µ”¹µ…À¹é½µ‰¥•MÁ…Ý¹Ì ¤¹Ù…±Õ•Ì ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€€€€€¹™¥±Ñ•È¡ÍÁ…Ý¸€´øÍÁ…Ý¸¹µ¥¹¥µÕµI½Õ¹ ¤€ðôÉ½Õ¹€˜˜ÍÁ…Ý¸¹µ…á¥µÕµI½Õ¹ ¤€øôÉ½Õ¹¤4(€€€€€€€€€€€€¹™¥±Ñ•È¡ÍÁ…Ý¸€´øÉÕ¹Ñ¥µ”¹…±¥Ù•	åMÁ…Ý¸¹•Ñ=É•™…Õ±Ð¡ÍÁ…Ý¸¹¥ ¤°€À¤€ðÍÁ…Ý¸¹…Á…¥Ñä ¤¤4(€€€€€€€€€€€€¹™¥±Ñ•È 4(€€€€€€€€€€€€€€€ÍÁ…Ý¸€´ø4(€€€€€€€€€€€€€€€€€€€€…ÉÕ¹Ñ¥µ”¹±…ÍÑMÁ…Ý¹Q¥¬¹½¹Ñ…¥¹Í-•ä¡ÍÁ…Ý¸¹¥ ¤¤4(€€€€€€€€€€€€€€€€€€€€€€€ñðÑ¥¬€´ÉÕ¹Ñ¥µ”¹±…ÍÑMÁ…Ý¹Q¥¬¹•Ð¡ÍÁ…Ý¸¹¥ ¤¤€øôÍÁ…Ý¸¹½½±‘½Ý¹Q¥­Ì ¤¤4(€€€€€€€€€€€€¹™¥±Ñ•È¡ÍÁ…Ý¸€´øÙ…±¥‘A±…å•É¥ÍÑ…¹”¡ÉÕ¹Ñ¥µ”°ÍÁ…Ý¸¤¤4(€€€€€€€€€€€€¹Ñ½1¥ÍÐ ¤ì4(€€€‘½Õ‰±”Ñ½Ñ…°€ô•±¥¥‰±”¹ÍÑÉ•…´ ¤¹µ…ÁQ½½Õ‰±”¡5…Á•™¥¹¥Ñ¥½¸¹i½µ‰¥•MÁ…Ý¸èéÝ•¥¡Ð¤¹ÍÕ´ ¤ì4(€€€¥˜€¡Ñ½Ñ…°€ðô€À¤ì4(€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹•µÁÑä ¤ì4(€€€ô4(€€€‘½Õ‰±”ÕÉÍ½È€ô©…Ù„¹ÕÑ¥°¹½¹ÕÉÉ•¹Ð¹Q¡É•…‘1½…±I…¹‘½´¹ÕÉÉ•¹Ð ¤¹¹•áÑ½Õ‰±”¡Ñ½Ñ…°¤ì4(€€€™½È€¡5…Á•™¥¹¥Ñ¥½¸¹i½µ‰¥•MÁ…Ý¸ÍÁ…Ý¸€è•±¥¥‰±”¤ì4(€€€€€ÕÉÍ½È€´ôÍÁ…Ý¸¹Ý•¥¡Ð ¤ì4(€€€€€¥˜€¡ÕÉÍ½È€ð€À¤ì4(€€€€€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹½˜¡ÍÁ…Ý¸¤ì4(€€€€€ô4(€€€ô4(€€€É•ÑÕÉ¸=ÁÑ¥½¹…°¹½˜¡•±¥¥‰±”¹•Ñ1…ÍÐ ¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ‰½½±•…¸Ù…±¥‘A±…å•É¥ÍÑ…¹” 4(€€€€€IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”°5…Á•™¥¹¥Ñ¥½¸¹i½µ‰¥•MÁ…Ý¸ÍÁ…Ý¸¤ì4(€€€]½É±Ý½É±€ô	Õ­­¥Ð¹•Ñ]½É±¡ÉÕ¹Ñ¥µ”¹Ý½É±‘9…µ”¤ì4(€€€¥˜€¡Ý½É±€ôô¹Õ±°¤ì4(€€€€€É•ÑÕÉ¸™…±Í”ì4(€€€ô4(€€€1½…Ñ¥½¸±½…Ñ¥½¸€ô4(€€€€€€€¹•Ü1½…Ñ¥½¸¡Ý½É±°ÍÁ…Ý¸¹Á½Í¥Ñ¥½¸ ¤¹à ¤°ÍÁ…Ý¸¹Á½Í¥Ñ¥½¸ ¤¹ä ¤°ÍÁ…Ý¸¹Á½Í¥Ñ¥½¸ ¤¹è ¤¤ì4(€€€‘½Õ‰±”µ¥¹¥µÕ´€ôÍÁ…Ý¸¹µ¥¹¥µÕµ¥ÍÑ…¹” ¤€¨ÍÁ…Ý¸¹µ¥¹¥µÕµ¥ÍÑ…¹” ¤ì4(€€€‘½Õ‰±”µ…á¥µÕ´€ôÍÁ…Ý¸¹µ…á¥µÕµ¥ÍÑ…¹” ¤€¨ÍÁ…Ý¸¹µ…á¥µÕµ¥ÍÑ…¹” ¤ì4(€€€É•ÑÕÉ¸ÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹Á±…å•ÉÌ ¤¹•¹ÑÉåM•Ð ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€¹™¥±Ñ•È¡•¹ÑÉä€´ø•¹ÑÉä¹•ÑY…±Õ” ¤¹ÍÑ…Ñ” ¤€ôô…µ•A±…å•ÉMÑ…Ñ”¹1%Y¤4(€€€€€€€€¹µ…À¡•¹ÑÉä€´ø	Õ­­¥Ð¹•ÑA±…å•È¡•¹ÑÉä¹•Ñ-•ä ¤¤¤4(€€€€€€€€¹™¥±Ñ•È¡©…Ù„¹ÕÑ¥°¹=‰©•ÑÌèé¹½¹9Õ±°¤4(€€€€€€€€¹™¥±Ñ•È¡Á±…å•È€´øÁ±…å•È¹•Ñ]½É± ¤¹•ÅÕ…±Ì¡Ý½É±¤¤4(€€€€€€€€¹µ…ÁQ½½Õ‰±”¡Á±…å•È€´øÁ±…å•È¹•Ñ1½…Ñ¥½¸ ¤¹‘¥ÍÑ…¹•MÅÕ…É•¡±½…Ñ¥½¸¤¤4(€€€€€€€€¹…¹å5…Ñ ¡‘¥ÍÑ…¹”€´ø‘¥ÍÑ…¹”€øôµ¥¹¥µÕ´€˜˜‘¥ÍÑ…¹”€ðôµ…á¥µÕ´¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥ÕÁ‘…Ñ•I•Ù¥Ù•Ì¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”¤ì4(€€€ÉÕ¹Ñ¥µ”¹‰±••‘=ÕÐ¹­•åM•Ð ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€¹µ…À¡	Õ­­¥Ðèé•ÑA±…å•È¤4(€€€€€€€€¹™¥±Ñ•È¡©…Ù„¹ÕÑ¥°¹=‰©•ÑÌèé¹½¹9Õ±°¤4(€€€€€€€€¹™½É… ¡Ñ¡¥Ìèé…ÁÁ±å½Ý¹•‘AÉ•Í•¹Ñ…Ñ¥½¸¤ì4(€€€ÉÕ¹Ñ¥µ”4(€€€€€€€€¹‰±••‘=ÕÐ4(€€€€€€€€¹•¹ÑÉåM•Ð ¤4(€€€€€€€€¹É•µ½Ù•%˜ 4(€€€€€€€€€€€•¹ÑÉä€´øì4(€€€€€€€€€€€€€¥˜€¡Ñ¥¬€ð•¹ÑÉä¹•ÑY…±Õ” ¤¤ì4(€€€€€€€€€€€€€€€É•ÑÕÉ¸™…±Í”ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹•±¥µ¥¹…Ñ”¡•¹ÑÉä¹•Ñ-•ä ¤¤ì4(€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹ÍÁ•Ñ…Ñ”¡•¹ÑÉä¹•Ñ-•ä ¤¤ì4(€€€€€€€€€€€€€A±…å•ÈÁ±…å•È€ô	Õ­­¥Ð¹•ÑA±…å•È¡•¹ÑÉä¹•Ñ-•ä ¤¤ì4(€€€€€€€€€€€€€¥˜€¡Á±…å•È€„ô¹Õ±°¤ì4(€€€€€€€€€€€€€€€±•…É½Ý¹•‘AÉ•Í•¹Ñ…Ñ¥½¸¡Á±…å•È¤ì4(€€€€€€€€€€€€€€€Á±…å•È¹Í•Ñ…µ•5½‘”¡…µ•5½‘”¹MAQQ=H¤ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì4(€€€€€€€€€€€ô¤ì4(€€€ÉÕ¹Ñ¥µ”4(€€€€€€€€¹É•Ù¥Ù•Ì4(€€€€€€€€¹•¹ÑÉåM•Ð ¤4(€€€€€€€€¹É•µ½Ù•%˜ 4(€€€€€€€€€€€•¹ÑÉä€´øì4(€€€€€€€€€€€€€I•Ù¥Ù•ÑÑ•µÁÐ…ÑÑ•µÁÐ€ô•¹ÑÉä¹•ÑY…±Õ” ¤ì4(€€€€€€€€€€€€€A±…å•ÈÑ…É•Ð€ô	Õ­­¥Ð¹•ÑA±…å•È¡•¹ÑÉä¹•Ñ-•ä ¤¤ì4(€€€€€€€€€€€€€A±…å•ÈÉ•Ù¥Ù•È€ô	Õ­­¥Ð¹•ÑA±…å•È¡…ÑÑ•µÁÐ¹É•Ù¥Ù•È¤ì4(€€€€€€€€€€€€€¥˜€¡Ñ…É•Ð€ôô¹Õ±°4(€€€€€€€€€€€€€€€€€ñðÉ•Ù¥Ù•È€ôô¹Õ±°4(€€€€€€€€€€€€€€€€€ñð€…É•Ù¥Ù•È¹¥ÍM¹•…­¥¹œ ¤4(€€€€€€€€€€€€€€€€€ñðÉ•Ù¥Ù•È¹•Ñ1½…Ñ¥½¸ ¤¹‘¥ÍÑ…¹•MÅÕ…É•¡Ñ…É•Ð¹•Ñ1½…Ñ¥½¸ ¤¤€ø€ä¤ì4(€€€€€€€€€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€¥˜€¡Ñ¥¬€ð…ÑÑ•µÁÐ¹½µÁ±•Ñ•Ð¤ì4(€€€€€€€€€€€€€€€É•ÑÕÉ¸™…±Í”ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€¥˜€¡ÉÕ¹Ñ¥µ”¹…µ”¹É•Ù¥Ù”¡•¹ÑÉä¹•Ñ-•ä ¤°…ÑÑ•µÁÐ¹É•Ù¥Ù•È¤¤ì4(€€€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹‰±••‘=ÕÐ¹É•µ½Ù”¡•¹ÑÉä¹•Ñ-•ä ¤¤ì4(€€€€€€€€€€€€€€€É•Ý…É‘Ì¹É•Ù¥Ù” 4(€€€€€€€€€€€€€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤°4(€€€€€€€€€€€€€€€€€€€…ÑÑ•µÁÐ¹É•Ù¥Ù•È°4(€€€€€€€€€€€€€€€€€€€•¹ÑÉä¹•Ñ-•ä ¤°4(€€€€€€€€€€€€€€€€€€€€‰É•Ù¥Ù”èˆ4(€€€€€€€€€€€€€€€€€€€€€€€€¬ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤4(€€€€€€€€€€€€€€€€€€€€€€€€¬€ˆèˆ4(€€€€€€€€€€€€€€€€€€€€€€€€¬…ÑÑ•µÁÐ¹É•Ù¥Ù•È4(€€€€€€€€€€€€€€€€€€€€€€€€¬€ˆèˆ4(€€€€€€€€€€€€€€€€€€€€€€€€¬•¹ÑÉä¹•Ñ-•ä ¤4(€€€€€€€€€€€€€€€€€€€€€€€€¬€ˆèˆ4(€€€€€€€€€€€€€€€€€€€€€€€€¬Ñ¥¬¤ì4(€€€€€€€€€€€€€€€Ñ…É•Ð¹Í•Ñ…µ•5½‘”¡…µ•5½‘”¹Y9QUI¤ì4(€€€€€€€€€€€€€€€±•…É½Ý¹•‘AÉ•Í•¹Ñ…Ñ¥½¸¡Ñ…É•Ð¤ì4(€€€€€€€€€€€€€€€Ñ…É•Ð¹Í•Ñ!•…±Ñ  4(€€€€€€€€€€€€€€€€€€€5…Ñ ¹µ¥¸¡µ…á¥µÕµ!•…±Ñ ¡Ñ…É•Ð¤°ÉÕ¹Ñ¥µ”¹…µ”¹½¹™¥ÕÉ…Ñ¥½¸ ¤¹É•Ù¥Ù•!•…±Ñ  ¤¤¤ì4(€€€€€€€€€€€€€ô4(€€€€€€€€€€€€€É•ÑÕÉ¸ÑÉÕ”ì4(€€€€€€€€€€€ô¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥ÕÁ‘…Ñ•	½…É‘Ì¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”¤ì4(€€€¥˜€¡Ñ¥¬€”€ÄÀ€„ô€À¤ì4(€€€€€É•ÑÕÉ¸ì4(€€€ô4(€€€i½µ‰¥•…µ”¹M¹…ÁÍ¡½ÐÍ¹…ÁÍ¡½Ð€ôÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤ì4(€€€™½È€¡UU%Á±…å•É%€èÍ¹…ÁÍ¡½Ð¹Á±…å•ÉÌ ¤¹­•åM•Ð ¤¤ì4(€€€€€A±…å•ÈÁ±…å•È€ô	Õ­­¥Ð¹•ÑA±…å•È¡Á±…å•É%¤ì4(€€€€€¥˜€¡Á±…å•È€„ô¹Õ±°¤ì4(€€€€€€€±½¹œ‰…±…¹”€ô4(€€€€€€€€€€€•½¹½µ¥•Ì¹Ý…±±•Ð¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤°Á±…å•É%¤¹µ…À¡Ù…±Õ”€´øÙ…±Õ”¹‰…±…¹” ¤¤¹½É±Í” Á0¤ì4(€€€€€€€Í½É•‰½…É‘Ì¹ÕÁ‘…Ñ•…µ” 4(€€€€€€€€€€€Á±…å•È°4(€€€€€€€€€€€Í¹…ÁÍ¡½Ð°4(€€€€€€€€€€€‰…±…¹”°4(€€€€€€€€€€€Á½Ý•ÉUÁÌ¹Á½¥¹Ñ5Õ±Ñ¥Á±¥•È¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤°4(€€€€€€€€€€€Á½Ý•ÉUÁÌ¹…Ñ¥Ù”¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤¹Í¥é” ¤¤ì4(€€€€€ô4(€€€ô4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥‘…µ…•••‘‰…¬¡A±…å•ÈÁ±…å•È¤ì4(€€€Á±…å•È¹Á±…å!ÕÉÑ¹¥µ…Ñ¥½¸ À¤ì4(€€€Á±…å•È¹Á±…åM½Õ¹¡Á±…å•È¹•Ñ1½…Ñ¥½¸ ¤°½Éœ¹‰Õ­­¥Ð¹M½Õ¹¹9Q%Qe}A1eI}!UIP°€À¸á˜°€À¸å˜¤ì4(€€€Á±…å•È4(€€€€€€€€¹•Ñ]½É± ¤4(€€€€€€€€¹ÍÁ…Ý¹A…ÉÑ¥±” 4(€€€€€€€€€€€½Éœ¹‰Õ­­¥Ð¹A…ÉÑ¥±”¹5}%9%Q=H°4(€€€€€€€€€€€Á±…å•È¹•Ñ1½…Ñ¥½¸ ¤¹…‘ À°€Ä°€À¤°4(€€€€€€€€€€€€Ð°4(€€€€€€€€€€€€À¸ÈÔ°4(€€€€€€€€€€€€À¸ÌÔ°4(€€€€€€€€€€€€À¸ÈÔ°4(€€€€€€€€€€€€À¸ÀÔ¤ì4(€€€Á±…å•È¹Í•¹‘Ñ¥½¹	…È¡µ•ÍÍ…•Ì¹É•¹‘•È ‰…µ”¹‘…µ…”µÉ••¥Ù•ˆ¤¤ì4(€€€½Éœ¹‰Õ­­¥Ð¹ÕÑ¥°¹Y•Ñ½ÈÉ•½¥°€ôÁ±…å•È¹•Ñ1½…Ñ¥½¸ ¤¹•Ñ¥É•Ñ¥½¸ ¤¹µÕ±Ñ¥Á±ä ´À¸ÄØ¤¹Í•Ñd À¸Àà¤ì4(€€€Á±…å•È¹Í•ÑY•±½¥Ñä¡Á±…å•È¹•ÑY•±½¥Ñä ¤¹…‘¡É•½¥°¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥…ÁÁ±å½Ý¹•‘AÉ•Í•¹Ñ…Ñ¥½¸¡A±…å•ÈÁ±…å•È¤ì4(€€€Á±…å•È¹Í•ÑMÁÉ¥¹Ñ¥¹œ¡™…±Í”¤ì4(€€€Á±…å•È¹Í•ÑA½Í”¡½Éœ¹‰Õ­­¥Ð¹•¹Ñ¥Ñä¹A½Í”¹M]%55%9°ÑÉÕ”¤ì4(€€€Á±…å•È¹Í•Ñ]…±­MÁ•• À¤ì4(€€€Á±…å•È¹…‘‘A½Ñ¥½¹™™•Ð 4(€€€€€€€¹•Ü½Éœ¹‰Õ­­¥Ð¹Á½Ñ¥½¸¹A½Ñ¥½¹™™•Ð 4(€€€€€€€€€€€½Éœ¹‰Õ­­¥Ð¹Á½Ñ¥½¸¹A½Ñ¥½¹™™•ÑQåÁ”¹M1=]9ML°€ÄÈ°€ÄÀ°™…±Í”°™…±Í”°™…±Í”¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥±•…É½Ý¹•‘AÉ•Í•¹Ñ…Ñ¥½¸¡A±…å•ÈÁ±…å•È¤ì4(€€€Á±…å•È¹Í•ÑA½Í”¡½Éœ¹‰Õ­­¥Ð¹•¹Ñ¥Ñä¹A½Í”¹MQ9%9°™…±Í”¤ì4(€€€Á±…å•È¹Í•Ñ]…±­MÁ•• À¸É˜¤ì4(€€€Á±…å•È¹É•µ½Ù•A½Ñ¥½¹™™•Ð¡½Éœ¹‰Õ­­¥Ð¹Á½Ñ¥½¸¹A½Ñ¥½¹™™•ÑQåÁ”¹M1=]9ML¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥™¥¹¥Í ¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”¤ì4(€€€ÉÕ¹Ñ¥µ•Ì¹É•µ½Ù”¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€•¹Ñ¥Ñå…µ•Ì¹•¹ÑÉåM•Ð ¤¹É•µ½Ù•%˜¡•¹ÑÉä€´ø•¹ÑÉä¹•ÑY…±Õ” ¤¹•ÅÕ…±Ì¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤¤ì4(€€€™½È€¡UU%Á±…å•É%€èÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹Á±…å•ÉÌ ¤¹­•åM•Ð ¤¤ì4(€€€€€A±…å•ÈÁ±…å•È€ô	Õ­­¥Ð¹•ÑA±…å•È¡Á±…å•É%¤ì4(€€€€€¥˜€¡Á±…å•È€„ô¹Õ±°¤ì4(€€€€€€€½½É‘¥¹…Ñ½È¹±•…Ù”¡Á±…å•È¤ì4(€€€€€ô4(€€€ô4(€€€½½É‘¥¹…Ñ½È¹ÍÑ½À¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€…µ•Ì¹É•µ½Ù”¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€Á…Á•ÉA½Ý•ÉUÁÌ¹±•…È¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€É•Ý…É‘Ì¹±•…È¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€ÁÕÉ¡…Í•Ì¹É•µ½Ù•…µ”¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€€€•½¹½µ¥•Ì¹É•µ½Ù”¡ÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”5…ÀñUU%°™È¹¡•¹•É¥„¹é½µ‰¥”¹½É”¹…µ”¹…µ•I•ÍÕ±Ð¹½¹½µåA±…å•ÉI•ÍÕ±Ðø•½¹½µåI•ÍÕ±Ð 4(€€€€€UU%…µ•%¤ì4(€€€Ù…È•½¹½µä€ô•½¹½µ¥•Ì¹™¥¹¡…µ•%¤¹½É±Í”¡¹Õ±°¤ì4(€€€¥˜€¡•½¹½µä€ôô¹Õ±°¤ì4(€€€€€É•ÑÕÉ¸5…À¹½˜ ¤ì4(€€€ô4(€€€1¥¹­•‘!…Í¡5…ÀñUU%°™È¹¡•¹•É¥„¹é½µ‰¥”¹½É”¹…µ”¹…µ•I•ÍÕ±Ð¹½¹½µåA±…å•ÉI•ÍÕ±ÐøÙ…±Õ•Ì€ô4(€€€€€€€¹•Ü1¥¹­•‘!…Í¡5…Àðø ¤ì4(€€€•½¹½µä4(€€€€€€€€¹Í¹…ÁÍ¡½Ð ¤4(€€€€€€€€¹Ý…±±•ÑÌ ¤4(€€€€€€€€¹™½É…  4(€€€€€€€€€€€€¡Á±…å•É%°Ý…±±•Ð¤€´øì4(€€€€€€€€€€€€€Ù…È¡¥ÍÑ½Éä€ô•½¹½µä¹¡¥ÍÑ½Éä¡Á±…å•É%¤ì4(€€€€€€€€€€€€€±½¹œÁÕÉ¡…Í•Ì€ô4(€€€€€€€€€€€€€€€€€¡¥ÍÑ½Éä¹ÍÑÉ•…´ ¤¹™¥±Ñ•È¡Ù…±Õ”€´øÙ…±Õ”¹ÑåÁ” ¤€ôôQÉ…¹Í…Ñ¥½¹QåÁ”¹	%P¤¹½Õ¹Ð ¤ì4(€€€€€€€€€€€€€±½¹œ±…É•ÍÐ€ô4(€€€€€€€€€€€€€€€€€¡¥ÍÑ½Éä¹ÍÑÉ•…´ ¤4(€€€€€€€€€€€€€€€€€€€€€€¹™¥±Ñ•È¡Ù…±Õ”€´øÙ…±Õ”¹ÑåÁ” ¤€ôôQÉ…¹Í…Ñ¥½¹QåÁ”¹	%P¤4(€€€€€€€€€€€€€€€€€€€€€€¹µ…ÁQ½1½¹œ¡Ù…±Õ”€´øÙ…±Õ”¹…µ½Õ¹Ð ¤¤4(€€€€€€€€€€€€€€€€€€€€€€¹µ…à ¤4(€€€€€€€€€€€€€€€€€€€€€€¹½É±Í” À¤ì4(€€€€€€€€€€€€€Ù…±Õ•Ì¹ÁÕÐ 4(€€€€€€€€€€€€€€€€€Á±…å•É%°4(€€€€€€€€€€€€€€€€€¹•Ü™È¹¡•¹•É¥„¹é½µ‰¥”¹½É”¹…µ”¹…µ•I•ÍÕ±Ð¹½¹½µåA±…å•ÉI•ÍÕ±Ð 4(€€€€€€€€€€€€€€€€€€€€€Ý…±±•Ð¹Ñ½Ñ…±…É¹• ¤°4(€€€€€€€€€€€€€€€€€€€€€Ý…±±•Ð¹Ñ½Ñ…±MÁ•¹Ð ¤°4(€€€€€€€€€€€€€€€€€€€€€Ý…±±•Ð¹Ñ½Ñ…±I•™Õ¹‘• ¤°4(€€€€€€€€€€€€€€€€€€€€€Ý…±±•Ð¹‰…±…¹” ¤°4(€€€€€€€€€€€€€€€€€€€€€Ý…±±•Ð¹ÑÉ…¹Í…Ñ¥½¹½Õ¹Ð ¤°4(€€€€€€€€€€€€€€€€€€€€€ÁÕÉ¡…Í•Ì°4(€€€€€€€€€€€€€€€€€€€€€±…É•ÍÐ°4(€€€€€€€€€€€€€€€€€€€€€Á…Á•ÉA½Ý•ÉUÁÌ¹½±±•Ñ•¡…µ•%°Á±…å•É%¤¤¤ì4(€€€€€€€€€€€ô¤ì4(€€€É•ÑÕÉ¸5…À¹½Áå=˜¡Ù…±Õ•Ì¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”¥¹Ð…Ñ¥Ù•A±…å•ÉÌ¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”¤ì4(€€€É•ÑÕÉ¸€¡¥¹Ð¤4(€€€€€€€ÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹Á±…å•ÉÌ ¤¹Ù…±Õ•Ì ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€€€€€¹™¥±Ñ•È 4(€€€€€€€€€€€€€€€Á±…å•È€´ø4(€€€€€€€€€€€€€€€€€€€Á±…å•È¹ÍÑ…Ñ” ¤€ôô…µ•A±…å•ÉMÑ…Ñ”¹1%Y4(€€€€€€€€€€€€€€€€€€€€€€€ñðÁ±…å•È¹ÍÑ…Ñ” ¤€ôô…µ•A±…å•ÉMÑ…Ñ”¹]%Q%94(€€€€€€€€€€€€€€€€€€€€€€€ñðÁ±…å•È¹ÍÑ…Ñ” ¤€ôô…µ•A±…å•ÉMÑ…Ñ”¹=]94(€€€€€€€€€€€€€€€€€€€€€€€ñðÁ±…å•È¹ÍÑ…Ñ” ¤€ôô…µ•A±…å•ÉMÑ…Ñ”¹%M=99Q¤4(€€€€€€€€€€€€¹½Õ¹Ð ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”=ÁÑ¥½¹…°ñIÕ¹Ñ¥µ•MÑ…Ñ”øÉÕ¹Ñ¥µ•½È¡UU%Á±…å•É%¤ì4(€€€É•ÑÕÉ¸…µ•%‘½È¡Á±…å•É%¤¹µ…À¡ÉÕ¹Ñ¥µ•Ìèé•Ð¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”=ÁÑ¥½¹…°ñUU%ø…µ•%‘½È¡UU%Á±…å•É%¤ì4(€€€É•ÑÕÉ¸ÉÕ¹Ñ¥µ•Ì¹Ù…±Õ•Ì ¤¹ÍÑÉ•…´ ¤4(€€€€€€€€¹™¥±Ñ•È¡ÉÕ¹Ñ¥µ”€´øÉÕ¹Ñ¥µ”¹…µ”¹Í¹…ÁÍ¡½Ð ¤¹Á±…å•ÉÌ ¤¹½¹Ñ…¥¹Í-•ä¡Á±…å•É%¤¤4(€€€€€€€€¹µ…À¡ÉÕ¹Ñ¥µ”€´øÉÕ¹Ñ¥µ”¹…µ”¹¥ ¤¤4(€€€€€€€€¹™¥¹‘¥ÉÍÐ ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”I½Õ¹‘½¹™¥ÕÉ…Ñ¥½¸½¹™¥ÕÉ…Ñ¥½¸ ¤ì4(€€€…µ•Á±…å=ÁÑ¥½¹ÌÙ…±Õ”€ô½¹™¥ÕÉ…Ñ¥½¹Ì¹ÕÉÉ•¹Ð ¤¹Í•ÑÑ¥¹Ì ¤¹…µ•Á±…ä ¤ì4(€€€É•ÑÕÉ¸¹•ÜI½Õ¹‘½¹™¥ÕÉ…Ñ¥½¸ 4(€€€€€€€Ù…±Õ”¹µ¥¹¥µÕµA±…å•ÉÌ ¤°4(€€€€€€€Ù…±Õ”¹½Õ¹Ñ‘½Ý¹M•½¹‘Ì ¤°4(€€€€€€€Ù…±Õ”¹…¹•±½Õ¹Ñ‘½Ý¹]¡•¹%¹ÍÕ™™¥¥•¹Ð ¤°4(€€€€€€€Ù…±Õ”¹©½¥¹%¹AÉ½É•ÍÌ ¤°4(€€€€€€€Ù…±Õ”¹•¹‘MÉ••¹M•½¹‘Ì ¤°4(€€€€€€€Ù…±Õ”¹ÍÑ…ÉÑ¥¹A½¥¹ÑÌ ¤°4(€€€€€€€Ù…±Õ”¹µ…á¥µÕµI½Õ¹ ¤°4(€€€€€€€Ù…±Õ”¹™¥ÉÍÑI½Õ¹‘•±…åM•½¹‘Ì ¤°4(€€€€€€€Ù…±Õ”¹ÑÉ…¹Í¥Ñ¥½¹M•½¹‘Ì ¤°4(€€€€€€€Ù…±Õ”¹•¹•µå	…Í” ¤°4(€€€€€€€Ù…±Õ”¹•¹•µ¥•ÍA•ÉI½Õ¹ ¤°4(€€€€€€€Ù…±Õ”¹Á±…å•É5Õ±Ñ¥Á±¥•È ¤°4(€€€€€€€Ù…±Õ”¹µ¥¹¥µÕµ¹•µ¥•Ì ¤°4(€€€€€€€Ù…±Õ”¹µ…á¥µÕµ¹•µ¥•Ì ¤°4(€€€€€€€Ù…±Õ”¹‰…Í•!•…±Ñ  ¤°4(€€€€€€€Ù…±Õ”¹¡•…±Ñ¡5Õ±Ñ¥Á±¥•È ¤°4(€€€€€€€Ù…±Õ”¹µ…á¥µÕµ!•…±Ñ  ¤°4(€€€€€€€Ù…±Õ”¹µ…á¥µÕµ±¥Ù•	…Í” ¤°4(€€€€€€€Ù…±Õ”¹µ…á¥µÕµ±¥Ù•A•ÉA±…å•È ¤°4(€€€€€€€Ù…±Õ”¹¥¹¥Ñ¥…±MÁ…Ý¹•±…åQ¥­Ì ¤°4(€€€€€€€Ù…±Õ”¹ÍÁ…Ý¹•±…åQ¥­Ì ¤°4(€€€€€€€Ù…±Õ”¹µ¥¹¥µÕµMÁ…Ý¹•±…åQ¥­Ì ¤°4(€€€€€€€Ù…±Õ”¹‰…Ñ¡M¥é” ¤°4(€€€€€€€Ù…±Õ”¹‘½Ý¹•‘¹…‰±• ¤°4(€€€€€€€Ù…±Õ”¹‰±••‘=ÕÑM•½¹‘Ì ¤°4(€€€€€€€Ù…±Õ”¹É•Ù¥Ù•M•½¹‘Ì ¤°4(€€€€€€€Ù…±Õ”¹É•Ù¥Ù•!•…±Ñ  ¤°4(€€€€€€€Ù…±Õ”¹Á½¥¹ÑÍA•É-¥±° ¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ‘½Õ‰±”µ…á¥µÕµ!•…±Ñ ¡A±…å•ÈÁ±…å•È¤ì4(€€€Ù…È…ÑÑÉ¥‰ÕÑ”€ôÁ±…å•È¹•ÑÑÑÉ¥‰ÕÑ”¡A…Á•ÉÑÑÉ¥‰ÕÑ•I•Í½±Ù•È¹µ…á!•…±Ñ  ¤¤ì4(€€€É•ÑÕÉ¸…ÑÑÉ¥‰ÕÑ”€ôô¹Õ±°€ü€ÈÀ¸À€è…ÑÑÉ¥‰ÕÑ”¹•ÑY…±Õ” ¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ‰½½±•…¸Ñ•±•Á½ÉÑQ½A±…å•ÉMÁ…Ý¸¡IÕ¹Ñ¥µ•MÑ…Ñ”ÉÕ¹Ñ¥µ”°A±…å•ÈÁ±…å•È¤ì4(€€€]½É±Ý½É±€ô	Õ­­¥Ð¹•Ñ]½É±¡ÉÕ¹Ñ¥µ”¹Ý½É±‘9…µ”¤ì4(€€€¥˜€¡Ý½É±€ôô¹Õ±°¤ì4(€€€€€É•ÑÕÉ¸™…±Í”ì4(€€€ô4(€€€Ù…ÈÁ½¥¹Ð€ôÉÕ¹Ñ¥µ”¹µ…À¹Á±…å•ÉMÁ…Ý¸ ¤¹½É±Í•Q¡É½Ü ¤ì4(€€€É•ÑÕÉ¸Á±…å•È¹Ñ•±•Á½ÉÐ 4(€€€€€€€¹•Ü1½…Ñ¥½¸¡Ý½É±°Á½¥¹Ð¹à ¤°Á½¥¹Ð¹ä ¤°Á½¥¹Ð¹è ¤°Á½¥¹Ð¹å…Ü ¤°Á½¥¹Ð¹Á¥Ñ  ¤¤¤ì4(€ô4(4(€ÁÉ¥Ù…Ñ”Ù½¥…¹¹½Õ¹”¡½±±•Ñ¥½¸ñUU%øÁ±…å•ÉÌ°MÑÉ¥¹œ­•ä°MÑÉ¥¹œ¸¸¸Á±…•¡½±‘•ÉÌ¤ì4(€€€½µÁ½¹•¹ÐÑ•áÐ€ôµ•ÍÍ…•Ì¹É•¹‘•È¡­•ä°Á±…•¡½±‘•ÉÌ¤ì4(€€€™½È€¡UU%Á±…å•É%€èÁ±…å•ÉÌ¤ì4(€€€€€A±…å•ÈÁ±…å•È€ô	Õ­­¥Ð¹•ÑA±…å•È¡Á±…å•É%¤ì4(€€€€€¥˜€¡Á±…å•È€„ô¹Õ±°¤ì4(€€€€€€€Á±…å•È¹Í¡½ÝQ¥Ñ±”¡Q¥Ñ±”¹Ñ¥Ñ±”¡Ñ•áÐ°½µÁ½¹•¹Ð¹•µÁÑä ¤¤¤ì4(€€€€€ô4(€€€ô4(€ô4(4(€ÁÉ¥Ù…Ñ”ÍÑ…Ñ¥Œ™¥¹…°±…ÍÌIÕ¹Ñ¥µ•MÑ…Ñ”ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°i½µ‰¥•…µ”…µ”ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°5…Á•™¥¹¥Ñ¥½¸µ…Àì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°MÑÉ¥¹œÝ½É±‘9…µ”ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°5…ÀñUU%°Ñ¥Ù•¹Ñ¥Ñäø•¹Ñ¥Ñ¥•Ì€ô¹•Ü1¥¹­•‘!…Í¡5…Àðø ¤ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°5…ÀñMÑÉ¥¹œ°%¹Ñ••Èø…±¥Ù•	åMÁ…Ý¸€ô¹•Ü1¥¹­•‘!…Í¡5…Àðø ¤ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°5…ÀñMÑÉ¥¹œ°1½¹œø±…ÍÑMÁ…Ý¹Q¥¬€ô¹•Ü1¥¹­•‘!…Í¡5…Àðø ¤ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°5…ÀñUU%°1½¹œø‰±••‘=ÕÐ€ô¹•Ü1¥¹­•‘!…Í¡5…Àðø ¤ì4(€€€ÁÉ¥Ù…Ñ”™¥¹…°5…ÀñUU%°I•Ù¥Ù•ÑÑ•µÁÐøÉ•Ù¥Ù•Ì€ô¹•Ü1¥¹­•‘!…Í¡5…Àðø ¤ì4(€€€ÁÉ¥Ù…Ñ”±½¹œ¹•áÑÑ¥½¹Ðì4(€€€ÁÉ¥Ù…Ñ”±½¹œ•¹‘Ðì4(€€€ÁÉ¥Ù…Ñ”‰½½±•…¸•¹‘¥¹œì4(4(€€€ÁÉ¥Ù…Ñ”IÕ¹Ñ¥µ•MÑ…Ñ”¡i½µ‰¥•…µ”…µ”°5…Á•™¥¹¥Ñ¥½¸µ…À°MÑÉ¥¹œÝ½É±‘9…µ”°±½¹œ¹•áÑÑ¥½¹Ð¤ì4(€€€€€Ñ¡¥Ì¹…µ”€ô…µ”ì4(€€€€€Ñ¡¥Ì¹µ…À€ôµ…Àì4(€€€€€Ñ¡¥Ì¹Ý½É±‘9…µ”€ôÝ½É±‘9…µ”ì4(€€€€€Ñ¡¥Ì¹¹•áÑÑ¥½¹Ð€ô¹•áÑÑ¥½¹Ðì4(€€€ô4(€ô4(4(€ÁÉ¥Ù…Ñ”É•½ÉI•Ù¥Ù•ÑÑ•µÁÐ¡UU%É•Ù¥Ù•È°±½¹œ½µÁ±•Ñ•Ð¤íô4(4(€ÁÉ¥Ù…Ñ”É•½ÉÑ¥Ù•¹Ñ¥Ñä¡¥¹ÐÉ½Õ¹°MÑÉ¥¹œÍÁ…Ý¹%¤íô4)ô4

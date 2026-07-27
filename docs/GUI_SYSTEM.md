@@ -1,6 +1,6 @@
 # Système GUI
 
-**Statut :** framework configurable et écrans fondamentaux opérationnels au Ticket 003.
+**Statut :** framework configurable et parcours joueur/administrateur opérationnels.
 
 ## Architecture
 
@@ -40,15 +40,17 @@ ne nécessitent aucun listener supplémentaire.
 
 ## Menus livrés
 
-- `/zombies` : menu joueur et accès aux instances ;
-- `/zombie admin` : accueil administration ;
+- `/zombies` : accueil joueur, catalogue publié et sortie de partie ;
+- `/zombies admin` : accueil administration consolidé ;
+- maps joueur : informations, état temps réel et entrée automatique ;
+- maps administrateur : création, édition, validation, test, publication et versions ;
 - maps : recherche, pagination, aperçu et création d'instance ;
 - instances : état dynamique, entrée et arrêt confirmé ;
 - diagnostics : versions, compteurs, lobby, stockage et avertissements ;
 - confirmation partagée.
 
-Groupe, profil, statistiques, paramètres, éditeurs, duplication, export, suppression de map,
-observation et nettoyage forcé sont explicitement indiqués comme futurs.
+Groupe, profil et statistiques persistantes restent absents tant que leur modèle de données n'est
+pas livré. Les commandes techniques restent disponibles pour la console et le diagnostic.
 
 ## Configuration et thèmes
 
@@ -102,9 +104,10 @@ les 20 ticks et actualise les inventaires en place selon leur intervalle.
 
 ## Permissions et erreurs
 
-Les permissions sont `zombie.gui.player`, `admin`, `maps`, `instances`, `settings`, `diagnostics`
-et `dangerous-actions`. Elles sont revérifiées au clic. Le YAML choisit si un refus masque le
-bouton ou affiche une barrière avec la permission requise.
+Les permissions historiques restent compatibles. Le parcours courant utilise
+`zombies.menu.player`, `zombies.menu.admin`, `zombies.admin.maps.*`,
+`zombies.admin.games.view`, `zombies.admin.config.view` et `zombies.admin.diagnostics`. Elles sont
+revérifiées au clic.
 
 Une taille invalide, collision, action ou thème inconnu est journalisé et refuse le reload. Une
 exception d'action est journalisée et signalée au joueur sans casser le moteur.

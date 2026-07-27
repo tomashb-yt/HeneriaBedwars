@@ -160,8 +160,7 @@ public final class GuiScreens {
   }
 
   private void renderPlayer(GuiView view, GuiContext ignored) {
-    for (String key :
-        List.of("play", "join", "group", "profile", "statistics", "settings", "help")) {
+    for (String key : List.of("play", "leave", "statistics", "settings", "help", "admin")) {
       view.configured(key);
     }
   }
@@ -169,7 +168,18 @@ public final class GuiScreens {
   private void renderAdmin(GuiView view, GuiContext ignored) {
     for (String key :
         List.of(
-            "maps", "instances", "settings", "editor", "diagnostics", "documentation", "reload")) {
+            "maps",
+            "instances",
+            "weapons",
+            "zombies",
+            "economy",
+            "powerups",
+            "settings",
+            "editor",
+            "diagnostics",
+            "documentation",
+            "reload",
+            "player")) {
       view.configured(key);
     }
   }

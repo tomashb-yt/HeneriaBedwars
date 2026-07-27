@@ -15,6 +15,7 @@ public final class MapEditorService {
   private final MapPersistence persistence;
   private final Clock clock;
   private final ConcurrentHashMap<UUID, MapEditorSession> sessions = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, UUID> mapEditors = new ConcurrentHashMap<>();
 
   public MapEditorService(MapRegistry registry, MapPersistence persistence, Clock clock) {
     this.registry = Objects.requireNonNull(registry, "registry");
@@ -42,15 +43,35 @@ public final class MapEditorService {
     return persistence.save(definition).thenApply(ignored -> definition);
   }
 
+  /** Registers and persists a complete copy after its physical world has been duplicated. */
+  public CompletableFuture<MapDefinition> duplicate(
+      String sourceId, String newId, UUID creator, String newWorld) {
+    MapDefinition source =
+        registry
+            .find(sourceId)
+            .orElseThrow(() -> new IllegalArgumentException("Unknown source map"));
+    MapDefinition definition = source.duplicatedAs(newId, creator, clock.instant(), newWorld);
+    if (!registry.register(definition)) {
+      return CompletableFuture.failedFuture(new IllegalArgumentException("Map already exists"));
+    }
+    return persistence.save(definition).thenApply(ignored -> definition);
+  }
+
   public Optional<MapEditorSession> open(UUID playerId, String mapId) {
     MapDefinition definition = registry.find(mapId).orElse(null);
     if (definition == null || sessions.containsKey(playerId)) {
       return Optional.empty();
     }
+    UUID currentEditor = mapEditors.putIfAbsent(mapId, playerId);
+    if (currentEditor != null && !currentEditor.equals(playerId)) {
+      return Optional.empty();
+    }
     MapEditorSession session = new MapEditorSession(playerId, definition, clock.instant());
-    return sessions.putIfAbsent(playerId, session) == null
-        ? Optional.of(session)
-        : Optional.empty();
+    if (sessions.putIfAbsent(playerId, session) == null) {
+      return Optional.of(session);
+    }
+    mapEditors.remove(mapId, playerId);
+    return Optional.empty();
   }
 
   public Optional<MapEditorSession> session(UUID playerId) {
@@ -59,9 +80,11 @@ public final class MapEditorService {
 
   public CompletableFuture<Boolean> leave(UUID playerId) {
     MapEditorSession removed = sessions.remove(playerId);
-    return removed == null
-        ? CompletableFuture.completedFuture(false)
-        : saveWorkingCopy(removed).thenApply(ignored -> true);
+    if (removed == null) {
+      return CompletableFuture.completedFuture(false);
+    }
+    mapEditors.remove(removed.definition().id(), playerId);
+    return saveWorkingCopy(removed).thenApply(ignored -> true);
   }
 
   public CompletableFuture<MapDefinition> mutate(
@@ -105,6 +128,11 @@ public final class MapEditorService {
 
   public Map<UUID, MapEditorSession> sessions() {
     return Map.copyOf(sessions);
+  }
+
+  /** Returns the administrator currently holding a map edit lock. */
+  public Optional<UUID> editorOf(String mapId) {
+    return Optional.ofNullable(mapEditors.get(mapId));
   }
 
   private CompletableFuture<Void> saveWorkingCopy(MapEditorSession session) {

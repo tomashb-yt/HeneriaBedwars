@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -40,6 +41,7 @@ public final class InstanceCoordinator {
   private final ContextScoreboardService scoreboards;
   private final VisibilityService visibility;
   private final Executor mainThread;
+  private final Function<String, Optional<java.nio.file.Path>> publishedWorlds;
 
   /**
    * Creates the coordinator.
@@ -63,7 +65,8 @@ public final class InstanceCoordinator {
       PaperPlayerStateService playerStates,
       ContextScoreboardService scoreboards,
       VisibilityService visibility,
-      Executor mainThread) {
+      Executor mainThread,
+      Function<String, Optional<java.nio.file.Path>> publishedWorlds) {
     this.instances = Objects.requireNonNull(instances, "instances");
     this.sessions = Objects.requireNonNull(sessions, "sessions");
     this.templates = Objects.requireNonNull(templates, "templates");
@@ -73,6 +76,7 @@ public final class InstanceCoordinator {
     this.scoreboards = Objects.requireNonNull(scoreboards, "scoreboards");
     this.visibility = Objects.requireNonNull(visibility, "visibility");
     this.mainThread = Objects.requireNonNull(mainThread, "mainThread");
+    this.publishedWorlds = Objects.requireNonNull(publishedWorlds, "publishedWorlds");
   }
 
   /**
@@ -83,24 +87,59 @@ public final class InstanceCoordinator {
    * @return future created snapshot
    */
   public CompletableFuture<GameInstanceSnapshot> create(String mapId, Optional<UUID> owner) {
+    return create(mapId, owner, java.util.OptionalInt.empty());
+  }
+
+  /**
+   * Creates an instance with the capacity declared by a validated editorial snapshot.
+   *
+   * @param mapId template identifier
+   * @param owner optional owner
+   * @param maximumPlayers validated capacity
+   * @return future created snapshot
+   */
+  public CompletableFuture<GameInstanceSnapshot> create(
+      String mapId, Optional<UUID> owner, int maximumPlayers) {
+    if (maximumPlayers < 1) {
+      return CompletableFuture.failedFuture(
+          new IllegalArgumentException("Maximum players must be positive"));
+    }
+    return create(mapId, owner, java.util.OptionalInt.of(maximumPlayers));
+  }
+
+  private CompletableFuture<GameInstanceSnapshot> create(
+      String mapId, Optional<UUID> owner, java.util.OptionalInt capacity) {
     return templates
         .find(mapId)
         .thenCompose(
             template ->
                 template
                     .map(
-                        value ->
-                            instances.createInstance(
+                        value -> {
+                          GameInstanceOptions options =
+                              new GameInstanceOptions(
+                                  capacity.orElse(value.maximumPlayers()),
+                                  owner,
+                                  owner.isPresent()
+                                      ? fr.heneria.zombie.core.instance.InstanceAccess.PRIVATE
+                                      : fr.heneria.zombie.core.instance.InstanceAccess.PUBLIC);
+                          if (owner.isEmpty()) {
+                            Optional<java.nio.file.Path> published = publishedWorlds.apply(mapId);
+                            if (published.isEmpty()) {
+                              return CompletableFuture.<GameInstanceSnapshot>failedFuture(
+                                  new IllegalStateException(
+                                      "No published world snapshot for " + mapId));
+                            }
+                            return instances.createInstance(
                                 mapId,
-                                new GameInstanceOptions(
-                                    value.maximumPlayers(),
-                                    owner,
-                                    owner.isPresent()
-                                        ? fr.heneria.zombie.core.instance.InstanceAccess.PRIVATE
-                                        : fr.heneria.zombie.core.instance.InstanceAccess.PUBLIC)))
+                                options,
+                                id -> worlds.prepareFrom(id, published.orElseThrow()));
+                          }
+                          return instances.createInstance(mapId, options);
+                        })
                     .orElseGet(
                         () ->
-                            CompletableFuture.failedFuture(
+                            CompletableFuture.<GameInstanceSnapshot>failedFuture(
                                 new IllegalArgumentException(
                                     "Unknown or invalid map "
                                         + mapId
@@ -121,14 +160,19 @@ public final class InstanceCoordinator {
       return CompletableFuture.completedFuture(PlayerInstanceResult.INSTANCE_NOT_FOUND);
     }
     GameInstanceSnapshot instance = found.get();
-    return templates
-        .find(instance.mapId())
-        .thenApplyAsync(
-            template ->
-                template
-                    .map(value -> joinOnMain(player, instance, value))
-                    .orElse(PlayerInstanceResult.TEMPLATE_INVALID),
-            mainThread);
+    CompletableFuture<Optional<MapTemplateDefinition>> template =
+        instance.owner().isEmpty()
+            ? publishedWorlds
+                .apply(instance.mapId())
+                .map(path -> templates.findPublished(instance.mapId(), path))
+                .orElseGet(() -> CompletableFuture.completedFuture(Optional.empty()))
+            : templates.find(instance.mapId());
+    return template.thenApplyAsync(
+        resolvedTemplate ->
+            resolvedTemplate
+                .map(value -> joinOnMain(player, instance, value))
+                .orElse(PlayerInstanceResult.TEMPLATE_INVALID),
+        mainThread);
   }
 
   /**

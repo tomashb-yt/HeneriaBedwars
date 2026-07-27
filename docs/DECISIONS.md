@@ -162,3 +162,20 @@ partie, même si les détails anciens du journal sont purgés.
 
 Conséquence : le financement individuel est sûr maintenant ; les économies d'équipe et
 contributions nécessiteront leurs propres agrégats, sans réutiliser un portefeuille joueur.
+
+## ADR-030 — Copie de travail et publication immuable
+
+Une définition éditoriale reste modifiable dans `MapRegistry`. Une publication validée crée une
+révision immuable distincte et durable. Seule la révision active au statut `PUBLISHED` alimente le
+catalogue et les nouvelles parties publiques ; une partie capture sa définition au démarrage.
+
+Une restauration ajoute une révision au lieu de réécrire l'historique. Cette séparation évite
+qu'un autosave administratif modifie la production et permet de dépublier sans interrompre les
+instances existantes.
+
+## ADR-031 — Matchmaking simple sans file artificielle
+
+Un clic joueur rejoint en priorité une instance publique disposant d'une place. En l'absence
+d'instance, le système en crée une avec le pipeline isolé existant. Aucune file persistante ou
+simulation de disponibilité n'est créée tant qu'une politique de file configurable n'est pas
+définie.

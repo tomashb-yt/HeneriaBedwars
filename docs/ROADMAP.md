@@ -1,6 +1,6 @@
 # Roadmap
 
-**Statut :** Tickets 001 à 007 terminés dans le code.
+**Statut :** socle, gameplay jusqu'au Ticket 008 et publication GUI opérationnels.
 
 ## Étapes
 
@@ -11,8 +11,9 @@
    diagnostics, recherche et confirmations terminés.
 4. **Ticket 004 — Schéma et éditeur universel :** registre, sessions, outil, GUI, sauvegarde,
    historique et validation terminés.
-5. **Activation des maps :** relier une définition éditoriale validée au catalogue de clones.
-6. **Lobby enrichi et matchmaking :** sélection de map, files et groupes.
+5. **Activation des maps :** terminé en 0.10.0 avec snapshots publiés et restauration.
+6. **Lobby enrichi et matchmaking :** sélection publiée et création automatique terminées ;
+   files configurables, groupes et statistiques restent à livrer.
 7. **Boucle classique minimale :** terminée au Ticket 005 : manches, zombies temporaires, points,
    mort, réanimation et fin contrôlée.
 8. **Moteur d'ennemis :** terminé au Ticket 006 : définitions, IA de mêlée, dégâts, capacités,
@@ -35,7 +36,15 @@ qu'avec un modèle persistant défini.
 - Double Points, Max Ammo, Insta-Kill, Nuke, drops et nettoyage ;
 - commandes, affichage, agrégats de résultat et tests automatisés.
 
+## Version 0.10.0 — menus et publication
+
+- espaces joueur et administrateur séparés sous `/zombies` ;
+- catalogue joueur limité aux versions publiées ;
+- entrée automatique dans une partie publique disponible ou nouvellement créée ;
+- création, validation, test, publication et dépublication depuis les menus ;
+- historique durable, restauration non destructive et verrou exclusif d'édition.
+
 ## Prochain ticket
 
-Ticket 009 : perks, machines, prix via `PurchaseService`, limites, effets, perte à la mise à terre
-et améliorations.
+Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,
+statistiques et files configurables.

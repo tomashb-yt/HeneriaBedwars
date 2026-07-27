@@ -122,8 +122,8 @@ et l'IA native, sans NMS. `ZombieDefinitionLoader` effectue les accès disque ho
 atomiquement le registre. Voir `ZOMBIE_ENGINE.md` et `ZOMBIE_AI.md`.
 
 Le manifeste facultatif `zombie-map.yml` reste l'adaptateur technique de clonage. Une définition
-éditoriale validée et un monde source homonyme alimentent désormais une partie de test. Le
-matchmaking et l'activation publique des maps restent à livrer.
+éditoriale validée et un monde source homonyme alimentent les tests privés et les parties
+publiques. Le sélecteur rejoint une instance disponible ou en crée une.
 
 ## Frontière économique
 
@@ -134,3 +134,15 @@ commandes.
 
 Le graphe d'appel est `gameplay -> RewardService/PurchaseService -> TransactionService ->
 GameEconomy`. Les adaptateurs ne reçoivent aucune référence mutable vers un portefeuille.
+
+## Frontière de publication
+
+Le core sépare `MapRegistry`, qui contient les copies de travail, de
+`MapPublicationService`, qui expose des `PublishedMapVersion` immuables. Le port
+`MapPublicationPersistence` garantit que la publication candidate est écrite avant son activation
+en mémoire. `YamlMapPublicationPersistence` est l'adaptateur YAML asynchrone et conserve un
+snapshot physique du monde par version.
+
+`MapMenuModule` orchestre les services et affiche leurs snapshots. `PaperGameRuntime` choisit la
+copie de travail pour une instance privée et la publication active pour une instance publique,
+puis conserve ce choix pendant toute la partie.

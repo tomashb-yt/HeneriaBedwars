@@ -67,8 +67,18 @@ public final class PaperWorldInstanceService implements WorldInstanceGateway {
 
   @Override
   public CompletableFuture<WorldInstanceHandle> prepare(UUID instanceId, String mapId) {
+    return prepareFrom(instanceId, templates.sourceDirectory(mapId));
+  }
+
+  /**
+   * Prepares an isolated instance from an already validated publication snapshot directory.
+   *
+   * @param instanceId technical owner
+   * @param source immutable world source
+   * @return prepared world
+   */
+  public CompletableFuture<WorldInstanceHandle> prepareFrom(UUID instanceId, Path source) {
     String worldName = runtimeWorldName(instanceId);
-    Path source = templates.sourceDirectory(mapId);
     Path destination = runtimeDirectory(worldName);
     return CompletableFuture.runAsync(() -> copyTemplate(source, destination), ioExecutor)
         .thenApplyAsync(

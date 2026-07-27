@@ -121,6 +121,7 @@ class GuiConfigurationServiceTest {
         () -> {
           HashSet<String> actions = new HashSet<>(GuiScreens.ACTION_IDS);
           actions.addAll(fr.heneria.zombie.plugin.editor.EditorGuiModule.ACTION_IDS);
+          actions.addAll(MapMenuModule.ACTION_IDS);
           return Set.copyOf(actions);
         },
         ignored -> {});

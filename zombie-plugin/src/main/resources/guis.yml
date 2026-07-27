@@ -18,27 +18,95 @@ menus:
     size: 54
     theme: dark
     buttons:
-      play: {slot: 20, material: NETHER_STAR, name: "<green>Jouer", lore: ["<gray>Ouvre les parties disponibles.", "", "<yellow>Cliquez pour continuer."], permission: zombie.gui.player, sound: UI_BUTTON_CLICK, actions: {left: nav.instances}}
-      join: {slot: 22, material: ENDER_EYE, name: "<aqua>Rejoindre une partie", lore: ["<gray>Consulte les instances actives."], permission: zombie.gui.player, actions: {left: nav.instances}}
-      group: {slot: 24, material: PLAYER_HEAD, name: "<dark_gray>Groupe — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
-      profile: {slot: 29, material: NAME_TAG, name: "<dark_gray>Profil — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
+      play: {slot: 20, material: NETHER_STAR, name: "<green>Jouer", lore: ["<gray>Choisir une map publiée.", "", "<yellow>Cliquez pour continuer."], permission: zombies.menu.player, sound: UI_BUTTON_CLICK, actions: {left: maps.player}}
+      leave: {slot: 24, material: RED_BED, name: "<red>Quitter la partie", lore: ["<gray>Retourner immédiatement au lobby."], permission: zombies.menu.player, actions: {left: maps.leave}}
       statistics: {slot: 31, material: BOOK, name: "<dark_gray>Statistiques — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
       settings: {slot: 33, material: COMPARATOR, name: "<dark_gray>Paramètres — indisponible", lore: ["<gray>Prévu dans un prochain ticket."], actions: {left: feedback.unavailable}}
       help: {slot: 49, material: PAPER, name: "<blue>Aide", lore: ["<gray>Utilisez /zombie help."], actions: {left: feedback.unavailable}}
+      admin: {slot: 53, material: COMMAND_BLOCK, name: "<red>Administration", lore: ["<gray>Ouvrir l'espace administrateur."], permission: zombies.menu.admin, actions: {left: nav.admin}}
 
   admin-main:
     title: "<dark_gray>Administration Zombies"
     size: 54
     theme: dark
     buttons:
-      maps: {slot: 20, material: FILLED_MAP, name: "<aqua>Gestion des maps", lore: ["<gray>Prévisualiser et créer des instances.", "", "<yellow>Cliquez pour ouvrir."], permission: zombie.gui.maps, sound: UI_BUTTON_CLICK, actions: {left: nav.maps}}
-      instances: {slot: 22, material: ENDER_EYE, name: "<light_purple>Instances actives", lore: ["<gray>Inspecter, rejoindre ou arrêter."], permission: zombie.gui.instances, actions: {left: nav.instances}}
-      settings: {slot: 24, material: COMPARATOR, name: "<dark_gray>Configuration — indisponible", lore: ["<gray>Éditeur prévu dans un prochain ticket."], permission: zombie.gui.settings, actions: {left: feedback.unavailable}}
-      editor: {slot: 29, material: BLAZE_ROD, name: "<gold>Éditeur universel", lore: ["<gray>Configure les maps entièrement en jeu.", "<yellow>Cliquez pour ouvrir la session active."], permission: zombie.editor, actions: {left: nav.editor}}
-      weapons: {slot: 30, material: CROSSBOW, name: "<gold>Catalogue des armes", lore: ["<gray>Types, statistiques et prévisualisation.", "<yellow>Cliquez pour ouvrir."], permission: zombies.admin.weapon.types, actions: {left: nav.weapons}}
-      diagnostics: {slot: 31, material: REDSTONE_TORCH, name: "<blue>Diagnostics", lore: ["<gray>État technique sans donnée sensible."], permission: zombie.gui.diagnostics, actions: {left: nav.diagnostics}}
-      documentation: {slot: 33, material: WRITABLE_BOOK, name: "<blue>Documentation et version", lore: ["<gray>Consultez /zombie et les fichiers docs."], actions: {left: feedback.unavailable}}
+      maps: {slot: 10, material: FILLED_MAP, name: "<aqua>Gestion des maps", lore: ["<gray>Créer, valider, tester et publier.", "", "<yellow>Cliquez pour ouvrir."], permission: zombies.admin.maps.view, sound: UI_BUTTON_CLICK, actions: {left: maps.admin}}
+      instances: {slot: 11, material: ENDER_EYE, name: "<light_purple>Parties et instances", lore: ["<gray>Inspecter, rejoindre ou arrêter."], permission: zombies.admin.games.view, actions: {left: nav.instances}}
+      weapons: {slot: 12, material: CROSSBOW, name: "<gold>Armes", lore: ["<gray>Catalogue et statistiques."], permission: zombies.admin.weapon.types, actions: {left: nav.weapons}}
+      zombies: {slot: 13, material: ZOMBIE_HEAD, name: "<green>Zombies", lore: ["<gray>Types et moteur d'ennemis.", "<dark_gray>Commandes avancées conservées."], permission: zombies.admin.zombie.types, actions: {left: feedback.unavailable}}
+      economy: {slot: 14, material: GOLD_INGOT, name: "<yellow>Économie", lore: ["<gray>Points et transactions.", "<dark_gray>Commandes avancées conservées."], permission: zombies.admin.economy.balance, actions: {left: feedback.unavailable}}
+      powerups: {slot: 15, material: NETHER_STAR, name: "<light_purple>Power-ups", lore: ["<gray>Bonus actifs et configuration."], permission: zombies.admin.economy.powerup, actions: {left: feedback.unavailable}}
+      editor: {slot: 19, material: BLAZE_ROD, name: "<gold>Éditeur actif", lore: ["<gray>Rouvrir la session active."], permission: zombies.admin.maps.edit, actions: {left: nav.editor}}
+      settings: {slot: 21, material: COMPARATOR, name: "<dark_gray>Configuration", lore: ["<gray>Configuration globale sécurisée."], permission: zombies.admin.config.view, actions: {left: feedback.unavailable}}
+      diagnostics: {slot: 22, material: REDSTONE_TORCH, name: "<blue>Diagnostics", lore: ["<gray>État technique sans donnée sensible."], permission: zombies.admin.diagnostics, actions: {left: nav.diagnostics}}
+      documentation: {slot: 23, material: WRITABLE_BOOK, name: "<blue>Documentation et journaux", lore: ["<gray>Consultez les diagnostics et les fichiers docs."], permission: zombies.admin.diagnostics, actions: {left: nav.diagnostics}}
       reload: {slot: 49, material: LIME_DYE, name: "<green>Recharger les GUI", lore: ["<gray>Activation atomique si la configuration est valide."], permission: zombie.command.reload, actions: {left: config.reload}}
+      player: {slot: 53, material: PLAYER_HEAD, name: "<aqua>Menu joueur", lore: ["<gray>Voir l'expérience publique."], actions: {left: nav.player}}
+
+  player-maps:
+    title: "<dark_gray>Choisir une map"
+    size: 54
+    theme: dark
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
+      previous: {slot: 47, material: SPECTRAL_ARROW, name: "<blue>Page précédente", lore: [], actions: {left: page.previous}}
+      search: {slot: 48, material: OAK_SIGN, name: "<yellow>Rechercher", lore: ["<gray>Saisie privée dans le chat."], actions: {left: maps.search}}
+      next: {slot: 51, material: SPECTRAL_ARROW, name: "<blue>Page suivante", lore: [], actions: {left: page.next}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
+
+  admin-maps:
+    title: "<dark_gray>Administration des maps"
+    size: 54
+    theme: dark
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
+      create: {slot: 46, material: LIME_DYE, name: "<green>Créer une map", lore: ["<gray>Assistant guidé par saisie privée."], permission: zombies.admin.maps.create, actions: {left: maps.create}}
+      previous: {slot: 47, material: SPECTRAL_ARROW, name: "<blue>Page précédente", lore: [], actions: {left: page.previous}}
+      search: {slot: 48, material: OAK_SIGN, name: "<yellow>Rechercher", lore: ["<gray>Saisie privée dans le chat."], actions: {left: maps.search}}
+      next: {slot: 51, material: SPECTRAL_ARROW, name: "<blue>Page suivante", lore: [], actions: {left: page.next}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
+
+  admin-map-detail:
+    title: "<dark_gray>Gestion de la map"
+    size: 45
+    theme: dark
+    buttons:
+      edit: {slot: 10, material: BLAZE_ROD, name: "<gold>Modifier", lore: ["<gray>Ouvre une copie de travail verrouillée."], permission: zombies.admin.maps.edit, actions: {left: maps.edit}}
+      duplicate: {slot: 11, material: MAP, name: "<aqua>Dupliquer", lore: ["<gray>Copie la configuration et le monde d'édition."], permission: zombies.admin.maps.create, actions: {left: maps.duplicate}}
+      validate: {slot: 12, material: SPYGLASS, name: "<yellow>Valider", lore: ["<gray>Affiche les erreurs et avertissements."], permission: zombies.admin.maps.validate, actions: {left: maps.validate}}
+      test: {slot: 14, material: ENDER_EYE, name: "<aqua>Tester", lore: ["<gray>Crée une instance privée."], permission: zombies.admin.maps.test, actions: {left: maps.test}}
+      publish: {slot: 16, material: LIME_CONCRETE, name: "<green>Publier", lore: ["<gray>Crée une version immuable visible des joueurs."], permission: zombies.admin.maps.publish, actions: {left: maps.publish}}
+      unpublish: {slot: 17, material: ORANGE_CONCRETE, name: "<gold>Dépublier", lore: ["<gray>Retire la map du catalogue sans arrêter les parties."], permission: zombies.admin.maps.unpublish, actions: {left: maps.unpublish}}
+      history: {slot: 22, material: BOOKSHELF, name: "<light_purple>Historique", lore: ["<gray>Consulter toutes les versions publiées."], permission: zombies.admin.maps.view, actions: {left: maps.history}}
+      archive: {slot: 26, material: LAVA_BUCKET, name: "<red>Archiver", lore: ["<gray>Retire la map sans supprimer son historique."], permission: zombies.admin.maps.delete, actions: {left: maps.archive}}
+      back: {slot: 36, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
+      home: {slot: 44, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
+
+  admin-map-history:
+    title: "<dark_gray>Versions publiées"
+    size: 54
+    theme: dark
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
+      previous: {slot: 47, material: SPECTRAL_ARROW, name: "<blue>Page précédente", lore: [], actions: {left: page.previous}}
+      search: {slot: 48, material: OAK_SIGN, name: "<yellow>Rechercher", lore: [], actions: {left: maps.search}}
+      next: {slot: 51, material: SPECTRAL_ARROW, name: "<blue>Page suivante", lore: [], actions: {left: page.next}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
+
+  admin-map-validation:
+    title: "<dark_gray>Validation de la map"
+    size: 54
+    theme: dark
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    buttons:
+      back: {slot: 45, material: ARROW, name: "<blue>Retour", lore: [], actions: {left: nav.back}}
+      previous: {slot: 47, material: SPECTRAL_ARROW, name: "<blue>Page précédente", lore: [], actions: {left: page.previous}}
+      search: {slot: 48, material: OAK_SIGN, name: "<yellow>Rechercher", lore: [], actions: {left: maps.search}}
+      next: {slot: 51, material: SPECTRAL_ARROW, name: "<blue>Page suivante", lore: [], actions: {left: page.next}}
+      home: {slot: 53, material: NETHER_STAR, name: "<blue>Accueil", lore: [], actions: {left: nav.home}}
 
   maps:
     title: "<dark_gray>Sélecteur de maps"

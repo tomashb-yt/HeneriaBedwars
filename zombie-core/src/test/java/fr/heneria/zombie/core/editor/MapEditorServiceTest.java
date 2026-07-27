@@ -49,6 +49,44 @@ class MapEditorServiceTest {
     assertFalse(service.session(player).isPresent());
   }
 
+  @Test
+  void locksOneMapToOneEditorUntilTheSessionLeaves() {
+    MapEditorService service =
+        new MapEditorService(new MapRegistry(), new MemoryPersistence(), Clock.systemUTC());
+    UUID creator = UUID.randomUUID();
+    UUID first = UUID.randomUUID();
+    UUID second = UUID.randomUUID();
+    service.create("crypt", "Crypt", creator, "world").join();
+
+    assertTrue(service.open(first, "crypt").isPresent());
+    assertEquals(first, service.editorOf("crypt").orElseThrow());
+    assertTrue(service.open(second, "crypt").isEmpty());
+
+    assertTrue(service.leave(first).join());
+    assertTrue(service.open(second, "crypt").isPresent());
+  }
+
+  @Test
+  void duplicatesACompleteDefinitionIntoADistinctEditingWorld() {
+    MemoryPersistence persistence = new MemoryPersistence();
+    MapEditorService service =
+        new MapEditorService(new MapRegistry(), persistence, Clock.systemUTC());
+    UUID creator = UUID.randomUUID();
+    service.create("crypt", "Crypt", creator, "world").join();
+    MapPoint point = new MapPoint("world", 4, 70, 8, 90, 0);
+    service.open(creator, "crypt");
+    service.mutate(creator, map -> map.withPlayerSpawn(point, Instant.now())).join();
+    service.leave(creator).join();
+
+    MapDefinition copy =
+        service.duplicate("crypt", "crypt_copy", creator, "zombie_editing/crypt_copy").join();
+
+    assertEquals("crypt_copy", copy.id());
+    assertEquals("zombie_editing/crypt_copy", copy.world());
+    assertEquals("zombie_editing/crypt_copy", copy.playerSpawn().orElseThrow().world());
+    assertEquals(copy, persistence.values.get("crypt_copy"));
+  }
+
   private static final class MemoryPersistence implements MapPersistence {
     private final Map<String, MapDefinition> values = new ConcurrentHashMap<>();
 

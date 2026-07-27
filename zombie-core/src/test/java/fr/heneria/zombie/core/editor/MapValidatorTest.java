@@ -58,6 +58,7 @@ class MapValidatorTest {
             "world",
             "FILLED_MAP",
             "",
+            1,
             4,
             "",
             "NORMAL",

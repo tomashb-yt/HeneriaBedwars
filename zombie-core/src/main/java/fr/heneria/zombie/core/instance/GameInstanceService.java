@@ -67,6 +67,21 @@ public final class GameInstanceService {
    */
   public CompletableFuture<GameInstanceSnapshot> createInstance(
       String mapId, GameInstanceOptions options) {
+    return createInstance(mapId, options, id -> worlds.prepare(id, mapId));
+  }
+
+  /**
+   * Creates an instance with an explicitly selected, platform-owned world preparation pipeline.
+   *
+   * @param mapId logical map identifier
+   * @param options creation options
+   * @param preparation isolated world preparation function
+   * @return future prepared snapshot
+   */
+  public CompletableFuture<GameInstanceSnapshot> createInstance(
+      String mapId,
+      GameInstanceOptions options,
+      java.util.function.Function<UUID, CompletableFuture<WorldInstanceHandle>> preparation) {
     GameInstance instance;
     synchronized (capacityLock) {
       int maximum = maximumConcurrentGames.getAsInt();
@@ -78,8 +93,8 @@ public final class GameInstanceService {
       registry.register(instance);
     }
 
-    return worlds
-        .prepare(instance.id(), mapId)
+    return preparation
+        .apply(instance.id())
         .orTimeout(creationTimeout.get().toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS)
         .thenApply(
             handle -> {

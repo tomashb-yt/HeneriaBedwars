@@ -2,6 +2,35 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.10.0-SNAPSHOT — Menus et publication des maps
+
+### Ajouté
+
+- `/zombies` ouvre le menu joueur et `/zombies admin` l'espace administratif ;
+- catalogue des seules maps publiées avec informations, état et occupation en temps réel ;
+- entrée automatique dans une instance publique disponible ou création d'une nouvelle partie ;
+- gestion GUI des maps : création, édition, validation, test, publication et dépublication ;
+- duplication complète de la configuration et du monde d'édition, archivage sans perte ;
+- joueurs minimum/maximum configurables et attente jusqu'au seuil de démarrage ;
+- validation paginée avec détail, solution et téléportation lorsqu'une position existe ;
+- statuts explicites, versions immuables, historique durable et restauration confirmée ;
+- permissions séparées `zombies.menu.*`, `zombies.admin.maps.*`, parties et diagnostics.
+
+### Sécurité
+
+- copie de travail distincte de la version publiée ;
+- snapshot physique des blocs par version et clonage public depuis ce snapshot ;
+- publication activée seulement après validation, contrôle du modèle et écriture réussie ;
+- sérialisation des publications concurrentes par map ;
+- verrou exclusif d'édition ;
+- parties actives conservant le snapshot capturé à leur démarrage.
+- démarrage du JAR validé sur Paper 1.21.11 build 132 avec Java 21.
+
+### Modifié
+
+- les commandes techniques restent disponibles pour debug, console et secours ;
+- version portée à `0.10.0-SNAPSHOT`.
+
 ## 0.9.2-SNAPSHOT — Stabilisation des interactions
 
 ### Corrigé

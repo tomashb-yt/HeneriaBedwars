@@ -36,6 +36,7 @@ class YamlMapPersistenceTest {
             "world",
             "FILLED_MAP",
             "crypt.png",
+            1,
             4,
             "music.crypt",
             "HARD",

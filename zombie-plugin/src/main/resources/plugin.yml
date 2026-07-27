@@ -13,9 +13,9 @@ commands:
     usage: /zombie [help|lobby|admin|reload|map|instance]
     permission: zombie.command.use
   zombies:
-    description: Opens the HeneriaZombie player menu
-    usage: /zombies
-    permission: zombie.gui.player
+    description: Opens the HeneriaZombie player or administrative menu
+    usage: /zombies [player|admin]
+    permission: zombies.menu.player
   zmap:
     description: Creates and edits versioned Zombies maps in game
     usage: /zmap [create|edit|leave|validate|test|save|undo|redo]
@@ -56,6 +56,20 @@ permissions:
       zombie.gui.settings: true
       zombie.gui.diagnostics: true
       zombie.gui.dangerous-actions: true
+      zombies.menu.player: true
+      zombies.menu.admin: true
+      zombies.admin.maps.view: true
+      zombies.admin.maps.create: true
+      zombies.admin.maps.edit: true
+      zombies.admin.maps.validate: true
+      zombies.admin.maps.test: true
+      zombies.admin.maps.publish: true
+      zombies.admin.maps.unpublish: true
+      zombies.admin.maps.rollback: true
+      zombies.admin.maps.delete: true
+      zombies.admin.games.view: true
+      zombies.admin.config.view: true
+      zombies.admin.diagnostics: true
       zombies.admin.game.start: true
       zombies.admin.game.stop: true
       zombies.admin.game.round: true
@@ -122,6 +136,48 @@ permissions:
     default: op
   zombie.gui.dangerous-actions:
     description: Confirms destructive GUI actions
+    default: op
+  zombies.menu.player:
+    description: Opens the public Zombies menu and published map catalogue
+    default: true
+  zombies.menu.admin:
+    description: Opens the consolidated administrative menu
+    default: op
+  zombies.admin.maps.view:
+    description: Views editable maps and their publication state
+    default: op
+  zombies.admin.maps.create:
+    description: Creates editable maps through the guided menu
+    default: op
+  zombies.admin.maps.edit:
+    description: Opens an exclusive map working copy
+    default: op
+  zombies.admin.maps.validate:
+    description: Runs structural map validation
+    default: op
+  zombies.admin.maps.test:
+    description: Starts private map test instances
+    default: op
+  zombies.admin.maps.publish:
+    description: Publishes and unpublishes immutable map versions
+    default: op
+  zombies.admin.maps.unpublish:
+    description: Removes a map from the player catalogue without stopping active games
+    default: op
+  zombies.admin.maps.rollback:
+    description: Restores a historical map and world snapshot as a new version
+    default: op
+  zombies.admin.maps.delete:
+    description: Archives unused maps after a protected confirmation
+    default: op
+  zombies.admin.games.view:
+    description: Views and joins active game instances
+    default: op
+  zombies.admin.config.view:
+    description: Views global configuration controls
+    default: op
+  zombies.admin.diagnostics:
+    description: Views diagnostics and operational information
     default: op
   zombies.admin.game.start:
     description: Starts a game in an existing instance

@@ -95,6 +95,22 @@ diagnostics et confirmation. Ils réutilisent les services du Ticket 002.
 L'éditeur configure les informations, zones, portes, spawns et objets sans YAML manuel. Groupe,
 profil, statistiques et export restent désactivés. Le rendu doit encore être validé manuellement.
 
+## Menus et publication 0.10.0
+
+`/zombies` est désormais l'entrée joueur : seules les versions au statut `PUBLISHED` sont
+affichées et un clic rejoint une instance publique ou en crée une. `/zombies admin` ouvre la
+gestion centrale. La gestion des maps permet création, édition verrouillée, validation, test,
+publication, dépublication, historique et restauration.
+
+`MapPublicationService` est dans le core. Il persiste via `YamlMapPublicationPersistence` des
+snapshots immuables numérotés. `map.yml` reste la copie de travail. `PaperGameRuntime` utilise la
+publication pour une instance publique et la copie de travail pour un test privé. Une partie
+capture toujours sa définition.
+
+Voir `MAP_PUBLICATION.md`. Les commandes `/zmap`, `/zgame`, `/zzombie`, `/zweapon` et `/zeconomy`
+restent les surfaces avancées. Les statistiques persistantes, groupes, files configurables et
+options de simulation qui dépendent des futurs moteurs ne doivent pas être présentés comme actifs.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec
