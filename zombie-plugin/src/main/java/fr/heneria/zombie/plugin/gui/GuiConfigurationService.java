@@ -33,7 +33,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public final class GuiConfigurationService {
 
   private static final String RESOURCE = "guis.yml";
-  private static final int CURRENT_SCHEMA = 2;
+  private static final int CURRENT_SCHEMA = 3;
   private final Path dataDirectory;
   private final ClassLoader resourceLoader;
   private final Executor ioExecutor;
@@ -142,16 +142,22 @@ public final class GuiConfigurationService {
    */
   private static void migrateLegacy(YamlConfiguration candidate) {
     int schema = candidate.getInt("schema-version", 1);
-    if (schema >= CURRENT_SCHEMA) {
-      return;
+    if (schema < 2) {
+      removeLegacyButton(candidate, "join", "nav.instances");
+      removeLegacyButton(candidate, "group", "feedback.unavailable");
+      removeLegacyButton(candidate, "profile", "feedback.unavailable");
+      String playAction = candidate.getString("menus.player-main.buttons.play.actions.left", "");
+      if ("nav.instances".equals(playAction)) {
+        candidate.set("menus.player-main.buttons.play.actions.left", "maps.player");
+        candidate.set("menus.player-main.buttons.play.permission", "zombies.menu.player");
+      }
     }
-    removeLegacyButton(candidate, "join", "nav.instances");
-    removeLegacyButton(candidate, "group", "feedback.unavailable");
-    removeLegacyButton(candidate, "profile", "feedback.unavailable");
-    String playAction = candidate.getString("menus.player-main.buttons.play.actions.left", "");
-    if ("nav.instances".equals(playAction)) {
-      candidate.set("menus.player-main.buttons.play.actions.left", "maps.player");
-      candidate.set("menus.player-main.buttons.play.permission", "zombies.menu.player");
+    if (schema < 3) {
+      String mapsAction = candidate.getString("menus.admin-main.buttons.maps.actions.left", "");
+      if ("nav.maps".equals(mapsAction)) {
+        candidate.set("menus.admin-main.buttons.maps.actions.left", "maps.admin");
+        candidate.set("menus.admin-main.buttons.maps.permission", "zombies.admin.maps.view");
+      }
     }
     candidate.set("schema-version", CURRENT_SCHEMA);
   }

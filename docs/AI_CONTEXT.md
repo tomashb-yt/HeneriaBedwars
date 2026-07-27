@@ -123,6 +123,11 @@ la définition (spawns et objets inclus), l'historique publié, les snapshots et
 monde d'édition au chemin possédé `zombie_editing/hz_edit_<mapId>` peut être supprimé ; un monde
 serveur externe n'est jamais effacé.
 
+Le correctif `0.10.2` porte le schéma GUI à `3` et migre également l'ancien bouton
+`menus.admin-main.buttons.maps` de `nav.maps` vers `maps.admin`. Sans cette redirection, un ancien
+fichier ouvrait le sélecteur technique au lieu du gestionnaire donnant accès au test, à la
+publication et à la suppression.
+
 ## Reprise
 
 Les Tickets 001 à 007 sont terminés dans le code. Une map validée se teste avec

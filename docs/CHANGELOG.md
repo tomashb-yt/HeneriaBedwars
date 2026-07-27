@@ -2,6 +2,15 @@
 
 Toutes les évolutions notables de HeneriaZombie sont consignées ici.
 
+## 0.10.2-SNAPSHOT — Accès au gestionnaire de maps
+
+### Corrigé
+
+- migration de l'ancien bouton administratif `Gestion des maps` de `nav.maps` vers `maps.admin` ;
+- accès restauré au détail contenant modification, validation, test, publication, archivage et
+  suppression ;
+- schéma GUI porté à `3`.
+
 ## 0.10.1-SNAPSHOT — Migration GUI et suppression complète
 
 ### Corrigé

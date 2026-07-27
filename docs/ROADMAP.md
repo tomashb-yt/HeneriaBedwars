@@ -51,6 +51,9 @@ qu'avec un modèle persistant défini.
   snapshots et mondes possédés ;
 - protection absolue des mondes serveur externes.
 
+Le correctif `0.10.2` restaure l'accès au gestionnaire complet depuis les anciens menus
+administratifs.
+
 ## Prochain ticket
 
 Perks, machines et réglages de test avancés fondés sur leurs moteurs réels, puis groupes,

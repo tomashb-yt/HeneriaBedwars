@@ -109,6 +109,9 @@ class GuiConfigurationServiceTest {
     assertEquals(
         "<red>Administration personnalisée",
         snapshot.menu(new GuiId("admin-main")).orElseThrow().title());
+    assertEquals(
+        "maps.admin",
+        snapshot.menu(new GuiId("admin-main")).orElseThrow().buttons().get("maps").leftAction());
     assertEquals("dark", editor.theme());
     assertEquals(10, information.slot());
     assertEquals(org.bukkit.Material.BOOK, information.material());
